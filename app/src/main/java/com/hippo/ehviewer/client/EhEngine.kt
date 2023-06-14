@@ -40,6 +40,7 @@ import com.hippo.ehviewer.client.parser.ProfileParser
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.SignInParser
 import com.hippo.ehviewer.client.parser.TorrentParser
+import com.hippo.ehviewer.client.parser.TorrentResult
 import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dailycheck.showEventNotification
@@ -129,7 +130,7 @@ private suspend inline fun <T> Request.executeAndParsingWith(block: String.() ->
 }
 
 object EhEngine {
-    suspend fun getTorrentList(url: String, gid: Long, token: String?): List<TorrentParser.Result> {
+    suspend fun getTorrentList(url: String, gid: Long, token: String?): TorrentResult {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         return ehRequest(url, referer).executeAndParsingWith(TorrentParser::parse)
     }

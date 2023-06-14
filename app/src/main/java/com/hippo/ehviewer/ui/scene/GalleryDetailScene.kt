@@ -137,7 +137,7 @@ import com.hippo.ehviewer.client.exception.NoHAtHClientException
 import com.hippo.ehviewer.client.parser.ArchiveParser
 import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
-import com.hippo.ehviewer.client.parser.TorrentParser
+import com.hippo.ehviewer.client.parser.TorrentResult
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.coil.read
@@ -204,7 +204,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private var favButtonText by mutableStateOf("")
     private var getDetailError by mutableStateOf("")
 
-    private var mTorrentList: List<TorrentParser.Result>? = null
+    private var mTorrentList: TorrentResult? = null
     private var requestStoragePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { result: Boolean ->
@@ -1696,7 +1696,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
         }
 
-        private fun bind(data: List<TorrentParser.Result>?) {
+        private fun bind(data: TorrentResult?) {
             if (null == mDialog || null == mProgressView || null == mErrorText || null == mListView) {
                 return
             }

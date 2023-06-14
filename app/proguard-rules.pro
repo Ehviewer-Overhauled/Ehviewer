@@ -13,6 +13,8 @@
 
 -keep class androidx.viewpager.widget.ViewPager$LayoutParams { int position; }
 
+-keep class com.hippo.ehviewer.client.parser.Torrent
+
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
 
