@@ -10,7 +10,6 @@ object HomeParser {
 
     fun parse(body: String): Limits {
         val value = parseLimit(body)
-        check(value.size == 3)
         if (value[0] == -1) throw ParseException("Parse image limits error", body)
         return Limits(value[0], value[1], value[2])
     }
