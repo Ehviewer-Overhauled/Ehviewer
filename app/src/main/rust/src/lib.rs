@@ -7,21 +7,21 @@ extern crate quick_xml;
 extern crate regex;
 extern crate tl;
 
-use std::ffi::c_void;
-
 use android_logger::Config;
 use apply::Also;
 use jni::objects::{JClass, JList, JObject, JObjectArray, JString};
 use jni::sys::{jint, jintArray, JavaVM, JNI_VERSION_1_6};
 use jni::JNIEnv;
-use once_cell::sync::Lazy;
 use quick_xml::escape::unescape;
-use regex::Regex;
+use std::ffi::c_void;
 use tl::{Parser, VDom};
 
-static TORRENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new("</span> ([0-9-]+) [0-9:]+</td>[\\s\\S]+</span> ([0-9.]+ [KMGT]B)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span>([^<]+)</td>[\\s\\S]+onclick=\"document.location='([^\"]+)'[^<]+>([^<]+)</a>").unwrap()
-});
+macro_rules! regex {
+    ($re:literal $(,)?) => {{
+        static RE: once_cell::sync::OnceCell<regex::Regex> = once_cell::sync::OnceCell::new();
+        RE.get_or_init(|| regex::Regex::new($re).unwrap())
+    }};
+}
 
 fn parse_jni_string<F, R>(env: &mut JNIEnv, str: &JString, mut f: F) -> Option<R>
 where
@@ -115,7 +115,8 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_TorrentParserKt_par
             .filter_map(|e| {
                 let array = env.new_object_array(7, &string, JObject::null()).ok()?;
                 let html = e.get(parser)?.inner_html(parser);
-                let grp = TORRENT_REGEX.captures(&html)?;
+                let reg = regex!("</span> ([0-9-]+) [0-9:]+</td>[\\s\\S]+</span> ([0-9.]+ [KMGT]B)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span>([^<]+)</td>[\\s\\S]+onclick=\"document.location='([^\"]+)'[^<]+>([^<]+)</a>");
+                let grp = reg.captures(&html)?;
                 let name = unescape(&grp[8]).ok()?;
                 let vec = vec![&grp[1], &grp[2], &grp[3], &grp[4], &grp[5], &grp[7], &name];
                 vec.iter().enumerate().for_each(|(i, &n)| {
