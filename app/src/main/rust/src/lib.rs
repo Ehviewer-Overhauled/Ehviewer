@@ -11,11 +11,9 @@ fn parse_limit(body: &str) -> Option<Vec<i32>> {
     let html2 = home_box.inner_html(parser);
     let dom2 = tl::parse(&*html2, tl::ParserOptions::default()).ok()?;
     let parser = dom2.parser();
-    let mut iter = dom2.query_selector("strong")?;
-    let v1 = iter.next()?.get(parser)?.inner_text(parser).parse::<i32>().unwrap_or(0);
-    let v2 = iter.next()?.get(parser)?.inner_text(parser).parse::<i32>().unwrap_or(0);
-    let v3 = iter.next()?.get(parser)?.inner_text(parser).parse::<i32>().unwrap_or(0);
-    Some(vec![v1, v2, v3])
+    let iter = dom2.query_selector("strong")?;
+    let vec: Vec<i32> = iter.filter_map(|e| Some(e.get(parser)?.inner_text(parser).parse::<i32>().ok()?)).collect();
+    Some(vec)
 }
 
 #[no_mangle]
