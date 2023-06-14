@@ -75,7 +75,8 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_FavoritesParserKt_p
                 let top = e.get(parser)?.children()?;
                 let children = top.top();
                 let cat = children[5].get(parser)?.inner_text(parser);
-                env.set_object_array_element(&str, i as i32, env.new_string(cat.trim()).ok()?)
+                let name = unescape(&cat).ok()?;
+                env.set_object_array_element(&str, i as i32, env.new_string(name.trim()).ok()?)
                     .ok()?;
                 Some(
                     children[1]
