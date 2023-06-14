@@ -1,4 +1,5 @@
 extern crate android_logger;
+extern crate apply;
 extern crate jni;
 extern crate log;
 extern crate tl;
@@ -6,6 +7,7 @@ extern crate tl;
 use std::ffi::c_void;
 
 use android_logger::Config;
+use apply::Also;
 use jni::JNIEnv;
 use jni::objects::{JClass, JObjectArray, JString};
 use jni::sys::{JavaVM, jint, jintArray, JNI_VERSION_1_6};
@@ -26,9 +28,7 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_HomeParserKt_parseL
         let vec: Vec<i32> = iter.filter_map(|e| Some(e.get(parser)?.inner_text(parser).parse::<i32>().ok()?)).collect();
         if vec.len() == 3 { Some(vec) } else { None }
     }).unwrap_or(vec![]);
-    let jir = env.new_int_array(3).unwrap();
-    env.set_int_array_region(&jir, 0, &vec).unwrap();
-    jir.into_raw()
+    env.new_int_array(3).unwrap().also(|it| env.set_int_array_region(&it, 0, &vec).unwrap()).into_raw()
 }
 
 #[no_mangle]
@@ -45,9 +45,7 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_FavoritesParserKt_p
         }).collect();
         if vec.len() == 10 { Some(vec) } else { None }
     }).unwrap_or(vec![]);
-    let jir = env.new_int_array(10).unwrap();
-    env.set_int_array_region(&jir, 0, &vec).unwrap();
-    jir.into_raw()
+    env.new_int_array(10).unwrap().also(|it| env.set_int_array_region(&it, 0, &vec).unwrap()).into_raw()
 }
 
 #[no_mangle]
