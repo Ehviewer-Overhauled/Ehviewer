@@ -10,8 +10,8 @@ extern crate tl;
 
 use android_logger::Config;
 use apply::Also;
-use jnix::jni::objects::{JClass, JList, JObject, JString};
-use jnix::jni::sys::{jint, jintArray, jobjectArray, JavaVM, JNI_VERSION_1_6};
+use jnix::jni::objects::{JClass, JString};
+use jnix::jni::sys::{jint, jintArray, jobject, jobjectArray, JavaVM, JNI_VERSION_1_6};
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
@@ -36,6 +36,12 @@ pub struct Torrent {
     downloads: i32,
     url: String,
     name: String,
+}
+
+#[derive(Default, IntoJava)]
+#[jnix(package = "com.hippo.ehviewer.client.parser")]
+pub struct TorrentResult {
+    list: Vec<Torrent>,
 }
 
 fn parse_jni_string<F, R>(env: &mut JNIEnv, str: &JString, mut f: F) -> Option<R>
@@ -118,36 +124,19 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_TorrentParserKt_par
     mut env: JNIEnv,
     _class: JClass,
     input: JString,
-    list: JObject,
-) {
+) -> jobject {
     let env2 = JnixEnv::from(env);
-    let r = parse_jni_string(&mut env, &input, |dom, parser, _env| {
-        let vec: Vec<JObject> = dom
-            .query_selector("table")?
-            .filter_map(|e| {
+    parse_jni_string(&mut env, &input, |dom, parser, _env| {
+        Some(TorrentResult {
+            list: dom.query_selector("table")?.filter_map(|e| {
                 let html = e.get(parser)?.inner_html(parser);
                 let reg = regex!("</span> ([0-9-]+) [0-9:]+</td>[\\s\\S]+</span> ([0-9.]+ [KMGT]B)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span>([^<]+)</td>[\\s\\S]+onclick=\"document.location='([^\"]+)'[^<]+>([^<]+)</a>");
                 let grp = reg.captures(&html)?;
                 let name = unescape(&grp[8]).ok()?;
-                Some(
-                    Torrent {
-                        posted: grp[1].to_string(),
-                        size: grp[2].to_string(),
-                        seeds: grp[3].parse().ok()?,
-                        peers: grp[4].parse().ok()?,
-                        downloads: grp[5].parse().ok()?,
-                        url: grp[7].to_string(),
-                        name: name.to_string(),
-                    }.into_java(&env2).forget()
-                )
-            })
-            .collect();
-        Some(vec)
-    }).unwrap();
-    let list = JList::from_env(&env, list).ok().unwrap();
-    for i in r {
-        list.add(i).ok().unwrap()
-    }
+                Some(Torrent { posted: grp[1].to_string(), size: grp[2].to_string(), seeds: grp[3].parse().ok()?, peers: grp[4].parse().ok()?, downloads: grp[5].parse().ok()?, url: grp[7].to_string(), name: name.to_string() })
+            }).collect()
+        })
+    }).unwrap().into_java(&env2).forget().into_inner()
 }
 
 #[no_mangle]

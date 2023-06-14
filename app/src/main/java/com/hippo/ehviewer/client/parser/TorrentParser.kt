@@ -1,11 +1,7 @@
 package com.hippo.ehviewer.client.parser
 
 object TorrentParser {
-    fun parse(body: String) = run {
-        val list = mutableListOf<Torrent>()
-        parseTorrent(body, list)
-        list
-    }
+    fun parse(body: String) = parseTorrent(body)
 }
 
 class Torrent(
@@ -20,6 +16,8 @@ class Torrent(
     fun format() = "[$posted] $name [$size] [↑$seeds ↓$peers ✓$downloads]"
 }
 
-typealias TorrentResult = List<Torrent>
+class TorrentResult(
+    val list: ArrayList<Torrent>,
+) : List<Torrent> by list
 
-private external fun parseTorrent(body: String, list: List<Torrent>)
+private external fun parseTorrent(body: String): TorrentResult
