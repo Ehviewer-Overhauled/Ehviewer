@@ -15,6 +15,7 @@
 
 -keep class com.hippo.ehviewer.client.parser.Torrent { *; }
 -keep class com.hippo.ehviewer.client.parser.TorrentResult { *; }
+-keep class com.hippo.ehviewer.client.parser.Limits { *; }
 
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile

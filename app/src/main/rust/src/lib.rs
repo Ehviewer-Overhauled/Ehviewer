@@ -48,7 +48,16 @@ pub struct TorrentResult {
     list: Vec<Torrent>,
 }
 
-fn parse_jni_string<F, R>(env: &mut JNIEnv, str: &JString, mut f: F) -> Option<R>
+#[derive(Default, IntoJava)]
+#[allow(non_snake_case)]
+#[jnix(package = "com.hippo.ehviewer.client.parser")]
+pub struct Limits {
+    current: i32,
+    maximum: i32,
+    resetCost: i32,
+}
+
+fn parse_jni_string<F, R>(env: &JNIEnv, str: &JString, mut f: F) -> Option<R>
 where
     F: FnMut(&VDom, &Parser, &JNIEnv) -> Option<R>,
 {
@@ -62,22 +71,25 @@ where
 #[catch_panic(default = "std::ptr::null_mut()")]
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.HomeParserKt")]
-pub fn parseLimit(mut env: JNIEnv, _class: JClass, input: JString) -> jintArray {
+pub fn parseLimit(mut env: JNIEnv, _class: JClass, input: JString) -> jobject {
+    let mut env = JnixEnv::from(env);
     let vec = parse_jni_string(&mut env, &input, |dom, parser, _env| {
         let iter = dom.query_selector("strong")?;
         let vec: Vec<i32> = iter
             .filter_map(|e| Some(e.get(parser)?.inner_text(parser).parse::<i32>().ok()?))
             .collect();
         if vec.len() == 3 {
-            Some(vec)
+            Some(Limits {
+                current: vec[0],
+                maximum: vec[1],
+                resetCost: vec[2],
+            })
         } else {
             None
         }
     })
-    .unwrap_or(vec![]);
-    env.new_int_array(3)
-        .unwrap()
-        .also(|it| env.set_int_array_region(*it, 0, &vec).unwrap())
+    .unwrap();
+    vec.into_java(&env).forget().into_inner()
 }
 
 #[no_mangle]
@@ -124,8 +136,8 @@ pub fn parseFav(mut env: JNIEnv, _class: JClass, input: JString, str: jobjectArr
 #[catch_panic(default = "std::ptr::null_mut()")]
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.TorrentParserKt")]
-pub fn parseTorrent(mut env: JNIEnv, _class: JClass, input: JString) -> jobject {
-    let env2 = JnixEnv::from(env);
+pub fn parseTorrent(env: JNIEnv, _class: JClass, input: JString) -> jobject {
+    let mut env = JnixEnv::from(env);
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
         Some(TorrentResult {
             list: dom.query_selector("table")?.filter_map(|e| {
@@ -136,7 +148,7 @@ pub fn parseTorrent(mut env: JNIEnv, _class: JClass, input: JString) -> jobject 
                 Some(Torrent { posted: grp[1].to_string(), size: grp[2].to_string(), seeds: grp[3].parse().ok()?, peers: grp[4].parse().ok()?, downloads: grp[5].parse().ok()?, url: grp[7].to_string(), name: name.to_string() })
             }).collect()
         })
-    }).unwrap().into_java(&env2).forget().into_inner()
+    }).unwrap().into_java(&env).forget().into_inner()
 }
 
 #[no_mangle]

@@ -36,6 +36,7 @@ import com.hippo.ehviewer.client.parser.GalleryPageApiParser
 import com.hippo.ehviewer.client.parser.GalleryPageParser
 import com.hippo.ehviewer.client.parser.GalleryTokenApiParser
 import com.hippo.ehviewer.client.parser.HomeParser
+import com.hippo.ehviewer.client.parser.Limits
 import com.hippo.ehviewer.client.parser.ProfileParser
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.SignInParser
@@ -301,7 +302,7 @@ object EhEngine {
         return null
     }
 
-    suspend fun resetImageLimits(): HomeParser.Limits? {
+    suspend fun resetImageLimits(): Limits? {
         return ehRequest(EhUrl.URL_HOME) {
             formBody {
                 add("act", "limits")

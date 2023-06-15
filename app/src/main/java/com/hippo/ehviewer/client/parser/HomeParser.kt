@@ -8,11 +8,7 @@ object HomeParser {
     private val PATTERN_FUNDS = Regex("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", RegexOption.DOT_MATCHES_ALL)
     private const val RESET_SUCCEED = "Image limit was successfully reset."
 
-    fun parse(body: String): Limits {
-        val value = parseLimit(body)
-        if (value.isEmpty()) throw ParseException("Parse image limits error", body)
-        return Limits(value[0], value[1], value[2])
-    }
+    fun parse(body: String) = parseLimit(body)
 
     fun parseResetLimits(body: String): Limits? {
         return if (body.contains(RESET_SUCCEED)) {
@@ -32,11 +28,11 @@ object HomeParser {
     }
 
     @Parcelize
-    data class Limits(val current: Int = 0, val maximum: Int = 0, val resetCost: Int = 0) : Parcelable
-
-    @Parcelize
     data class Funds(val fundsGP: Int, val fundsC: Int) : Parcelable
     class Result(val limits: Limits, val funds: Funds)
 }
 
-private external fun parseLimit(body: String): IntArray
+@Parcelize
+data class Limits(val current: Int, val maximum: Int, val resetCost: Int) : Parcelable
+
+private external fun parseLimit(body: String): Limits
