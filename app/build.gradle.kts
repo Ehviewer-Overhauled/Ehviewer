@@ -7,6 +7,9 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
+val isRelease: Boolean
+    get() = gradle.startParameter.taskNames.any { it.contains("Release") }
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -26,7 +29,7 @@ android {
         abi {
             isEnable = true
             reset()
-            if (gradle.startParameter.taskNames.any { it.contains("Release") }) {
+            if (isRelease) {
                 include("arm64-v8a", "x86_64", "armeabi-v7a", "x86")
                 isUniversalApk = true
             } else {
@@ -268,8 +271,8 @@ aboutLibraries {
 cargo {
     module = "src/main/rust"
     libname = "ehviewer_rust"
-    targets = listOf("arm", "x86", "arm64", "x86_64")
-    profile = "release"
+    targets = if (isRelease) listOf("arm", "x86", "arm64", "x86_64") else listOf("arm64")
+    if (isRelease) profile = "release"
 }
 
 tasks.whenObjectAdded {
