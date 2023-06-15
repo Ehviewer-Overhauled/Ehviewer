@@ -18,6 +18,7 @@ jnix-macros = "*"
 catch_panic = "*"
 catch_panic_macros = "*"
 jni_fn = "*"
+jni = "0.19.0"
 
 [profile.release]
 strip = true
