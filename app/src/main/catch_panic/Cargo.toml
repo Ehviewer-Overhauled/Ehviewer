@@ -1,0 +1,19 @@
+[package]
+name = "catch_panic"
+version = "1.0.0"
+edition = "2021"
+authors = [
+    "Arc-blroth <45273859+Arc-blroth@users.noreply.github.com>",
+    "Cayden Pocrass <caydenrp9@gmail.com>",
+    "AdityaJain1030 <50159919+AdityaJain1030@users.noreply.github.com>"
+]
+readme = "../README.md"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/HermitSocialClub/catch_panic"
+description = "A helper macro for safe Java-Rust interop that \"catches\" Rust panics and rethrows them as Java exceptions."
+keywords = ["ffi", "jni", "java"]
+categories = ["api-bindings"]
+
+[dependencies]
+jni = "*"
+catch_panic_macros = { path = "../catch_panic_macros" }

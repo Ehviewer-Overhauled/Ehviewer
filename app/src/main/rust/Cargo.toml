@@ -15,10 +15,9 @@ once_cell = "*"
 quick-xml = "*"
 jnix = "*"
 jnix-macros = "*"
-catch_panic = "*"
-catch_panic_macros = "*"
+catch_panic = { path = "../catch_panic" }
+catch_panic_macros = { path = "../catch_panic_macros" }
 jni_fn = "*"
-jni = "0.19.0"
 
 [profile.release]
 strip = true

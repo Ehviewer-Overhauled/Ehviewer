@@ -1,0 +1,22 @@
+[package]
+name = "catch_panic_macros"
+version = "1.0.0"
+edition = "2021"
+authors = [
+    "Arc-blroth <45273859+Arc-blroth@users.noreply.github.com>",
+    "Cayden Pocrass <caydenrp9@gmail.com>",
+    "AdityaJain1030 <50159919+AdityaJain1030@users.noreply.github.com>"
+]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/HermitSocialClub/catch_panic"
+description = "The proc macro impl for catch_panic"
+keywords = ["ffi", "jni", "java"]
+categories = ["api-bindings"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "*"
+quote = "*"
+syn = { version = "*", features = ["full"] }
