@@ -1,0 +1,22 @@
+[package]
+name = "jni_fn"
+version = "0.1.0"
+authors = ["Anton Lazarev <https://antonok.com>"]
+edition = "2021"
+description = "JNI-compatible method signature generator"
+repository = "https://gitlab.com/antonok/jni_fn"
+readme = "README.md"
+keywords = ["jni", "java", "jvm", "android", "ndk"]
+categories = ["api-bindings", "development-tools::procedural-macro-helpers"]
+license = "MIT OR Apache-2.0"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "1.0.109", features = ["full"] }
+quote = "*"
+proc-macro2 = "*"
+
+[dev-dependencies]
+jni = "0.19.0"
