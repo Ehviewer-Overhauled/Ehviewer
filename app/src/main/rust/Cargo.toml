@@ -17,6 +17,7 @@ jnix = "*"
 jnix-macros = "*"
 catch_panic = "*"
 catch_panic_macros = "*"
+jni_fn = "*"
 
 [profile.release]
 strip = true

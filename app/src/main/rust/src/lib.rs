@@ -1,6 +1,7 @@
 extern crate android_logger;
 extern crate apply;
 extern crate catch_panic;
+extern crate jni_fn;
 extern crate jnix;
 extern crate jnix_macros;
 extern crate log;
@@ -12,6 +13,7 @@ extern crate tl;
 use android_logger::Config;
 use apply::Also;
 use catch_panic::catch_panic;
+use jni_fn::jni_fn;
 use jnix::jni::objects::{JClass, JString};
 use jnix::jni::sys::{jint, jintArray, jobject, jobjectArray, JavaVM, JNI_VERSION_1_6};
 use jnix::jni::JNIEnv;
@@ -125,11 +127,9 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_FavoritesParserKt_p
 
 #[no_mangle]
 #[catch_panic(default = "std::ptr::null_mut()")]
-pub extern "system" fn Java_com_hippo_ehviewer_client_parser_TorrentParserKt_parseTorrent(
-    mut env: JNIEnv,
-    _class: JClass,
-    input: JString,
-) -> jobject {
+#[allow(non_snake_case)]
+#[jni_fn("com.hippo.ehviewer.client.parser.TorrentParserKt")]
+pub fn parseTorrent(mut env: JNIEnv, _class: JClass, input: JString) -> jobject {
     let env2 = JnixEnv::from(env);
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
         Some(TorrentResult {
