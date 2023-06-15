@@ -75,15 +75,6 @@ pub struct BaseGalleryInfo {
     favoriteName: Option<String>,
 }
 
-#[derive(Default, IntoJava)]
-#[allow(non_snake_case)]
-#[jnix(package = "com.hippo.ehviewer.client.parser")]
-pub struct Limits {
-    current: i32,
-    maximum: i32,
-    resetCost: i32,
-}
-
 fn parse_jni_string<F, R>(env: &mut JnixEnv, str: &JString, mut f: F) -> Option<R>
 where
     F: FnMut(&VDom, &Parser, &JnixEnv) -> Option<R>,
@@ -92,31 +83,6 @@ where
     let dom = tl::parse(html.to_str().ok()?, tl::ParserOptions::default()).ok()?;
     let parser = dom.parser();
     Some(f(&dom, parser, env)?)
-}
-
-#[no_mangle]
-#[catch_panic(default = "std::ptr::null_mut()")]
-#[allow(non_snake_case)]
-#[jni_fn("com.hippo.ehviewer.client.parser.HomeParserKt")]
-pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
-    let mut env = JnixEnv { env };
-    let vec = parse_jni_string(&mut env, &input, |dom, parser, _env| {
-        let iter = dom.query_selector("strong")?;
-        let vec: Vec<i32> = iter
-            .filter_map(|e| Some(e.get(parser)?.inner_text(parser).parse::<i32>().ok()?))
-            .collect();
-        if vec.len() == 3 {
-            Some(Limits {
-                current: vec[0],
-                maximum: vec[1],
-                resetCost: vec[2],
-            })
-        } else {
-            None
-        }
-    })
-    .unwrap();
-    vec.into_java(&env).forget().into_raw()
 }
 
 #[no_mangle]

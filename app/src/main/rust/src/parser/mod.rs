@@ -1,1 +1,2 @@
+mod home;
 mod torrent;
