@@ -92,8 +92,8 @@ where
 pub fn parseFav(env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) -> jintArray {
     let mut env = JnixEnv { env };
     let vec = parse_jni_string(&mut env, &input, |dom, parser, env| {
-        let fp = dom.get_elements_by_class_name("fp");
-        let vec: Vec<i32> = fp
+        let vec: Vec<i32> = dom
+            .get_elements_by_class_name("fp")
             .enumerate()
             .filter_map(|(i, e)| {
                 if i == 10 {
@@ -120,7 +120,7 @@ pub fn parseFav(env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) 
             None
         }
     })
-    .unwrap_or(vec![]);
+    .unwrap();
     env.new_int_array(10)
         .unwrap()
         .also(|it| env.set_int_array_region(*it, 0, &vec).unwrap())
@@ -133,25 +133,28 @@ pub fn parseFav(env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) 
 pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject {
     let mut env = JnixEnv { env };
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
-        let title = dom
-            .get_first_element_by_class_name("glink")?
-            .inner_text(parser)
-            .into_owned();
-        let thumb = dom
-            .get_first_element_by_class_name("glthumb")?
-            .children()?
-            .top()
-            .get(1)?
-            .get(parser)?
-            .as_tag()?
-            .children()
-            .top()
-            .get(1)?
-            .get(parser)?
-            .as_tag()?
-            .attributes()
-            .get("data-src")??
-            .try_as_utf8_str()?;
+        let title = match dom.get_first_element_by_class_name("glink") {
+            None => "".to_string(),
+            Some(glink) => glink.inner_text(parser).to_string(),
+        };
+        let thumb = match dom.query_selector("[data-src]")?.next() {
+            None => match dom.query_selector("[src]")?.next() {
+                None => "a",
+                Some(thumb) => thumb
+                    .get(parser)?
+                    .as_tag()?
+                    .attributes()
+                    .get("src")??
+                    .try_as_utf8_str()?,
+            },
+            Some(thumb) => thumb
+                .get(parser)?
+                .as_tag()?
+                .attributes()
+                .get("data-src")??
+                .try_as_utf8_str()?,
+        }
+        .to_string();
         error!("{}", thumb);
         Some(BaseGalleryInfo {
             gid: 0,

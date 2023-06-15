@@ -25,6 +25,7 @@ pub struct Torrent {
 pub struct TorrentResult {
     list: Vec<Torrent>,
 }
+
 #[no_mangle]
 #[catch_panic(default = "std::ptr::null_mut()")]
 #[allow(non_snake_case)]
