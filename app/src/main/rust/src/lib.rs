@@ -1,5 +1,6 @@
 extern crate android_logger;
 extern crate apply;
+extern crate catch_panic;
 extern crate jnix;
 extern crate jnix_macros;
 extern crate log;
@@ -10,6 +11,7 @@ extern crate tl;
 
 use android_logger::Config;
 use apply::Also;
+use catch_panic::catch_panic;
 use jnix::jni::objects::{JClass, JString};
 use jnix::jni::sys::{jint, jintArray, jobject, jobjectArray, JavaVM, JNI_VERSION_1_6};
 use jnix::jni::JNIEnv;
@@ -55,6 +57,7 @@ where
 }
 
 #[no_mangle]
+#[catch_panic(default = "std::ptr::null_mut()")]
 pub extern "system" fn Java_com_hippo_ehviewer_client_parser_HomeParserKt_parseLimit(
     mut env: JNIEnv,
     _class: JClass,
@@ -78,6 +81,7 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_HomeParserKt_parseL
 }
 
 #[no_mangle]
+#[catch_panic(default = "std::ptr::null_mut()")]
 pub extern "system" fn Java_com_hippo_ehviewer_client_parser_FavoritesParserKt_parseFav(
     mut env: JNIEnv,
     _class: JClass,
@@ -120,6 +124,7 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_FavoritesParserKt_p
 }
 
 #[no_mangle]
+#[catch_panic(default = "std::ptr::null_mut()")]
 pub extern "system" fn Java_com_hippo_ehviewer_client_parser_TorrentParserKt_parseTorrent(
     mut env: JNIEnv,
     _class: JClass,
