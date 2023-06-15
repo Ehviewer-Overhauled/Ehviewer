@@ -71,7 +71,7 @@ where
 #[catch_panic(default = "std::ptr::null_mut()")]
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.HomeParserKt")]
-pub fn parseLimit(mut env: JNIEnv, _class: JClass, input: JString) -> jobject {
+pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
     let mut env = JnixEnv::from(env);
     let vec = parse_jni_string(&mut env, &input, |dom, parser, _env| {
         let iter = dom.query_selector("strong")?;
