@@ -86,10 +86,9 @@
 pub extern crate jni;
 
 mod as_jvalue;
-mod from_java;
 mod into_java;
 mod jnix_env;
 
-pub use self::{as_jvalue::AsJValue, from_java::FromJava, into_java::IntoJava, jnix_env::JnixEnv};
+pub use self::{as_jvalue::AsJValue, into_java::IntoJava, jnix_env::JnixEnv};
 #[cfg(feature = "derive")]
 pub use jnix_macros::{FromJava, IntoJava};

@@ -1,5 +1,3 @@
-mod net;
-
 use crate::{IntoJava, JnixEnv};
 use jni::{
     objects::{AutoLocal, JList, JObject, JValue},
