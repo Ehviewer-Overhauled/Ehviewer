@@ -1,6 +1,7 @@
 mod net;
 
 use crate::{IntoJava, JnixEnv};
+use jni::sys::jfloat;
 use jni::{
     objects::{AutoLocal, JList, JObject, JValue},
     sys::{jboolean, jdouble, jint, jlong, jshort, jsize, JNI_FALSE, JNI_TRUE},
@@ -47,6 +48,16 @@ impl<'borrow, 'env: 'borrow> IntoJava<'borrow, 'env> for i64 {
 
     fn into_java(self, _: &'borrow JnixEnv<'env>) -> Self::JavaType {
         self as jlong
+    }
+}
+
+impl<'borrow, 'env: 'borrow> IntoJava<'borrow, 'env> for f32 {
+    const JNI_SIGNATURE: &'static str = "F";
+
+    type JavaType = jfloat;
+
+    fn into_java(self, _: &'borrow JnixEnv<'env>) -> Self::JavaType {
+        self as jfloat
     }
 }
 
