@@ -13,7 +13,7 @@ apply = "*"
 regex = "*"
 once_cell = "*"
 quick-xml = "*"
-jnix = "*"
+jnix = { path = "jnix" }
 jnix-macros = "*"
 catch_panic = { path = "catch_panic" }
 catch_panic_macros = { path = "catch_panic_macros" }
