@@ -13,7 +13,7 @@ static CLASS_CACHE: Lazy<Mutex<HashMap<String, GlobalRef>>> =
 ///
 /// Also provides an internal cache for loaded classes.
 pub struct JnixEnv<'env> {
-    env: JNIEnv<'env>,
+    pub env: JNIEnv<'env>,
 }
 
 impl<'env> From<JNIEnv<'env>> for JnixEnv<'env> {

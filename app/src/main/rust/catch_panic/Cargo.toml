@@ -15,5 +15,5 @@ keywords = ["ffi", "jni", "java"]
 categories = ["api-bindings"]
 
 [dependencies]
-jni = "0.19.0"
+jni = "0.20.0"
 catch_panic_macros = { path = "../catch_panic_macros" }

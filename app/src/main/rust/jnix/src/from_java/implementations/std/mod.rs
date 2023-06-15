@@ -1,9 +1,10 @@
 mod net;
 
 use crate::{FromJava, JnixEnv};
+use jni::signature::ReturnType;
 use jni::{
     objects::{AutoLocal, JObject, JString, JValue},
-    signature::{JavaType, Primitive},
+    signature::Primitive,
     sys::{jboolean, jint, JNI_FALSE},
 };
 
@@ -150,7 +151,7 @@ impl<'env, 'sub_env> FromJava<'env, JObject<'sub_env>> for Option<i32> {
             let method_id = env
                 .get_method_id(&class, "intValue", "()I")
                 .expect("Failed to get method ID for Integer.intValue()");
-            let return_type = JavaType::Primitive(Primitive::Int);
+            let return_type = ReturnType::Primitive(Primitive::Int);
 
             let int_value = env
                 .call_method_unchecked(source, method_id, return_type, &[])
@@ -175,7 +176,7 @@ where
         let size_method_id = env
             .get_method_id(&class, "size", "()I")
             .expect("Failed to get method ID for ArrayList.size()");
-        let size_return_type = JavaType::Primitive(Primitive::Int);
+        let size_return_type = ReturnType::Primitive(Primitive::Int);
 
         let item_count = env
             .call_method_unchecked(source, size_method_id, size_return_type, &[])
@@ -188,7 +189,7 @@ where
         let get_method_id = env
             .get_method_id(&class, "get", "(I)Ljava/lang/Object;")
             .expect("Failed to get method ID for ArrayList.get()");
-        let get_return_type = JavaType::Object("java/lang/Object".to_owned());
+        let get_return_type = ReturnType::Object;
 
         for index in 0..item_count {
             let object = env
@@ -196,7 +197,7 @@ where
                     source,
                     get_method_id,
                     get_return_type.clone(),
-                    &[JValue::Int(index)],
+                    &[JValue::from(index).to_jni()],
                 )
                 .expect("Failed to call ArrayList.get()")
                 .l()

@@ -76,7 +76,7 @@ impl<'borrow, 'env: 'borrow> IntoJava<'borrow, 'env> for &'_ [u8] {
         env.set_byte_array_region(array, 0, data)
             .expect("Failed to copy bytes to Java array");
 
-        env.auto_local(JObject::from(array))
+        env.auto_local(unsafe { JObject::from_raw(array) })
     }
 }
 

@@ -83,8 +83,6 @@
 //! [derive `IntoJava`]: ../jnix_macros/derive.IntoJava.html
 //! [derive `FromJava`]: ../jnix_macros/derive.FromJava.html
 
-#![deny(missing_docs)]
-
 pub extern crate jni;
 
 mod as_jvalue;

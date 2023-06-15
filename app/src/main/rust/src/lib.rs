@@ -57,9 +57,9 @@ pub struct Limits {
     resetCost: i32,
 }
 
-fn parse_jni_string<F, R>(env: &JNIEnv, str: &JString, mut f: F) -> Option<R>
+fn parse_jni_string<F, R>(env: &mut JnixEnv, str: &JString, mut f: F) -> Option<R>
 where
-    F: FnMut(&VDom, &Parser, &JNIEnv) -> Option<R>,
+    F: FnMut(&VDom, &Parser, &JnixEnv) -> Option<R>,
 {
     let html = env.get_string(*str).ok()?;
     let dom = tl::parse(html.to_str().ok()?, tl::ParserOptions::default()).ok()?;
@@ -72,7 +72,7 @@ where
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.HomeParserKt")]
 pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
-    let mut env = JnixEnv::from(env);
+    let mut env = JnixEnv { env };
     let vec = parse_jni_string(&mut env, &input, |dom, parser, _env| {
         let iter = dom.query_selector("strong")?;
         let vec: Vec<i32> = iter
@@ -89,7 +89,7 @@ pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
         }
     })
     .unwrap();
-    vec.into_java(&env).forget().into_inner()
+    vec.into_java(&env).forget().into_raw()
 }
 
 #[no_mangle]
@@ -97,6 +97,7 @@ pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.FavoritesParserKt")]
 pub fn parseFav(mut env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) -> jintArray {
+    let mut env = JnixEnv { env };
     let vec = parse_jni_string(&mut env, &input, |dom, parser, env| {
         let fp = dom.get_elements_by_class_name("fp");
         let vec: Vec<i32> = fp
@@ -137,7 +138,7 @@ pub fn parseFav(mut env: JNIEnv, _class: JClass, input: JString, str: jobjectArr
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.TorrentParserKt")]
 pub fn parseTorrent(env: JNIEnv, _class: JClass, input: JString) -> jobject {
-    let mut env = JnixEnv::from(env);
+    let mut env = JnixEnv { env };
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
         Some(TorrentResult {
             list: dom.query_selector("table")?.filter_map(|e| {
@@ -148,7 +149,7 @@ pub fn parseTorrent(env: JNIEnv, _class: JClass, input: JString) -> jobject {
                 Some(Torrent { posted: grp[1].to_string(), size: grp[2].to_string(), seeds: grp[3].parse().ok()?, peers: grp[4].parse().ok()?, downloads: grp[5].parse().ok()?, url: grp[7].to_string(), name: name.to_string() })
             }).collect()
         })
-    }).unwrap().into_java(&env).forget().into_inner()
+    }).unwrap().into_java(&env).forget().into_raw()
 }
 
 #[no_mangle]

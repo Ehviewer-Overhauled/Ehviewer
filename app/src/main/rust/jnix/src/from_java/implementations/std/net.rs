@@ -1,8 +1,6 @@
 use crate::{FromJava, JnixEnv};
-use jni::{
-    objects::JObject,
-    signature::{JavaType, Primitive},
-};
+use jni::objects::JObject;
+use jni::signature::ReturnType;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 fn read_inet_address_octets<'env, 'o>(env: &JnixEnv<'env>, source: JObject<'o>) -> JObject<'env>
@@ -13,7 +11,7 @@ where
     let method_id = env
         .get_method_id(&class, "getAddress", "()[B")
         .expect("Failed to get method ID for InetAddress.getAddress()");
-    let return_type = JavaType::Array(Box::new(JavaType::Primitive(Primitive::Byte)));
+    let return_type = ReturnType::Array;
 
     env.call_method_unchecked(source, method_id, return_type, &[])
         .expect("Failed to call InetAddress.getAddress()")
@@ -31,7 +29,7 @@ where
     let buffer_octets = buffer.as_mut();
     let buffer_size = buffer_octets.len();
 
-    env.get_byte_array_region(octets.into_inner(), 0, &mut signed_octets[..buffer_size])
+    env.get_byte_array_region(octets.into_raw(), 0, &mut signed_octets[..buffer_size])
         .expect("Failed to read octets returned by InetAddress.getAddress()");
 
     for index in 0..buffer_size {
@@ -76,7 +74,7 @@ where
     fn from_java(env: &JnixEnv<'env>, source: JObject<'sub_env>) -> Self {
         let octets = read_inet_address_octets(env, source);
         let octet_count = env
-            .get_array_length(octets.into_inner())
+            .get_array_length(octets.into_raw())
             .expect("Failed to get length of byte array returned by InetAddress.getAddress()");
 
         match octet_count {

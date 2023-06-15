@@ -1,7 +1,7 @@
-use crate::{AsJValue, IntoJava, JnixEnv};
+use crate::{IntoJava, JnixEnv};
+use jni::signature::ReturnType;
 use jni::{
     objects::{AutoLocal, JObject, JValue},
-    signature::JavaType,
     sys::jint,
 };
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
@@ -27,13 +27,13 @@ fn ipvx_addr_into_java<'borrow, 'env: 'borrow>(
     env.set_byte_array_region(octets_array, 0, &octet_data)
         .expect("Failed to copy IP address octets to byte array");
 
-    let octets = env.auto_local(JObject::from(octets_array));
+    let octets = env.auto_local(unsafe { JObject::from_raw(octets_array) });
     let result = env
         .call_static_method_unchecked(
             &class,
             constructor,
-            JavaType::Object("java/net/InetAddress".to_owned()),
-            &[octets.as_jvalue()],
+            ReturnType::Object,
+            &[JValue::from(&octets).to_jni()],
         )
         .expect("Failed to create InetAddress Java object");
 

@@ -14,7 +14,7 @@ edition = "2018"
 derive = ["jnix-macros"]
 
 [dependencies]
-jni = "0.19"
+jni = "0.20.0"
 jnix-macros = { version = "0.4.1", optional = true }
 once_cell = "*"
 parking_lot = "*"
