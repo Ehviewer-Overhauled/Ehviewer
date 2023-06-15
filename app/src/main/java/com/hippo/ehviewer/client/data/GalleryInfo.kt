@@ -24,7 +24,7 @@ interface GalleryInfo : AbstractGalleryInfo, Parcelable {
             ?: title?.let { generateSLangFromTitle(it) }
     }
 
-    private fun generateSLangFromTags(simpleTags: Array<String>): String? {
+    private fun generateSLangFromTags(simpleTags: List<String>): String? {
         for (tag in simpleTags) {
             for (i in S_LANGS.indices) {
                 if (S_LANG_TAGS[i] == tag) {

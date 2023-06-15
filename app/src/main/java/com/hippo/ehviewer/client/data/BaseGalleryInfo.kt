@@ -57,7 +57,7 @@ open class BaseGalleryInfo(
     override var rated: Boolean = false,
 
     @Ignore
-    override var simpleTags: Array<String>? = null,
+    override var simpleTags: ArrayList<String>? = null,
 
     @Ignore
     override var pages: Int = 0,

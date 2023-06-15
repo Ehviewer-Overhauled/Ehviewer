@@ -40,7 +40,7 @@ object GalleryApiParser {
             gi.rating = NumberUtils.parseFloatSafely(g.getString("rating"), 0.0f)
             // tags
             val tagJa = g.getJSONArray("tags")
-            gi.simpleTags = (0 until tagJa.length()).map { tagJa.getString(it) }.toTypedArray()
+            gi.simpleTags = (0 until tagJa.length()).map { tagJa.getString(it) }.let { arrayListOf<String>().apply { addAll(it) } }
             gi.pages = NumberUtils.parseIntSafely(g.getString("filecount"), 0)
             gi.generateSLang()
         }

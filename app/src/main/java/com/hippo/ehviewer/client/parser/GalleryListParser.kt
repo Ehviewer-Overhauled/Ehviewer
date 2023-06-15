@@ -127,7 +127,7 @@ object GalleryListParser {
             for (gt in gts) {
                 tags.add(gt.attr("title"))
             }
-            gi.simpleTags = tags.toTypedArray()
+            gi.simpleTags = tags
         }
 
         // Category
