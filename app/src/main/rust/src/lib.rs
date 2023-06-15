@@ -60,11 +60,9 @@ where
 
 #[no_mangle]
 #[catch_panic(default = "std::ptr::null_mut()")]
-pub extern "system" fn Java_com_hippo_ehviewer_client_parser_HomeParserKt_parseLimit(
-    mut env: JNIEnv,
-    _class: JClass,
-    input: JString,
-) -> jintArray {
+#[allow(non_snake_case)]
+#[jni_fn("com.hippo.ehviewer.client.parser.HomeParserKt")]
+pub fn parseLimit(mut env: JNIEnv, _class: JClass, input: JString) -> jintArray {
     let vec = parse_jni_string(&mut env, &input, |dom, parser, _env| {
         let iter = dom.query_selector("strong")?;
         let vec: Vec<i32> = iter
@@ -84,12 +82,9 @@ pub extern "system" fn Java_com_hippo_ehviewer_client_parser_HomeParserKt_parseL
 
 #[no_mangle]
 #[catch_panic(default = "std::ptr::null_mut()")]
-pub extern "system" fn Java_com_hippo_ehviewer_client_parser_FavoritesParserKt_parseFav(
-    mut env: JNIEnv,
-    _class: JClass,
-    input: JString,
-    str: jobjectArray,
-) -> jintArray {
+#[allow(non_snake_case)]
+#[jni_fn("com.hippo.ehviewer.client.parser.FavoritesParserKt")]
+pub fn parseFav(mut env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) -> jintArray {
     let vec = parse_jni_string(&mut env, &input, |dom, parser, env| {
         let fp = dom.get_elements_by_class_name("fp");
         let vec: Vec<i32> = fp
