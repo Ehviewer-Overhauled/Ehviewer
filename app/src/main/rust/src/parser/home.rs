@@ -22,21 +22,19 @@ pub struct Limits {
 #[jni_fn("com.hippo.ehviewer.client.parser.HomeParserKt")]
 pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
     let mut env = JnixEnv { env };
-    let vec = parse_jni_string(&mut env, &input, |dom, parser, _env| {
+    parse_jni_string(&mut env, &input, |dom, parser, _env| {
         let iter = dom.query_selector("strong")?;
         let vec: Vec<i32> = iter
             .filter_map(|e| Some(e.get(parser)?.inner_text(parser).parse::<i32>().ok()?))
             .collect();
-        if vec.len() == 3 {
-            Some(Limits {
-                current: vec[0],
-                maximum: vec[1],
-                resetCost: vec[2],
-            })
-        } else {
-            None
-        }
+        Some(Limits {
+            current: vec[0],
+            maximum: vec[1],
+            resetCost: vec[2],
+        })
     })
-    .unwrap();
-    vec.into_java(&env).forget().into_raw()
+    .unwrap()
+    .into_java(&env)
+    .forget()
+    .into_raw()
 }
