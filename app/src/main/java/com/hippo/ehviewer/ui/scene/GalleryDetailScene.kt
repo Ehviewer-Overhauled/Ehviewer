@@ -70,7 +70,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -79,7 +78,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -168,6 +166,8 @@ import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.CrystalCard
+import com.hippo.ehviewer.ui.tools.FilledTertiaryIconButton
+import com.hippo.ehviewer.ui.tools.FilledTertiaryIconToggleButton
 import com.hippo.ehviewer.ui.tools.GalleryDetailRating
 import com.hippo.ehviewer.util.AppHelper
 import com.hippo.ehviewer.util.ExceptionUtils
@@ -679,44 +679,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         @Composable
         fun EhIconButton(
             icon: ImageVector,
-            text: String,
             onClick: () -> Unit,
-        ) {
-            OutlinedButton(
-                onClick = onClick,
-                contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
-                modifier = Modifier.padding(end = 8.dp),
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                )
-                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                Text(text = text)
-            }
-        }
-
-        @Composable
-        fun EhAccentIconButton(
-            icon: ImageVector,
-            text: String,
-            onClick: () -> Unit,
-        ) {
-            Button(
-                onClick = onClick,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onSecondaryContainer),
-                contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
-                modifier = Modifier.padding(end = 8.dp),
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                )
-                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                Text(text = text)
-            }
+        ) = FilledTertiaryIconButton(onClick = onClick) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+            )
         }
         if (galleryDetail.newerVersions.isNotEmpty()) {
             Box(contentAlignment = Alignment.Center) {
@@ -734,42 +702,30 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            if (favourite) {
-                EhAccentIconButton(
-                    icon = Icons.Default.Favorite,
-                    text = favButtonText,
-                    onClick = ::modifyFavourite,
-                )
-            } else {
-                EhIconButton(
-                    icon = Icons.Default.FavoriteBorder,
-                    text = stringResource(id = R.string.not_favorited),
-                    onClick = ::modifyFavourite,
+            FilledTertiaryIconToggleButton(checked = favourite, onCheckedChange = { modifyFavourite() }) {
+                Icon(
+                    imageVector = if (favourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = null,
                 )
             }
             EhIconButton(
                 icon = Icons.Default.Difference,
-                text = stringResource(id = R.string.similar_gallery),
                 onClick = ::showSimilarGalleryList,
             )
             EhIconButton(
                 icon = Icons.Default.ImageSearch,
-                text = stringResource(id = R.string.search_cover),
                 onClick = ::showCoverGalleryList,
             )
             EhIconButton(
                 icon = Icons.Default.Share,
-                text = stringResource(id = R.string.share),
                 onClick = ::doShareGallery,
             )
             EhIconButton(
                 icon = Icons.Default.SwapVerticalCircle,
-                text = torrentText,
                 onClick = ::showTorrentDialog,
             )
             EhIconButton(
                 icon = Icons.Default.CloudDone,
-                text = stringResource(id = R.string.archive),
                 onClick = ::showArchiveDialog,
             )
         }
