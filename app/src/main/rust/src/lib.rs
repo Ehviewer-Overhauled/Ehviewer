@@ -23,8 +23,9 @@ use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
 use log::{error, LevelFilter};
+use std::borrow::Cow;
 use std::ffi::c_void;
-use tl::{Node, Parser, VDom};
+use tl::{Node, NodeHandle, Parser, VDom};
 
 #[macro_export]
 macro_rules! regex {
@@ -45,6 +46,23 @@ impl<'a> Anon for VDom<'a> {
     fn get_first_element_by_class_name(&self, name: &str) -> Option<&Node> {
         let handle = self.get_elements_by_class_name(name).next()?;
         Some(handle.get(self.parser())?)
+    }
+}
+
+fn to_category_i32(category: &str) -> i32 {
+    match category {
+        "misc" => 0x1,
+        "doujinshi" => 0x2,
+        "manga" => 0x4,
+        "artistcg" | "artist cg sets" | "artist cg" => 0x8,
+        "gamecg" | "game cg sets" | "game cg" => 0x10,
+        "imageset" | "image sets" | "image set" => 0x20,
+        "cosplay" => 0x40,
+        "asianporn" | "asian porn" => 0x80,
+        "non-h" => 0x100,
+        "western" => 0x200,
+        "private" => 0x400,
+        _ => 0x800,
     }
 }
 
@@ -83,6 +101,16 @@ where
     let dom = tl::parse(html.to_str().ok()?, tl::ParserOptions::default()).ok()?;
     let parser = dom.parser();
     Some(f(&dom, parser, env)?)
+}
+
+fn get_node_attr<'a>(node: &NodeHandle, parser: &'a Parser, attr: &'a str) -> Option<&'a str> {
+    let str = node
+        .get(parser)?
+        .as_tag()?
+        .attributes()
+        .get(attr)??
+        .try_as_utf8_str()?;
+    Some(str)
 }
 
 #[no_mangle]
@@ -140,22 +168,19 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
         let thumb = match dom.query_selector("[data-src]")?.next() {
             None => match dom.query_selector("[src]")?.next() {
                 None => "a",
-                Some(thumb) => thumb
-                    .get(parser)?
-                    .as_tag()?
-                    .attributes()
-                    .get("src")??
-                    .try_as_utf8_str()?,
+                Some(thumb) => get_node_attr(&thumb, parser, "src")?,
             },
-            Some(thumb) => thumb
-                .get(parser)?
-                .as_tag()?
-                .attributes()
-                .get("data-src")??
-                .try_as_utf8_str()?,
+            Some(thumb) => get_node_attr(&thumb, parser, "data-src")?,
         }
         .to_string();
-        error!("{}", thumb);
+        let category = match dom.get_first_element_by_class_name("cn") {
+            None => match dom.get_first_element_by_class_name("cs") {
+                None => Cow::from("unknown"),
+                Some(cs) => cs.inner_text(parser),
+            },
+            Some(cn) => cn.inner_text(parser),
+        };
+        error!("{}", category);
         Some(BaseGalleryInfo {
             gid: 0,
             token: "".to_string(),
@@ -166,7 +191,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
                 .trim_start_matches(EX_PREFIX)
                 .trim_start_matches("t/")
                 .to_string(),
-            category: 0,
+            category: to_category_i32(&category.trim().to_lowercase()),
             posted: "".to_string(),
             uploader: None,
             disowned: false,
