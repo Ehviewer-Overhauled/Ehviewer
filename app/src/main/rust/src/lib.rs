@@ -201,8 +201,8 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
     let mut env = JnixEnv { env };
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
         let title = match dom.get_first_element_by_class_name("glink") {
-            None => "".to_string(),
-            Some(glink) => glink.inner_text(parser).to_string(),
+            None => panic!("No title found"),
+            Some(glink) => glink.inner_text(parser),
         };
         let gdlink = match dom.get_first_element_by_class_name("glname") {
             None => panic!("Cannot parse token and gid!"),
@@ -232,7 +232,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
         Some(BaseGalleryInfo {
             gid: 0,
             token: "".to_string(),
-            title: title.to_string(),
+            title: decode_html_entities(title.trim()).to_string(),
             titleJpn: None,
             thumbKey: thumb
                 .trim_start_matches(EHGT_PREFIX)
