@@ -66,6 +66,27 @@ fn to_category_i32(category: &str) -> i32 {
     }
 }
 
+fn parse_rating(str: &str) -> f32 {
+    let reg = regex!("\\d+px");
+    let mut iter = reg.find_iter(str);
+    match (iter.next(), iter.next()) {
+        (Some(num1), Some(num2)) => {
+            let num1 = num1.as_str().replace("px", "").parse().unwrap_or(-1);
+            let num2 = num2.as_str().replace("px", "").parse().unwrap_or(-1);
+            if num1 == -1 || num2 == -1 {
+                return -1.0;
+            }
+            let rate = 5 - num1 / 16;
+            if num2 == 21 {
+                (rate - 1) as f32 + 0.5
+            } else {
+                rate as f32
+            }
+        }
+        _ => -1.0,
+    }
+}
+
 #[derive(Default, IntoJava)]
 #[allow(non_snake_case)]
 #[jnix(package = "com.hippo.ehviewer.client.data")]
@@ -180,6 +201,8 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             },
             Some(cn) => cn.inner_text(parser),
         };
+        let ir = dom.get_first_element_by_class_name("ir")?;
+        let rating = ir.as_tag()?.attributes().get("style")??.try_as_utf8_str()?;
         error!("{}", category);
         Some(BaseGalleryInfo {
             gid: 0,
@@ -195,7 +218,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             posted: "".to_string(),
             uploader: None,
             disowned: false,
-            rating: 0.0,
+            rating: parse_rating(rating),
             rated: false,
             simpleTags: vec![],
             pages: 0,
