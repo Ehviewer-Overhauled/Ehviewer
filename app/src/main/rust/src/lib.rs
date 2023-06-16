@@ -91,6 +91,13 @@ fn parse_rating(str: &str) -> f32 {
     }
 }
 
+fn get_thumb_key(url: &str) -> String {
+    url.trim_start_matches(EHGT_PREFIX)
+        .trim_start_matches(EX_PREFIX)
+        .trim_start_matches("t/")
+        .to_string()
+}
+
 fn parse_token_and_gid(str: &str) -> (i64, String) {
     let reg = regex!(
         "https?://(?:exhentai.org|e-hentai.org|lofi.e-hentai.org)/(?:g|mpv)/(\\d+)/([0-9a-f]{10})"
@@ -224,12 +231,11 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
         let (gid, token) = parse_token_and_gid(gdlink);
         let thumb = match dom.query_selector("[data-src]")?.next() {
             None => match dom.query_selector("[src]")?.next() {
-                None => "a",
+                None => panic!("No thumb found"),
                 Some(thumb) => get_node_handle_attr(&thumb, parser, "src")?,
             },
             Some(thumb) => get_node_handle_attr(&thumb, parser, "data-src")?,
-        }
-        .to_string();
+        };
         let category = match dom.get_first_element_by_class_name("cn") {
             None => match dom.get_first_element_by_class_name("cs") {
                 None => Cow::from("unknown"),
@@ -244,11 +250,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             token,
             title: decode_html_entities(title.trim()).to_string(),
             titleJpn: None,
-            thumbKey: thumb
-                .trim_start_matches(EHGT_PREFIX)
-                .trim_start_matches(EX_PREFIX)
-                .trim_start_matches("t/")
-                .to_string(),
+            thumbKey: get_thumb_key(thumb),
             category: to_category_i32(&category.trim().to_lowercase()),
             posted: "".to_string(),
             uploader: None,
