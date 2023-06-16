@@ -69,13 +69,17 @@ fn to_category_i32(category: &str) -> i32 {
 fn parse_rating(str: &str) -> f32 {
     let reg = regex!("\\d+px");
     let mut iter = reg.find_iter(str);
-    match (iter.next(), iter.next()) {
+    let mut next = || {
+        Some(
+            iter.next()?
+                .as_str()
+                .replace("px", "")
+                .parse::<i32>()
+                .ok()?,
+        )
+    };
+    match (next(), next()) {
         (Some(num1), Some(num2)) => {
-            let num1 = num1.as_str().replace("px", "").parse().unwrap_or(-1);
-            let num2 = num2.as_str().replace("px", "").parse().unwrap_or(-1);
-            if num1 == -1 || num2 == -1 {
-                return -1.0;
-            }
             let rate = 5 - num1 / 16;
             if num2 == 21 {
                 (rate - 1) as f32 + 0.5
