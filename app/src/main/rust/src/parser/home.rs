@@ -5,7 +5,7 @@ use jnix::jni::sys::jobject;
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
-use parse_jni_string;
+use {parse_jni_string, Anon};
 
 #[derive(Default, IntoJava)]
 #[allow(non_snake_case)]
@@ -23,7 +23,10 @@ pub struct Limits {
 pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
     let mut env = JnixEnv { env };
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
-        let iter = dom.query_selector("strong")?;
+        let iter = dom
+            .get_first_element_by_class_name("homebox")?
+            .as_tag()?
+            .query_selector(parser, "strong")?;
         let vec: Vec<i32> = iter
             .filter_map(|e| Some(e.get(parser)?.inner_text(parser).parse::<i32>().ok()?))
             .collect();
