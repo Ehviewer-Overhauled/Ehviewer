@@ -22,7 +22,7 @@ use jnix::jni::sys::{jint, jintArray, jobject, jobjectArray, JavaVM, JNI_VERSION
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
-use log::{error, LevelFilter};
+use log::LevelFilter;
 use std::borrow::Cow;
 use std::ffi::c_void;
 use tl::{Node, NodeHandle, Parser, VDom};
@@ -89,6 +89,16 @@ fn parse_rating(str: &str) -> f32 {
         }
         _ => -1.0,
     }
+}
+
+fn parse_token_and_gid(str: &str) -> (i64, String) {
+    let reg = regex!(
+        "https?://(?:exhentai.org|e-hentai.org|lofi.e-hentai.org)/(?:g|mpv)/(\\d+)/([0-9a-f]{10})"
+    );
+    let grp = reg.captures(str).unwrap();
+    let token = &grp[2];
+    let gid = grp[1].parse().unwrap();
+    (gid, token.to_string())
 }
 
 #[derive(Default, IntoJava)]
@@ -211,7 +221,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
                 Some(attr) => attr,
             },
         };
-        error!("{}", gdlink);
+        let (gid, token) = parse_token_and_gid(gdlink);
         let thumb = match dom.query_selector("[data-src]")?.next() {
             None => match dom.query_selector("[src]")?.next() {
                 None => "a",
@@ -230,8 +240,8 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
         let ir = dom.get_first_element_by_class_name("ir")?;
         let rating = ir.as_tag()?.attributes().get("style")??.try_as_utf8_str()?;
         Some(BaseGalleryInfo {
-            gid: 0,
-            token: "".to_string(),
+            gid,
+            token,
             title: decode_html_entities(title.trim()).to_string(),
             titleJpn: None,
             thumbKey: thumb
