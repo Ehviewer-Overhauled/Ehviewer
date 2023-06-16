@@ -1,11 +1,11 @@
 use catch_panic::catch_panic;
+use html_escape::decode_html_entities;
 use jni_fn::jni_fn;
 use jnix::jni::objects::{JClass, JString};
 use jnix::jni::sys::jobject;
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
-use quick_xml::escape::unescape;
 use {parse_jni_string, regex};
 
 #[derive(Default, IntoJava)]
@@ -38,7 +38,7 @@ pub fn parseTorrent(env: JNIEnv, _class: JClass, input: JString) -> jobject {
                 let html = e.get(parser)?.inner_html(parser);
                 let reg = regex!("</span> ([0-9-]+) [0-9:]+</td>[\\s\\S]+</span> ([0-9.]+ [KMGT]B)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span>([^<]+)</td>[\\s\\S]+onclick=\"document.location='([^\"]+)'[^<]+>([^<]+)</a>");
                 let grp = reg.captures(&html)?;
-                let name = unescape(&grp[8]).ok()?;
+                let name = decode_html_entities(&grp[8]);
                 Some(Torrent {
                     posted: grp[1].to_string(),
                     size: grp[2].to_string(),

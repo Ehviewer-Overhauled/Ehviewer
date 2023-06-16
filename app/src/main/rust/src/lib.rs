@@ -3,18 +3,19 @@ mod parser;
 extern crate android_logger;
 extern crate apply;
 extern crate catch_panic;
+extern crate html_escape;
 extern crate jni_fn;
 extern crate jnix;
 extern crate jnix_macros;
 extern crate log;
 extern crate once_cell;
-extern crate quick_xml;
 extern crate regex;
 extern crate tl;
 
 use android_logger::Config;
 use apply::Also;
 use catch_panic::catch_panic;
+use html_escape::decode_html_entities;
 use jni_fn::jni_fn;
 use jnix::jni::objects::{JClass, JString};
 use jnix::jni::sys::{jint, jintArray, jobject, jobjectArray, JavaVM, JNI_VERSION_1_6};
@@ -22,7 +23,6 @@ use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
 use log::{error, LevelFilter};
-use quick_xml::escape::unescape;
 use std::ffi::c_void;
 use tl::{Node, Parser, VDom};
 
@@ -102,7 +102,7 @@ pub fn parseFav(env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) 
                 let top = e.get(parser)?.children()?;
                 let children = top.top();
                 let cat = children[5].get(parser)?.inner_text(parser);
-                let name = unescape(&cat).ok()?;
+                let name = decode_html_entities(&cat);
                 env.set_object_array_element(str, i as i32, env.new_string(name.trim()).ok()?)
                     .ok()?;
                 Some(

@@ -12,17 +12,17 @@ default-features = false
 features = ["std", "perf", "unicode-perl"]
 
 [dependencies]
-tl = "*"
-log = "*"
-android_logger = "*"
-apply = "*"
-once_cell = "*"
-quick-xml = "*"
 jnix = { path = "jnix" }
 jnix-macros = "*"
 catch_panic = { path = "catch_panic" }
 catch_panic_macros = { path = "catch_panic_macros" }
 jni_fn = { path = "jni_fn" }
+html-escape = "0.2.13"
+tl = "0.7.7"
+log = "0.4.19"
+android_logger = "0.13.1"
+apply = "0.3.0"
+once_cell = "1.18.0"
 
 [profile.release]
 strip = true
