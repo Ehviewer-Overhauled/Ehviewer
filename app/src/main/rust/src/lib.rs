@@ -128,14 +128,28 @@ where
     Some(f(&dom, parser, env)?)
 }
 
-fn get_node_attr<'a>(node: &NodeHandle, parser: &'a Parser, attr: &'a str) -> Option<&'a str> {
-    let str = node
-        .get(parser)?
-        .as_tag()?
-        .attributes()
-        .get(attr)??
-        .try_as_utf8_str()?;
+fn get_node_handle_attr<'a>(
+    node: &NodeHandle,
+    parser: &'a Parser,
+    attr: &'a str,
+) -> Option<&'a str> {
+    Some(get_node_attr(node.get(parser)?, attr)?)
+}
+
+fn get_node_attr<'a>(node: &'a Node<'_>, attr: &'a str) -> Option<&'a str> {
+    let str = node.as_tag()?.attributes().get(attr)??.try_as_utf8_str()?;
     Some(str)
+}
+
+// Should not use it at too upper node, since it will do DFS?
+fn query_childs_first_match_attr<'a>(
+    node: &'a Node<'_>,
+    parser: &'a Parser,
+    attr: &'a str,
+) -> Option<&'a str> {
+    let selector = format!("[{}]", attr);
+    let mut iter = node.as_tag()?.query_selector(parser, &selector)?;
+    Some(get_node_handle_attr(&iter.next()?, parser, attr)?)
 }
 
 #[no_mangle]
@@ -190,12 +204,20 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             None => "".to_string(),
             Some(glink) => glink.inner_text(parser).to_string(),
         };
+        let gdlink = match dom.get_first_element_by_class_name("glname") {
+            None => panic!("Cannot parse token and gid!"),
+            Some(glname) => match query_childs_first_match_attr(glname, parser, "href") {
+                None => query_childs_first_match_attr(&dom.nodes()[0], parser, "href")?,
+                Some(attr) => attr,
+            },
+        };
+        error!("{}", gdlink);
         let thumb = match dom.query_selector("[data-src]")?.next() {
             None => match dom.query_selector("[src]")?.next() {
                 None => "a",
-                Some(thumb) => get_node_attr(&thumb, parser, "src")?,
+                Some(thumb) => get_node_handle_attr(&thumb, parser, "src")?,
             },
-            Some(thumb) => get_node_attr(&thumb, parser, "data-src")?,
+            Some(thumb) => get_node_handle_attr(&thumb, parser, "data-src")?,
         }
         .to_string();
         let category = match dom.get_first_element_by_class_name("cn") {
@@ -207,7 +229,6 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
         };
         let ir = dom.get_first_element_by_class_name("ir")?;
         let rating = ir.as_tag()?.attributes().get("style")??.try_as_utf8_str()?;
-        error!("{}", category);
         Some(BaseGalleryInfo {
             gid: 0,
             token: "".to_string(),
