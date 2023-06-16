@@ -1,16 +1,21 @@
 [package]
 name = "ehviewer_rust"
 version = "0.0.0"
+resolver = "2"
 
 [lib]
 crate_type = ["cdylib"]
+
+[dependencies.regex]
+version = "1"
+default-features = false
+features = ["std", "perf", "unicode-perl"]
 
 [dependencies]
 tl = "*"
 log = "*"
 android_logger = "*"
 apply = "*"
-regex = "*"
 once_cell = "*"
 quick-xml = "*"
 jnix = { path = "jnix" }
