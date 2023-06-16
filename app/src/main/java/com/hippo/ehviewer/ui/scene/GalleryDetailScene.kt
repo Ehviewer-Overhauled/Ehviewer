@@ -686,6 +686,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 contentDescription = null,
             )
         }
+        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         if (galleryDetail.newerVersions.isNotEmpty()) {
             Box(contentAlignment = Alignment.Center) {
                 CrystalCard(
