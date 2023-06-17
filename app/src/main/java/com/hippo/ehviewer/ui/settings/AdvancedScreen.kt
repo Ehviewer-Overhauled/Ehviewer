@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
 import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -32,15 +31,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
-import com.hippo.ehviewer.client.systemDns
 import com.hippo.ehviewer.ui.LocalNavController
-import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.tools.observed
 import com.hippo.ehviewer.util.LogCat
 import com.hippo.ehviewer.util.ReadableTime
@@ -48,10 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.dnsoverhttps.DnsOverHttps
 import java.io.File
-import java.net.InetAddress
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -132,37 +125,6 @@ fun AdvancedScreen() {
                 entry = R.array.app_language_entries,
                 entryValueRes = R.array.app_language_entry_values,
                 value = Settings::language,
-            )
-            SwitchPreference(
-                title = stringResource(id = R.string.settings_advanced_built_in_hosts_title),
-                value = Settings::builtInHosts,
-            )
-            Preference(title = stringResource(id = R.string.settings_advanced_dns_over_http_title)) {
-                val builder = EditTextDialogBuilder(context, Settings.dohUrl, context.getString(R.string.settings_advanced_dns_over_http_hint))
-                builder.setTitle(R.string.settings_advanced_dns_over_http_title)
-                builder.setPositiveButton(android.R.string.ok, null)
-                val dialog = builder.create().apply { show() }
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-                    val text = builder.text.trim()
-                    runCatching {
-                        doh = if (text.isNotBlank()) buildDoHDNS(text) else null
-                    }.onFailure {
-                        builder.setError("Invalid URL!")
-                    }.onSuccess {
-                        Settings.dohUrl = text
-                        dialog.dismiss()
-                    }
-                }
-            }
-            SwitchPreference(
-                title = stringResource(id = R.string.settings_advanced_domain_fronting_title),
-                summary = stringResource(id = R.string.settings_advanced_domain_fronting_summary),
-                value = Settings::dF,
-            )
-            SwitchPreference(
-                title = stringResource(id = R.string.settings_advanced_bypass_vpn_title),
-                summary = stringResource(id = R.string.settings_advanced_bypass_vpn_summary),
-                value = Settings::bypassVpn,
             )
             SwitchPreference(
                 title = stringResource(id = R.string.preload_thumb_aggressively),
@@ -264,19 +226,4 @@ fun AdvancedScreen() {
             Spacer(modifier = Modifier.size(paddingValues.calculateBottomPadding()))
         }
     }
-}
-
-private fun buildDoHDNS(url: String): DnsOverHttps {
-    return DnsOverHttps.Builder().apply {
-        client(EhApplication.okHttpClient)
-        url(url.toHttpUrl())
-        post(true)
-        systemDns(systemDns)
-    }.build()
-}
-
-private var doh: DnsOverHttps? = Settings.dohUrl.runCatching { buildDoHDNS(this) }.getOrNull()
-
-object EhDoH {
-    fun lookup(hostname: String): List<InetAddress>? = doh?.runCatching { lookup(hostname).takeIf { it.isNotEmpty() } }?.onFailure { it.printStackTrace() }?.getOrNull()
 }

@@ -18,6 +18,7 @@ package com.hippo.ehviewer
 
 import android.app.Application
 import android.content.ComponentCallbacks2
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -26,11 +27,8 @@ import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.hippo.ehviewer.client.EhCookieStore
-import com.hippo.ehviewer.client.EhDns
-import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.client.install
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.coil.diskCache
 import com.hippo.ehviewer.coil.imageLoader
@@ -48,6 +46,9 @@ import com.hippo.ehviewer.yorozuya.FileUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.DelicateCoroutinesApi
+import okhttp3.AsyncDns
+import okhttp3.Dns
+import okhttp3.android.AndroidAsyncDns
 import okio.Path.Companion.toOkioPath
 import splitties.arch.room.roomDb
 import splitties.init.appCtx
@@ -146,15 +147,15 @@ class EhApplication : Application(), ImageLoaderFactory {
 
     companion object {
         val nonCacheOkHttpClient by lazy {
+            val systemDns = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6) else Dns.SYSTEM
             httpClient {
                 cookieJar(EhCookieStore)
-                dns(EhDns)
+                dns(systemDns)
                 addInterceptor(
                     ChuckerInterceptor.Builder(appCtx).apply {
                         alwaysReadResponseBody(false)
                     }.build(),
                 )
-                if (Settings.dF) install(EhSSLSocketFactory)
             }
         }
 

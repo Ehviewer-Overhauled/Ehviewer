@@ -24,14 +24,10 @@ import android.content.pm.verify.domain.DomainVerificationManager
 import android.content.pm.verify.domain.DomainVerificationUserState
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
-import android.net.ConnectivityManager
 import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -201,9 +197,6 @@ class MainActivity : EhActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (Settings.dF && Settings.bypassVpn) {
-            bypassVpn()
-        }
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -247,19 +240,6 @@ class MainActivity : EhActivity() {
                     } catch (ignored: PackageManager.NameNotFoundException) {
                     }
                 }
-            }
-        }
-    }
-
-    private fun bypassVpn() {
-        val network = connectivityManager.activeNetwork
-        val capabilities = connectivityManager.getNetworkCapabilities(network)
-        capabilities?.let {
-            if (it.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-                val builder = NetworkRequest.Builder()
-                    .addCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)
-                    .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
-                connectivityManager.registerNetworkCallback(builder.build(), mNetworkCallback)
             }
         }
     }
@@ -483,26 +463,5 @@ class MainActivity : EhActivity() {
     override fun onProvideAssistContent(outContent: AssistContent?) {
         super.onProvideAssistContent(outContent)
         mShareUrl?.let { outContent?.webUri = Uri.parse(mShareUrl) }
-    }
-
-    private val mNetworkCallback = object : ConnectivityManager.NetworkCallback() {
-        private val TAG = "mNetworkCallback"
-
-        override fun onAvailable(network: Network) {
-            Log.d(TAG, "onAvailable: $network")
-            connectivityManager.bindProcessToNetwork(network)
-            availableNetworks.add(network)
-        }
-
-        override fun onLost(network: Network) {
-            Log.d(TAG, "onLost: $network")
-            val activeNetwork = availableNetworks.last()
-            availableNetworks.remove(network)
-            if (network == activeNetwork) {
-                connectivityManager.bindProcessToNetwork(
-                    availableNetworks.takeIf { it.isNotEmpty() }?.last(),
-                )
-            }
-        }
     }
 }

@@ -12,8 +12,6 @@ import kotlin.reflect.KProperty
 
 object Settings : DataStorePreferences(null) {
     private const val KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations"
-    private const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
-    private const val KEY_DOMAIN_FRONTING = "domain_fronting"
 
     var downloadScheme by stringOrNullPref("image_scheme", null)
     var downloadAuthority by stringOrNullPref("image_authority", null)
@@ -48,14 +46,11 @@ object Settings : DataStorePreferences(null) {
     var saveParseErrorBody by boolPref("save_parse_error_body", true)
     var saveCrashLog by boolPref("save_crash_log", true)
     var security by boolPref("require_unlock", false)
-    var builtInHosts by boolPref(KEY_BUILT_IN_HOSTS, false)
     var removeImageFiles by boolPref("include_pic", true)
     var needSignIn by boolPref("need_sign_in", true)
     var blackDarkTheme by boolPref("black_dark_theme", false).observed { updateWhenAmoledModeChanges() }
     var preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
-    var dF by boolPref(KEY_DOMAIN_FRONTING, false)
     var downloadOriginImage by boolPref("download_origin_image", false)
-    var bypassVpn by boolPref("bypass_vpn", true)
     var thumbSizeDp by intPref("thumb_size_", 120)
     var favLocalCount by intPref("fav_local", 0)
     var favCloudCount by intPref("fav_cloud", 0)
@@ -78,8 +73,6 @@ object Settings : DataStorePreferences(null) {
     init {
         if ("CN" == Locale.getDefault().country) {
             edit {
-                if (KEY_BUILT_IN_HOSTS !in prefs) builtInHosts = true
-                if (KEY_DOMAIN_FRONTING !in prefs) dF = true
                 if (KEY_SHOW_TAG_TRANSLATIONS !in prefs) showTagTranslations = true
             }
         }
