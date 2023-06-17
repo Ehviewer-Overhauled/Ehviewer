@@ -105,8 +105,6 @@
     <string name="read">Lesen</string>
     <string name="share">Teilen</string>
     <string name="rate">Bewerten</string>
-    <string name="similar_gallery">Ähnlich</string>
-    <string name="search_cover">Nach dem Umschlag suchen</string>
     <string name="no_tags">Kein Etikett</string>
     <string name="no_comments">Kein Kommentar</string>
     <string name="no_more_comments">Keine weiteren Kommentare</string>
@@ -120,7 +118,6 @@
     <string name="rate_failed">Bewertung fehlgeschlagen</string>
     <string name="no_torrents">Keine Torrentdatei</string>
     <string name="torrents">Torrentdateien</string>
-    <string name="not_favorited">Nicht zu Favoriten hinzugefügt</string>
     <string name="add_favorites_dialog_title">Zu Favoriten hinzufügen</string>
     <string name="remember_favorite_collection">Favoritenansammlung merken</string>
     <string name="add_to_favorite_success">Zu Favoriten hinzugefügt</string>
@@ -313,7 +310,6 @@
     <string name="no_archives">Keine Archivdatei</string>
     <string name="download_archive_started">Archivdatei wird heruntergeladen</string>
     <string name="download_archive_failure">Fehler beim Herunterladen der Archivdatei</string>
-    <string name="archive">Archivdateien</string>
     <string name="download_archive_failure_no_hath">H@H-Klient ist für das Herunterladen der Archivdateien erforderlich</string>
     <string name="settings_privacy">Datenschutzoptionen</string>
     <string name="settings_privacy_secure">Screenshot verhindern</string>
@@ -326,7 +322,6 @@
     <string name="clipboard_gallery_url_snack_message">Ein Link von einen Galerie wurde in Zwischenablage erkennt.</string>
     <string name="clipboard_gallery_url_snack_action">Gehen</string>
     <string name="settings_advanced_read_cache_size">Größe des Lesezwischenspeichers</string>
-    <string name="settings_advanced_built_in_hosts_title">Standard-hosts.txt</string>
     <string name="settings_about_declaration_summary">EhViewer verbindet sich in keiner Weise mit E-Hentai.org.</string>
     <string name="settings_about_source">Quellcode</string>
     <string name="settings_about_version">Versionnummer</string>

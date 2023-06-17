@@ -96,6 +96,7 @@
     <string name="error_empty_html">Empty page</string>
     <string name="kokomade_tip">Settings-&gt;Eh-&gt;Gallery Site-&gt;e-hentai</string>
     <string name="app_waring">The content of this application is from the Internet. Some of it may do physical or mental harm to you. You have learnt the risks above and would like to undertake them. By continuing to use it, you agree to the above terms.</string>
+    <string name="app_waring_2">By continuing to use it, you agree to the above terms.</string>
     <string name="error_username_cannot_empty">Username cannot be an empty string</string>
     <string name="error_password_cannot_empty">Password cannot be an empty string</string>
     <string name="tourist_mode">Continue without signing in</string>
@@ -176,8 +177,6 @@
     <string name="torrent_count">Torrent (%d)</string>
     <string name="share">Share</string>
     <string name="rate">Rate</string>
-    <string name="similar_gallery">Similar</string>
-    <string name="search_cover">Search Cover</string>
     <string name="no_tags">No tags</string>
     <string name="no_comments">No comments</string>
     <string name="no_more_comments">No more comments</string>
@@ -193,7 +192,6 @@
     <string name="download_torrent_started">Torrent download started</string>
     <string name="download_torrent_failure">Failed to download torrent</string>
     <string name="torrents">Torrents</string>
-    <string name="not_favorited">Not favorited</string>
     <string name="add_favorites_dialog_title">Add to favorites</string>
     <string name="remember_favorite_collection">Remember favorite collection</string>
     <string name="add_to_favorite_success">Added to favorites</string>
@@ -415,13 +413,6 @@
     <string name="settings_advanced_dump_logcat_to">Logcat dumped to %s</string>
     <string name="settings_advanced_read_cache_size">Read cache size</string>
     <string name="settings_advanced_app_language_title">App language</string>
-    <string name="settings_advanced_built_in_hosts_title">Built-in hosts.txt</string>
-    <string name="settings_advanced_dns_over_http_title">DNS Over HTTPS</string>
-    <string name="settings_advanced_dns_over_http_hint">Server URL, blank: disable</string>
-    <string name="settings_advanced_domain_fronting_title">Domain fronting</string>
-    <string name="settings_advanced_domain_fronting_summary">Bypass SNI blocking.</string>
-    <string name="settings_advanced_bypass_vpn_title">Bypass VPN</string>
-    <string name="settings_advanced_bypass_vpn_summary">Try to bypass VPN when domain fronting is enabled</string>
     <string name="settings_advanced_export_data">Export data</string>
     <string name="settings_advanced_export_data_summary">Save data like download list, quick search list, to external storage</string>
     <string name="settings_advanced_export_data_to">Exported data to %s</string>
@@ -516,7 +507,6 @@
     <string name="no_archives">No Archives</string>
     <string name="download_archive_started">Archive download started</string>
     <string name="download_archive_failure">Failed to download archive</string>
-    <string name="archive">Archive</string>
     <string name="archive_free">Free</string>
     <string name="archive_original">Original archive</string>
     <string name="archive_resample">Resample archive</string>

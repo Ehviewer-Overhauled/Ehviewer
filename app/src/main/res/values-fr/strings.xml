@@ -147,8 +147,6 @@
     <string name="torrent_count">Torrent (%d)</string>
     <string name="share">Partager</string>
     <string name="rate">Noter</string>
-    <string name="similar_gallery">Similaire(s)</string>
-    <string name="search_cover">Chercher le couverture</string>
     <string name="no_tags">Aucun tag</string>
     <string name="no_comments">Aucun commentaire</string>
     <string name="no_more_comments">Pas d\'autres commentaires</string>
@@ -162,7 +160,6 @@
     <string name="rate_failed">Échec de notation</string>
     <string name="no_torrents">Aucun fiche torrent</string>
     <string name="torrents">Fiches torrent</string>
-    <string name="not_favorited">Non ajoutée à favoris</string>
     <string name="add_favorites_dialog_title">Ajouter à favoris</string>
     <string name="remember_favorite_collection">Enrégistrer la collection favoris</string>
     <string name="add_to_favorite_success">Ajouté à favoris</string>
@@ -446,13 +443,11 @@
     <string name="no_archives">Aucun fiche archives</string>
     <string name="download_archive_started">Téléchargement du fiche archives a commencé</string>
     <string name="download_archive_failure">Téléchargement du fiche archives a échoué</string>
-    <string name="archive">Fiches archives</string>
     <string name="download_archive_failure_no_hath">Client H@H est nécessaire pour le téléchargement de fiches archives</string>
     <string name="settings_privacy">Confidentialité</string>
     <string name="settings_privacy_secure">Empêcher les captures d\'ecran</string>
     <string name="settings_privacy_secure_summary">Quand cette option est activée, vous ne pouvez prendre aucune capture d\'écran de l\'application, et le systéme n\'affiche pas le contenu d\'écran dans le sélecteur de tâches.\n\nRedémarrage de l\'application est nécessaire pour appliquer le changement</string>
     <string name="settings_advanced_app_language_title">Langue de l\'app (Language)</string>
-    <string name="settings_advanced_built_in_hosts_title">hosts.txt integré</string>
     <string name="app_language_system">Langue du système (défaut)</string>
     <string name="settings_eh_identity_cookies_signed">Tout le monde peut utiliser les cookies de ce compte pour s\'y connecter.&lt;br&gt;&lt;b&gt;GARDEZ-LES BIEN !&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">Vous ne vous êtes pas connecté.</string>

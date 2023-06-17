@@ -134,8 +134,6 @@
     <string name="torrent_count">種子 (%d)</string>
     <string name="share">分享</string>
     <string name="rate">評分</string>
-    <string name="similar_gallery">類似的圖庫</string>
-    <string name="search_cover">以封面搜尋</string>
     <string name="no_tags">還沒有標籤</string>
     <string name="no_comments">沒有留言</string>
     <string name="no_more_comments">已顯示所有的留言了</string>
@@ -151,7 +149,6 @@
     <string name="download_torrent_started">開始下載種子</string>
     <string name="download_torrent_failure">無法下載種子</string>
     <string name="torrents">種子</string>
-    <string name="not_favorited">未收藏</string>
     <string name="add_favorites_dialog_title">新增到收藏裡</string>
     <string name="remember_favorite_collection">記住常用收藏</string>
     <string name="add_to_favorite_success">已新增至收藏中</string>
@@ -371,11 +368,6 @@
     <string name="settings_advanced_dump_logcat_to">已將紀錄檔儲存至 %s</string>
     <string name="settings_advanced_read_cache_size">閱讀快取大小</string>
     <string name="settings_advanced_app_language_title">應用程式介面語言</string>
-    <string name="settings_advanced_built_in_hosts_title">內建 hosts.txt</string>
-    <string name="settings_advanced_domain_fronting_title">域名前綴</string>
-    <string name="settings_advanced_domain_fronting_summary">繞過 SNI 封鎖</string>
-    <string name="settings_advanced_bypass_vpn_title">繞過 VPN</string>
-    <string name="settings_advanced_bypass_vpn_summary">啟用域名前綴時嘗試繞過 VPN</string>
     <string name="settings_advanced_export_data">匯出檔案</string>
     <string name="settings_advanced_export_data_summary">儲存資料至外接儲存設備，例如下載列表，快速搜尋列表</string>
     <string name="settings_advanced_export_data_to">已匯出資料至 %s</string>
@@ -448,7 +440,6 @@
     <string name="no_archives">沒有壓縮檔</string>
     <string name="download_archive_started">開始下載壓縮檔</string>
     <string name="download_archive_failure">下載失敗</string>
-    <string name="archive">壓縮檔</string>
     <string name="archive_free">免費</string>
     <string name="archive_original">原始檔案</string>
     <string name="archive_resample">重新採樣檔案</string>

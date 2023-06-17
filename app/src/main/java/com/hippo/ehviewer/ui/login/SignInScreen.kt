@@ -196,6 +196,11 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                         modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.single_max_width)).padding(top = 24.dp),
                         style = MaterialTheme.typography.titleMedium,
                     )
+                    Text(
+                        text = stringResource(id = R.string.app_waring_2),
+                        modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.single_max_width)).padding(top = 12.dp),
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
                     Spacer(modifier = Modifier.weight(1f))
                     Row(modifier = Modifier.padding(top = dimensionResource(R.dimen.keyline_margin))) {
                         FilledTonalButton(
@@ -279,6 +284,11 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                             text = stringResource(id = R.string.app_waring),
                             modifier = Modifier.widthIn(max = 360.dp),
                             style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.app_waring_2),
+                            modifier = Modifier.widthIn(max = 360.dp),
+                            style = MaterialTheme.typography.headlineMedium,
                         )
                     }
                     Column(

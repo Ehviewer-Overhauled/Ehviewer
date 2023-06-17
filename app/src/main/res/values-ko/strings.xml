@@ -137,8 +137,6 @@
     <string name="torrent_count">토렌트 (%d)</string>
     <string name="share">공유</string>
     <string name="rate">평가</string>
-    <string name="similar_gallery">유사</string>
-    <string name="search_cover">커버 검색</string>
     <string name="no_tags">태그 없음</string>
     <string name="no_comments">코멘트 없음</string>
     <string name="no_more_comments">코멘트가 더 없음</string>
@@ -152,7 +150,6 @@
     <string name="rate_failed">평가에 실패했습니다.</string>
     <string name="no_torrents">토렌트 없음</string>
     <string name="torrents">토렌트</string>
-    <string name="not_favorited">즐겨찾기에 없음</string>
     <string name="add_favorites_dialog_title">즐겨찾기에 추가</string>
     <string name="remember_favorite_collection">즐겨찾기 저장 위치 기억</string>
     <string name="add_to_favorite_success">즐겨찾기에 추가했습니다.</string>
@@ -335,7 +332,6 @@
     <string name="settings_advanced_dump_logcat_to">%s 경로에 로그캣을 저장했습니다.</string>
     <string name="settings_advanced_read_cache_size">읽기 캐시 크기</string>
     <string name="settings_advanced_app_language_title">앱 언어 (Language)</string>
-    <string name="settings_advanced_built_in_hosts_title">앱 내장 hosts.txt</string>
     <string name="settings_advanced_export_data">데이터 내보내기</string>
     <string name="settings_advanced_export_data_summary">다운로드 목록, 빠른 검색 목록 등의 데이터를 외부 저장소에 저장</string>
     <string name="settings_advanced_export_data_to">%s 경로에 데이터를 내보냈습니다.</string>
@@ -411,7 +407,6 @@
     <string name="no_archives">아카이브 없음</string>
     <string name="download_archive_started">아카이브 다운로드가 시작되었습니다.</string>
     <string name="download_archive_failure">아카이브 다운로드에 실패했습니다.</string>
-    <string name="archive">아카이브</string>
     <string name="download_archive_failure_no_hath">아카이브를 다운로드하려면 H@H 클라이언트가 필요합니다.</string>
     <string name="settings_privacy">개인 정보</string>
     <string name="settings_privacy_secure">화면 캡처 허용 안 함</string>

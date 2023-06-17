@@ -139,8 +139,6 @@
     <string name="torrent_count">Torrent (%d)</string>
     <string name="share">แชร์</string>
     <string name="rate">คะแนน</string>
-    <string name="similar_gallery">เหมือน</string>
-    <string name="search_cover">ค้นหาปก</string>
     <string name="no_tags">ไม่มีแท็ก</string>
     <string name="no_comments">ไม่มีความคิดเห็น</string>
     <string name="no_more_comments">ไม่มีความเห็นเพิ่มเติมแล้ว</string>
@@ -154,7 +152,6 @@
     <string name="rate_failed">การให้คะแนนล้มเหลว</string>
     <string name="no_torrents">ไม่มีไฟล์ torrents</string>
     <string name="torrents">Torrents</string>
-    <string name="not_favorited">ยังไม่เพิ่มรายการโปรด</string>
     <string name="add_favorites_dialog_title">เพิ่มเข้ารายการโปรด</string>
     <string name="remember_favorite_collection">จดจำรายการโปรดที่เลือก</string>
     <string name="add_to_favorite_success">เพิ่มเข้าในรายการโปรดแล้ว</string>
@@ -350,7 +347,6 @@
     <string name="settings_advanced_dump_logcat_to">Logcat ถูกสร้างอยู่ที่ %s</string>
     <string name="settings_advanced_read_cache_size">ขนาดในการเก็บไฟล์ชั่วคราวเพื่ออ่าน</string>
     <string name="settings_advanced_app_language_title">ภาษาของแอป</string>
-    <string name="settings_advanced_built_in_hosts_title">ใช้ hosts.txt ของตัวแอป</string>
     <string name="settings_advanced_export_data">สำเนาข้อมูล</string>
     <string name="settings_advanced_export_data_summary">บันทึกข้อมูลต่างๆเช่นรายการดาวน์โหลด และค้นหาอย่างด่วนลงพื้นที่จัดเก็บภายนอก</string>
     <string name="settings_advanced_export_data_to">ได้สำเนาข้อมูลแล้วจัดเก็บที่ %s</string>
@@ -426,7 +422,6 @@
     <string name="no_archives">ยังไม่มีไฟล์บีบอัด</string>
     <string name="download_archive_started">เริ่มการดาวน์โหลดบีบอัด</string>
     <string name="download_archive_failure">การดาวน์โหลดไฟล์บีบอัดล้มเหลว</string>
-    <string name="archive">การบีบอัด</string>
     <string name="download_archive_failure_no_hath">ต้องการ H@H client เพื่อโหลดไฟล์บีบอัด</string>
     <string name="settings_privacy">ความเป็นส่วนตัว</string>
     <string name="settings_privacy_secure">ป้องกันการบันทึกภาพหน้าจอ</string>

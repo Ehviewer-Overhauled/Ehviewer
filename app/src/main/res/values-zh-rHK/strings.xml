@@ -155,8 +155,6 @@
     <string name="torrent_count">種子 (%d)</string>
     <string name="share">分享</string>
     <string name="rate">評分</string>
-    <string name="similar_gallery">相似畫廊</string>
-    <string name="search_cover">搜索封面</string>
     <string name="no_tags">暫無標籤</string>
     <string name="no_comments">暫無評論</string>
     <string name="no_more_comments">已顯示所有評論</string>
@@ -170,7 +168,6 @@
     <string name="rate_failed">評分失敗</string>
     <string name="no_torrents">沒有種子</string>
     <string name="torrents">種子</string>
-    <string name="not_favorited">未收藏</string>
     <string name="add_favorites_dialog_title">添加收藏</string>
     <string name="remember_favorite_collection">記住收藏夾</string>
     <string name="add_to_favorite_success">已添加至收藏</string>
@@ -389,7 +386,6 @@
     <string name="settings_advanced_dump_logcat_to">已保存日誌至 %s</string>
     <string name="settings_advanced_read_cache_size">閲讀緩存大小</string>
     <string name="settings_advanced_app_language_title">App 界面語言</string>
-    <string name="settings_advanced_built_in_hosts_title">內置 hosts.txt</string>
     <string name="settings_advanced_export_data">導出數據</string>
     <string name="settings_advanced_export_data_summary">保存數據至外置存儲器，例如下載列表，快速搜索列表</string>
     <string name="settings_advanced_export_data_to">已導出數據至 %s</string>
@@ -467,7 +463,6 @@
     <string name="no_archives">沒有壓縮包</string>
     <string name="download_archive_started">開始下載壓縮包</string>
     <string name="download_archive_failure">無法下載壓縮包</string>
-    <string name="archive">壓縮包</string>
     <string name="download_archive_failure_no_hath">下載壓縮包需要 H@H 客户端</string>
     <string name="settings_privacy">隱私</string>
     <string name="settings_privacy_secure">不允許荧幕抓取</string>

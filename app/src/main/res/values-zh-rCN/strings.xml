@@ -56,7 +56,8 @@
     <string name="error_invalid_number">非法数字</string>
     <string name="error_empty_html">页面内容为空</string>
     <string name="kokomade_tip">设置-&gt;Eh-&gt;画廊站点-&gt;e-hentai</string>
-    <string name="app_waring">本应用中内容来自互联网，部分内容可能对您的生理及心理造成难以恢复的伤害。本应用作者不会对由本应用造成的任何后果负责。未成年人应在监护人指导下使用本应用。继续使用即代表您同意上述条款。</string>
+    <string name="app_waring">本应用中内容来自互联网，部分内容可能对您的生理及心理造成难以恢复的伤害。本应用作者不会对由本应用造成的任何后果负责。未成年人应在监护人指导下使用本应用。请遵守所在地的法律法规。</string>
+    <string name="app_waring_2">继续使用即代表您同意上述条款。</string>
     <string name="error_username_cannot_empty">用户名不可为空</string>
     <string name="error_password_cannot_empty">密码不可为空</string>
     <string name="tourist_mode">游客模式</string>
@@ -134,8 +135,6 @@
     <string name="torrent_count">种子 (%d)</string>
     <string name="share">分享</string>
     <string name="rate">评分</string>
-    <string name="similar_gallery">相似画廊</string>
-    <string name="search_cover">搜索封面</string>
     <string name="no_tags">暂无标签</string>
     <string name="no_comments">暂无评论</string>
     <string name="no_more_comments">已显示所有评论</string>
@@ -151,7 +150,6 @@
     <string name="download_torrent_started">开始下载种子</string>
     <string name="download_torrent_failure">无法下载种子</string>
     <string name="torrents">种子</string>
-    <string name="not_favorited">未收藏</string>
     <string name="add_favorites_dialog_title">添加收藏</string>
     <string name="remember_favorite_collection">记住收藏夹</string>
     <string name="add_to_favorite_success">已添加至收藏</string>
@@ -371,11 +369,6 @@
     <string name="settings_advanced_dump_logcat_to">已保存日志至 %s</string>
     <string name="settings_advanced_read_cache_size">阅读缓存大小</string>
     <string name="settings_advanced_app_language_title">App 界面语言</string>
-    <string name="settings_advanced_built_in_hosts_title">内置 hosts.txt</string>
-    <string name="settings_advanced_domain_fronting_title">域名前置（重启应用后生效）</string>
-    <string name="settings_advanced_domain_fronting_summary">绕过 SNI 封锁\n启用时会禁用代理设置</string>
-    <string name="settings_advanced_bypass_vpn_title">绕过VPN</string>
-    <string name="settings_advanced_bypass_vpn_summary">启用域名前置时尝试绕过VPN</string>
     <string name="settings_advanced_export_data">导出数据</string>
     <string name="settings_advanced_export_data_summary">保存数据至外置存储器，例如下载列表，快速搜索列表</string>
     <string name="settings_advanced_export_data_to">已导出数据至 %s</string>
@@ -449,7 +442,6 @@
     <string name="no_archives">没有压缩包</string>
     <string name="download_archive_started">开始下载压缩包</string>
     <string name="download_archive_failure">无法下载压缩包</string>
-    <string name="archive">压缩包</string>
     <string name="archive_free">免费</string>
     <string name="archive_original">原始档案</string>
     <string name="archive_resample">重采样档案</string>

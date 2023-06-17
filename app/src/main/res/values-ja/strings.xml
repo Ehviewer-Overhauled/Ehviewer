@@ -146,8 +146,6 @@
     <string name="torrent_count">トレント (%d)</string>
     <string name="share">共有</string>
     <string name="rate">評価</string>
-    <string name="similar_gallery">類似のギャラリー</string>
-    <string name="search_cover">カバーを検索</string>
     <string name="no_tags">タグなし</string>
     <string name="no_comments">コメントなし</string>
     <string name="no_more_comments">コメントはこれ以上ありません</string>
@@ -161,7 +159,6 @@
     <string name="rate_failed">評価できませんでした</string>
     <string name="no_torrents">トレントなし</string>
     <string name="torrents">トレント</string>
-    <string name="not_favorited">未追加</string>
     <string name="add_favorites_dialog_title">お気に入りに追加</string>
     <string name="remember_favorite_collection">お気に入りを記憶</string>
     <string name="add_to_favorite_success">お気に入りに追加しました。</string>
@@ -437,7 +434,6 @@
     <string name="no_archives">圧縮パッケージなし</string>
     <string name="download_archive_started">圧縮パッケージのダウンロードを開始しました</string>
     <string name="download_archive_failure">圧縮パッケージをダウンロードできませんでした</string>
-    <string name="archive">圧縮パッケージ</string>
     <string name="download_archive_failure_no_hath">圧縮パッケージのダウンロードにはH@Hクライアントが必要です</string>
     <string name="settings_privacy">プライバシー</string>
     <string name="settings_privacy_secure">スクリーンキャプチャを防ぐ</string>
@@ -448,7 +444,6 @@
     <string name="clipboard_gallery_url_snack_message">クリップボードにはギャラリーURLが検出されました。</string>
     <string name="clipboard_gallery_url_snack_action">移動</string>
     <string name="settings_advanced_app_language_title">アプリ言語（Language）</string>
-    <string name="settings_advanced_built_in_hosts_title">既定hosts.txt</string>
     <string name="app_language_system">システム言語（既定）</string>
     <string name="download_service">ダウンロードサービス</string>
 
