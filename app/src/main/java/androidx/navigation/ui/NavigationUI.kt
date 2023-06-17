@@ -1,5 +1,6 @@
 package androidx.navigation.ui
 
+import android.annotation.SuppressLint
 import android.view.MenuItem
 import androidx.annotation.IdRes
 import androidx.navigation.ActivityNavigator
@@ -8,6 +9,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavOptions
 
+@SuppressLint("PrivateResource")
 fun onNavDestinationSelected2(item: MenuItem, navController: NavController): Boolean {
     if (navController.currentDestination?.matchDestination(item.itemId) == true) return true
     val builder = NavOptions.Builder().setLaunchSingleTop(true)
@@ -20,10 +22,10 @@ fun onNavDestinationSelected2(item: MenuItem, navController: NavController): Boo
             .setPopEnterAnim(R.anim.nav_default_pop_enter_anim)
             .setPopExitAnim(R.anim.nav_default_pop_exit_anim)
     } else {
-        builder.setEnterAnim(com.hippo.ehviewer.R.anim.scene_open_enter)
-            .setExitAnim(com.hippo.ehviewer.R.anim.scene_open_exit)
-            .setPopEnterAnim(com.hippo.ehviewer.R.anim.scene_close_enter)
-            .setPopExitAnim(com.hippo.ehviewer.R.anim.scene_close_exit)
+        builder.setEnterAnim(androidx.fragment.R.animator.fragment_open_enter)
+            .setExitAnim(androidx.fragment.R.animator.fragment_open_exit)
+            .setPopEnterAnim(androidx.fragment.R.animator.fragment_close_enter)
+            .setPopExitAnim(androidx.fragment.R.animator.fragment_close_exit)
     }
     val options = builder.build()
     return try {
