@@ -442,8 +442,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
         detector = GestureDetector(
             context,
             object : GestureDetector.SimpleOnGestureListener() {
-                override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                    if (panEnabled && isReady && vTranslate != null && (abs(e1.x - e2.x) > 50 || abs(e1.y - e2.y) > 50) && (abs(velocityX) > 500 || abs(velocityY) > 500) && !isZooming) {
+                override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                    if (panEnabled && isReady && vTranslate != null && e1 != null && (abs(e1.x - e2.x) > 50 || abs(e1.y - e2.y) > 50) && (abs(velocityX) > 500 || abs(velocityY) > 500) && !isZooming) {
                         val vTranslateEnd = PointF(vTranslate!!.x + velocityX * 0.25F, vTranslate!!.y + velocityY * 0.25F)
                         val sCenterXEnd = (width / 2 - vTranslateEnd.x) / scale
                         val sCenterYEnd = (height / 2 - vTranslateEnd.y) / scale
