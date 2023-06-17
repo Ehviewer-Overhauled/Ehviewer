@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CallSuper
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
@@ -17,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.search.SearchView
-import com.google.android.material.search.SearchView.TransitionListener
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -70,9 +68,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
                 onSearchViewHidden()
             }
         }
-        binding.searchview.addTransitionListener(mSearchViewOnBackPressedCallback)
         val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
         return binding.root.apply { addView(contentView, 0) }
     }
 
@@ -90,7 +86,6 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mSearchViewOnBackPressedCallback.remove()
         _binding = null
     }
 
@@ -345,25 +340,6 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         _binding ?: return
         binding.appbar.setExpanded(true)
     }
-
-    private val mSearchViewOnBackPressedCallback =
-        object : OnBackPressedCallback(false), TransitionListener {
-            override fun handleOnBackPressed() {
-                binding.searchview.hide()
-            }
-
-            override fun onStateChanged(
-                searchView: SearchView,
-                previousState: SearchView.TransitionState,
-                newState: SearchView.TransitionState,
-            ) {
-                if (newState == SearchView.TransitionState.SHOWING) {
-                    isEnabled = true
-                } else if (newState == SearchView.TransitionState.HIDING) {
-                    isEnabled = false
-                }
-            }
-        }
 }
 
 fun wrapTagKeyword(keyword: String): String {
