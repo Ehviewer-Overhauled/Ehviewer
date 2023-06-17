@@ -118,7 +118,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     @CallSuper
     open fun onSearchViewHidden() {
-        binding.toolbar.text = binding.searchview.text
+        binding.toolbar.setText(binding.searchview.text)
         privLockModeStart?.let { setDrawerLockMode(it, GravityCompat.START) }
         privLockModeStart = null
         privLockModeEnd?.let { setDrawerLockMode(it, GravityCompat.END) }
@@ -130,7 +130,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     fun setSearchBarText(text: String?) {
-        binding.toolbar.text = text
+        binding.toolbar.setText(text)
         binding.searchview.setText(text)
     }
 
@@ -159,7 +159,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     fun onApplySearch() {
-        binding.toolbar.text = binding.searchview.text
+        binding.toolbar.setText(binding.searchview.text)
         binding.searchview.hide()
         val query = binding.toolbar.text.toString().trim()
         if (!mAllowEmptySearch && query.isEmpty()) {

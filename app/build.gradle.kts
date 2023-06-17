@@ -64,7 +64,7 @@ android {
     defaultConfig {
         applicationId = "moe.tarsin.ehviewer"
         minSdk = 28
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 180042
         versionName = "1.8.9.0-SNAPSHOT"
         resourceConfigurations.addAll(
@@ -214,7 +214,7 @@ dependencies {
     val accompanist_version = "0.31.3-SNAPSHOT"
     implementation("com.google.accompanist:accompanist-themeadapter-material3:$accompanist_version")
     implementation("com.google.accompanist:accompanist-webview:$accompanist_version")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0-alpha04")
 
     val splitties = "3.0.0"
     implementation("com.louiscad.splitties:splitties-appctx:$splitties")
