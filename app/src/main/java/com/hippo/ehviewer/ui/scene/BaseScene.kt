@@ -198,11 +198,14 @@ abstract class BaseScene : Fragment() {
     val theme: Theme
         get() = requireActivity().theme
 
+    @SuppressLint("PrivateResource")
     @JvmOverloads
     fun navigate(id: Int, args: Bundle?, singleTop: Boolean = false) {
         val options: NavOptions = NavOptions.Builder().setLaunchSingleTop(singleTop)
-            .setEnterAnim(R.anim.scene_open_enter).setExitAnim(R.anim.scene_open_exit)
-            .setPopEnterAnim(R.anim.scene_close_enter).setPopExitAnim(R.anim.scene_close_exit)
+            .setEnterAnim(androidx.fragment.R.animator.fragment_open_enter)
+            .setExitAnim(androidx.fragment.R.animator.fragment_open_exit)
+            .setPopEnterAnim(androidx.fragment.R.animator.fragment_close_enter)
+            .setPopExitAnim(androidx.fragment.R.animator.fragment_close_exit)
             .build()
         NavHostFragment.findNavController(this).navigate(id, args, options)
     }
