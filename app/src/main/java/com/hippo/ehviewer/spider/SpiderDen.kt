@@ -133,22 +133,27 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7) {
-            cronetRequest(url) {
+            val req = cronetRequest(url) {
                 referer?.let { addHeader("Referer", it) }
-            } execute { info ->
-                val headers = info.headers.asMap
-                val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
-                val length = headers["Content-Length"]!!.first().toLong()
-                saveResponseMeta(index, type, length) { file ->
-                    file.openOutputStream().use {
-                        val chan = it.channel
-                        consumeBodyFully { info, buffer ->
-                            val read = chan.write(buffer)
-                            notifyProgress(length, info.receivedByteCount, read)
+            }
+            try {
+                req execute { info ->
+                    val headers = info.headers.asMap
+                    val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
+                    val length = headers["Content-Length"]!!.first().toLong()
+                    saveResponseMeta(index, type, length) { file ->
+                        file.openOutputStream().use {
+                            val chan = it.channel
+                            consumeBodyFully { info, buffer ->
+                                val read = chan.write(buffer)
+                                notifyProgress(length, info.receivedByteCount, read)
+                            }
                         }
+                        file.length()
                     }
-                    file.length()
                 }
+            } finally {
+                req.dispose()
             }
         } else {
             ehRequest(url, referer).executeNonCache {

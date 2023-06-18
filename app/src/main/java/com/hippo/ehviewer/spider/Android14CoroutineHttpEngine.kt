@@ -57,22 +57,21 @@ class CronetRequest {
         override fun onSucceeded(p0: UrlRequest, p1: UrlResponseInfo) {
             val length = p1.receivedByteCount
             // TODO: validate body length
-            pool.recycle(buffer)
             readerCont.resume(Unit)
             daemonCont.resume(true)
         }
 
         override fun onFailed(p0: UrlRequest, p1: UrlResponseInfo?, p2: HttpException) {
-            pool.recycle(buffer)
             daemonCont.resumeWithException(p2)
         }
 
         override fun onCanceled(p0: UrlRequest, p1: UrlResponseInfo?) {
-            pool.recycle(buffer)
         }
     }
 
     val buffer = pool.borrow()
+
+    fun dispose() = pool.recycle(buffer)
 }
 
 inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
