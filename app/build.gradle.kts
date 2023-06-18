@@ -244,7 +244,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose")
     implementation("io.coil-kt:coil-gif")
 
-    implementation("io.ktor:ktor-io-jvm:2.3.1")
+    val ktor = "2.3.1"
+    implementation("io.ktor:ktor-io-jvm:$ktor")
+    implementation("io.ktor:ktor-utils-jvm:$ktor")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
