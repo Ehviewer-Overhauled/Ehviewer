@@ -35,7 +35,7 @@ class CronetRequest {
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
     lateinit var daemonCont: Continuation<Boolean>
-    lateinit var readerCont: Continuation<Unit>
+    lateinit var readerCont: Continuation<Long>
     val callback = object : UrlRequest.Callback {
         override fun onRedirectReceived(p0: UrlRequest, p1: UrlResponseInfo, p2: String) {
             // No-op
@@ -54,8 +54,7 @@ class CronetRequest {
 
         override fun onSucceeded(p0: UrlRequest, p1: UrlResponseInfo) {
             val length = p1.receivedByteCount
-            // TODO: validate body length
-            readerCont.resume(Unit)
+            readerCont.resume(length)
             daemonCont.resume(true)
         }
 
@@ -76,7 +75,7 @@ inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = Cro
     request = cronetHttpClient.newUrlRequestBuilder(url, cronetHttpClientExecutor, callback).apply(conf).build()
 }
 
-suspend infix fun CronetRequest.consumeBodyFully(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = apply {
+suspend infix fun CronetRequest.consumeBodyFully(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = run {
     mConsumer = callback
     suspendCancellableCoroutine { cont ->
         readerCont = cont

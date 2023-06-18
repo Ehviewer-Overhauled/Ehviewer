@@ -149,7 +149,6 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                                 notifyProgress(length, info.receivedByteCount, read)
                             }
                         }
-                        file.length()
                     }
                 }
             } finally {
