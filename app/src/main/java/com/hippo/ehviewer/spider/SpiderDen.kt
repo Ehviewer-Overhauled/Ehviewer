@@ -142,7 +142,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 saveResponseMeta(index, type, length) { file ->
                     file.openOutputStream().use {
                         val chan = it.channel
-                        consumeBody { info, buffer ->
+                        consumeBodyFully { info, buffer ->
                             val read = chan.write(buffer)
                             notifyProgress(length, info.receivedByteCount, read)
                         }

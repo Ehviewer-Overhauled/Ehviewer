@@ -244,6 +244,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose")
     implementation("io.coil-kt:coil-gif")
 
+    implementation("io.ktor:ktor-io-jvm:2.3.1")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
     implementation("org.jsoup:jsoup:1.16.1")

@@ -9,6 +9,7 @@ import android.net.http.UrlResponseInfo
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import com.hippo.ehviewer.EhApplication
+import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -17,6 +18,8 @@ import java.nio.ByteBuffer
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+
+private val pool = DirectByteBufferPool(32)
 
 val cronetHttpClient = HttpEngine.Builder(appCtx).apply {
     setEnableHttp2(true)
@@ -54,28 +57,29 @@ class CronetRequest {
         override fun onSucceeded(p0: UrlRequest, p1: UrlResponseInfo) {
             val length = p1.receivedByteCount
             // TODO: validate body length
+            pool.recycle(buffer)
             readerCont.resume(Unit)
             daemonCont.resume(true)
         }
 
         override fun onFailed(p0: UrlRequest, p1: UrlResponseInfo?, p2: HttpException) {
+            pool.recycle(buffer)
             daemonCont.resumeWithException(p2)
         }
 
         override fun onCanceled(p0: UrlRequest, p1: UrlResponseInfo?) {
-            // No-op
+            pool.recycle(buffer)
         }
     }
 
-    // TODO: Pool it
-    val buffer: ByteBuffer = ByteBuffer.allocateDirect(4096)
+    val buffer = pool.borrow()
 }
 
 inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
     request = cronetHttpClient.newUrlRequestBuilder(url, cronetHttpClientExecutor, callback).apply(conf).build()
 }
 
-suspend infix fun CronetRequest.consumeBody(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = apply {
+suspend infix fun CronetRequest.consumeBodyFully(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = apply {
     mConsumer = callback
     suspendCancellableCoroutine { cont ->
         readerCont = cont
