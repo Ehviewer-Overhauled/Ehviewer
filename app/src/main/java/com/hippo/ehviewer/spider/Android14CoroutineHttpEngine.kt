@@ -48,10 +48,8 @@ class CronetRequest {
         override fun onReadCompleted(p0: UrlRequest, p1: UrlResponseInfo, p2: ByteBuffer) {
             p2.flip()
             mConsumer(p1, p2)
-            cronetHttpClientExecutor.execute {
-                buffer.flip()
-                request.read(buffer)
-            }
+            buffer.flip()
+            request.read(buffer)
         }
 
         override fun onSucceeded(p0: UrlRequest, p1: UrlResponseInfo) {
