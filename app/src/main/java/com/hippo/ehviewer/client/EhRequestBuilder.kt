@@ -63,7 +63,7 @@ const val TAG_CALL = "CancellableCallReadingScope"
 // Since Okio is not suspendable/cancellable, also okhttp, [executeAsync] only make [Request -> Response] cancellable, reading a Response is still not cancellable
 // Considering interrupting is not safe and performant, See https://github.com/Kotlin/kotlinx.coroutines/issues/3551#issuecomment-1353245978, we have such [usingCancellable]
 // TODO: Remove logging after this function stable
-suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R): R = executeAsync().use {
+suspend inline fun <R> Call.usingCancellable(crossinline block: suspend Response.() -> R): R = executeAsync().use {
     val call = this
     Log.d(TAG_CALL, "Got response of call$call")
     coroutineScope {
@@ -101,7 +101,7 @@ suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R
 }
 
 suspend inline fun <R> Request.execute(block: Response.() -> R) = okHttpClient.newCall(this).executeAsync().use(block)
-suspend inline fun <R> Request.executeNonCache(crossinline block: Response.() -> R) = nonCacheOkHttpClient.newCall(this).usingCancellable(block)
+suspend inline fun <R> Request.executeNonCache(crossinline block: suspend Response.() -> R) = nonCacheOkHttpClient.newCall(this).usingCancellable(block)
 
 const val CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
 const val CHROME_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"

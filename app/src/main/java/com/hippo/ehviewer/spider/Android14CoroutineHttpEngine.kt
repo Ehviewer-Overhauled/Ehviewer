@@ -9,6 +9,8 @@ import android.net.http.UrlResponseInfo
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import com.hippo.ehviewer.EhApplication
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import splitties.init.appCtx
 import java.nio.ByteBuffer
@@ -29,7 +31,8 @@ class CronetRequest {
     lateinit var mConsumer: (UrlResponseInfo, ByteBuffer) -> Unit
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
-    lateinit var mCont: Continuation<Boolean>
+    lateinit var daemonCont: Continuation<Boolean>
+    lateinit var readerCont: Continuation<Unit>
     val callback = object : UrlRequest.Callback {
         override fun onRedirectReceived(p0: UrlRequest, p1: UrlResponseInfo, p2: String) {
             // No-op
@@ -37,7 +40,6 @@ class CronetRequest {
 
         override fun onResponseStarted(p0: UrlRequest, p1: UrlResponseInfo) {
             onResponse(p1)
-            request.read(buffer)
         }
 
         override fun onReadCompleted(p0: UrlRequest, p1: UrlResponseInfo, p2: ByteBuffer) {
@@ -52,11 +54,12 @@ class CronetRequest {
         override fun onSucceeded(p0: UrlRequest, p1: UrlResponseInfo) {
             val length = p1.receivedByteCount
             // TODO: validate body length
-            mCont.resume(true)
+            readerCont.resume(Unit)
+            daemonCont.resume(true)
         }
 
         override fun onFailed(p0: UrlRequest, p1: UrlResponseInfo?, p2: HttpException) {
-            mCont.resumeWithException(p2)
+            daemonCont.resumeWithException(p2)
         }
 
         override fun onCanceled(p0: UrlRequest, p1: UrlResponseInfo?) {
@@ -72,15 +75,25 @@ inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = Cro
     request = cronetHttpClient.newUrlRequestBuilder(url, cronetHttpClientExecutor, callback).apply(conf).build()
 }
 
-infix fun CronetRequest.consumeBody(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = apply {
+suspend infix fun CronetRequest.consumeBody(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = apply {
     mConsumer = callback
+    suspendCancellableCoroutine { cont ->
+        readerCont = cont
+        request.read(buffer)
+    }
 }
 
-suspend inline infix fun CronetRequest.execute(noinline callback: CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
-    onResponse = callback
-    return suspendCancellableCoroutine { cont ->
-        cont.invokeOnCancellation { request.cancel() }
-        mCont = cont
-        request.start()
+suspend inline infix fun CronetRequest.execute(noinline callback: suspend CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
+    return coroutineScope {
+        onResponse = {
+            launch {
+                callback(it)
+            }
+        }
+        suspendCancellableCoroutine { cont ->
+            cont.invokeOnCancellation { request.cancel() }
+            daemonCont = cont
+            request.start()
+        }
     }
 }

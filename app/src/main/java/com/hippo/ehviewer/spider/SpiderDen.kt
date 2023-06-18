@@ -26,7 +26,6 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehRequest
 import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
-import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.coil.suspendEdit
 import com.hippo.ehviewer.download.downloadLocation
@@ -43,10 +42,7 @@ import okio.Buffer
 import okio.ForwardingSink
 import okio.sink
 import java.io.IOException
-import java.nio.channels.FileChannel
-import java.nio.file.StandardOpenOption
 import java.util.Locale
-import kotlin.io.path.deleteIfExists
 import kotlin.io.path.readText
 import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
 
@@ -137,24 +133,21 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7) {
-            val key = getImageKey(mGid, index)
-            sCache.suspendEdit(key) {
-                val path = data.toNioPath()
-                path.deleteIfExists()
-                @Suppress("BlockingMethodInNonBlockingContext")
-                FileChannel.open(path, StandardOpenOption.APPEND, StandardOpenOption.CREATE_NEW).use { chan ->
-                    cronetRequest(url) {
-                        referer?.let { addHeader("Referer", it) }
-                    } execute {
-                        val headers = it.headers.asMap
-                        val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
-                        val length = headers["Content-Length"]!!.first().toLong()
-                        metadata.toFile().writeText(type)
+            cronetRequest(url) {
+                referer?.let { addHeader("Referer", it) }
+            } execute { info ->
+                val headers = info.headers.asMap
+                val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
+                val length = headers["Content-Length"]!!.first().toLong()
+                saveResponseMeta(index, type, length) { file ->
+                    file.openOutputStream().use {
+                        val chan = it.channel
                         consumeBody { info, buffer ->
                             val read = chan.write(buffer)
                             notifyProgress(length, info.receivedByteCount, read)
                         }
                     }
+                    file.length()
                 }
             }
         } else {
@@ -168,7 +161,30 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         }
     }
 
-    private fun saveFromHttpResponse(index: Int, response: Response, notifyProgress: (Long, Long, Int) -> Unit): Boolean {
+    private suspend fun saveResponseMeta(index: Int, ext: String, length: Long, fops: suspend (UniFile) -> Long): Boolean {
+        suspend fun realFops(f: UniFile) = fops(f).apply {
+            if (ext.lowercase() == "gif") {
+                f.openFileDescriptor("rw").use { rewriteGifSource2(it.fd) }
+            }
+        }
+        findDownloadFileForIndex(index, ext)?.run {
+            return realFops(this) == length
+        }
+
+        // Read Mode, allow save to cache
+        if (mode == SpiderQueen.MODE_READ) {
+            val key = getImageKey(mGid, index)
+            var received = 0L
+            sCache.suspendEdit(key) {
+                metadata.toFile().writeText(ext)
+                received = realFops(UniFile.fromFile(data.toFile())!!)
+            }
+            return received == length
+        }
+        return false
+    }
+
+    private suspend fun saveFromHttpResponse(index: Int, response: Response, notifyProgress: (Long, Long, Int) -> Unit): Boolean {
         val contentType = response.body.contentType()
         val extension = contentType?.subtype ?: "jpg"
         val length = response.body.contentLength()
@@ -188,22 +204,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             }
         }
 
-        findDownloadFileForIndex(index, extension)?.run {
-            return doSave(this) == length
-        }
-
-        // Read Mode, allow save to cache
-        if (mode == SpiderQueen.MODE_READ) {
-            val key = getImageKey(mGid, index)
-            var received: Long = 0
-            sCache.edit(key) {
-                metadata.toFile().writeText(extension)
-                received = doSave(UniFile.fromFile(data.toFile())!!)
-            }
-            return received == length
-        }
-
-        return false
+        return saveResponseMeta(index, extension, length) { doSave(it) }
     }
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {
