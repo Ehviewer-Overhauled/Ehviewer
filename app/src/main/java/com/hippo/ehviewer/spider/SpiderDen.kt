@@ -16,8 +16,10 @@
 package com.hippo.ehviewer.spider
 
 import android.graphics.ImageDecoder
+import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
+import android.os.ext.SdkExtensions
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -26,6 +28,7 @@ import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
+import com.hippo.ehviewer.coil.suspendEdit
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.ehviewer.image.Image.CloseableSource
@@ -34,12 +37,16 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
 import okio.Buffer
 import okio.ForwardingSink
 import okio.sink
 import java.io.IOException
+import java.nio.channels.FileChannel
+import java.nio.file.StandardOpenOption
 import java.util.Locale
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.readText
 import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
 
@@ -129,13 +136,32 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         referer: String?,
         notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
-        // TODO: Use HttpEngine[https://developer.android.com/reference/android/net/http/HttpEngine] directly here if available
-        // Since we don't want unnecessary copy between jvm heap & native heap
-        return ehRequest(url, referer).executeNonCache {
-            if (code >= 400) {
-                false
-            } else {
-                saveFromHttpResponse(index, this, notifyProgress)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7) {
+            val key = getImageKey(mGid, index)
+            sCache.suspendEdit(key) {
+                val path = data.toNioPath()
+                path.deleteIfExists()
+                @Suppress("BlockingMethodInNonBlockingContext")
+                FileChannel.open(path, StandardOpenOption.APPEND, StandardOpenOption.CREATE_NEW).use {
+                    cronetRequest(url) {
+                        referer?.let { addHeader("Referer", it) }
+                    } onResponse {
+                        val type = it.headers.asMap["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
+                        metadata.toFile().writeText(type)
+                    } execute { info, buffer ->
+                        val read = it.write(buffer)
+                        val length = info.headers.asMap["Content-Length"]!!.first().toLong()
+                        notifyProgress(length, info.receivedByteCount, read)
+                    }
+                }
+            }
+        } else {
+            ehRequest(url, referer).executeNonCache {
+                if (code >= 400) {
+                    false
+                } else {
+                    saveFromHttpResponse(index, this, notifyProgress)
+                }
             }
         }
     }
