@@ -142,16 +142,18 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 val path = data.toNioPath()
                 path.deleteIfExists()
                 @Suppress("BlockingMethodInNonBlockingContext")
-                FileChannel.open(path, StandardOpenOption.APPEND, StandardOpenOption.CREATE_NEW).use {
+                FileChannel.open(path, StandardOpenOption.APPEND, StandardOpenOption.CREATE_NEW).use { chan ->
                     cronetRequest(url) {
                         referer?.let { addHeader("Referer", it) }
-                    } onResponse {
-                        val type = it.headers.asMap["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
+                    } execute {
+                        val headers = it.headers.asMap
+                        val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
+                        val length = headers["Content-Length"]!!.first().toLong()
                         metadata.toFile().writeText(type)
-                    } execute { info, buffer ->
-                        val read = it.write(buffer)
-                        val length = info.headers.asMap["Content-Length"]!!.first().toLong()
-                        notifyProgress(length, info.receivedByteCount, read)
+                        consumeBody { info, buffer ->
+                            val read = chan.write(buffer)
+                            notifyProgress(length, info.receivedByteCount, read)
+                        }
                     }
                 }
             }

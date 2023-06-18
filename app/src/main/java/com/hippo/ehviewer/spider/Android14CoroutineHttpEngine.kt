@@ -27,7 +27,7 @@ val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.exe
 
 class CronetRequest {
     lateinit var mConsumer: (UrlResponseInfo, ByteBuffer) -> Unit
-    lateinit var onResponse: (UrlResponseInfo) -> Unit
+    lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
     lateinit var mCont: Continuation<Boolean>
     val callback = object : UrlRequest.Callback {
@@ -36,6 +36,7 @@ class CronetRequest {
         }
 
         override fun onResponseStarted(p0: UrlRequest, p1: UrlResponseInfo) {
+            onResponse(p1)
             request.read(buffer)
         }
 
@@ -71,12 +72,12 @@ inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = Cro
     request = cronetHttpClient.newUrlRequestBuilder(url, cronetHttpClientExecutor, callback).apply(conf).build()
 }
 
-infix fun CronetRequest.onResponse(callback: (UrlResponseInfo) -> Unit) = apply {
-    onResponse = callback
+infix fun CronetRequest.consumeBody(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = apply {
+    mConsumer = callback
 }
 
-suspend inline infix fun CronetRequest.execute(noinline consumer: (UrlResponseInfo, ByteBuffer) -> Unit): Boolean {
-    mConsumer = consumer
+suspend inline infix fun CronetRequest.execute(noinline callback: CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
+    onResponse = callback
     return suspendCancellableCoroutine { cont ->
         cont.invokeOnCancellation { request.cancel() }
         mCont = cont
