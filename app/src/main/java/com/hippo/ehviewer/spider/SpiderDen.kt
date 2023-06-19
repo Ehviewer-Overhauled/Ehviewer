@@ -19,7 +19,6 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
-import android.os.ext.SdkExtensions
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -132,13 +131,13 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         referer: String?,
         notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val req = cronetRequest(url) {
                 referer?.let { addHeader("Referer", it) }
             }
             try {
                 req execute { info ->
-                    val headers = info.headers.asMap
+                    val headers = info.allHeaders
                     val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
                     val length = headers["Content-Length"]!!.first().toLong()
                     saveResponseMeta(index, type, length) { file ->

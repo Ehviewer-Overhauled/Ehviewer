@@ -1,18 +1,14 @@
-@file:RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-
 package com.hippo.ehviewer.spider
 
-import android.net.http.HttpEngine
-import android.net.http.HttpException
-import android.net.http.UrlRequest
-import android.net.http.UrlResponseInfo
-import android.os.Build
-import androidx.annotation.RequiresExtension
 import com.hippo.ehviewer.EhApplication
 import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.chromium.net.CronetEngine
+import org.chromium.net.CronetException
+import org.chromium.net.UrlRequest
+import org.chromium.net.UrlResponseInfo
 import splitties.init.appCtx
 import java.nio.ByteBuffer
 import kotlin.coroutines.Continuation
@@ -21,11 +17,11 @@ import kotlin.coroutines.resumeWithException
 
 private val pool = DirectByteBufferPool(32)
 
-val cronetHttpClient = HttpEngine.Builder(appCtx).apply {
-    setEnableHttp2(true)
-    setEnableBrotli(true)
-    setEnableHttpCache(HttpEngine.Builder.HTTP_CACHE_DISABLED, 0)
-    setEnableQuic(true)
+val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
+    enableHttp2(true)
+    enableBrotli(true)
+    enableHttpCache(CronetEngine.Builder.HTTP_CACHE_DISABLED, 0)
+    enableQuic(true)
 }.build()
 
 val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.executorService
@@ -36,7 +32,7 @@ class CronetRequest {
     lateinit var request: UrlRequest
     lateinit var daemonCont: Continuation<Boolean>
     lateinit var readerCont: Continuation<Long>
-    val callback = object : UrlRequest.Callback {
+    val callback = object : UrlRequest.Callback() {
         override fun onRedirectReceived(p0: UrlRequest, p1: UrlResponseInfo, p2: String) {
             // No-op
         }
@@ -58,7 +54,7 @@ class CronetRequest {
             daemonCont.resume(true)
         }
 
-        override fun onFailed(p0: UrlRequest, p1: UrlResponseInfo?, p2: HttpException) {
+        override fun onFailed(p0: UrlRequest, p1: UrlResponseInfo?, p2: CronetException) {
             daemonCont.resumeWithException(p2)
         }
 
@@ -72,7 +68,7 @@ class CronetRequest {
 }
 
 inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
-    request = cronetHttpClient.newUrlRequestBuilder(url, cronetHttpClientExecutor, callback).apply(conf).build()
+    request = cronetHttpClient.newUrlRequestBuilder(url, callback, cronetHttpClientExecutor).apply(conf).build()
 }
 
 suspend infix fun CronetRequest.consumeBodyFully(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = run {
