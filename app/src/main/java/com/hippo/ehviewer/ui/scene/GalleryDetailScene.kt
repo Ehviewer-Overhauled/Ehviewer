@@ -33,8 +33,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -111,7 +109,6 @@ import androidx.navigation.fragment.findNavController
 import arrow.core.partially1
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhApplication.Companion.imageCache
@@ -141,6 +138,10 @@ import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.databinding.DialogArchiveListBinding
+import com.hippo.ehviewer.databinding.DialogRateBinding
+import com.hippo.ehviewer.databinding.DialogTorrentListBinding
+import com.hippo.ehviewer.databinding.ItemGalleryCommentBinding
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.spider.SpiderQueen
@@ -153,9 +154,7 @@ import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
-import com.hippo.ehviewer.ui.legacy.GalleryRatingBar
 import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
-import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
@@ -175,7 +174,6 @@ import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.util.addTextToClipboard
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.FileUtils
-import com.hippo.ehviewer.yorozuya.ViewUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -210,12 +208,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     ) { result: Boolean ->
         if (result && composeBindingGD != null) {
             val helper = TorrentListDialogHelper()
+            val binding = DialogTorrentListBinding.inflate(layoutInflater)
             val dialog: Dialog = BaseDialogBuilder(requireActivity())
                 .setTitle(R.string.torrents)
-                .setView(R.layout.dialog_torrent_list)
+                .setView(binding.root)
                 .setOnDismissListener(helper)
                 .show()
-            helper.setDialog(dialog, composeBindingGD!!.torrentUrl)
+            helper.setDialog(dialog, binding, composeBindingGD!!.torrentUrl)
         }
     }
     private var mArchiveFormParamOr: String? = null
@@ -522,9 +521,14 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         fun onGalleryInfoCardClick() {
             showSheet = true
         }
+
         val navController = remember { findNavController() }
         CompositionLocalProvider(LocalNavController provides navController) {
-            composeBindingGD?.let { if (showSheet) GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false } }
+            composeBindingGD?.let {
+                if (showSheet) {
+                    GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false }
+                }
+            }
         }
         val windowSizeClass = calculateWindowSizeClass(requireActivity())
         val columnCount = calculateSuitableSpanCount()
@@ -703,7 +707,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            FilledTertiaryIconToggleButton(checked = favourite, onCheckedChange = { modifyFavourite() }) {
+            FilledTertiaryIconToggleButton(
+                checked = favourite,
+                onCheckedChange = { modifyFavourite() },
+            ) {
                 Icon(
                     imageVector = if (favourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
@@ -845,7 +852,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 EhDB.putHistoryInfo(galleryDetail)
                 if (Settings.preloadThumbAggressively) {
                     lifecycleScope.launchIO {
-                        galleryDetail.previewList.forEach { context?.run { imageLoader.enqueue(imageRequest(it) { justDownload() }) } }
+                        galleryDetail.previewList.forEach {
+                            context?.run { imageLoader.enqueue(imageRequest(it) { justDownload() }) }
+                        }
                     }
                 }
                 composeBindingGD = galleryDetail
@@ -889,7 +898,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
                         onModifyFavoritesSuccess(true)
                     }.onFailure {
-                        if (it !is CancellationException) showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                        if (it !is CancellationException) {
+                            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                        }
                     }
                     mModifyingFavorites = false
                     remove = true
@@ -903,7 +914,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             onModifyFavoritesSuccess(false)
                         }
                     }.onFailure {
-                        if (it !is CancellationException) showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                        if (it !is CancellationException) {
+                            showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                        }
                     }
                     mModifyingFavorites = false
                 }
@@ -946,12 +959,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             return
         }
         val helper = ArchiveListDialogHelper()
+        val binding = DialogArchiveListBinding.inflate(layoutInflater)
         val dialog: Dialog = BaseDialogBuilder(requireContext())
             .setTitle(R.string.settings_download)
-            .setView(R.layout.dialog_archive_list)
+            .setView(binding.root)
             .setOnDismissListener(helper)
             .show()
-        helper.setDialog(dialog, galleryDetail.archiveUrl)
+        helper.setDialog(dialog, binding, galleryDetail.archiveUrl)
     }
 
     private fun bindViewSecond() {
@@ -1031,6 +1045,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 lub.keyword = tag
                                 navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                             }
+
                             val hapticFeedback = LocalHapticFeedback.current
 
                             fun onLongClick() {
@@ -1090,22 +1105,19 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 for (i in 0 until length) {
                     val comment = commentsList[i]
                     AndroidView(factory = {
-                        LayoutInflater.from(it).inflate(R.layout.item_gallery_comment, null, false)
+                        ItemGalleryCommentBinding.inflate(LayoutInflater.from(it), null, false)
                             .apply {
-                                val user = findViewById<TextView>(R.id.user)
                                 user.text = comment.user
                                 user.setBackgroundColor(Color.TRANSPARENT)
-                                val time = findViewById<TextView>(R.id.time)
                                 time.text = ReadableTime.getTimeAgo(comment.time)
-                                val c = findViewById<ObservedTextView>(R.id.comment)
-                                c.maxLines = 5
-                                c.text = Html.fromHtml(
+                                this.comment.maxLines = 5
+                                this.comment.text = Html.fromHtml(
                                     comment.comment,
                                     Html.FROM_HTML_MODE_LEGACY,
-                                    URLImageGetter(c),
+                                    URLImageGetter(this.comment),
                                     null,
                                 )
-                            }
+                            }.root
                     })
                 }
             }
@@ -1194,12 +1206,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             requestStoragePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         } else {
             val helper = TorrentListDialogHelper()
+            val binding = DialogTorrentListBinding.inflate(layoutInflater)
             val dialog: Dialog = BaseDialogBuilder(requireContext())
                 .setTitle(R.string.torrents)
-                .setView(R.layout.dialog_torrent_list)
+                .setView(binding.root)
                 .setOnDismissListener(helper)
                 .show()
-            helper.setDialog(dialog, galleryDetail.torrentUrl)
+            helper.setDialog(dialog, binding, galleryDetail.torrentUrl)
         }
     }
 
@@ -1209,14 +1222,14 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             showTip(R.string.sign_in_first, LENGTH_LONG)
             return
         }
-        val helper = RateDialogHelper()
-        val dialog: Dialog = BaseDialogBuilder(requireContext())
+        val binding = DialogRateBinding.inflate(layoutInflater)
+        val helper = RateDialogHelper(binding, galleryDetail.rating)
+        BaseDialogBuilder(requireContext())
             .setTitle(R.string.rate)
-            .setView(R.layout.dialog_rate)
+            .setView(binding.root)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok, helper)
             .show()
-        helper.setDialog(dialog, galleryDetail.rating)
     }
 
     private fun showFilterTagDialog(tag: String) {
@@ -1354,7 +1367,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
                         onModifyFavoritesSuccess(true)
                     }.onFailure {
-                        if (it !is CancellationException) showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                        if (it !is CancellationException) {
+                            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                        }
                     }
                     mModifyingFavorites = false
                     remove = true
@@ -1368,7 +1383,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             onModifyFavoritesSuccess(false)
                         }
                     }.onFailure {
-                        if (it !is CancellationException) showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                        if (it !is CancellationException) {
+                            showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                        }
                     }
                     mModifyingFavorites = false
                 }
@@ -1468,23 +1485,22 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private inner class ArchiveListDialogHelper : AdapterView.OnItemClickListener, DialogInterface.OnDismissListener {
-        private var mProgressView: CircularProgressIndicator? = null
+    private inner class ArchiveListDialogHelper :
+        AdapterView.OnItemClickListener,
+        DialogInterface.OnDismissListener {
+        private var _binding: DialogArchiveListBinding? = null
+        private val binding get() = _binding!!
         private var mJob: Job? = null
-        private var mErrorText: TextView? = null
-        private var mListView: ListView? = null
         private var mDialog: Dialog? = null
-        fun setDialog(dialog: Dialog?, url: String?) {
+        fun setDialog(dialog: Dialog?, dialogBinding: DialogArchiveListBinding, url: String?) {
             mDialog = dialog
-            mProgressView = ViewUtils.`$$`(dialog, R.id.progress) as CircularProgressIndicator
-            mErrorText = ViewUtils.`$$`(dialog, R.id.text) as TextView
-            mListView = ViewUtils.`$$`(dialog, R.id.list_view) as ListView
-            mListView!!.onItemClickListener = this
+            _binding = dialogBinding
+            binding.listView.onItemClickListener = this
             val context = context
             if (context != null) {
                 if (mArchiveList == null) {
-                    mErrorText!!.visibility = View.GONE
-                    mListView!!.visibility = View.GONE
+                    binding.text.visibility = View.GONE
+                    binding.listView.visibility = View.GONE
                     mJob = lifecycleScope.launchIO {
                         runSuspendCatching {
                             EhEngine.getArchiveList(url!!, mGid, mToken)
@@ -1497,10 +1513,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             }
                         }.onFailure {
                             withUIContext {
-                                mProgressView?.visibility = View.GONE
-                                mErrorText?.visibility = View.VISIBLE
-                                mListView?.visibility = View.GONE
-                                mErrorText?.text = ExceptionUtils.getReadableString(it)
+                                binding.progress.visibility = View.GONE
+                                binding.text.visibility = View.VISIBLE
+                                binding.listView.visibility = View.GONE
+                                binding.text.text = ExceptionUtils.getReadableString(it)
                             }
                         }
                         mJob = null
@@ -1512,14 +1528,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
 
         private fun bind(data: List<ArchiveParser.Archive>?, funds: HomeParser.Funds?) {
-            if (null == mDialog || null == mProgressView || null == mErrorText || null == mListView) {
-                return
-            }
+            mDialog ?: return
             if (data.isNullOrEmpty()) {
-                mProgressView!!.visibility = View.GONE
-                mErrorText!!.visibility = View.VISIBLE
-                mListView!!.visibility = View.GONE
-                mErrorText!!.setText(R.string.no_archives)
+                binding.progress.visibility = View.GONE
+                binding.text.visibility = View.VISIBLE
+                binding.listView.visibility = View.GONE
+                binding.text.setText(R.string.no_archives)
             } else {
                 val nameArray = data.map {
                     it.run {
@@ -1536,10 +1550,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         }
                     }
                 }.toTypedArray()
-                mProgressView!!.visibility = View.GONE
-                mErrorText!!.visibility = View.GONE
-                mListView!!.visibility = View.VISIBLE
-                mListView!!.adapter =
+                binding.progress.visibility = View.GONE
+                binding.text.visibility = View.GONE
+                binding.listView.visibility = View.VISIBLE
+                binding.listView.adapter =
                     ArrayAdapter(mDialog!!.context, R.layout.item_select_dialog, nameArray)
                 if (funds != null) {
                     var fundsGP = funds.fundsGP.toString()
@@ -1577,8 +1591,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             EhEngine.downloadArchive(gid, token, mArchiveFormParamOr, res, isHAtH)
                         }.onSuccess { result ->
                             val r = DownloadManager.Request(Uri.parse(result))
-                            val name = gid.toString() + "-" + EhUtils.getSuitableTitle(this@run) + ".zip"
-                            r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, FileUtils.sanitizeFilename(name))
+                            val name = "$gid-" + EhUtils.getSuitableTitle(this@run) + ".zip"
+                            r.setDestinationInExternalPublicDir(
+                                Environment.DIRECTORY_DOWNLOADS,
+                                FileUtils.sanitizeFilename(name),
+                            )
                             r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                             runCatching {
                                 downloadManager.enqueue(r)
@@ -1606,29 +1623,26 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             mJob?.cancel()
             mJob = null
             mDialog = null
-            mProgressView = null
-            mErrorText = null
-            mListView = null
+            _binding = null
         }
     }
 
-    private inner class TorrentListDialogHelper : AdapterView.OnItemClickListener, DialogInterface.OnDismissListener {
-        private var mProgressView: CircularProgressIndicator? = null
-        private var mErrorText: TextView? = null
-        private var mListView: ListView? = null
+    private inner class TorrentListDialogHelper :
+        AdapterView.OnItemClickListener,
+        DialogInterface.OnDismissListener {
+        private var _binding: DialogTorrentListBinding? = null
+        private val binding get() = _binding!!
         private var mJob: Job? = null
         private var mDialog: Dialog? = null
-        fun setDialog(dialog: Dialog?, url: String?) {
+        fun setDialog(dialog: Dialog?, dialogBinding: DialogTorrentListBinding, url: String?) {
             mDialog = dialog
-            mProgressView = ViewUtils.`$$`(dialog, R.id.progress) as CircularProgressIndicator
-            mErrorText = ViewUtils.`$$`(dialog, R.id.text) as TextView
-            mListView = ViewUtils.`$$`(dialog, R.id.list_view) as ListView
-            mListView!!.onItemClickListener = this
+            _binding = dialogBinding
+            binding.listView.onItemClickListener = this
             val context = context
             if (context != null) {
                 if (mTorrentList == null) {
-                    mErrorText!!.visibility = View.GONE
-                    mListView!!.visibility = View.GONE
+                    binding.text.visibility = View.GONE
+                    binding.listView.visibility = View.GONE
                     mJob = lifecycleScope.launchIO {
                         runSuspendCatching {
                             EhEngine.getTorrentList(url!!, mGid, mToken)
@@ -1639,10 +1653,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             }
                         }.onFailure {
                             withUIContext {
-                                mProgressView?.visibility = View.GONE
-                                mErrorText?.visibility = View.VISIBLE
-                                mListView?.visibility = View.GONE
-                                mErrorText?.text = ExceptionUtils.getReadableString(it)
+                                binding.progress.visibility = View.GONE
+                                binding.text.visibility = View.VISIBLE
+                                binding.listView.visibility = View.GONE
+                                binding.text.text = ExceptionUtils.getReadableString(it)
                             }
                         }
                         mJob = null
@@ -1654,20 +1668,18 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
 
         private fun bind(data: TorrentResult?) {
-            if (null == mDialog || null == mProgressView || null == mErrorText || null == mListView) {
-                return
-            }
+            mDialog ?: return
             if (data.isNullOrEmpty()) {
-                mProgressView!!.visibility = View.GONE
-                mErrorText!!.visibility = View.VISIBLE
-                mListView!!.visibility = View.GONE
-                mErrorText!!.setText(R.string.no_torrents)
+                binding.progress.visibility = View.GONE
+                binding.text.visibility = View.VISIBLE
+                binding.listView.visibility = View.GONE
+                binding.text.setText(R.string.no_torrents)
             } else {
                 val nameArray = data.map { it.format() }.toTypedArray()
-                mProgressView!!.visibility = View.GONE
-                mErrorText!!.visibility = View.GONE
-                mListView!!.visibility = View.VISIBLE
-                mListView!!.adapter =
+                binding.progress.visibility = View.GONE
+                binding.text.visibility = View.GONE
+                binding.listView.visibility = View.VISIBLE
+                binding.listView.adapter =
                     ArrayAdapter(mDialog!!.context, R.layout.item_select_dialog, nameArray)
             }
         }
@@ -1705,33 +1717,27 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             mJob?.cancel()
             mJob = null
             mDialog = null
-            mProgressView = null
-            mErrorText = null
-            mListView = null
+            _binding = null
         }
     }
 
-    private inner class RateDialogHelper : OnUserRateListener, DialogInterface.OnClickListener {
-        private var mRatingBar: GalleryRatingBar? = null
-        private var mRatingText: TextView? = null
-        fun setDialog(dialog: Dialog?, rating: Float) {
-            mRatingText = ViewUtils.`$$`(dialog, R.id.rating_text) as TextView
-            mRatingBar = ViewUtils.`$$`(dialog, R.id.rating_view) as GalleryRatingBar
-            mRatingText!!.setText(getRatingText(rating))
-            mRatingBar!!.rating = rating
-            mRatingBar!!.setOnUserRateListener(this)
+    private inner class RateDialogHelper(private var binding: DialogRateBinding, rating: Float) :
+        OnUserRateListener,
+        DialogInterface.OnClickListener {
+        init {
+            binding.ratingText.setText(getRatingText(rating))
+            binding.ratingView.rating = rating
+            binding.ratingView.setOnUserRateListener(this)
         }
 
         override fun onUserRate(rating: Float) {
-            if (null != mRatingText) {
-                mRatingText!!.setText(getRatingText(rating))
-            }
+            binding.ratingText.setText(getRatingText(rating))
         }
 
         override fun onClick(dialog: DialogInterface, which: Int) {
             if (which != DialogInterface.BUTTON_POSITIVE) return
             val gd = composeBindingGD ?: return
-            val r = mRatingBar?.rating ?: return
+            val r = binding.ratingView.rating
             lifecycleScope.launchIO {
                 runSuspendCatching {
                     EhEngine.rateGallery(gd.apiUid, gd.apiKey, gd.gid, gd.token, r)
