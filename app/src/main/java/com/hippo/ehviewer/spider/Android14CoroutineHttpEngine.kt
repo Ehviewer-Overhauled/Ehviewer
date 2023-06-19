@@ -26,7 +26,7 @@ val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
 
 val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.executorService
 
-class CronetRequest {
+class CronetRequest : AutoCloseable {
     lateinit var mConsumer: (UrlResponseInfo, ByteBuffer) -> Unit
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
@@ -64,7 +64,7 @@ class CronetRequest {
 
     val buffer = pool.borrow()
 
-    fun dispose() = pool.recycle(buffer)
+    override fun close() = pool.recycle(buffer)
 }
 
 inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {

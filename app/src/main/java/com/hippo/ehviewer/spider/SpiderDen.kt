@@ -132,11 +132,10 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val req = cronetRequest(url) {
+            cronetRequest(url) {
                 referer?.let { addHeader("Referer", it) }
-            }
-            try {
-                req execute { info ->
+            }.use { request ->
+                request execute { info ->
                     val headers = info.allHeaders
                     val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
                     val length = headers["Content-Length"]!!.first().toLong()
@@ -150,8 +149,6 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                         }
                     }
                 }
-            } finally {
-                req.dispose()
             }
         } else {
             ehRequest(url, referer).executeNonCache {
@@ -191,23 +188,16 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         val contentType = response.body.contentType()
         val extension = contentType?.subtype ?: "jpg"
         val length = response.body.contentLength()
-
-        fun doSave(outFile: UniFile): Long {
-            return object : ForwardingSink(outFile.openOutputStream().sink()) {
+        return saveResponseMeta(index, extension, length) { outFile ->
+            object : ForwardingSink(outFile.openOutputStream().sink()) {
                 var totalBytesRead = 0L
                 override fun write(source: Buffer, byteCount: Long) {
                     super.write(source, byteCount)
                     totalBytesRead += byteCount
                     notifyProgress(length, totalBytesRead, byteCount.toInt())
                 }
-            }.use { sink -> response.body.source().use { source -> source.readAll(sink) } }.also {
-                if (extension.lowercase() == "gif") {
-                    outFile.openFileDescriptor("rw").use { rewriteGifSource2(it.fd) }
-                }
-            }
+            }.use { sink -> response.body.source().use { source -> source.readAll(sink) } }
         }
-
-        return saveResponseMeta(index, extension, length) { doSave(it) }
     }
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {
