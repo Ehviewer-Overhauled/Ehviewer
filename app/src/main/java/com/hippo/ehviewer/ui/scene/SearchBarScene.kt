@@ -21,6 +21,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.dao.SearchDatabase
+import com.hippo.ehviewer.databinding.ItemSimpleList2Binding
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -40,6 +41,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var mAllowEmptySearch = true
     private val mSearchDatabase = searchDatabase.searchDao()
     private var onApplySearch: (String) -> Unit = {}
+    protected val mSearchFab get() = binding.searchFab
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -184,30 +186,32 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
     }
 
-    private class SuggestionHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val text1 = itemView.findViewById(android.R.id.text1) as TextView
-        val text2 = itemView.findViewById(android.R.id.text2) as TextView
+    private class SuggestionHolder(private val binding: ItemSimpleList2Binding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(suggestion: Suggestion?) {
+            val text1 = suggestion?.getText(binding.text1)
+            val text2 = suggestion?.getText(binding.text2)
+            binding.text1.text = text1
+            if (text2 == null) {
+                binding.text2.visibility = View.GONE
+                binding.text2.text = ""
+            } else {
+                binding.text2.visibility = View.VISIBLE
+                binding.text2.text = text2
+            }
+        }
     }
 
     private inner class SuggestionAdapter constructor(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<SuggestionHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionHolder {
-            return SuggestionHolder(mInflater.inflate(R.layout.item_simple_list_2, parent, false))
+            return SuggestionHolder(ItemSimpleList2Binding.inflate(mInflater, parent, false))
         }
 
         override fun onBindViewHolder(holder: SuggestionHolder, position: Int) {
             val suggestion = mSuggestionList?.get(position)
-            val text1 = suggestion?.getText(holder.text1)
-            val text2 = suggestion?.getText(holder.text2)
-            holder.text1.text = text1
-            if (text2 == null) {
-                holder.text2.visibility = View.GONE
-                holder.text2.text = ""
-            } else {
-                holder.text2.visibility = View.VISIBLE
-                holder.text2.text = text2
-            }
+            holder.bind(suggestion)
 
             holder.itemView.setOnClickListener {
                 mSuggestionList?.run {
