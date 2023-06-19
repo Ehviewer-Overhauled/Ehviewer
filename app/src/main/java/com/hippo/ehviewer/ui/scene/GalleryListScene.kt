@@ -97,8 +97,6 @@ import com.hippo.ehviewer.ui.tools.DialogState
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
-import com.hippo.ehviewer.yorozuya.StringUtils
-import com.hippo.ehviewer.yorozuya.ViewUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -124,11 +122,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private lateinit var mUrlBuilder: ListUrlBuilder
     private var _binding: SceneGalleryListBinding? = null
     private val binding get() = _binding!!
-    private var mSearchFab: View? = null
     private val mSearchFabAnimatorListener: Animator.AnimatorListener =
         object : SimpleAnimatorListener() {
             override fun onAnimationEnd(animation: Animator) {
-                mSearchFab?.visibility = View.INVISIBLE
+                mSearchFab.visibility = View.INVISIBLE
             }
         }
     private val mActionFabAnimatorListener: Animator.AnimatorListener =
@@ -345,13 +342,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         requireActivity().onBackPressedDispatcher.addCallback(mCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
         mShowActionFab = true
-        mSearchFab = ViewUtils.`$$`(container, R.id.search_fab)
         ViewCompat.setWindowInsetsAnimationCallback(
             binding.root,
             WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 binding.fabLayout,
-                mSearchFab!!.parent as View,
+                mSearchFab.parent as View,
             ),
         )
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
@@ -401,7 +397,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         mActionFabDrawable =
             AddDeleteDrawable(context, colorID)
         binding.fabLayout.primaryFab!!.setImageDrawable(mActionFabDrawable)
-        mSearchFab!!.setOnClickListener { onApplySearch() }
+        mSearchFab.setOnClickListener { onApplySearch() }
 
         // Update list url builder
         onUpdateUrlBuilder()
@@ -752,9 +748,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private fun selectSearchFab(animation: Boolean) {
         _binding ?: return
-        if (null == mSearchFab) {
-            return
-        }
         mShowActionFab = false
         if (animation) {
             val fab: View? = binding.fabLayout.primaryFab
@@ -768,9 +761,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     .setDuration(ANIMATE_TIME).setStartDelay(0L)
                     .setInterpolator(AnimationUtils.SLOW_FAST_INTERPOLATOR).start()
             }
-            mSearchFab!!.visibility = View.VISIBLE
-            mSearchFab!!.rotation = -45.0f
-            mSearchFab!!.animate().scaleX(1.0f).scaleY(1.0f).rotation(0.0f).setListener(null)
+            mSearchFab.visibility = View.VISIBLE
+            mSearchFab.rotation = -45.0f
+            mSearchFab.animate().scaleX(1.0f).scaleY(1.0f).rotation(0.0f).setListener(null)
                 .setDuration(ANIMATE_TIME).setStartDelay(delay)
                 .setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR).start()
         } else {
@@ -779,25 +772,22 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             fab!!.visibility = View.INVISIBLE
             fab.scaleX = 0.0f
             fab.scaleY = 0.0f
-            mSearchFab!!.visibility = View.VISIBLE
-            mSearchFab!!.scaleX = 1.0f
-            mSearchFab!!.scaleY = 1.0f
+            mSearchFab.visibility = View.VISIBLE
+            mSearchFab.scaleX = 1.0f
+            mSearchFab.scaleY = 1.0f
         }
     }
 
     private fun selectActionFab(animation: Boolean) {
         _binding ?: return
-        if (null == mSearchFab) {
-            return
-        }
         mShowActionFab = true
         if (animation) {
             val delay: Long
-            if (View.INVISIBLE == mSearchFab!!.visibility) {
+            if (View.INVISIBLE == mSearchFab.visibility) {
                 delay = 0L
             } else {
                 delay = ANIMATE_TIME
-                mSearchFab!!.animate().scaleX(0.0f).scaleY(0.0f)
+                mSearchFab.animate().scaleX(0.0f).scaleY(0.0f)
                     .setListener(mSearchFabAnimatorListener)
                     .setDuration(ANIMATE_TIME).setStartDelay(0L)
                     .setInterpolator(AnimationUtils.SLOW_FAST_INTERPOLATOR).start()
@@ -814,9 +804,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             fab!!.visibility = View.VISIBLE
             fab.scaleX = 1.0f
             fab.scaleY = 1.0f
-            mSearchFab!!.visibility = View.INVISIBLE
-            mSearchFab!!.scaleX = 0.0f
-            mSearchFab!!.scaleY = 0.0f
+            mSearchFab.visibility = View.INVISIBLE
+            mSearchFab.scaleX = 0.0f
+            mSearchFab.scaleY = 0.0f
         }
     }
 
@@ -1155,7 +1145,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 runSuspendCatching {
                     if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.mode) {
                         EhEngine.imageSearch(
-                            File(StringUtils.avoidNull(mUrlBuilder.imagePath)),
+                            File(mUrlBuilder.imagePath!!),
                             mUrlBuilder.isUseSimilarityScan,
                             mUrlBuilder.isOnlySearchCovers,
                         )
