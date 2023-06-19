@@ -26,7 +26,6 @@ import android.os.Looper
 import android.text.Html
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.TextUtils
 import android.text.style.CharacterStyle
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
@@ -42,9 +41,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.text.getSpans
@@ -57,9 +53,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.viewbinding.ViewBinding
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
@@ -70,12 +65,15 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.databinding.ItemDrawerFavoritesBinding
+import com.hippo.ehviewer.databinding.ItemGalleryCommentBinding
+import com.hippo.ehviewer.databinding.ItemGalleryCommentMoreBinding
+import com.hippo.ehviewer.databinding.ItemGalleryCommentProgressBinding
+import com.hippo.ehviewer.databinding.SceneGalleryCommentsBinding
 import com.hippo.ehviewer.ui.jumpToReaderByPage
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
-import com.hippo.ehviewer.ui.legacy.FabLayout
-import com.hippo.ehviewer.ui.legacy.LinkifyTextView
 import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.ViewTransition
@@ -92,7 +90,6 @@ import com.hippo.ehviewer.util.toBBCode
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
 import com.hippo.ehviewer.yorozuya.StringUtils
-import com.hippo.ehviewer.yorozuya.ViewUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -101,17 +98,12 @@ import rikka.core.res.resolveColor
 import kotlin.math.hypot
 
 class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefreshListener {
+    private var _binding: SceneGalleryCommentsBinding? = null
+    private val binding get() = _binding!!
     private val mCallback = EditPanelOnBackPressedCallback()
     private var mGalleryDetail: GalleryDetail? = null
-    private var mRecyclerView: EasyRecyclerView? = null
-    private var mFabLayout: FabLayout? = null
-    private var mFab: FloatingActionButton? = null
-    private var mEditPanel: View? = null
-    private var mSendImage: ImageView? = null
-    private var mEditText: EditText? = null
     private var mAdapter: CommentAdapter? = null
     private var mViewTransition: ViewTransition? = null
-    private var mRefreshLayout: SwipeRefreshLayout? = null
     private var mSendDrawable: Drawable? = null
     private var mPencilDrawable: Drawable? = null
     private var mCommentId: Long = 0
@@ -157,31 +149,25 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         savedInstanceState: Bundle?,
     ): View {
         val view = inflater.inflate(R.layout.scene_gallery_comments, container, false) as ViewGroup
-        mRecyclerView = ViewUtils.`$$`(view, R.id.recycler_view) as EasyRecyclerView
-        setLiftOnScrollTargetView(mRecyclerView)
-        val tip = ViewUtils.`$$`(view, R.id.tip) as TextView
-        mEditPanel = ViewUtils.`$$`(view, R.id.edit_panel)
-        mSendImage = ViewUtils.`$$`(mEditPanel, R.id.send) as ImageView
-        mEditText = ViewUtils.`$$`(mEditPanel, R.id.edit_text) as EditText
-        mFabLayout = ViewUtils.`$$`(view, R.id.fab_layout) as FabLayout
-        mFab = ViewUtils.`$$`(view, R.id.fab) as FloatingActionButton
-        mRefreshLayout = ViewUtils.`$$`(view, R.id.refresh_layout) as SwipeRefreshLayout
+        _binding = SceneGalleryCommentsBinding.bind(view)
+        setLiftOnScrollTargetView(binding.recyclerView)
+        val tip = binding.tip
 
         // Workaround for fab and edittext render out of screen
-        view.removeView(mFabLayout)
-        view.removeView(mEditPanel!!.parent as View)
+        view.removeView(binding.fabLayout)
+        view.removeView(binding.editPanel.parent as View)
         assert(container != null)
-        container!!.addView(mFabLayout)
-        container.addView(mEditPanel!!.parent as View)
+        container!!.addView(binding.fabLayout)
+        container.addView(binding.editPanel.parent as View)
         ViewCompat.setWindowInsetsAnimationCallback(
             view,
             WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
-                mEditPanel,
-                mFabLayout,
+                binding.editPanel,
+                binding.fabLayout,
             ),
         )
-        mRefreshLayout!!.setOnRefreshListener(this)
+        binding.refreshLayout.setOnRefreshListener(this)
         val context = requireContext()
         val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)
         drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
@@ -189,20 +175,20 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         mSendDrawable = ContextCompat.getDrawable(context, R.drawable.v_send_dark_x24)
         mPencilDrawable = ContextCompat.getDrawable(context, R.drawable.v_pencil_dark_x24)
         mAdapter = CommentAdapter()
-        mRecyclerView!!.adapter = mAdapter
-        mRecyclerView!!.layoutManager = LinearLayoutManager(
+        binding.recyclerView.adapter = mAdapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(
             context,
             RecyclerView.VERTICAL,
             false,
         )
-        mRecyclerView!!.setHasFixedSize(true)
+        binding.recyclerView.setHasFixedSize(true)
         // Cancel change animator
-        val itemAnimator = mRecyclerView!!.itemAnimator
+        val itemAnimator = binding.recyclerView.itemAnimator
         if (itemAnimator is DefaultItemAnimator) {
             itemAnimator.supportsChangeAnimations = false
         }
-        mSendImage!!.setOnClickListener(this)
-        mEditText!!.customSelectionActionModeCallback = object : ActionMode.Callback {
+        binding.send.setOnClickListener(this)
+        binding.editText.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
                 requireActivity().menuInflater.inflate(R.menu.context_comment, menu)
                 return true
@@ -214,9 +200,9 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 item?.let {
-                    val text = mEditText!!.editableText
-                    val start = mEditText!!.selectionStart
-                    val end = mEditText!!.selectionEnd
+                    val text = binding.editText.editableText
+                    val start = binding.editText.selectionStart
+                    val end = binding.editText.selectionEnd
                     when (item.itemId) {
                         R.id.action_bold -> text[start, end] = StyleSpan(Typeface.BOLD)
 
@@ -230,7 +216,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                             val oldSpans = text.getSpans<URLSpan>(start, end)
                             var oldUrl = "https://"
                             oldSpans.forEach {
-                                if (!TextUtils.isEmpty(it.url)) {
+                                if (!it.url.isNullOrEmpty()) {
                                     oldUrl = it.url
                                 }
                             }
@@ -246,7 +232,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                             button?.setOnClickListener(
                                 View.OnClickListener {
                                     val url = builder.text.trim()
-                                    if (TextUtils.isEmpty(url)) {
+                                    if (url.isEmpty()) {
                                         builder.setError(getString(R.string.text_is_empty))
                                         return@OnClickListener
                                     } else {
@@ -273,11 +259,10 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             override fun onDestroyActionMode(mode: ActionMode?) {
             }
         }
-        mFab!!.setOnClickListener(this)
-        addAboveSnackView(mEditPanel)
-        addAboveSnackView(mFabLayout)
-        mViewTransition =
-            ViewTransition(mRecyclerView, tip)
+        binding.fab.setOnClickListener(this)
+        addAboveSnackView(binding.editPanel)
+        addAboveSnackView(binding.fabLayout)
+        mViewTransition = ViewTransition(binding.recyclerView, tip)
         updateView(false)
         return view
     }
@@ -300,21 +285,9 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     override fun onDestroyView() {
         super.onDestroyView()
         mCallback.remove()
-        if (null != mRecyclerView) {
-            mRecyclerView!!.stopScroll()
-            mRecyclerView = null
-        }
-        if (null != mEditPanel) {
-            removeAboveSnackView(mEditPanel)
-            mEditPanel = null
-        }
-        if (null != mFabLayout) {
-            removeAboveSnackView(mFabLayout)
-            mFabLayout = null
-        }
-        mFab = null
-        mSendImage = null
-        mEditText = null
+        binding.recyclerView.stopScroll()
+        removeAboveSnackView(binding.editPanel)
+        removeAboveSnackView(binding.fabLayout)
         mAdapter = null
         mViewTransition = null
     }
@@ -384,8 +357,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     @SuppressLint("InflateParams")
-    fun showVoteStatusDialog(context: Context?, voteStatus: String?) {
-        var context = context
+    fun showVoteStatusDialog(context: Context, voteStatus: String?) {
         val temp = StringUtils.split(voteStatus, ',')
         val length = temp.size
         val userArray = arrayOfNulls<String>(length)
@@ -402,25 +374,24 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 voteArray[i] = StringUtils.trim(str.substring(index + 1))
             }
         }
-        val builder = BaseDialogBuilder(context!!)
-        context = builder.context
-        val inflater = LayoutInflater.from(context)
+        val builder = BaseDialogBuilder(context)
+        val builderContext = builder.context
+        val inflater = LayoutInflater.from(builderContext)
         val rv = inflater.inflate(R.layout.dialog_recycler_view, null) as EasyRecyclerView
-        rv.adapter = object : RecyclerView.Adapter<InfoHolder>() {
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoHolder {
-                return InfoHolder(inflater.inflate(R.layout.item_drawer_favorites, parent, false))
+        rv.adapter = object : RecyclerView.Adapter<VoteHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VoteHolder {
+                return VoteHolder(ItemDrawerFavoritesBinding.inflate(inflater, parent, false))
             }
 
-            override fun onBindViewHolder(holder: InfoHolder, position: Int) {
-                holder.key.text = userArray[position]
-                holder.value.text = voteArray[position]
+            override fun onBindViewHolder(holder: VoteHolder, position: Int) {
+                holder.bind(userArray[position], voteArray[position])
             }
 
             override fun getItemCount(): Int {
                 return length
             }
         }
-        rv.layoutManager = LinearLayoutManager(context)
+        rv.layoutManager = LinearLayoutManager(builderContext)
         rv.clipToPadding = false
         builder.setView(rv).show()
     }
@@ -452,7 +423,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             menu.add(resources.getString(if (comment.voteDownEd) R.string.cancel_vote_down else R.string.vote_down))
             menuId.add(R.id.vote_down)
         }
-        if (!TextUtils.isEmpty(comment.voteState)) {
+        if (!comment.voteState.isNullOrEmpty()) {
             menu.add(resources.getString(R.string.check_vote_status))
             menuId.add(R.id.check_vote_status)
         }
@@ -474,7 +445,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                     showVoteStatusDialog(context, comment.voteState)
                 } else if (id == R.id.edit_comment) {
                     prepareEditComment(comment.id, text)
-                    if (!mInAnimation && mEditPanel != null && mEditPanel!!.visibility != View.VISIBLE) {
+                    if (!mInAnimation && binding.editPanel.visibility != View.VISIBLE) {
                         showEditPanel(true)
                     }
                 }
@@ -485,8 +456,8 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         val activity = mainActivity ?: return false
         val holder = parent!!.getChildViewHolder(view2!!)
         if (holder is ActualCommentHolder) {
-            val span = holder.comment.currentSpan
-            holder.comment.clearCurrentSpan()
+            val span = holder.binding.comment.currentSpan
+            holder.binding.comment.clearCurrentSpan()
             val detail = mGalleryDetail ?: return false
             if (span is URLSpan) {
                 if (!activity.jumpToReaderByPage(span.url, detail)) {
@@ -535,43 +506,33 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     private fun prepareNewComment() {
         mCommentId = 0
-        if (mSendImage != null) {
-            mSendImage!!.setImageDrawable(mSendDrawable)
-        }
+        binding.send.setImageDrawable(mSendDrawable)
     }
 
     private fun prepareEditComment(commentId: Long, text: CharSequence) {
         mCommentId = commentId
-        mEditText?.setText(text)
-        if (mSendImage != null) {
-            mSendImage!!.setImageDrawable(mPencilDrawable)
-        }
+        binding.editText.setText(text)
+        binding.send.setImageDrawable(mPencilDrawable)
     }
 
     private fun showEditPanelWithAnimation() {
-        if (null == mFab || null == mEditPanel) {
-            return
-        }
         mInAnimation = true
-        mFab!!.translationX = 0.0f
-        mFab!!.translationY = 0.0f
-        mFab!!.scaleX = 1.0f
-        mFab!!.scaleY = 1.0f
-        val fabEndX = mEditPanel!!.left + mEditPanel!!.width / 2 - mFab!!.width / 2
-        val fabEndY = mEditPanel!!.top + mEditPanel!!.height / 2 - mFab!!.height / 2
-        mFab!!.animate().x(fabEndX.toFloat()).y(fabEndY.toFloat()).scaleX(0.0f).scaleY(0.0f)
+        binding.fab.translationX = 0.0f
+        binding.fab.translationY = 0.0f
+        binding.fab.scaleX = 1.0f
+        binding.fab.scaleY = 1.0f
+        val fabEndX = binding.editPanel.left + binding.editPanel.width / 2 - binding.fab.width / 2
+        val fabEndY = binding.editPanel.top + binding.editPanel.height / 2 - binding.fab.height / 2
+        binding.fab.animate().x(fabEndX.toFloat()).y(fabEndY.toFloat()).scaleX(0.0f).scaleY(0.0f)
             .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
             .setDuration(300L).setListener(object : SimpleAnimatorListener() {
                 override fun onAnimationEnd(animation: Animator) {
-                    if (null == mFab || null == mEditPanel) {
-                        return
-                    }
-                    (mFab as View).visibility = View.INVISIBLE
-                    mEditPanel!!.visibility = View.VISIBLE
-                    val halfW = mEditPanel!!.width / 2
-                    val halfH = mEditPanel!!.height / 2
+                    (binding.fab as View).visibility = View.INVISIBLE
+                    binding.editPanel.visibility = View.VISIBLE
+                    val halfW = binding.editPanel.width / 2
+                    val halfH = binding.editPanel.height / 2
                     val animator = ViewAnimationUtils.createCircularReveal(
-                        mEditPanel,
+                        binding.editPanel,
                         halfW,
                         halfH,
                         0f,
@@ -592,23 +553,17 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (animation) {
             showEditPanelWithAnimation()
         } else {
-            if (null == mFab || null == mEditPanel) {
-                return
-            }
-            (mFab as View).visibility = View.INVISIBLE
-            mEditPanel!!.visibility = View.VISIBLE
+            (binding.fab as View).visibility = View.INVISIBLE
+            binding.editPanel.visibility = View.VISIBLE
         }
     }
 
     private fun hideEditPanelWithAnimation() {
-        if (null == mFab || null == mEditPanel) {
-            return
-        }
         mInAnimation = true
-        val halfW = mEditPanel!!.width / 2
-        val halfH = mEditPanel!!.height / 2
+        val halfW = binding.editPanel.width / 2
+        val halfH = binding.editPanel.height / 2
         val animator = ViewAnimationUtils.createCircularReveal(
-            mEditPanel,
+            binding.editPanel,
             halfW,
             halfH,
             hypot(halfW.toDouble(), halfH.toDouble()).toFloat(),
@@ -616,25 +571,25 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         ).setDuration(300L)
         animator.addListener(object : SimpleAnimatorListener() {
             override fun onAnimationEnd(a: Animator) {
-                if (null == mFab || null == mEditPanel) {
-                    return
-                }
                 if (Looper.myLooper() != Looper.getMainLooper()) {
                     // Some devices may run this block in non-UI thread.
                     // It might be a bug of Android OS.
                     // Check it here to avoid crash.
                     return
                 }
-                mEditPanel!!.visibility = View.GONE
-                (mFab as View).visibility = View.VISIBLE
-                val fabStartX = mEditPanel!!.left + mEditPanel!!.width / 2 - mFab!!.width / 2
-                val fabStartY = mEditPanel!!.top + mEditPanel!!.height / 2 - mFab!!.height / 2
-                mFab!!.x = fabStartX.toFloat()
-                mFab!!.y = fabStartY.toFloat()
-                mFab!!.scaleX = 0.0f
-                mFab!!.scaleY = 0.0f
-                mFab!!.rotation = -45.0f
-                mFab!!.animate().translationX(0.0f).translationY(0.0f).scaleX(1.0f).scaleY(1.0f)
+                binding.editPanel.visibility = View.GONE
+                (binding.fab as View).visibility = View.VISIBLE
+                val fabStartX =
+                    binding.editPanel.left + binding.editPanel.width / 2 - binding.fab.width / 2
+                val fabStartY =
+                    binding.editPanel.top + binding.editPanel.height / 2 - binding.fab.height / 2
+                binding.fab.x = fabStartX.toFloat()
+                binding.fab.y = fabStartY.toFloat()
+                binding.fab.scaleX = 0.0f
+                binding.fab.scaleY = 0.0f
+                binding.fab.rotation = -45.0f
+                binding.fab.animate().translationX(0.0f).translationY(0.0f).scaleX(1.0f)
+                    .scaleY(1.0f)
                     .rotation(0.0f)
                     .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
                     .setDuration(300L).setListener(object : SimpleAnimatorListener() {
@@ -653,11 +608,8 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (animation) {
             hideEditPanelWithAnimation()
         } else {
-            if (null == mFab || null == mEditPanel) {
-                return
-            }
-            (mFab as View).visibility = View.VISIBLE
-            mEditPanel!!.visibility = View.INVISIBLE
+            (binding.fab as View).visibility = View.VISIBLE
+            binding.editPanel.visibility = View.INVISIBLE
         }
     }
 
@@ -676,17 +628,17 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     override fun onClick(v: View) {
         val context = context
         val activity = mainActivity
-        if (null == context || null == activity || null == mEditText) {
+        if (null == context || null == activity) {
             return
         }
-        if (mFab === v) {
+        if (binding.fab === v) {
             if (!mInAnimation) {
                 prepareNewComment()
                 showEditPanel(true)
             }
-        } else if (mSendImage === v) {
+        } else if (binding.send === v) {
             if (!mInAnimation) {
-                val comment = mEditText?.text?.toBBCode()?.takeIf { it.isNotBlank() } ?: return
+                val comment = binding.editText.text?.toBBCode()?.takeIf { it.isNotBlank() } ?: return
                 val url = galleryDetailUrl ?: return
                 lifecycleScope.launchIO {
                     runSuspendCatching {
@@ -723,7 +675,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (mGalleryDetail == null || mAdapter == null) {
             return
         }
-        mRefreshLayout!!.isRefreshing = false
+        binding.refreshLayout.isRefreshing = false
         mRefreshingComments = false
         mGalleryDetail!!.comments = result
         mAdapter!!.notifyDataSetChanged()
@@ -734,7 +686,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (mAdapter == null) {
             return
         }
-        mRefreshLayout!!.isRefreshing = false
+        binding.refreshLayout.isRefreshing = false
         mRefreshingComments = false
         val position = mAdapter!!.itemCount - 1
         if (position >= 0) {
@@ -750,9 +702,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         mAdapter!!.notifyDataSetChanged()
 
         // Remove text
-        if (mEditText != null) {
-            mEditText!!.setText("")
-        }
+        binding.editText.setText("")
         updateView(true)
     }
 
@@ -796,32 +746,24 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
     }
 
-    private class InfoHolder(itemView: View?) : RecyclerView.ViewHolder(
-        itemView!!,
-    ) {
-        val key: TextView
-        val value: TextView
-
-        init {
-            key = ViewUtils.`$$`(itemView, R.id.key) as TextView
-            value = ViewUtils.`$$`(itemView, R.id.value) as TextView
+    private class VoteHolder(private val binding: ItemDrawerFavoritesBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(user: String?, vote: String?) {
+            binding.key.text = user
+            binding.value.text = vote
         }
     }
 
-    private abstract class CommentHolder(inflater: LayoutInflater, resId: Int, parent: ViewGroup?) :
-        RecyclerView.ViewHolder(inflater.inflate(resId, parent, false))
+    private abstract class CommentHolder(binding: ViewBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
-    private class MoreCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
-        CommentHolder(inflater, R.layout.item_gallery_comment_more, parent)
+    private class MoreCommentHolder(binding: ItemGalleryCommentMoreBinding) : CommentHolder(binding)
 
-    private class ProgressCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
-        CommentHolder(inflater, R.layout.item_gallery_comment_progress, parent)
+    private class ProgressCommentHolder(binding: ItemGalleryCommentProgressBinding) :
+        CommentHolder(binding)
 
-    private inner class ActualCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
-        CommentHolder(inflater, R.layout.item_gallery_comment, parent) {
-        private val user: TextView = itemView.findViewById(R.id.user)
-        private val time: TextView = itemView.findViewById(R.id.time)
-        val comment: LinkifyTextView = itemView.findViewById(R.id.comment)
+    private inner class ActualCommentHolder(val binding: ItemGalleryCommentBinding) :
+        CommentHolder(binding) {
         lateinit var sp: CharSequence
 
         private fun generateComment(
@@ -864,20 +806,22 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
 
         fun bind(value: GalleryComment) {
-            user.text = value.user?.let {
-                if (value.uploader) getString(R.string.comment_user_uploader, it) else it
-            }
-            user.setOnClickListener {
-                value.user?.let {
-                    val lub = ListUrlBuilder().apply {
-                        mode = ListUrlBuilder.MODE_UPLOADER
-                        keyword = it
-                    }
-                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+            binding.run {
+                user.text = value.user?.let {
+                    if (value.uploader) getString(R.string.comment_user_uploader, it) else it
                 }
+                user.setOnClickListener {
+                    value.user?.let {
+                        val lub = ListUrlBuilder().apply {
+                            mode = ListUrlBuilder.MODE_UPLOADER
+                            keyword = it
+                        }
+                        navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                    }
+                }
+                time.text = ReadableTime.getTimeAgo(value.time)
+                comment.text = generateComment(binding.comment.context, binding.comment, value)
             }
-            time.text = ReadableTime.getTimeAgo(value.time)
-            comment.text = generateComment(comment.context, comment, value)
         }
     }
 
@@ -886,9 +830,18 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentHolder {
             return when (viewType) {
-                TYPE_COMMENT -> ActualCommentHolder(mInflater, parent)
-                TYPE_MORE -> MoreCommentHolder(mInflater, parent)
-                TYPE_PROGRESS -> ProgressCommentHolder(mInflater, parent)
+                TYPE_COMMENT -> ActualCommentHolder(
+                    ItemGalleryCommentBinding.inflate(mInflater, parent, false),
+                )
+
+                TYPE_MORE -> MoreCommentHolder(
+                    ItemGalleryCommentMoreBinding.inflate(mInflater, parent, false),
+                )
+
+                TYPE_PROGRESS -> ProgressCommentHolder(
+                    ItemGalleryCommentProgressBinding.inflate(mInflater, parent, false),
+                )
+
                 else -> throw IllegalStateException("Invalid view type: $viewType")
             }
         }
@@ -900,7 +853,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             }
             holder.itemView.setOnClickListener {
                 onItemClick(
-                    mRecyclerView,
+                    binding.recyclerView,
                     holder.itemView,
                     position,
                 )
@@ -933,7 +886,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     internal inner class EditPanelOnBackPressedCallback : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!mInAnimation && null != mEditPanel && mEditPanel!!.visibility == View.VISIBLE) {
+            if (!mInAnimation && binding.editPanel.visibility == View.VISIBLE) {
                 hideEditPanel(true)
             }
         }
