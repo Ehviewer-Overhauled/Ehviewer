@@ -17,14 +17,11 @@ package com.hippo.ehviewer.ui.legacy
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.CheckBox
-import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.yorozuya.ViewUtils
+import com.hippo.ehviewer.databinding.DialogListCheckboxBuilderBinding
 
 class ListCheckBoxDialogBuilder(
     context: Context,
@@ -35,10 +32,10 @@ class ListCheckBoxDialogBuilder(
 ) : BaseDialogBuilder(
     context,
 ) {
-    private val mCheckBox: CheckBox
+    private val binding =
+        DialogListCheckboxBuilderBinding.inflate(LayoutInflater.from(getContext()))
     private var mDialog: AlertDialog? = null
-    val isChecked: Boolean
-        get() = mCheckBox.isChecked
+    val isChecked get() = binding.checkbox.isChecked
 
     override fun create(): AlertDialog {
         mDialog = super.create()
@@ -46,18 +43,14 @@ class ListCheckBoxDialogBuilder(
     }
 
     init {
-        val view =
-            LayoutInflater.from(getContext()).inflate(R.layout.dialog_list_checkbox_builder, null)
-        setView(view)
-        val listView = ViewUtils.`$$`(view, R.id.list_view) as ListView
-        mCheckBox = ViewUtils.`$$`(view, R.id.checkbox) as CheckBox
-        listView.adapter = ArrayAdapter(getContext(), R.layout.item_select_dialog, items)
-        listView.onItemClickListener =
-            AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+        setView(binding.root)
+        binding.listView.adapter = ArrayAdapter(getContext(), R.layout.item_select_dialog, items)
+        binding.listView.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
                 listener(this@ListCheckBoxDialogBuilder, mDialog, position)
                 mDialog?.dismiss()
             }
-        mCheckBox.text = checkText
-        mCheckBox.isChecked = checked
+        binding.checkbox.text = checkText
+        binding.checkbox.isChecked = checked
     }
 }
