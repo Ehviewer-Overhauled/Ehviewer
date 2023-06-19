@@ -25,18 +25,13 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.CompoundButton
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.annotation.IntDef
 import androidx.core.content.edit
 import androidx.core.view.forEach
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.hippo.ehviewer.R
@@ -44,6 +39,9 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.databinding.SearchAdvanceBinding
+import com.hippo.ehviewer.databinding.SearchCategoryBinding
+import com.hippo.ehviewer.databinding.SearchNormalBinding
 import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.ehviewer.yorozuya.ViewUtils
 
@@ -59,17 +57,12 @@ class SearchLayout @JvmOverloads constructor(
     @SearchMode
     private var mSearchMode = SEARCH_MODE_NORMAL
     private var mEnableAdvance = false
-    private var mCategoryGroup: ChipGroup
-    private var mNormalView: View
-    private var mNormalSearchMode: RadioGridGroup
-    private var mNormalSearchModeHelp: ImageView
-    private var mEnableAdvanceSwitch: CheckBox
-    private var mAdvanceView: View
-    private var mTableAdvanceSearch: AdvanceSearchTable
-    private var mImageView: ImageSearchLayout
-    private var mActionView: View
-    private var mAction: TabLayout
-    private var mAdapter: SearchAdapter
+    private val binding: SearchNormalBinding
+    private val advanceBinding: SearchAdvanceBinding
+    private val mImageView: ImageSearchLayout
+    private val mActionView: View
+    private val mAction: TabLayout
+    private val mAdapter: SearchAdapter
     private var mHelper: Helper? = null
     private val mSharePref: SharedPreferences = Settings.prefs
     private val mInflater: LayoutInflater
@@ -97,9 +90,8 @@ class SearchLayout @JvmOverloads constructor(
         addItemDecoration(decoration)
         decoration.applyPaddings(this)
         // Create normal view
-        mNormalView = mInflater.inflate(R.layout.search_normal, null)
+        binding = SearchNormalBinding.inflate(mInflater)
         val mCategoryStored = mSharePref.getInt(SEARCH_CATEGORY_PREF, EhUtils.ALL_CATEGORY)
-        mCategoryGroup = mNormalView.findViewById(R.id.search_category_chipgroup)
         for (mPair in mCategoryTable) {
             val mChip = inflate(context, R.layout.filter_chip, null) as IdentifiedChip
             mChip.isCheckable = true
@@ -108,33 +100,29 @@ class SearchLayout @JvmOverloads constructor(
             mChip.isChecked = NumberUtils.int2boolean(mPair.first and mCategoryStored)
             mChip.setOnLongClickListener {
                 if (mChip.isChecked) {
-                    mCategoryGroup.forEach {
+                    binding.searchCategoryChipgroup.forEach {
                         (it as IdentifiedChip).isChecked = true
                     }
                     mChip.isChecked = false
                 } else {
-                    mCategoryGroup.clearCheck()
+                    binding.searchCategoryChipgroup.clearCheck()
                     mChip.isChecked = true
                 }
                 true
             }
-            mCategoryGroup.addView(mChip)
+            binding.searchCategoryChipgroup.addView(mChip)
         }
-        mCategoryGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+        binding.searchCategoryChipgroup.setOnCheckedStateChangeListener { group, checkedIds ->
             var mCategory = 0
             for (index in checkedIds) {
                 mCategory = mCategory or group.findViewById<IdentifiedChip>(index).idt
             }
             mSharePref.edit { putInt(SEARCH_CATEGORY_PREF, mCategory) }
         }
-        mNormalSearchMode = mNormalView.findViewById(R.id.normal_search_mode)
-        mNormalSearchModeHelp = mNormalView.findViewById(R.id.normal_search_mode_help)
-        mEnableAdvanceSwitch = mNormalView.findViewById(R.id.search_enable_advance)
-        mNormalSearchModeHelp.setOnClickListener(this)
-        mEnableAdvanceSwitch.setOnCheckedChangeListener(this)
+        binding.normalSearchModeHelp.setOnClickListener(this)
+        binding.searchEnableAdvance.setOnCheckedChangeListener(this)
         // Create advance view
-        mAdvanceView = mInflater.inflate(R.layout.search_advance, null)
-        mTableAdvanceSearch = mAdvanceView.findViewById(R.id.search_advance_search_table)
+        advanceBinding = SearchAdvanceBinding.inflate(mInflater)
         // Create image view
         mImageView = mInflater.inflate(R.layout.search_image, null) as ImageSearchLayout
         // Create action view
@@ -156,11 +144,11 @@ class SearchLayout @JvmOverloads constructor(
     }
 
     fun setNormalSearchMode(id: Int) {
-        mNormalSearchMode.check(id)
+        binding.normalSearchMode.check(id)
     }
 
     fun setCategory(category: Int) {
-        mCategoryGroup.forEach {
+        binding.searchCategoryChipgroup.forEach {
             (it as IdentifiedChip).apply {
                 isChecked = idt and category != 0
             }
@@ -168,7 +156,7 @@ class SearchLayout @JvmOverloads constructor(
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-        if (buttonView === mEnableAdvanceSwitch) {
+        if (buttonView === binding.searchEnableAdvance) {
             post {
                 mEnableAdvance = isChecked
                 if (mSearchMode == SEARCH_MODE_NORMAL) {
@@ -191,7 +179,7 @@ class SearchLayout @JvmOverloads constructor(
         urlBuilder.reset()
         when (mSearchMode) {
             SEARCH_MODE_NORMAL -> {
-                when (mNormalSearchMode.checkedRadioButtonId) {
+                when (binding.normalSearchMode.checkedRadioButtonId) {
                     R.id.search_subscription_search -> {
                         urlBuilder.mode = ListUrlBuilder.MODE_SUBSCRIPTION
                     }
@@ -214,10 +202,10 @@ class SearchLayout @JvmOverloads constructor(
                     0,
                 )
                 if (mEnableAdvance) {
-                    urlBuilder.advanceSearch = mTableAdvanceSearch.advanceSearch
-                    urlBuilder.minRating = mTableAdvanceSearch.minRating
-                    val pageFrom = mTableAdvanceSearch.pageFrom
-                    val pageTo = mTableAdvanceSearch.pageTo
+                    urlBuilder.advanceSearch = advanceBinding.searchAdvanceSearchTable.advanceSearch
+                    urlBuilder.minRating = advanceBinding.searchAdvanceSearchTable.minRating
+                    val pageFrom = advanceBinding.searchAdvanceSearchTable.pageFrom
+                    val pageTo = advanceBinding.searchAdvanceSearchTable.pageTo
                     if (pageTo != -1 && pageTo < 10) {
                         throw EhException(context.getString(R.string.search_sp_err1))
                     } else if (pageFrom != -1 && pageTo != -1 && pageTo - pageFrom < 20) {
@@ -236,7 +224,7 @@ class SearchLayout @JvmOverloads constructor(
     }
 
     override fun onClick(v: View) {
-        if (mNormalSearchModeHelp === v) {
+        if (binding.normalSearchModeHelp === v) {
             BaseDialogBuilder(context)
                 .setMessage(R.string.search_tip)
                 .show()
@@ -302,25 +290,25 @@ class SearchLayout @JvmOverloads constructor(
                 view = mActionView
             } else {
                 view = mInflater.inflate(R.layout.search_category, parent, false)
-                val title = view.findViewById<TextView>(R.id.category_title)
-                val content = view.findViewById<FrameLayout>(R.id.category_content)
-                when (viewType) {
-                    ITEM_TYPE_NORMAL -> {
-                        title.setText(R.string.search_normal)
-                        ViewUtils.removeFromParent(mNormalView)
-                        content.addView(mNormalView)
-                    }
+                SearchCategoryBinding.bind(view).run {
+                    when (viewType) {
+                        ITEM_TYPE_NORMAL -> {
+                            categoryTitle.setText(R.string.search_normal)
+                            ViewUtils.removeFromParent(binding.root)
+                            categoryContent.addView(binding.root)
+                        }
 
-                    ITEM_TYPE_NORMAL_ADVANCE -> {
-                        title.setText(R.string.search_advance)
-                        ViewUtils.removeFromParent(mAdvanceView)
-                        content.addView(mAdvanceView)
-                    }
+                        ITEM_TYPE_NORMAL_ADVANCE -> {
+                            categoryTitle.setText(R.string.search_advance)
+                            ViewUtils.removeFromParent(advanceBinding.root)
+                            categoryContent.addView(advanceBinding.root)
+                        }
 
-                    ITEM_TYPE_IMAGE -> {
-                        title.setText(R.string.search_image)
-                        ViewUtils.removeFromParent(mImageView)
-                        content.addView(mImageView)
+                        ITEM_TYPE_IMAGE -> {
+                            categoryTitle.setText(R.string.search_image)
+                            ViewUtils.removeFromParent(mImageView)
+                            categoryContent.addView(mImageView)
+                        }
                     }
                 }
             }
