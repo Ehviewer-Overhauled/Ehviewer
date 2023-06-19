@@ -68,6 +68,11 @@ abstract class BaseScene : Fragment() {
         }
     }
 
+    fun isDrawerOpen(drawerGravity: Int): Boolean {
+        val activity = activity
+        return activity is MainActivity && activity.isDrawerOpen(drawerGravity)
+    }
+
     fun openDrawer(drawerGravity: Int) {
         val activity = activity
         if (activity is MainActivity) {

@@ -408,6 +408,8 @@ class MainActivity : EhActivity() {
         return binding.drawView.getDrawerLockMode(edgeGravity)
     }
 
+    fun isDrawerOpen(drawerGravity: Int) = binding.drawView.isDrawerOpen(drawerGravity)
+
     fun openDrawer(drawerGravity: Int) {
         binding.drawView.openDrawer(drawerGravity)
     }
