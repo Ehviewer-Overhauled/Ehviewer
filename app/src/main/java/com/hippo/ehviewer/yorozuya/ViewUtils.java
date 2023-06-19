@@ -16,14 +16,9 @@
 
 package com.hippo.ehviewer.yorozuya;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,30 +58,4 @@ public final class ViewUtils {
         }
     }
 
-    @NonNull
-    public static View $$(Activity activity, @IdRes int id) {
-        View result = activity.findViewById(id);
-        if (null == result) {
-            throw new NullPointerException("Can't find view with id: " + id);
-        }
-        return result;
-    }
-
-    @NonNull
-    public static View $$(Dialog dialog, @IdRes int id) {
-        View result = dialog.findViewById(id);
-        if (null == result) {
-            throw new NullPointerException("Can't find view with id: " + id);
-        }
-        return result;
-    }
-
-    @NonNull
-    public static View $$(View view, @IdRes int id) {
-        View result = view.findViewById(id);
-        if (null == result) {
-            throw new NullPointerException("Can't find view with id: " + id);
-        }
-        return result;
-    }
 }
