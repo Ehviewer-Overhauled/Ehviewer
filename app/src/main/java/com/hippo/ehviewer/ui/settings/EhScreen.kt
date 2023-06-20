@@ -51,6 +51,7 @@ import com.hippo.ehviewer.ui.MYTAGS_SCREEN
 import com.hippo.ehviewer.ui.SIGN_IN_ROUTE_NAME
 import com.hippo.ehviewer.ui.UCONFIG_SCREEN
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.tools.TimePickerDialog
 import com.hippo.ehviewer.ui.tools.observed
 import com.hippo.ehviewer.ui.tools.rememberedAccessor
 import com.hippo.ehviewer.util.whisperClipboard

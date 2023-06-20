@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.settings
+package com.hippo.ehviewer.ui.tools
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
