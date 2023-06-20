@@ -49,7 +49,6 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.AsyncDns
-import okhttp3.Dns
 import okhttp3.android.AndroidAsyncDns
 import okio.Path.Companion.toOkioPath
 import splitties.arch.room.roomDb
@@ -149,10 +148,9 @@ class EhApplication : Application(), ImageLoaderFactory {
 
     companion object {
         val nonCacheOkHttpClient by lazy {
-            val systemDns = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6) else Dns.SYSTEM
             httpClient {
                 cookieJar(EhCookieStore)
-                dns(systemDns)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) dns(AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6))
                 addInterceptor(
                     ChuckerInterceptor.Builder(appCtx).apply {
                         alwaysReadResponseBody(false)
