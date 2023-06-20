@@ -107,11 +107,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import arrow.core.partially1
-import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
-import com.hippo.ehviewer.EhApplication.Companion.imageCache
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -135,7 +133,6 @@ import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.TorrentResult
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
-import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.databinding.DialogArchiveListBinding
@@ -1167,7 +1164,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    @OptIn(ExperimentalCoilApi::class)
     private fun showCoverGalleryList() {
         context ?: return
         val gid = gid
@@ -1176,11 +1172,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
         try {
             val key = composeBindingGI!!.thumbKey!!
-            val path = imageCache.read(key) { data }
             val lub = ListUrlBuilder()
-            lub.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
-            lub.imagePath = path.toString()
-            lub.isUseSimilarityScan = true
+            lub.mode = ListUrlBuilder.MODE_NORMAL
+            lub.hash = key.substringAfterLast('/').substringBefore('-')
             navigate(R.id.galleryListScene, lub.toStartArgs(), true)
         } catch (e: Throwable) {
             e.printStackTrace()

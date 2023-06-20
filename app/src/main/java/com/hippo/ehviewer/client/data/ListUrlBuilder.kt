@@ -39,7 +39,7 @@ data class ListUrlBuilder(
     private var mJumpTo: String? = null,
     var category: Int = EhUtils.NONE,
     private var mKeyword: String? = null,
-    private var mSHash: String? = null,
+    var hash: String? = null,
     var advanceSearch: Int = -1,
     var minRating: Int = -1,
     var pageFrom: Int = -1,
@@ -63,7 +63,7 @@ data class ListUrlBuilder(
         imagePath = null
         isUseSimilarityScan = false
         isOnlySearchCovers = false
-        mSHash = null
+        hash = null
     }
 
     fun setIndex(index: String?, isNext: Boolean = true) {
@@ -246,7 +246,7 @@ data class ListUrlBuilder(
 
                 "f_spf" -> pageFrom = NumberUtils.parseIntSafely(value, -1)
                 "f_spt" -> pageTo = NumberUtils.parseIntSafely(value, -1)
-                "f_shash" -> mSHash = value
+                "f_shash" -> hash = value
             }
         }
         this.category = category
@@ -282,7 +282,7 @@ data class ListUrlBuilder(
                 if (this.category != EhUtils.NONE) {
                     ub.addQuery("f_cats", category.inv() and EhUtils.ALL_CATEGORY)
                 }
-                mSHash?.let {
+                hash?.let {
                     ub.addQuery("f_shash", it)
                 }
                 mJumpTo?.let {
@@ -296,10 +296,12 @@ data class ListUrlBuilder(
                 }
                 // Search key
                 // the settings of ub:UrlBuilder may be overwritten by following Advance search
-                StringUtils.split(mKeyword, '|')?.forEachIndexed { idx, keyword ->
-                    val keyword = keyword.trim { it <= ' ' }
+                StringUtils.split(mKeyword, '|')?.forEachIndexed { idx, kwd ->
+                    val keyword = kwd.trim { it <= ' ' }
                     when (idx) {
-                        0 -> keyword.takeIf { it.isNotEmpty() }?.let { ub.addQuery("f_search", encodeUTF8(it)) }
+                        0 -> keyword.takeIf { it.isNotEmpty() }
+                            ?.let { ub.addQuery("f_search", encodeUTF8(it)) }
+
                         else -> keyword.indexOf(':').takeIf { it >= 0 }?.run {
                             val key = keyword.substring(0, this).trim { it <= ' ' }
                             val value = keyword.substring(this + 1).trim { it <= ' ' }
