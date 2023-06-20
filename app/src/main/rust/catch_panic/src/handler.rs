@@ -26,7 +26,7 @@ where
 /// `#[catch_panic]`'s default panic handler. This
 /// will rethrow all caught panics as java `RuntimeException`s
 /// with the message passed to `panic!`.
-pub fn default_handler(mut env: JNIEnv, err: Box<dyn Any + Send + 'static>) {
+pub fn default_handler(env: JNIEnv, err: Box<dyn Any + Send + 'static>) {
     let msg = match err.downcast_ref::<&'static str>() {
         Some(s) => *s,
         None => match err.downcast_ref::<String>() {

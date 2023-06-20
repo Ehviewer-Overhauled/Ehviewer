@@ -17,6 +17,7 @@ package com.hippo.ehviewer.client.parser
 
 import android.util.Log
 import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -28,6 +29,7 @@ import com.hippo.ehviewer.yorozuya.NumberUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import splitties.init.appCtx
 import java.util.regex.Pattern
 
 object GalleryListParser {
@@ -263,6 +265,7 @@ object GalleryListParser {
 
     fun parse(body: String): Result {
         val d = Jsoup.parse(body)
+        d.outputSettings().prettyPrint(false)
         return parse(d, body)
     }
 
@@ -307,18 +310,26 @@ object GalleryListParser {
         try {
             val itg = d.getElementsByClass("itg").first()
             val es = if ("table".equals(itg!!.tagName(), ignoreCase = true)) {
-                itg.child(0).children()
+                itg.child(0).children().let {
+                    // First one is table header in non-extended mode, skip it
+                    if (!itg.hasClass("glte")) it.drop(1) else it
+                }
             } else {
+                // Thumbnail mode
                 itg.children()
             }
             val list = result.galleryInfoList
-            // First one is table header, skip it
-            for (i in es.indices) {
-                val gi = parseGalleryInfo(es[i])
-                if (null != gi) {
-                    list.add(gi)
-                }
-            }
+            list.addAll(
+                es.mapNotNull {
+                    parseGalleryInfo(it.toString())?.apply {
+                        if (favoriteSlot == -2 && EhDB.containLocalFavorites(gid)) {
+                            favoriteSlot = -1
+                            favoriteName = appCtx.getString(R.string.local_favorites)
+                        }
+                        generateSLang()
+                    }
+                },
+            )
             if (list.isEmpty()) {
                 if (es.size < 2 || NO_UNFILTERED_TEXT != es[1].text()) {
                     Log.d(TAG, "No gallery found")
@@ -341,3 +352,5 @@ object GalleryListParser {
         val galleryInfoList = mutableListOf<GalleryInfo>()
     }
 }
+
+private external fun parseGalleryInfo(e: String): GalleryInfo?
