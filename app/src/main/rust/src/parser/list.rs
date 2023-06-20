@@ -3,16 +3,16 @@ use std::borrow::Cow;
 use catch_panic::catch_panic;
 use html_escape::decode_html_entities;
 use jni_fn::jni_fn;
-use jnix::{IntoJava, JnixEnv};
-use jnix::jni::JNIEnv;
 use jnix::jni::objects::{JClass, JString};
 use jnix::jni::sys::jobject;
+use jnix::jni::JNIEnv;
+use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
 
-use {get_node_attr, get_node_handle_attr, regex};
-use {Anon, parse_jni_string};
-use {EHGT_PREFIX, EX_PREFIX};
 use query_childs_first_match_attr;
+use {get_node_attr, get_node_handle_attr, regex};
+use {parse_jni_string, Anon};
+use {EHGT_PREFIX, EX_PREFIX};
 
 #[derive(Default, IntoJava)]
 #[allow(non_snake_case)]
@@ -98,12 +98,9 @@ fn parse_token_and_gid(str: &str) -> (i64, String) {
 }
 
 fn parse_uploader_and_pages(str: &str) -> (Option<String>, bool, i32) {
-    let reg_uploader = regex!(
-        r#"<div><a href="https://e[x-]hentai.org/uploader/.*?">(.*?)</a></div>"#
-    );
-    let reg_pages = regex!(
-        r"<div>(\d+) pages</div>"
-    );
+    let reg_uploader =
+        regex!(r#"<div><a href="https://e[x-]hentai.org/uploader/.*?">(.*?)</a></div>"#);
+    let reg_pages = regex!(r"<div>(\d+) pages</div>");
     let uploader = reg_uploader.captures(str).map(|grp| grp[1].to_string());
     let pages = match reg_pages.captures(str) {
         None => 0,
@@ -113,11 +110,9 @@ fn parse_uploader_and_pages(str: &str) -> (Option<String>, bool, i32) {
 }
 
 fn parse_thumb_resolution(str: &str) -> (i32, i32) {
-    let reg = regex!(
-        r"height:(\d+)px;width:(\d+)px"
-    );
+    let reg = regex!(r"height:(\d+)px;width:(\d+)px");
     match reg.captures(str) {
-        None => panic!("regex err".to_owned() + str),
+        None => panic!("regex err{}", str),
         //None => (0, 0),
         Some(grp) => (grp[1].parse().unwrap(), grp[2].parse().unwrap()),
     }
@@ -142,21 +137,22 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             },
         };
         let (gid, token) = parse_token_and_gid(gdlink);
-        let simpleTags = dom.query_selector(".gt, .gtl")?.filter_map(|tag| {
-            get_node_handle_attr(&tag, parser, "title").map(str::to_string)
-        }).collect();
+        let simpleTags = dom
+            .query_selector(".gt, .gtl")?
+            .filter_map(|tag| get_node_handle_attr(&tag, parser, "title").map(str::to_string))
+            .collect();
         let (thumb, (thumbHeight, thumbWidth)) = match dom.query_selector("[data-src]")?.next() {
             None => match dom.query_selector("[src]")?.next() {
                 None => panic!("No thumb found"),
                 Some(thumb) => (
                     get_node_handle_attr(&thumb, parser, "src")?,
                     parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
-                )
+                ),
             },
             Some(thumb) => (
                 get_node_handle_attr(&thumb, parser, "data-src")?,
                 parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
-            )
+            ),
         };
         let category = match dom.get_first_element_by_class_name("cn") {
             None => match dom.get_first_element_by_class_name("cs") {
@@ -165,14 +161,24 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             },
             Some(cn) => cn.inner_text(parser),
         };
-        let (posted, favoriteName) = match dom.get_element_by_id(format!("posted_{gid}").as_str())?.get(parser) {
+        let (posted, favoriteName) = match dom
+            .get_element_by_id(format!("posted_{gid}").as_str())?
+            .get(parser)
+        {
             None => ("".to_string(), None),
-            Some(node) => (node.inner_text(parser).trim().to_string(), get_node_attr(&node, "title").map(str::to_string)),
+            Some(node) => (
+                node.inner_text(parser).trim().to_string(),
+                get_node_attr(&node, "title").map(str::to_string),
+            ),
         };
-        let ir = dom.get_first_element_by_class_name("ir")?.as_tag()?.attributes();
+        let ir = dom
+            .get_first_element_by_class_name("ir")?
+            .as_tag()?
+            .attributes();
         let ir_c = ir.class()?.try_as_utf8_str()?;
         let rating = ir.get("style")??.try_as_utf8_str()?;
-        let (uploader, disowned, pages) = match dom.query_selector(".glhide, .gl3e, .gl5t")?.next() {
+        let (uploader, disowned, pages) = match dom.query_selector(".glhide, .gl3e, .gl5t")?.next()
+        {
             None => (None, false, 0),
             Some(node) => parse_uploader_and_pages(&node.get(parser)?.inner_html(parser)),
         };
@@ -196,5 +202,9 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             favoriteSlot: if favoriteName.is_some() { 0 } else { -2 },
             favoriteName,
         })
-    }).unwrap().into_java(&env).forget().into_raw()
+    })
+    .unwrap()
+    .into_java(&env)
+    .forget()
+    .into_raw()
 }

@@ -16,6 +16,7 @@
 -keep class com.hippo.ehviewer.client.parser.Torrent { *; }
 -keep class com.hippo.ehviewer.client.parser.TorrentResult { *; }
 -keep class com.hippo.ehviewer.client.parser.Limits { *; }
+-keep class com.hippo.ehviewer.client.data.BaseGalleryInfo { *; }
 
 # Ktor logger
 -dontwarn org.slf4j.impl.StaticLoggerBinder
