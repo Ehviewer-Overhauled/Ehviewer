@@ -154,8 +154,9 @@ final class ResponseConverter {
         .request(request)
         .code(cronetResponseInfo.getHttpStatusCode())
         .message(cronetResponseInfo.getHttpStatusText())
-        .protocol(convertProtocol(cronetResponseInfo.getNegotiatedProtocol()))
-        .body(responseBody);
+        .protocol(convertProtocol(cronetResponseInfo.getNegotiatedProtocol()));
+
+    if (responseBody != null) responseBuilder.body(responseBody);
 
     for (Map.Entry<String, String> header : cronetResponseInfo.getAllHeadersAsList()) {
       boolean copyHeader = true;

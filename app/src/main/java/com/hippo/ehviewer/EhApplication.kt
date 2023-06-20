@@ -26,6 +26,7 @@ import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
 import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.google.net.cronet.okhttptransport.CronetInterceptor
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
@@ -39,6 +40,7 @@ import com.hippo.ehviewer.legacy.cleanObsoleteCache
 import com.hippo.ehviewer.legacy.migrateCookies
 import com.hippo.ehviewer.okhttp.cache
 import com.hippo.ehviewer.okhttp.httpClient
+import com.hippo.ehviewer.spider.cronetHttpClient
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.lockObserver
 import com.hippo.ehviewer.util.ReadableTime
@@ -156,6 +158,7 @@ class EhApplication : Application(), ImageLoaderFactory {
                         alwaysReadResponseBody(false)
                     }.build(),
                 )
+                addInterceptor(CronetInterceptor.newBuilder(cronetHttpClient).build())
             }
         }
 
