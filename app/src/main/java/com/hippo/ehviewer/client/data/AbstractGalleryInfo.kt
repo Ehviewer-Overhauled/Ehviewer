@@ -16,9 +16,6 @@ interface AbstractGalleryInfo {
     var pages: Int
     var thumbWidth: Int
     var thumbHeight: Int
-    var spanSize: Int
-    var spanIndex: Int
-    var spanGroupIndex: Int
     var simpleLanguage: String?
     var favoriteSlot: Int
     var favoriteName: String?

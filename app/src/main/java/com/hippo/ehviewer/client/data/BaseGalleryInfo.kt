@@ -68,15 +68,6 @@ open class BaseGalleryInfo(
     @Ignore
     override var thumbHeight: Int = 0,
 
-    @Ignore
-    override var spanSize: Int = 0,
-
-    @Ignore
-    override var spanIndex: Int = 0,
-
-    @Ignore
-    override var spanGroupIndex: Int = 0,
-
     @ColumnInfo(name = "SIMPLE_LANGUAGE")
     override var simpleLanguage: String? = null,
 
