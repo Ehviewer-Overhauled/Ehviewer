@@ -28,7 +28,7 @@ val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.exe
 
 // TODO: Rewrite this to use android.net.http.HttpEngine and make it Android 14 only when released
 class CronetRequest : AutoCloseable {
-    lateinit var consumer: (UrlResponseInfo, ByteBuffer) -> Unit
+    lateinit var consumer: (ByteBuffer) -> Unit
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
     lateinit var daemonCont: Continuation<Boolean>
@@ -44,7 +44,7 @@ class CronetRequest : AutoCloseable {
 
         override fun onReadCompleted(req: UrlRequest, info: UrlResponseInfo, data: ByteBuffer) {
             data.flip()
-            consumer(info, data)
+            consumer(data)
             buffer.clear()
             request.read(buffer)
         }
@@ -73,7 +73,7 @@ inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = Cro
     request = cronetHttpClient.newUrlRequestBuilder(url, callback, cronetHttpClientExecutor).apply(conf).build()
 }
 
-suspend infix fun CronetRequest.awaitBodyFully(consumer: (UrlResponseInfo, ByteBuffer) -> Unit) = run {
+suspend infix fun CronetRequest.awaitBodyFully(consumer: (ByteBuffer) -> Unit) = run {
     this.consumer = consumer
     suspendCancellableCoroutine { cont ->
         readerCont = cont
