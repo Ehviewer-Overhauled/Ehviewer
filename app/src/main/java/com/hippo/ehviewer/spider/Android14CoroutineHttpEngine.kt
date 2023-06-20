@@ -34,32 +34,33 @@ class CronetRequest : AutoCloseable {
     lateinit var daemonCont: Continuation<Boolean>
     lateinit var readerCont: Continuation<Long>
     val callback = object : UrlRequest.Callback() {
-        override fun onRedirectReceived(p0: UrlRequest, p1: UrlResponseInfo, p2: String) {
+        override fun onRedirectReceived(req: UrlRequest, info: UrlResponseInfo, url: String) {
             // No-op
         }
 
-        override fun onResponseStarted(p0: UrlRequest, p1: UrlResponseInfo) {
-            onResponse(p1)
+        override fun onResponseStarted(req: UrlRequest, info: UrlResponseInfo) {
+            onResponse(info)
         }
 
-        override fun onReadCompleted(p0: UrlRequest, p1: UrlResponseInfo, p2: ByteBuffer) {
-            p2.flip()
-            consumer(p1, p2)
+        override fun onReadCompleted(req: UrlRequest, info: UrlResponseInfo, data: ByteBuffer) {
+            data.flip()
+            consumer(info, data)
             buffer.clear()
             request.read(buffer)
         }
 
-        override fun onSucceeded(p0: UrlRequest, p1: UrlResponseInfo) {
-            val length = p1.receivedByteCount
+        override fun onSucceeded(req: UrlRequest, info: UrlResponseInfo) {
+            val length = info.receivedByteCount
             readerCont.resume(length)
             daemonCont.resume(true)
         }
 
-        override fun onFailed(p0: UrlRequest, p1: UrlResponseInfo?, p2: CronetException) {
-            daemonCont.resumeWithException(p2)
+        override fun onFailed(req: UrlRequest, info: UrlResponseInfo?, e: CronetException) {
+            daemonCont.resumeWithException(e)
         }
 
-        override fun onCanceled(p0: UrlRequest, p1: UrlResponseInfo?) {
+        override fun onCanceled(req: UrlRequest, info: UrlResponseInfo?) {
+            // No-op
         }
     }
 
