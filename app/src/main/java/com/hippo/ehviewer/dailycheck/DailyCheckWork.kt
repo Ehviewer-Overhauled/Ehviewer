@@ -2,10 +2,15 @@ package com.hippo.ehviewer.dailycheck
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.text.Html
+import android.text.style.URLSpan
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.PendingIntentCompat
+import androidx.core.text.getSpans
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -48,8 +53,8 @@ val schedMinute
 
 private val whenToWork
     get() = LocalDateTime.now()
-        .run { withHour(schedHour ?: hour) }
-        .run { withMinute(schedMinute ?: minute) }
+        .run { withHour(schedHour) }
+        .run { withMinute(schedMinute) }
 
 private val initialDelay
     get() = Duration.between(LocalDateTime.now(), whenToWork)
@@ -104,13 +109,20 @@ fun showEventNotification(html: String) {
         .setName(CHANNEL_ID)
         .build()
     notificationManager.createNotificationChannel(chan)
+    val text = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
     val msg = NotificationCompat.Builder(appCtx, CHANNEL_ID)
+        .setAutoCancel(true)
         .setSmallIcon(R.drawable.ic_launcher_monochrome)
-        .setContentText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY))
+        .setContentText(text)
         .setStyle(NotificationCompat.BigTextStyle())
-        .build()
+    val urls = text.getSpans<URLSpan>(0, text.length)
+    if (urls.isNotEmpty()) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urls.first().url))
+        val pi = PendingIntentCompat.getActivity(appCtx, 0, intent, 0, false)
+        msg.setContentIntent(pi)
+    }
     runCatching {
-        notificationManager.notify(1, msg)
+        notificationManager.notify(1, msg.build())
     }.onFailure {
         it.printStackTrace()
     }
