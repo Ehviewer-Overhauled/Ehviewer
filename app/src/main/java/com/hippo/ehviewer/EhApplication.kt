@@ -156,6 +156,8 @@ class EhApplication : Application(), ImageLoaderFactory {
                         alwaysReadResponseBody(false)
                     }.build(),
                 )
+
+                // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
                 addInterceptor(CronetInterceptor.newBuilder(cronetHttpClient).build())
             }
         }

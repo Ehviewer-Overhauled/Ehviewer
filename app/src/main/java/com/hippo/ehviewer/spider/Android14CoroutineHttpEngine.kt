@@ -26,6 +26,7 @@ val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
 
 val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.executorService
 
+// TODO: Rewrite this to use android.net.http.HttpEngine and make it Android 14 only when released
 class CronetRequest : AutoCloseable {
     lateinit var mConsumer: (UrlResponseInfo, ByteBuffer) -> Unit
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
