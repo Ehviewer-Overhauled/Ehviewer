@@ -45,7 +45,7 @@ class CronetRequest : AutoCloseable {
         override fun onReadCompleted(p0: UrlRequest, p1: UrlResponseInfo, p2: ByteBuffer) {
             p2.flip()
             mConsumer(p1, p2)
-            buffer.flip()
+            buffer.clear()
             request.read(buffer)
         }
 
