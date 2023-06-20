@@ -321,7 +321,7 @@ object GalleryListParser {
             val list = result.galleryInfoList
             list.addAll(
                 es.mapNotNull {
-                    parseGalleryInfo(it.toString())?.apply {
+                    runCatching { parseGalleryInfo(it.toString()) }.onFailure { it.printStackTrace() }.getOrNull()?.apply {
                         if (favoriteSlot == -2 && EhDB.containLocalFavorites(gid)) {
                             favoriteSlot = -1
                             favoriteName = appCtx.getString(R.string.local_favorites)
@@ -353,4 +353,4 @@ object GalleryListParser {
     }
 }
 
-private external fun parseGalleryInfo(e: String): GalleryInfo?
+private external fun parseGalleryInfo(e: String): GalleryInfo
