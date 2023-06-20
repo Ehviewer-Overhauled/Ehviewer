@@ -18,6 +18,8 @@ package com.google.net.cronet.okhttptransport;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.hippo.ehviewer.client.EhCookieStore;
+
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -89,6 +91,8 @@ final class RequestResponseConverter {
     for (int i = 0; i < okHttpRequest.headers().size(); i++) {
       builder.addHeader(okHttpRequest.headers().name(i), okHttpRequest.headers().value(i));
     }
+    var cookies = EhCookieStore.INSTANCE.getCookieHeader(okHttpRequest.url());
+    builder.addHeader("Cookie", cookies);
 
     RequestBody body = okHttpRequest.body();
 
