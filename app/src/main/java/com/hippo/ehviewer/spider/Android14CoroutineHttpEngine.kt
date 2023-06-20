@@ -28,7 +28,7 @@ val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.exe
 
 // TODO: Rewrite this to use android.net.http.HttpEngine and make it Android 14 only when released
 class CronetRequest : AutoCloseable {
-    lateinit var mConsumer: (UrlResponseInfo, ByteBuffer) -> Unit
+    lateinit var consumer: (UrlResponseInfo, ByteBuffer) -> Unit
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
     lateinit var daemonCont: Continuation<Boolean>
@@ -44,7 +44,7 @@ class CronetRequest : AutoCloseable {
 
         override fun onReadCompleted(p0: UrlRequest, p1: UrlResponseInfo, p2: ByteBuffer) {
             p2.flip()
-            mConsumer(p1, p2)
+            consumer(p1, p2)
             buffer.clear()
             request.read(buffer)
         }
@@ -72,25 +72,23 @@ inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = Cro
     request = cronetHttpClient.newUrlRequestBuilder(url, callback, cronetHttpClientExecutor).apply(conf).build()
 }
 
-suspend infix fun CronetRequest.consumeBodyFully(callback: (UrlResponseInfo, ByteBuffer) -> Unit) = run {
-    mConsumer = callback
+suspend infix fun CronetRequest.awaitBodyFully(consumer: (UrlResponseInfo, ByteBuffer) -> Unit) = run {
+    this.consumer = consumer
     suspendCancellableCoroutine { cont ->
         readerCont = cont
         request.read(buffer)
     }
 }
 
-suspend inline infix fun CronetRequest.execute(noinline callback: suspend CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
-    return coroutineScope {
-        onResponse = {
-            launch {
-                callback(it)
+suspend inline fun CronetRequest.execute(noinline onResponse: suspend CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
+    return use {
+        coroutineScope {
+            this@execute.onResponse = { launch { onResponse(it) } }
+            suspendCancellableCoroutine { cont ->
+                cont.invokeOnCancellation { request.cancel() }
+                daemonCont = cont
+                request.start()
             }
-        }
-        suspendCancellableCoroutine { cont ->
-            cont.invokeOnCancellation { request.cancel() }
-            daemonCont = cont
-            request.start()
         }
     }
 }
