@@ -30,6 +30,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -190,10 +191,10 @@ class MainActivity : EhActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         navController = navHostFragment.navController
         if (!EhUtils.needSignedIn()) setNavGraph()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
 
         // Trick: Tweak NavigationUI to disable multiple backstack
@@ -325,6 +326,10 @@ class MainActivity : EhActivity() {
         super.onResume()
         lifecycleScope.launch {
             delay(300)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                mDrawerOnBackPressedCallback.remove()
+                onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
+            }
             checkClipboardUrl()
         }
     }
@@ -456,4 +461,20 @@ class MainActivity : EhActivity() {
         super.onProvideAssistContent(outContent)
         mShareUrl?.let { outContent?.webUri = Uri.parse(mShareUrl) }
     }
+
+    private val mDrawerOnBackPressedCallback =
+        object : OnBackPressedCallback(false), DrawerLayout.DrawerListener {
+            val slideThreshold = 0.05
+            override fun handleOnBackPressed() {
+                binding.drawView.closeDrawers()
+            }
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                isEnabled = slideOffset > slideThreshold
+            }
+
+            override fun onDrawerOpened(drawerView: View) {}
+            override fun onDrawerClosed(drawerView: View) {}
+            override fun onDrawerStateChanged(newState: Int) {}
+        }
 }
