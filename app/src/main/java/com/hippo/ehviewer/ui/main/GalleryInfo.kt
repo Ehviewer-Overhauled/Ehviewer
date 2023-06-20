@@ -107,6 +107,7 @@ fun GalleryInfoListItem(
                                         contentDescription = null,
                                         modifier = Modifier.size(16.dp),
                                     )
+                                    Text(text = info.favoriteName.orEmpty())
                                 }
                                 Text(text = info.simpleLanguage.orEmpty())
                                 if (info.pages != 0 && showPages) {
@@ -143,13 +144,15 @@ fun GalleryInfoGridItem(
                 modifier = Modifier.aspectRatio(aspect).fillMaxWidth(),
                 contentScale = ContentScale.Crop,
             )
-            val container = Color(color)
-            Badge(
-                modifier = Modifier.align(Alignment.TopEnd).width(32.dp).height(24.dp),
-                containerColor = container,
-                contentColor = contentColorFor(container),
-            ) {
-                Text(text = simpleLang?.uppercase().orEmpty())
+            simpleLang?.let {
+                val container = Color(color)
+                Badge(
+                    modifier = Modifier.align(Alignment.TopEnd).width(32.dp).height(24.dp),
+                    containerColor = container,
+                    contentColor = contentColorFor(container),
+                ) {
+                    Text(text = it.uppercase())
+                }
             }
         }
     }
