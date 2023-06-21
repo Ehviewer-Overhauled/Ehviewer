@@ -59,7 +59,7 @@ object LayoutManagerUtils {
     @JvmOverloads
     fun smoothScrollToPosition(
         layoutManager: RecyclerView.LayoutManager,
-        context: Context?,
+        context: Context,
         position: Int,
         millisecondsPerInch: Int = -1,
     ) {
@@ -106,7 +106,7 @@ object LayoutManagerUtils {
 
     fun scrollToPositionProperly(
         layoutManager: RecyclerView.LayoutManager,
-        context: Context?,
+        context: Context,
         position: Int,
         listener: OnScrollToPositionListener?,
     ) {

@@ -15,95 +15,81 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.view.View
+import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.core.view.WindowInsetsAnimationCompat.BoundsCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.math.MathUtils
 
-import android.view.View;
+class WindowInsetsAnimationHelper(dispatchMode: Int, vararg views: View) :
+    WindowInsetsAnimationCompat.Callback(dispatchMode) {
+    private val views: Array<View>
+    private val startPaddings = HashMap<View, Int>()
+    private val endPaddings = HashMap<View, Int>()
+    var animation: WindowInsetsAnimationCompat? = null
 
-import androidx.annotation.NonNull;
-import androidx.core.view.WindowInsetsAnimationCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.google.android.material.math.MathUtils;
-
-import java.util.HashMap;
-import java.util.List;
-
-public class WindowInsetsAnimationHelper extends WindowInsetsAnimationCompat.Callback {
-    private final View[] views;
-    private final HashMap<View, Integer> startPaddings = new HashMap<>();
-    private final HashMap<View, Integer> endPaddings = new HashMap<>();
-    WindowInsetsAnimationCompat animation;
-
-    public WindowInsetsAnimationHelper(int dispatchMode, View... views) {
-        super(dispatchMode);
-        this.views = views;
+    init {
+        this.views = arrayOf(*views)
     }
 
-    @Override
-    public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {
-        super.onPrepare(animation);
-        this.animation = animation;
-        for (View view : views) {
-            if (view == null) {
-                continue;
-            }
-            startPaddings.put(view, view.getPaddingBottom());
+    override fun onPrepare(animation: WindowInsetsAnimationCompat) {
+        super.onPrepare(animation)
+        this.animation = animation
+        for (view in views) {
+            startPaddings[view] = view.paddingBottom
         }
     }
 
-    @NonNull
-    @Override
-    public WindowInsetsAnimationCompat.BoundsCompat onStart(@NonNull WindowInsetsAnimationCompat animation, @NonNull WindowInsetsAnimationCompat.BoundsCompat bounds) {
-        this.animation = animation;
-        for (View view : views) {
-            if (view == null) {
-                continue;
-            }
-            endPaddings.put(view, view.getPaddingBottom());
-            int startPadding = startPaddings.containsKey(view) ? startPaddings.get(view) : 0;
-            view.setTranslationY(-(startPadding - view.getPaddingBottom()));
+    override fun onStart(
+        animation: WindowInsetsAnimationCompat,
+        bounds: BoundsCompat,
+    ): BoundsCompat {
+        this.animation = animation
+        for (view in views) {
+            endPaddings[view] = view.paddingBottom
+            val startPadding = if (startPaddings.containsKey(view)) startPaddings[view]!! else 0
+            view.translationY = -(startPadding - view.paddingBottom).toFloat()
         }
-        return bounds;
+        return bounds
     }
 
-    @NonNull
-    @Override
-    public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+    override fun onProgress(
+        insets: WindowInsetsCompat,
+        runningAnimations: List<WindowInsetsAnimationCompat>,
+    ): WindowInsetsCompat {
         if (animation == null) {
-            return insets;
+            return insets
         }
-        WindowInsetsAnimationCompat imeAnimation = null;
-        for (WindowInsetsAnimationCompat animation : runningAnimations) {
-            if ((animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
-                imeAnimation = animation;
-                break;
+        var imeAnimation: WindowInsetsAnimationCompat? = null
+        for (animation in runningAnimations) {
+            if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
+                imeAnimation = animation
+                break
             }
         }
         if (imeAnimation != null) {
-            for (View view : views) {
-                if (view == null) {
-                    continue;
-                }
-                int startPadding = startPaddings.containsKey(view) ? startPaddings.get(view) : 0;
-                int endPadding = endPaddings.containsKey(view) ? endPaddings.get(view) : 0;
-                view.setTranslationY(MathUtils.lerp(endPadding - startPadding, 0, animation.getInterpolatedFraction()));
+            for (view in views) {
+                val startPadding = if (startPaddings.containsKey(view)) startPaddings[view]!! else 0
+                val endPadding = if (endPaddings.containsKey(view)) endPaddings[view]!! else 0
+                view.translationY = MathUtils.lerp(
+                    (endPadding - startPadding).toFloat(),
+                    0f,
+                    animation!!.interpolatedFraction,
+                )
             }
         }
-        return insets;
+        return insets
     }
 
-    @Override
-    public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
-        super.onEnd(animation);
-        startPaddings.clear();
-        endPaddings.clear();
-        this.animation = null;
-        for (View view : views) {
-            if (view == null) {
-                continue;
-            }
-            view.setTranslationY(0);
+    override fun onEnd(animation: WindowInsetsAnimationCompat) {
+        super.onEnd(animation)
+        startPaddings.clear()
+        endPaddings.clear()
+        this.animation = null
+        for (view in views) {
+            view.translationY = 0f
         }
     }
 }
