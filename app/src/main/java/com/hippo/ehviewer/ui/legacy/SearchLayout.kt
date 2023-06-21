@@ -265,6 +265,8 @@ class SearchLayout @JvmOverloads constructor(
         }
     }
 
+    private inner class SimpleHolder(itemView: View) : ViewHolder(itemView)
+
     private inner class SearchAdapter : Adapter<SimpleHolder>() {
         override fun getItemCount(): Int {
             var count = SEARCH_ITEM_COUNT_ARRAY[mSearchMode]
@@ -283,7 +285,7 @@ class SearchLayout @JvmOverloads constructor(
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleHolder {
-            val view: View?
+            val view: View
             if (viewType == ITEM_TYPE_ACTION) {
                 mActionView.removeFromParent()
                 view = mActionView
