@@ -13,131 +13,107 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.PixelFormat
+import android.graphics.Rect
+import android.graphics.drawable.Drawable
 
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-
-public class WrapDrawable extends Drawable {
-
-    private Drawable mDrawable;
-
-    public Drawable getDrawable() {
-        return mDrawable;
+open class WrapDrawable : Drawable() {
+    open var drawable: Drawable? = null
+    fun updateBounds() {
+        setBounds(0, 0, intrinsicWidth, intrinsicHeight)
     }
 
-    public void setDrawable(Drawable drawable) {
-        mDrawable = drawable;
-    }
-
-    public void updateBounds() {
-        setBounds(0, 0, getIntrinsicWidth(), getIntrinsicHeight());
-    }
-
-    @Override
-    public void draw(Canvas canvas) {
-        if (mDrawable != null) {
-            mDrawable.draw(canvas);
+    override fun draw(canvas: Canvas) {
+        if (drawable != null) {
+            drawable!!.draw(canvas)
         }
     }
 
-    @Override
-    public void setBounds(int left, int top, int right, int bottom) {
-        super.setBounds(left, top, right, bottom);
-
-        if (mDrawable != null) {
-            mDrawable.setBounds(left, top, right, bottom);
+    override fun setBounds(left: Int, top: Int, right: Int, bottom: Int) {
+        super.setBounds(left, top, right, bottom)
+        if (drawable != null) {
+            drawable!!.setBounds(left, top, right, bottom)
         }
     }
 
-    @Override
-    public void setBounds(Rect bounds) {
-        super.setBounds(bounds);
-
-        if (mDrawable != null) {
-            mDrawable.setBounds(bounds);
+    override fun setBounds(bounds: Rect) {
+        super.setBounds(bounds)
+        if (drawable != null) {
+            drawable!!.bounds = bounds
         }
     }
 
-    @Override
-    public int getChangingConfigurations() {
-        if (mDrawable != null) {
-            return mDrawable.getChangingConfigurations();
+    override fun getChangingConfigurations(): Int {
+        return if (drawable != null) {
+            drawable!!.changingConfigurations
         } else {
-            return super.getChangingConfigurations();
+            super.getChangingConfigurations()
         }
     }
 
-    @Override
-    public void setChangingConfigurations(int configs) {
-        super.setChangingConfigurations(configs);
-
-        if (mDrawable != null) {
-            mDrawable.setChangingConfigurations(configs);
+    override fun setChangingConfigurations(configs: Int) {
+        super.setChangingConfigurations(configs)
+        if (drawable != null) {
+            drawable!!.changingConfigurations = configs
         }
     }
 
-    @Override
-    public void setDither(boolean dither) {
-        super.setDither(dither);
-
-        if (mDrawable != null) {
-            mDrawable.setDither(dither);
+    @Deprecated("Deprecated in Java")
+    override fun setDither(dither: Boolean) {
+        super.setDither(dither)
+        if (drawable != null) {
+            drawable!!.setDither(dither)
         }
     }
 
-    @Override
-    public void setFilterBitmap(boolean filter) {
-        super.setFilterBitmap(filter);
-
-        if (mDrawable != null) {
-            mDrawable.setFilterBitmap(filter);
+    override fun setFilterBitmap(filter: Boolean) {
+        super.setFilterBitmap(filter)
+        if (drawable != null) {
+            drawable!!.isFilterBitmap = filter
         }
     }
 
-
-    @Override
-    public void setAlpha(int alpha) {
-        if (mDrawable != null) {
-            mDrawable.setAlpha(alpha);
+    override fun setAlpha(alpha: Int) {
+        if (drawable != null) {
+            drawable!!.alpha = alpha
         }
     }
 
-    @Override
-    public void setColorFilter(ColorFilter cf) {
-        if (mDrawable != null) {
-            mDrawable.setColorFilter(cf);
+    override fun setColorFilter(cf: ColorFilter?) {
+        if (drawable != null) {
+            drawable!!.colorFilter = cf
         }
     }
 
-    @Override
-    public int getOpacity() {
-        if (mDrawable != null) {
-            return mDrawable.getOpacity();
+    @Deprecated(
+        "Deprecated in Java",
+        ReplaceWith("PixelFormat.TRANSLUCENT", "android.graphics.PixelFormat"),
+    )
+    override fun getOpacity(): Int {
+        return if (drawable != null) {
+            drawable!!.opacity
         } else {
-            return PixelFormat.UNKNOWN;
+            PixelFormat.UNKNOWN
         }
     }
 
-    @Override
-    public int getIntrinsicWidth() {
-        if (mDrawable != null) {
-            return mDrawable.getIntrinsicWidth();
+    override fun getIntrinsicWidth(): Int {
+        return if (drawable != null) {
+            drawable!!.intrinsicWidth
         } else {
-            return super.getIntrinsicWidth();
+            super.getIntrinsicWidth()
         }
     }
 
-    @Override
-    public int getIntrinsicHeight() {
-        if (mDrawable != null) {
-            return mDrawable.getIntrinsicHeight();
+    override fun getIntrinsicHeight(): Int {
+        return if (drawable != null) {
+            drawable!!.intrinsicHeight
         } else {
-            return super.getIntrinsicHeight();
+            super.getIntrinsicHeight()
         }
     }
 }
