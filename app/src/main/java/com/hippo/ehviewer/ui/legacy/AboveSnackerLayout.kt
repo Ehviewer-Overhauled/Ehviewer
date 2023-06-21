@@ -17,7 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.drakeet.drawer.FullDraggableHelper
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
-import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
+import com.hippo.ehviewer.yorozuya.dp2px
 
 class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Callback {
     private val helper: FullDraggableHelper
@@ -195,7 +195,7 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
                 val view = child.getAboveSnackViewAt(i)
                 if (view != null) {
                     val translationY =
-                        (dependency.translationY - dependency.height - dp2pix(view.context, 8f))
+                        (dependency.translationY - dependency.height - dp2px(view.context, 8f))
                             .coerceAtMost(0f)
                     ViewCompat.animate(view).setInterpolator(FastOutSlowInInterpolator())
                         .translationY(translationY).setDuration(150).start()
