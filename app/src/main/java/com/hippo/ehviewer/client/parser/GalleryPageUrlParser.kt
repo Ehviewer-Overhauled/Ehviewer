@@ -16,7 +16,8 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.toIntOrDefault
+import com.hippo.ehviewer.yorozuya.toLongOrDefault
 import java.util.regex.Pattern
 
 /**
@@ -33,9 +34,9 @@ object GalleryPageUrlParser {
         val pattern = if (strict) URL_STRICT_PATTERN else URL_PATTERN
         val m = pattern.matcher(url)
         return if (m.find()) {
-            val gid = NumberUtils.parseLongSafely(m.group(2), -1L)
+            val gid = m.group(2)!!.toLongOrDefault(-1L)
             val pToken = m.group(1)!!
-            val page = NumberUtils.parseIntSafely(m.group(3), 0) - 1
+            val page = m.group(3)!!.toIntOrDefault(0) - 1
             if (gid < 0 || page < 0) {
                 null
             } else {

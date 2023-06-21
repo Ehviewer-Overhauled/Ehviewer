@@ -21,7 +21,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import splitties.init.appCtx
@@ -71,7 +71,7 @@ object GalleryListParser {
                         val href = e.attr("href")
                         val matcher = PATTERN_NEXT_PAGE.matcher(href)
                         if (matcher.find()) {
-                            result.nextPage = NumberUtils.parseIntSafely(matcher.group(1), 0)
+                            result.nextPage = matcher.group(1)!!.toIntOrDefault(0)
                         }
                     }
                 }

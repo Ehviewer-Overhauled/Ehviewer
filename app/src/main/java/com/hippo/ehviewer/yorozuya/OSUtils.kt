@@ -46,7 +46,7 @@ object OSUtils {
                         while (reader.readLine().also { line = it } != null) {
                             val matcher = PROCFS_MEMFILE_FORMAT.matcher(line!!)
                             if (matcher.find() && MEMTOTAL_STRING == matcher.group(1)) {
-                                var mem = NumberUtils.parseLongSafely(matcher.group(2)!!, -1L)
+                                var mem = matcher.group(2)!!.toLongOrDefault(-1L)
                                 if (mem != -1L) {
                                     mem *= 1024
                                 }

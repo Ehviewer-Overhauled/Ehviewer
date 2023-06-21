@@ -35,7 +35,8 @@ import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.exception.PiningException
 import com.hippo.ehviewer.client.getThumbKey
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.toFloatOrDefault
+import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import com.hippo.ehviewer.yorozuya.trimAnd
 import com.hippo.ehviewer.yorozuya.unescapeXml
 import org.jsoup.Jsoup
@@ -174,10 +175,7 @@ object GalleryDetailParser {
             // Rating count
             val ratingCount = gm.getElementById("rating_count")
             if (null != ratingCount) {
-                gd.ratingCount = NumberUtils.parseIntSafely(
-                    ratingCount.text().trim(),
-                    0,
-                )
+                gd.ratingCount = ratingCount.text().trim().toIntOrDefault(0)
             } else {
                 gd.ratingCount = 0
             }
@@ -193,7 +191,7 @@ object GalleryDetailParser {
                     if (index == -1 || index >= ratingStr.length) {
                         gd.rating = 0f
                     } else {
-                        gd.rating = NumberUtils.parseFloatSafely(ratingStr.substring(index + 1), 0f)
+                        gd.rating = ratingStr.substring(index + 1).toFloatOrDefault(0f)
                     }
                 }
             } else {
@@ -263,7 +261,7 @@ object GalleryDetailParser {
         } else if (key.startsWith("Length")) {
             val index = value.indexOf(' ')
             if (index >= 0) {
-                gd.pages = NumberUtils.parseIntSafely(value.substring(0, index), 1)
+                gd.pages = value.substring(0, index).toIntOrDefault(1)
             } else {
                 gd.pages = 1
             }
@@ -276,7 +274,7 @@ object GalleryDetailParser {
                     if (index == -1) {
                         gd.favoriteCount = 0
                     } else {
-                        gd.favoriteCount = NumberUtils.parseIntSafely(value.substring(0, index), 0)
+                        gd.favoriteCount = value.substring(0, index).toIntOrDefault(0)
                     }
                 }
             }
@@ -375,10 +373,7 @@ object GalleryDetailParser {
             if (null != c5) {
                 val es = c5.children()
                 if (!es.isEmpty()) {
-                    comment.score = NumberUtils.parseIntSafely(
-                        es[0].text().trim(),
-                        0,
-                    )
+                    comment.score = es[0].text().trim().toIntOrDefault(0)
                 }
             }
             // time

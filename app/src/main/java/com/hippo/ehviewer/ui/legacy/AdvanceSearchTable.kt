@@ -28,7 +28,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.textfield.TextInputLayout
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.toIntOrDefault
 
 class AdvanceSearchTable @JvmOverloads constructor(
     context: Context,
@@ -90,11 +90,11 @@ class AdvanceSearchTable @JvmOverloads constructor(
             return advanceSearch
         }
         set(advanceSearch) {
-            mSh.isChecked = NumberUtils.int2boolean(advanceSearch and SH)
-            mSto.isChecked = NumberUtils.int2boolean(advanceSearch and STO)
-            mSfl.isChecked = NumberUtils.int2boolean(advanceSearch and SFL)
-            mSfu.isChecked = NumberUtils.int2boolean(advanceSearch and SFU)
-            mSft.isChecked = NumberUtils.int2boolean(advanceSearch and SFT)
+            mSh.isChecked = advanceSearch and SH != 0
+            mSto.isChecked = advanceSearch and STO != 0
+            mSfl.isChecked = advanceSearch and SFL != 0
+            mSfu.isChecked = advanceSearch and SFU != 0
+            mSft.isChecked = advanceSearch and SFT != 0
         }
     var minRating: Int
         get() {
@@ -113,7 +113,7 @@ class AdvanceSearchTable @JvmOverloads constructor(
         }
     var pageFrom: Int
         get() = if (mSp.isChecked) {
-            NumberUtils.parseIntSafely(mSpf.text.toString(), -1)
+            mSpf.text.toString().toIntOrDefault(-1)
         } else {
             -1
         }
@@ -128,7 +128,7 @@ class AdvanceSearchTable @JvmOverloads constructor(
         }
     var pageTo: Int
         get() = if (mSp.isChecked) {
-            NumberUtils.parseIntSafely(mSpt.text.toString(), -1)
+            mSpt.text.toString().toIntOrDefault(-1)
         } else {
             -1
         }

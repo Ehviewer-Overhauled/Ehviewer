@@ -15,7 +15,8 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.toIntOrDefault
+import com.hippo.ehviewer.yorozuya.toLongOrDefault
 import com.hippo.ehviewer.yorozuya.unescapeXml
 import java.time.Instant
 import java.time.ZoneOffset
@@ -36,10 +37,10 @@ object ParserUtils {
     }
 
     fun parseInt(str: String?, defValue: Int): Int {
-        return NumberUtils.parseIntSafely(trim(str).replace(",", ""), defValue)
+        return trim(str).replace(",", "").toIntOrDefault(defValue)
     }
 
     fun parseLong(str: String?, defValue: Long): Long {
-        return NumberUtils.parseLongSafely(trim(str).replace(",", ""), defValue)
+        return trim(str).replace(",", "").toLongOrDefault(defValue)
     }
 }
