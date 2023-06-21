@@ -33,7 +33,7 @@ object LayoutManagerUtils {
         try {
             sCsdfp = StaggeredGridLayoutManager::class.java.getDeclaredMethod(
                 "calculateScrollDirectionForPosition",
-                Int::class.javaPrimitiveType
+                Int::class.javaPrimitiveType,
             ).apply { isAccessible = true }
         } catch (e: NoSuchMethodException) {
             // Ignore
@@ -42,7 +42,9 @@ object LayoutManagerUtils {
     }
 
     fun scrollToPositionWithOffset(
-        layoutManager: RecyclerView.LayoutManager, position: Int, offset: Int
+        layoutManager: RecyclerView.LayoutManager,
+        position: Int,
+        offset: Int,
     ) {
         when (layoutManager) {
             is LinearLayoutManager -> layoutManager.scrollToPositionWithOffset(position, offset)
@@ -56,8 +58,10 @@ object LayoutManagerUtils {
 
     @JvmOverloads
     fun smoothScrollToPosition(
-        layoutManager: RecyclerView.LayoutManager, context: Context?, position: Int,
-        millisecondsPerInch: Int = -1
+        layoutManager: RecyclerView.LayoutManager,
+        context: Context?,
+        position: Int,
+        millisecondsPerInch: Int = -1,
     ) {
         val smoothScroller: SimpleSmoothScroller
         when (layoutManager) {
@@ -102,7 +106,9 @@ object LayoutManagerUtils {
 
     fun scrollToPositionProperly(
         layoutManager: RecyclerView.LayoutManager,
-        context: Context?, position: Int, listener: OnScrollToPositionListener?
+        context: Context?,
+        position: Int,
+        listener: OnScrollToPositionListener?,
     ) {
         SimpleHandler.postDelayed({
             val first = getFirstVisibleItemPosition(layoutManager)
@@ -111,8 +117,10 @@ object LayoutManagerUtils {
             val max = last - first
             if (offset < max && max > 0) {
                 smoothScrollToPosition(
-                    layoutManager, context, position,
-                    MathUtils.lerp(100F, 25F, (offset / max).toFloat()).toInt()
+                    layoutManager,
+                    context,
+                    position,
+                    MathUtils.lerp(100F, 25F, (offset / max).toFloat()).toInt(),
                 )
             } else {
                 scrollToPositionWithOffset(layoutManager, position, 0)

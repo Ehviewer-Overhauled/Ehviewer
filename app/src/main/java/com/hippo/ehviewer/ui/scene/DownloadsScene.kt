@@ -443,7 +443,7 @@ class DownloadsScene :
                 val items = arrayOf(
                     getString(R.string.let_me_select),
                     getString(R.string.default_download_label_name),
-                    *list
+                    *list,
                 )
                 BaseDialogBuilder(requireContext())
                     .setTitle(R.string.default_download_label)

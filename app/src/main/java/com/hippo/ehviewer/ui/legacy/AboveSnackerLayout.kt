@@ -24,15 +24,12 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
     private var drawerLayout: DrawerLayout? = null
     private var mAboveSnackViewList: MutableList<View>? = null
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(
-        context!!, attrs
-    ) {
+    constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) {
         helper = FullDraggableHelper(context, this)
     }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
-        context!!, attrs, defStyle
-    ) {
+    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) :
+        super(context!!, attrs, defStyle) {
         helper = FullDraggableHelper(context, this)
     }
 
@@ -65,8 +62,8 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
     }
 
     override fun hasEnabledDrawer(gravity: Int): Boolean {
-        return (drawerLayout!!.getDrawerLockMode(gravity) == DrawerLayout.LOCK_MODE_UNLOCKED
-                && findDrawerWithGravity(gravity) != null)
+        return drawerLayout!!.getDrawerLockMode(gravity) == DrawerLayout.LOCK_MODE_UNLOCKED &&
+            findDrawerWithGravity(gravity) != null
     }
 
     override fun offsetDrawer(gravity: Int, offset: Float) {
@@ -110,7 +107,7 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
             val method = DrawerLayout::class.java.getDeclaredMethod(
                 "moveDrawerToOffset",
                 View::class.java,
-                Float::class.javaPrimitiveType
+                Float::class.javaPrimitiveType,
             )
             method.isAccessible = true
             method.invoke(drawerLayout, drawerView, slideOffsetPercent)
@@ -124,9 +121,8 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
     // Copied from DrawerLayout
     private fun findDrawerWithGravity(gravity: Int): View? {
         val absHorizontalGravity = GravityCompat.getAbsoluteGravity(
-            gravity, ViewCompat.getLayoutDirection(
-                drawerLayout!!
-            )
+            gravity,
+            ViewCompat.getLayoutDirection(drawerLayout!!),
         ) and Gravity.HORIZONTAL_GRAVITY_MASK
         val childCount = drawerLayout!!.childCount
         for (i in 0 until childCount) {
@@ -144,7 +140,7 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
         val gravity = (drawerView.layoutParams as DrawerLayout.LayoutParams).gravity
         return GravityCompat.getAbsoluteGravity(
             gravity,
-            ViewCompat.getLayoutDirection(drawerLayout!!)
+            ViewCompat.getLayoutDirection(drawerLayout!!),
         )
     }
 
@@ -181,7 +177,7 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
         override fun layoutDependsOn(
             parent: CoordinatorLayout,
             child: AboveSnackerLayout,
-            dependency: View
+            dependency: View,
         ): Boolean {
             return dependency is SnackbarLayout
         }
@@ -189,7 +185,7 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
         override fun onDependentViewChanged(
             parent: CoordinatorLayout,
             child: AboveSnackerLayout,
-            dependency: View
+            dependency: View,
         ): Boolean {
             for (i in 0 until child.aboveSnackViewCount) {
                 val view = child.getAboveSnackViewAt(i)
@@ -207,7 +203,7 @@ class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Ca
         override fun onDependentViewRemoved(
             parent: CoordinatorLayout,
             child: AboveSnackerLayout,
-            dependency: View
+            dependency: View,
         ) {
             for (i in 0 until child.aboveSnackViewCount) {
                 val view = child.getAboveSnackViewAt(i)

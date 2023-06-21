@@ -52,7 +52,7 @@ class RadioGridGroup : SimpleGridLayout {
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
-        defStyle
+        defStyle,
     ) {
         init(context, attrs)
     }
@@ -221,9 +221,7 @@ class RadioGridGroup : SimpleGridLayout {
                     id = generateViewId()
                     child.setId(id)
                 }
-                child.setOnCheckedChangeListener(
-                    mChildOnCheckedChangeListener
-                )
+                child.setOnCheckedChangeListener(mChildOnCheckedChangeListener)
             }
             mOnHierarchyChangeListener?.onChildViewAdded(parent, child)
         }

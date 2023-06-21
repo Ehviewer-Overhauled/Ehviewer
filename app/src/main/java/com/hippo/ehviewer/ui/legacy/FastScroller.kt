@@ -67,7 +67,7 @@ class FastScroller : View {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     ) {
         init(context, attrs, defStyleAttr)
     }
@@ -167,7 +167,7 @@ class FastScroller : View {
         }
         check(mRecyclerView == null) {
             "The FastScroller is already attached to a RecyclerView, " +
-                    "call detachedFromRecyclerView first"
+                "call detachedFromRecyclerView first"
         }
         mRecyclerView = recyclerView
         mOnScrollChangeListener = object : RecyclerView.OnScrollListener() {
