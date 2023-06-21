@@ -35,7 +35,6 @@ import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.exception.PiningException
 import com.hippo.ehviewer.client.getThumbKey
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.util.JsoupUtils
 import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.ehviewer.yorozuya.StringUtils
 import com.hippo.ehviewer.yorozuya.trimAnd
@@ -141,11 +140,11 @@ object GalleryDetailParser {
             gd.titleJpn = gm.getElementById("gj")?.text()?.trim()
 
             // Category
-            val gdc = gm.getElementById("gdc")
             try {
-                var ce = JsoupUtils.getElementByClass(gdc, "cn")
+                val gdc = gm.getElementById("gdc")!!
+                var ce = gdc.getElementsByClass("cn").first()
                 if (ce == null) {
-                    ce = JsoupUtils.getElementByClass(gdc, "cs")
+                    ce = gdc.getElementsByClass("cs").first()
                 }
                 gd.category = getCategory(ce!!.text())
             } catch (e: Throwable) {
@@ -346,7 +345,7 @@ object GalleryDetailParser {
             val name = a!!.attr("name")
             comment.id = name trimAnd { substring(1).toInt().toLong() }
             // Editable, vote up and vote down
-            val c4 = JsoupUtils.getElementByClass(element, "c4")
+            val c4 = element.getElementsByClass("c4").first()
             if (null != c4) {
                 if ("Uploader Comment" == c4.text()) {
                     comment.uploader = true
@@ -368,12 +367,12 @@ object GalleryDetailParser {
                 }
             }
             // Vote state
-            val c7 = JsoupUtils.getElementByClass(element, "c7")
+            val c7 = element.getElementsByClass("c7").first()
             if (null != c7) {
                 comment.voteState = StringUtils.trim(c7.text())
             }
             // Score
-            val c5 = JsoupUtils.getElementByClass(element, "c5")
+            val c5 = element.getElementsByClass("c5").first()
             if (null != c5) {
                 val es = c5.children()
                 if (!es.isEmpty()) {
@@ -384,7 +383,7 @@ object GalleryDetailParser {
                 }
             }
             // time
-            val c3 = JsoupUtils.getElementByClass(element, "c3")
+            val c3 = element.getElementsByClass("c3").first()
             val temp = c3!!.ownText()
             val time = if (temp.endsWith(':')) {
                 // user
@@ -395,7 +394,7 @@ object GalleryDetailParser {
             }
             comment.time = Instant.from(WEB_COMMENT_DATE_FORMAT.parse(time)).toEpochMilli()
             // comment
-            val c6 = JsoupUtils.getElementByClass(element, "c6")
+            val c6 = element.getElementsByClass("c6").first()
             // fix underline support
             for (e in c6!!.children()) {
                 if ("span" == e.tagName() && "text-decoration:underline;" == e.attr("style")) {
@@ -411,7 +410,7 @@ object GalleryDetailParser {
                 }
             }
             // last edited
-            val c8 = JsoupUtils.getElementByClass(element, "c8")
+            val c8 = element.getElementsByClass("c8").first()
             if (c8 != null) {
                 val e = c8.children().first()
                 if (e != null) {

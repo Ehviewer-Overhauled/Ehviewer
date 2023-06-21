@@ -18,15 +18,13 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.util.JsoupUtils
 import org.jsoup.Jsoup
 
 object GalleryNotAvailableParser {
     fun parse(body: String): String? {
         return runCatching {
-            val document = Jsoup.parse(body)
-            val d = JsoupUtils.getElementByClass(document, "d")
-            d!!.child(0).html().replace("<br>", "\n")
+            val e = Jsoup.parse(body).getElementsByClass("d").first()
+            e!!.child(0).html().replace("<br>", "\n")
         }.getOrElse {
             ExceptionUtils.throwIfFatal(it)
             it.printStackTrace()

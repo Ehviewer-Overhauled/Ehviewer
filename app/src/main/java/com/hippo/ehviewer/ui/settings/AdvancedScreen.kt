@@ -38,7 +38,6 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.observed
-import com.hippo.ehviewer.util.LogCat
 import com.hippo.ehviewer.util.ReadableTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -104,7 +103,7 @@ fun AdvancedScreen() {
                                 }
                                 val logcatEntry = ZipEntry("logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt")
                                 zipOs.putNextEntry(logcatEntry)
-                                LogCat.save(zipOs)
+                                Runtime.getRuntime().exec("logcat -d").inputStream.use { it.copyTo(zipOs) }
                             }
                             launchSnackBar(getString(R.string.settings_advanced_dump_logcat_to, uri.toString()))
                         }
