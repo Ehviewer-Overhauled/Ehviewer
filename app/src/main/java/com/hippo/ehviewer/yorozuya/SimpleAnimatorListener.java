@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.yorozuya
 
-package com.hippo.ehviewer.yorozuya;
+import android.animation.Animator
 
-import android.animation.Animator;
-
-public abstract class SimpleAnimatorListener implements Animator.AnimatorListener {
-
-    @Override
-    public void onAnimationStart(Animator animation) {
-    }
-
-    @Override
-    public void onAnimationEnd(Animator animation) {
-    }
-
-    @Override
-    public void onAnimationCancel(Animator animation) {
-    }
-
-    @Override
-    public void onAnimationRepeat(Animator animation) {
-    }
+abstract class SimpleAnimatorListener : Animator.AnimatorListener {
+    override fun onAnimationStart(animation: Animator) {}
+    override fun onAnimationEnd(animation: Animator) {}
+    override fun onAnimationCancel(animation: Animator) {}
+    override fun onAnimationRepeat(animation: Animator) {}
 }

@@ -13,38 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.yorozuya
 
-package com.hippo.ehviewer.yorozuya;
+class ConcurrentPool<T>(size: Int) {
+    private val mArray: Array<T?>
+    private val mMaxSize: Int
+    private var mSize: Int
 
-public class ConcurrentPool<T> {
-
-    private final T[] mArray;
-    private final int mMaxSize;
-    private int mSize;
-
-    @SuppressWarnings("unchecked")
-    public ConcurrentPool(int size) {
-        if (size <= 0) {
-            throw new IllegalStateException("Pool size must > 0, it is " + size);
-        }
-        mArray = (T[]) new Object[size];
-        mMaxSize = size;
-        mSize = 0;
+    init {
+        check(size > 0) { "Pool size must > 0, it is $size" }
+        mArray = arrayOfNulls<Any>(size) as Array<T?>
+        mMaxSize = size
+        mSize = 0
     }
 
-    public synchronized void push(T t) {
+    @Synchronized
+    fun push(t: T?) {
         if (t != null && mSize < mMaxSize) {
-            mArray[mSize++] = t;
+            mArray[mSize++] = t
         }
     }
 
-    public synchronized T pop() {
-        if (mSize > 0) {
-            T t = mArray[--mSize];
-            mArray[mSize] = null;
-            return t;
+    @Synchronized
+    fun pop(): T? {
+        return if (mSize > 0) {
+            val t = mArray[--mSize]
+            mArray[mSize] = null
+            t
         } else {
-            return null;
+            null
         }
     }
 }
