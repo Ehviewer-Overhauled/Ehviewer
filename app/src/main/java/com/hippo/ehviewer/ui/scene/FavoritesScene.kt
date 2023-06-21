@@ -485,17 +485,14 @@ class FavoritesScene :
             return
         }
         mModifyGiList.clear()
-        val stateArray = binding.contentLayout.recyclerView.checkedItemPositions
-        var i = 0
-        val n = stateArray.size()
-        while (i < n) {
+        val stateArray = binding.contentLayout.recyclerView.checkedItemPositions!!
+        for (i in 0 until stateArray.size()) {
             if (stateArray.valueAt(i)) {
                 val gi = mHelper.getDataAtEx(stateArray.keyAt(i))
                 if (gi != null) {
                     mModifyGiList.add(gi)
                 }
             }
-            i++
         }
         when (position) {
             3 -> // Check all
@@ -696,13 +693,7 @@ class FavoritesScene :
             }
             binding.contentLayout.recyclerView.outOfCustomChoiceMode()
             if (mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
-                val gidArray = LongArray(mModifyGiList.size)
-                var i = 0
-                val n = mModifyGiList.size
-                while (i < n) {
-                    gidArray[i] = mModifyGiList[i].gid
-                    i++
-                }
+                val gidArray = mModifyGiList.map { it.gid }.toLongArray()
                 EhDB.removeLocalFavorites(gidArray)
                 mModifyGiList.clear()
                 mHelper.refresh()
@@ -737,13 +728,7 @@ class FavoritesScene :
             }
             binding.contentLayout.recyclerView.outOfCustomChoiceMode()
             if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from local to cloud
-                val gidArray = LongArray(mModifyGiList.size)
-                var i = 0
-                val n = mModifyGiList.size
-                while (i < n) {
-                    gidArray[i] = mModifyGiList[i].gid
-                    i++
-                }
+                val gidArray = mModifyGiList.map { it.gid }.toLongArray()
                 EhDB.removeLocalFavorites(gidArray)
                 mEnableModify = true
                 mModifyFavCat = dstCat
@@ -811,22 +796,13 @@ class FavoritesScene :
             if (mEnableModify) {
                 mEnableModify = false
                 val local = mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL
-                val gidArray = LongArray(mModifyGiList.size)
                 if (mModifyAdd) {
-                    val tokenArray = arrayOfNulls<String>(mModifyGiList.size)
-                    var i = 0
-                    val n = mModifyGiList.size
-                    while (i < n) {
-                        val gi = mModifyGiList[i]
-                        gidArray[i] = gi.gid
-                        tokenArray[i] = gi.token
-                        i++
-                    }
+                    val gidTokenArray = mModifyGiList.map { Pair(it.gid, it.token!!) }.toTypedArray()
                     val modifyGiListBackup: List<GalleryInfo> = ArrayList(mModifyGiList)
                     mModifyGiList.clear()
                     lifecycleScope.launchIO {
                         runSuspendCatching {
-                            EhEngine.addFavoritesRange(gidArray, tokenArray, mModifyFavCat)
+                            EhEngine.addFavoritesRange(gidTokenArray, mModifyFavCat)
                         }.onSuccess {
                             withUIContext {
                                 onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
@@ -841,12 +817,7 @@ class FavoritesScene :
                         }
                     }
                 } else {
-                    var i = 0
-                    val n = mModifyGiList.size
-                    while (i < n) {
-                        gidArray[i] = mModifyGiList[i].gid
-                        i++
-                    }
+                    val gidArray = mModifyGiList.map { it.gid }.toLongArray()
                     mModifyGiList.clear()
                     val url: String = if (local) {
                         // Local fav is shown now, but operation need be done for cloud fav

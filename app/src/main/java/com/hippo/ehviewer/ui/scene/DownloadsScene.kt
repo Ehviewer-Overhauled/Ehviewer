@@ -439,16 +439,12 @@ class DownloadsScene :
                 NewLabelDialogHelper(builder, dialog)
                 return@setOnMenuItemClickListener true
             } else if (id == R.id.action_default_download_label) {
-                val list = DownloadManager.labelList
-                val items = arrayOfNulls<String>(list.size + 2)
-                items[0] = getString(R.string.let_me_select)
-                items[1] = getString(R.string.default_download_label_name)
-                var i = 0
-                val n = list.size
-                while (i < n) {
-                    items[i + 2] = list[i].label
-                    i++
-                }
+                val list = DownloadManager.labelList.mapNotNull { it.label }.toTypedArray()
+                val items = arrayOf(
+                    getString(R.string.let_me_select),
+                    getString(R.string.default_download_label_name),
+                    *list
+                )
                 BaseDialogBuilder(requireContext())
                     .setTitle(R.string.default_download_label)
                     .setItems(items) { _: DialogInterface?, which: Int ->
@@ -539,7 +535,7 @@ class DownloadsScene :
             if (collectDownloadInfo) {
                 downloadInfoList = LinkedList()
             }
-            val stateArray = binding.recyclerView.checkedItemPositions
+            val stateArray = binding.recyclerView.checkedItemPositions!!
             for (i in 0 until stateArray.size()) {
                 if (stateArray.valueAt(i)) {
                     val info = list[stateArray.keyAt(i)]

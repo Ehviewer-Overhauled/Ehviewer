@@ -449,8 +449,7 @@ object EhEngine {
         if (filter) list.removeAll { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
     }
 
-    suspend fun addFavoritesRange(gidArray: LongArray, tokenArray: Array<String?>, dstCat: Int) {
-        require(gidArray.size == tokenArray.size)
-        gidArray.forEachIndexed { index, gid -> addFavorites(gid, tokenArray[index], dstCat, null) }
+    suspend fun addFavoritesRange(gidTokenArray: Array<Pair<Long, String>>, dstCat: Int) {
+        gidTokenArray.forEach { (gid, token) -> addFavorites(gid, token, dstCat, null) }
     }
 }
