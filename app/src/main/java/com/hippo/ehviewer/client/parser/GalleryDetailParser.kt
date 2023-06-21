@@ -36,7 +36,6 @@ import com.hippo.ehviewer.client.exception.PiningException
 import com.hippo.ehviewer.client.getThumbKey
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.yorozuya.NumberUtils
-import com.hippo.ehviewer.yorozuya.StringUtils
 import com.hippo.ehviewer.yorozuya.trimAnd
 import com.hippo.ehviewer.yorozuya.unescapeXml
 import org.jsoup.Jsoup
@@ -156,7 +155,7 @@ object GalleryDetailParser {
             val gdn = gm.getElementById("gdn")
             if (null != gdn) {
                 gd.disowned = gdn.attr("style").contains("opacity:0.5")
-                gd.uploader = StringUtils.trim(gdn.text())
+                gd.uploader = gdn.text().trim()
             } else {
                 gd.uploader = ""
             }
@@ -176,7 +175,7 @@ object GalleryDetailParser {
             val ratingCount = gm.getElementById("rating_count")
             if (null != ratingCount) {
                 gd.ratingCount = NumberUtils.parseIntSafely(
-                    StringUtils.trim(ratingCount.text()),
+                    ratingCount.text().trim(),
                     0,
                 )
             } else {
@@ -186,7 +185,7 @@ object GalleryDetailParser {
             // Rating
             val ratingLabel = gm.getElementById("rating_label")
             if (null != ratingLabel) {
-                val ratingStr = StringUtils.trim(ratingLabel.text())
+                val ratingStr = ratingLabel.text().trim()
                 if ("Not Yet Rated" == ratingStr) {
                     gd.rating = -1.0f
                 } else {
@@ -205,12 +204,12 @@ object GalleryDetailParser {
             val gdf = gm.getElementById("gdf")
             gd.isFavorited = false
             if (gdf != null) {
-                val favoriteName = StringUtils.trim(gdf.text())
+                val favoriteName = gdf.text().trim()
                 if (favoriteName == "Add to Favorites") {
                     gd.favoriteName = null
                 } else {
                     gd.isFavorited = true
-                    gd.favoriteName = StringUtils.trim(gdf.text())
+                    gd.favoriteName = gdf.text().trim()
                     PATTERN_FAVORITE_SLOT.find(body)?.run {
                         gd.favoriteSlot = ((groupValues[1].toIntOrNull() ?: 2) - 2) / 19
                     }
@@ -233,7 +232,7 @@ object GalleryDetailParser {
                 if (result != null) {
                     gi.gid = result.gid
                     gi.token = result.token
-                    gi.title = StringUtils.trim(element.text())
+                    gi.title = element.text().trim()
                     gi.posted = dates[index]
                     gd.newerVersions.add(gi)
                 }
@@ -246,8 +245,8 @@ object GalleryDetailParser {
         if (es.size < 2) {
             return
         }
-        val key = StringUtils.trim(es[0].text())
-        val value = StringUtils.trim(es[1].ownText())
+        val key = es[0].text().trim()
+        val value = es[1].ownText().trim()
         if (key.startsWith("Posted")) {
             gd.posted = value
         } else if (key.startsWith("Parent")) {
@@ -354,12 +353,12 @@ object GalleryDetailParser {
                     when (e.text()) {
                         "Vote+" -> {
                             comment.voteUpAble = true
-                            comment.voteUpEd = StringUtils.trim(e.attr("style")).isNotEmpty()
+                            comment.voteUpEd = e.attr("style").trim().isNotEmpty()
                         }
 
                         "Vote-" -> {
                             comment.voteDownAble = true
-                            comment.voteDownEd = StringUtils.trim(e.attr("style")).isNotEmpty()
+                            comment.voteDownEd = e.attr("style").trim().isNotEmpty()
                         }
 
                         "Edit" -> comment.editable = true
@@ -369,7 +368,7 @@ object GalleryDetailParser {
             // Vote state
             val c7 = element.getElementsByClass("c7").first()
             if (null != c7) {
-                comment.voteState = StringUtils.trim(c7.text())
+                comment.voteState = c7.text().trim()
             }
             // Score
             val c5 = element.getElementsByClass("c5").first()
@@ -377,7 +376,7 @@ object GalleryDetailParser {
                 val es = c5.children()
                 if (!es.isEmpty()) {
                     comment.score = NumberUtils.parseIntSafely(
-                        StringUtils.trim(es[0].text()),
+                        es[0].text().trim(),
                         0,
                     )
                 }

@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.client.data
 
 import android.os.Parcelable
-import android.text.TextUtils
 import androidx.annotation.IntDef
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
@@ -25,7 +24,6 @@ import com.hippo.ehviewer.network.UrlBuilder
 import com.hippo.ehviewer.ui.legacy.AdvanceSearchTable
 import com.hippo.ehviewer.util.encodeUTF8
 import com.hippo.ehviewer.yorozuya.NumberUtils
-import com.hippo.ehviewer.yorozuya.StringUtils
 import kotlinx.parcelize.Parcelize
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
@@ -116,7 +114,7 @@ data class ListUrlBuilder(
         if (q.category != this.category) {
             return false
         }
-        if (!StringUtils.equals(q.keyword, mKeyword)) {
+        if (q.keyword != mKeyword) {
             return false
         }
         if (q.advanceSearch != advanceSearch) {
@@ -138,10 +136,10 @@ data class ListUrlBuilder(
     // TODO page
     fun setQuery(query: String?) {
         reset()
-        if (TextUtils.isEmpty(query)) {
+        if (query.isNullOrEmpty()) {
             return
         }
-        val queries = StringUtils.split(query, '&')
+        val queries = query.split('&')
         var category = 0
         var keyword: String? = null
         var enableAdvanceSearch = false
@@ -296,7 +294,7 @@ data class ListUrlBuilder(
                 }
                 // Search key
                 // the settings of ub:UrlBuilder may be overwritten by following Advance search
-                StringUtils.split(mKeyword, '|')?.forEachIndexed { idx, kwd ->
+                mKeyword?.split('|')?.forEachIndexed { idx, kwd ->
                     val keyword = kwd.trim { it <= ' ' }
                     when (idx) {
                         0 -> keyword.takeIf { it.isNotEmpty() }

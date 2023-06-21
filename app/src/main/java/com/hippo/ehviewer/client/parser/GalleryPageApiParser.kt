@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.ehviewer.yorozuya.StringUtils
+import com.hippo.ehviewer.yorozuya.unescapeXml
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.regex.Matcher
@@ -38,22 +38,21 @@ object GalleryPageApiParser {
             val i3 = jo.getString("i3")
             m = PATTERN_IMAGE_URL.matcher(i3)
             val imageUrl = if (m.find()) {
-                StringUtils.unescapeXml(StringUtils.trim(m.group(1)))
+                m.group(1)!!.trim().unescapeXml()
             } else {
                 null
             }
             val i6 = jo.getString("i6")
             m = PATTERN_SKIP_HATH_KEY.matcher(i6)
             val skipHathKey = if (m.find()) {
-                StringUtils.unescapeXml(StringUtils.trim(m.group(1)))
+                m.group(1)!!.trim().unescapeXml()
             } else {
                 null
             }
             val i7 = jo.getString("i7")
             m = PATTERN_ORIGIN_IMAGE_URL.matcher(i7)
             val originImageUrl = if (m.find()) {
-                StringUtils.unescapeXml(m.group(1)) + "fullimg.php" +
-                    StringUtils.unescapeXml(m.group(2))
+                m.group(1)!!.unescapeXml() + "fullimg.php" + m.group(2)!!.unescapeXml()
             } else {
                 null
             }
