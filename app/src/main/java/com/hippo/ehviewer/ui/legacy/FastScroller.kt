@@ -30,9 +30,9 @@ import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.google.android.material.math.MathUtils.dist
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.yorozuya.AnimationUtils
-import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
 import com.hippo.ehviewer.yorozuya.SimpleHandler
+import com.hippo.ehviewer.yorozuya.dp2px
 import kotlin.math.abs
 
 class FastScroller : View {
@@ -79,7 +79,7 @@ class FastScroller : View {
         a.recycle()
         alpha = 0.0f
         visibility = INVISIBLE
-        mMinHandlerHeight = dp2pix(context, MIN_HANDLER_HEIGHT_DP.toFloat())
+        mMinHandlerHeight = dp2px(context, MIN_HANDLER_HEIGHT_DP.toFloat())
         mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
         mShowAnimator = ObjectAnimator.ofFloat(this, "alpha", 1.0f).apply {
             interpolator = AnimationUtils.FAST_SLOW_INTERPOLATOR

@@ -32,7 +32,7 @@ import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.MarginItemDecoration
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.STRATEGY_SUITABLE_SIZE
-import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
+import com.hippo.ehviewer.yorozuya.dp2px
 import splitties.init.appCtx
 
 abstract class GalleryAdapter(
@@ -100,7 +100,7 @@ abstract class GalleryAdapter(
                 }
 
                 TYPE_GRID -> {
-                    val columnWidth = dp2pix(appCtx, thumbSizeDp.toFloat())
+                    val columnWidth = dp2px(appCtx, thumbSizeDp.toFloat())
                     mLayoutManager.setColumnSize(columnWidth)
                     mLayoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
                     if (null != mListDecoration) {

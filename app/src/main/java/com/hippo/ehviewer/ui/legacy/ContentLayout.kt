@@ -35,8 +35,8 @@ import com.hippo.ehviewer.ui.legacy.ViewTransition.OnShowViewListener
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.IntIdGenerator
-import com.hippo.ehviewer.yorozuya.LayoutUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
+import com.hippo.ehviewer.yorozuya.dp2px
 import rikka.core.res.resolveColor
 
 class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
@@ -82,7 +82,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         binding.refreshLayout.setProgressViewOffset(
             true,
             0,
-            fitPaddingTop + LayoutUtils.dp2pix(context, 32f),
+            fitPaddingTop + dp2px(context, 32f),
         ) // TODO
     }
 
@@ -112,7 +112,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             binding.fastScroller.paddingRight,
             mFastScrollerOriginBottom + fitPaddingBottom,
         )
-        if (fitPaddingBottom > LayoutUtils.dp2pix(context, 16f)) {
+        if (fitPaddingBottom > dp2px(context, 16f)) {
             binding.bottomProgress.setPadding(0, 0, 0, fitPaddingBottom)
         } else {
             binding.bottomProgress.setPadding(0, 0, 0, 0)
@@ -235,7 +235,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             }
         fun init(contentLayout: ContentLayout) {
             binding = contentLayout.binding
-            mNextPageScrollSize = LayoutUtils.dp2pix(contentLayout.context, 48f)
+            mNextPageScrollSize = dp2px(contentLayout.context, 48f)
             val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
             drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
             binding.tip.setCompoundDrawables(null, drawable, null, null)
