@@ -13,206 +13,111 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.yorozuya
 
-package com.hippo.ehviewer.yorozuya;
+import java.io.File
+import java.util.Locale
+import kotlin.math.ln
+import kotlin.math.pow
 
-import android.text.TextUtils;
+object FileUtils {
+    private val FORBIDDEN_FILENAME_CHARACTERS = charArrayOf(
+        '\\',
+        '/',
+        ':',
+        '*',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+    )
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-
-public final class FileUtils {
-    private static final char[] FORBIDDEN_FILENAME_CHARACTERS = {
-            '\\',
-            '/',
-            ':',
-            '*',
-            '?',
-            '"',
-            '<',
-            '>',
-            '|',
-    };
-
-    private FileUtils() {
-    }
-
-    public static boolean ensureFile(File file) {
-        return file != null && (!file.exists() || file.isFile());
-    }
-
-    public static boolean ensureDirectory(File file) {
-        if (file != null) {
-            if (file.exists()) {
-                return file.isDirectory();
-            } else {
-                return file.mkdirs();
-            }
-        } else {
-            return false;
-        }
-    }
+    fun ensureDirectory(file: File?) =
+        file?.let { if (it.exists()) it.isDirectory else it.mkdirs() } ?: false
 
     /**
-     * Convert byte to human readable string.<br/>
+     * Convert byte to human readable string.<br></br>
      * http://stackoverflow.com/questions/3758606/
      *
      * @param bytes the bytes to convert
      * @param si    si units
      * @return the human readable string
      */
-    public static String humanReadableByteCount(long bytes, boolean si) {
-        int unit = si ? 1000 : 1024;
-        if (bytes < unit) return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-        return String.format(Locale.US, "%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    fun humanReadableByteCount(bytes: Long, si: Boolean): String {
+        val unit = if (si) 1000 else 1024
+        if (bytes < unit) return "$bytes B"
+        val exp = (ln(bytes.toDouble()) / ln(unit.toDouble())).toInt()
+        val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1].toString() + if (si) "" else "i"
+        return String.format(
+            Locale.US,
+            "%.1f %sB",
+            bytes / unit.toDouble().pow(exp.toDouble()),
+            pre,
+        )
     }
 
     /**
      * Try to delete file, dir and it's children
      *
      * @param file the file to delete
-     *             The dir to deleted
+     * The dir to deleted
      */
-    public static boolean delete(File file) {
-        if (file == null) {
-            return false;
-        }
-        boolean success = true;
-        File[] files = file.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                success &= delete(f);
-            }
-        }
-        /*
-        final File to = new File(file.getAbsolutePath()
-                + System.currentTimeMillis());
-        if (file.renameTo(to)) {
-            success &= to.delete();
-        } else
-            success &= file.delete();
-        }
-        */
-        success &= file.delete();
-        return success;
+    fun delete(file: File?): Boolean {
+        file ?: return false
+        return deleteContent(file) and file.delete()
     }
 
-    public static boolean deleteContent(File file) {
-        if (file == null) {
-            return false;
+    fun deleteContent(file: File?): Boolean {
+        file ?: return false
+        var success = true
+        file.listFiles()?.forEach {
+            success = success and delete(it)
         }
-
-        boolean success = true;
-        File[] files = file.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                success &= delete(f);
-            }
-        }
-        return success;
+        return success
     }
 
-    /**
-     * @return {@code null} for get exception
-     */
-    @Nullable
-    public static String read(File file) {
-        if (file == null) {
-            return null;
-        }
-
-        InputStream is = null;
-        try {
-            is = new FileInputStream(file);
-            return IOUtils.readString(is, "utf-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
-    }
-
-    public static boolean write(File file, String str) {
-        if (file == null) {
-            return false;
-        }
-        if (str == null) {
-            return true;
-        }
-
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(file);
-            os.write(str.getBytes(StandardCharsets.UTF_8));
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            IOUtils.closeQuietly(os);
-        }
-    }
-
-    public static String sanitizeFilename(@NonNull String filename) {
+    fun sanitizeFilename(rawFilename: String): String {
         // Remove forbidden_filename_characters
-        filename = StringUtils.remove(filename, FORBIDDEN_FILENAME_CHARACTERS);
+        var filename = rawFilename
+        filename = StringUtils.remove(filename, FORBIDDEN_FILENAME_CHARACTERS)
 
         // Ensure utf-8 byte count <= 255
-        int byteCount = 0;
-        int length = 0;
-        for (int len = filename.length(); length < len; length++) {
-            char ch = filename.charAt(length);
-            if (ch <= 0x7F) {
-                byteCount++;
-            } else if (ch <= 0x7FF) {
-                byteCount += 2;
+        var byteCount = 0
+        var length = 0
+        val len = filename.length
+        while (length < len) {
+            val ch = filename[length]
+            if (ch.code <= 0x7F) {
+                byteCount++
+            } else if (ch.code <= 0x7FF) {
+                byteCount += 2
             } else if (Character.isHighSurrogate(ch)) {
-                byteCount += 4;
-                ++length;
+                byteCount += 4
+                ++length
             } else {
-                byteCount += 3;
+                byteCount += 3
             }
             // Meet max byte count
             if (byteCount > 255) {
-                filename = filename.substring(0, length);
-                break;
+                filename = filename.substring(0, length)
+                break
             }
+            length++
         }
 
         // Trim
-        return StringUtils.trim(filename);
+        return StringUtils.trim(filename)
     }
 
     /**
      * Get extension from filename
      *
      * @param filename the complete filename
-     * @return null for can't find extension, "" empty String for ending with . dot
+     * @return null for can't find extension
      */
-    public static String getExtensionFromFilename(@Nullable String filename) {
-        if (null == filename) {
-            return null;
-        }
-
-        int index = filename.lastIndexOf('.');
-        if (index != -1) {
-            return filename.substring(index + 1);
-        } else {
-            return null;
-        }
-    }
+    fun getExtensionFromFilename(filename: String?) =
+        filename?.substringAfterLast('.', "").takeUnless { it.isNullOrEmpty() }
 
     /**
      * Get name from filename
@@ -220,19 +125,8 @@ public final class FileUtils {
      * @param filename the complete filename
      * @return null for start with . dot
      */
-    public static String getNameFromFilename(@Nullable String filename) {
-        if (null == filename) {
-            return null;
-        }
-
-        int index = filename.lastIndexOf('.');
-        if (index != -1) {
-            String name = filename.substring(0, index);
-            return TextUtils.isEmpty(name) ? null : name;
-        } else {
-            return filename;
-        }
-    }
+    fun getNameFromFilename(filename: String?) =
+        filename?.substringBeforeLast('.').takeUnless { it.isNullOrEmpty() }
 
     /**
      * Create a temp file, you need to delete it by you self.
@@ -241,88 +135,21 @@ public final class FileUtils {
      * @param extension The extension of temp file
      * @return The temp file or null
      */
-    @Nullable
-    public static File createTempFile(@Nullable File parent, @Nullable String extension) {
-        if (parent == null) {
-            return null;
-        }
-
-        long now = System.currentTimeMillis();
-        for (int i = 0; i < 100; i++) {
-            String filename = Long.toString(now + i);
-            if (extension != null) {
-                filename = filename + '.' + extension;
+    fun createTempFile(parent: File?, extension: String?): File? {
+        parent ?: return null
+        val now = System.currentTimeMillis()
+        for (i in 0..99) {
+            var filename = (now + i).toString()
+            extension?.let {
+                filename = "$filename.$it"
             }
-            File tempFile = new File(parent, filename);
+            val tempFile = File(parent, filename)
             if (!tempFile.exists()) {
-                return tempFile;
+                return tempFile
             }
         }
 
         // Unbelievable
-        return null;
-    }
-
-    /**
-     * Create a temp dir, you need to delete it by you self.
-     *
-     * @param parent The temp file's parent
-     * @return The temp dir or null
-     */
-    @Nullable
-    public static File createTempDir(@Nullable File parent) {
-        if (parent == null) {
-            return null;
-        }
-
-        long now = System.currentTimeMillis();
-        for (int i = 0; i < 100; i++) {
-            String filename = Long.toString(now + i);
-            File tempFile = new File(parent, filename);
-            if (!tempFile.exists() && tempFile.mkdirs()) {
-                return tempFile;
-            }
-        }
-
-        // Unbelievable
-        return null;
-    }
-
-    /**
-     * Only support file now
-     */
-    public static boolean rename(@NonNull File from, @NonNull File to) {
-        if (!from.isFile() || to.exists()) {
-            return false;
-        }
-
-        boolean ok = from.renameTo(to);
-        if (ok && !from.exists() && to.isFile()) {
-            return true;
-        }
-
-        // Copy content
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new FileInputStream(from);
-            os = new FileOutputStream(to);
-            IOUtils.copy(is, os);
-            ok = true;
-        } catch (IOException e) {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(os);
-            ok = false;
-        }
-
-        if (!ok) {
-            to.delete();
-            return false;
-        }
-
-        // delete old one
-        from.delete();
-
-        return true;
+        return null
     }
 }

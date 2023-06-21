@@ -307,8 +307,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         if (STATE_FINISHED != state) {
             return null
         }
-        val ext = mSpiderDen.getExtension(index)
-        val dst = dir.subFile(if (null != ext) "$filename.$ext" else filename) ?: return null
+        val dst = dir.subFile(filename) ?: return null
         return if (!mSpiderDen.saveToUniFile(index, dst)) null else dst
     }
 
@@ -335,7 +334,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     it.gid == galleryInfo.gid && it.token == galleryInfo.token
                 }
             }
-        } ?: readFromCache(galleryInfo.gid)?.takeIf { it.gid == galleryInfo.gid && it.token == galleryInfo.token }
+        }
+            ?: readFromCache(galleryInfo.gid)?.takeIf { it.gid == galleryInfo.gid && it.token == galleryInfo.token }
     }
 
     @Throws(ParseException::class)
@@ -359,7 +359,10 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
 
     private suspend fun readSpiderInfoFromInternet(): SpiderInfo? {
         return runSuspendCatching {
-            ehRequest(getGalleryDetailUrl(galleryInfo.gid, galleryInfo.token, 0, false), referer).execute {
+            ehRequest(
+                getGalleryDetailUrl(galleryInfo.gid, galleryInfo.token, 0, false),
+                referer,
+            ).execute {
                 val bodyStr = body.string()
                 val pages = parsePages(bodyStr)
                 val spiderInfo = SpiderInfo(galleryInfo.gid, pages)
