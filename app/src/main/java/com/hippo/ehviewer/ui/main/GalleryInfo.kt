@@ -3,9 +3,7 @@ package com.hippo.ehviewer.ui.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
@@ -59,64 +58,92 @@ fun GalleryInfoListItem(
                     modifier = Modifier.aspectRatio(0.6666667F).fillMaxSize(),
                 )
             }
-            Column(modifier = Modifier.padding(8.dp, 4.dp)) {
+            ConstraintLayout(modifier = Modifier.padding(8.dp, 4.dp).fillMaxSize()) {
+                val (titleRef, uploaderRef, ratingRef, categoryRef, postedRef, favRef, iconsRef) = createRefs()
                 Text(
                     text = EhUtils.getSuitableTitle(info),
                     maxLines = 2,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.constrainAs(titleRef) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }.fillMaxWidth(),
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleSmall,
                 )
-                Spacer(modifier = Modifier.weight(1f))
                 ProvideTextStyle(MaterialTheme.typography.labelLarge) {
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Column {
-                            if (!isInFavScene) {
-                                Text(
-                                    text = info.uploader ?: if (info.disowned) "(DISOWNED)" else "",
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                            GalleryListCardRating(rating = info.rating)
-                            val categoryColor = EhUtils.getCategoryColor(info.category)
-                            val categoryText = EhUtils.getCategory(info.category).uppercase()
-                            Text(
-                                text = categoryText,
-                                modifier = Modifier.background(Color(categoryColor)).padding(vertical = 2.dp, horizontal = 8.dp),
-                                color = Color.White,
-                                textAlign = TextAlign.Center,
+                    if (!isInFavScene) {
+                        Text(
+                            text = info.uploader ?: if (info.disowned) "(DISOWNED)" else "",
+                            modifier = Modifier.constrainAs(uploaderRef) {
+                                start.linkTo(parent.start)
+                                bottom.linkTo(ratingRef.top)
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    GalleryListCardRating(
+                        rating = info.rating,
+                        modifier = Modifier.constrainAs(ratingRef) {
+                            start.linkTo(parent.start)
+                            bottom.linkTo(categoryRef.top)
+                        },
+                    )
+                    val categoryColor = EhUtils.getCategoryColor(info.category)
+                    val categoryText = EhUtils.getCategory(info.category).uppercase()
+                    Text(
+                        text = categoryText,
+                        modifier = Modifier.constrainAs(categoryRef) {
+                            start.linkTo(parent.start)
+                            bottom.linkTo(parent.bottom)
+                        }.background(Color(categoryColor)).padding(vertical = 2.dp, horizontal = 8.dp),
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.constrainAs(iconsRef) {
+                            end.linkTo(parent.end)
+                            bottom.linkTo(postedRef.top)
+                        },
+                    ) {
+                        if (DownloadManager.containDownloadInfo(info.gid)) {
+                            Icon(
+                                Icons.Default.Download,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
                             )
                         }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Column(horizontalAlignment = Alignment.End) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                if (DownloadManager.containDownloadInfo(info.gid)) {
-                                    Icon(
-                                        Icons.Default.Download,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                }
-                                if (info.favoriteSlot != -2 && !isInFavScene) {
-                                    Icon(
-                                        Icons.Default.Favorite,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                    Text(text = info.favoriteName.orEmpty())
-                                }
-                                Text(text = info.simpleLanguage.orEmpty())
-                                if (info.pages != 0 && showPages) {
-                                    Text(text = "${info.pages}P")
-                                }
-                            }
-                            Text(text = info.posted.orEmpty())
+                        Text(text = info.simpleLanguage.orEmpty())
+                        if (info.pages != 0 && showPages) {
+                            Text(text = "${info.pages}P")
                         }
                     }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.constrainAs(favRef) {
+                            end.linkTo(parent.end)
+                            bottom.linkTo(iconsRef.top)
+                        },
+                    ) {
+                        if (info.favoriteSlot != -2 && !isInFavScene) {
+                            Icon(
+                                Icons.Default.Favorite,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Text(text = info.favoriteName.orEmpty())
+                        }
+                    }
+                    Text(
+                        text = info.posted.orEmpty(),
+                        modifier = Modifier.constrainAs(postedRef) {
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        },
+                    )
                 }
             }
         }

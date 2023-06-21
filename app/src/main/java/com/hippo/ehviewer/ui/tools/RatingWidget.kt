@@ -21,12 +21,12 @@ import kotlin.math.roundToInt
 private val colorYellow800 = Color(0xfff9a825)
 
 @Composable
-fun MetaRatingWidget(rating: Float, ratingSize: Dp, ratingInterval: Dp) {
+fun MetaRatingWidget(rating: Float, ratingSize: Dp, ratingInterval: Dp, modifier: Modifier = Modifier) {
     val r = (rating * 2).roundToInt().coerceIn(0, 10)
     val fullStar = r / 2
     val halfStar = r % 2
     val outlineStar = 5 - fullStar - halfStar
-    Row {
+    Row(modifier = modifier) {
         repeat(fullStar) {
             Icon(
                 imageVector = Icons.Default.Star,
@@ -58,11 +58,12 @@ fun MetaRatingWidget(rating: Float, ratingSize: Dp, ratingInterval: Dp) {
 }
 
 @Composable
-fun GalleryListCardRating(rating: Float) {
+fun GalleryListCardRating(rating: Float, modifier: Modifier = Modifier) {
     MetaRatingWidget(
         rating = rating,
         ratingSize = dimensionResource(id = R.dimen.rating_size),
         ratingInterval = dimensionResource(id = R.dimen.rating_interval),
+        modifier = modifier,
     )
 }
 
