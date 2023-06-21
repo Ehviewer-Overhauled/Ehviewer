@@ -13,24 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.yorozuya
 
-package com.hippo.ehviewer.yorozuya;
+import android.os.Handler
+import android.os.Looper
 
-import android.os.Handler;
-import android.os.Looper;
-
-public final class SimpleHandler extends Handler {
-
-    private static Handler sInstance;
-
-    private SimpleHandler(Looper mainLooper) {
-        super(mainLooper);
-    }
-
-    public static Handler getInstance() {
-        if (sInstance == null) {
-            sInstance = new Handler(Looper.getMainLooper());
-        }
-        return sInstance;
-    }
-}
+object SimpleHandler : Handler(Looper.getMainLooper())

@@ -36,7 +36,7 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
         super.stop()
         mSpiderQueen.removeOnSpiderListener(this)
         // Activity recreate may called, so wait 0.5s
-        SimpleHandler.getInstance().postDelayed(ReleaseTask(mSpiderQueen), 500)
+        SimpleHandler.postDelayed(ReleaseTask(mSpiderQueen), 500)
     }
 
     override val startPage

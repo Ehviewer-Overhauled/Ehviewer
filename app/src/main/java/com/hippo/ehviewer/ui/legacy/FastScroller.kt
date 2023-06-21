@@ -21,7 +21,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import android.os.Handler
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -33,11 +32,10 @@ import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
 import com.hippo.ehviewer.yorozuya.MathUtils.dist
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
-import com.hippo.ehviewer.yorozuya.SimpleHandler.Companion.instance
+import com.hippo.ehviewer.yorozuya.SimpleHandler
 import kotlin.math.abs
 
 class FastScroller : View {
-    private var mSimpleHandler: Handler? = null
     private var mDraggable = false
     private var mMinHandlerHeight = 0
     private var mRecyclerView: RecyclerView? = null
@@ -75,7 +73,6 @@ class FastScroller : View {
     }
 
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
-        mSimpleHandler = instance
         val a = context.obtainStyledAttributes(attrs, R.styleable.FastScroller, defStyleAttr, 0)
         mHandler = a.getDrawable(R.styleable.FastScroller_handler)
         mDraggable = a.getBoolean(R.styleable.FastScroller_draggable, true)
@@ -139,10 +136,9 @@ class FastScroller : View {
                 visibility = VISIBLE
                 mShowAnimator!!.start()
             }
-            val handler = mSimpleHandler
-            handler!!.removeCallbacks(mHideRunnable)
+            SimpleHandler.removeCallbacks(mHideRunnable)
             if (!mDragged) {
-                handler.postDelayed(mHideRunnable, SCROLL_BAR_DELAY.toLong())
+                SimpleHandler.postDelayed(mHideRunnable, SCROLL_BAR_DELAY.toLong())
             }
         }
     }
@@ -159,7 +155,7 @@ class FastScroller : View {
             if (mDragged) {
                 mDragged = false
             }
-            mSimpleHandler!!.removeCallbacks(mHideRunnable)
+            SimpleHandler.removeCallbacks(mHideRunnable)
             mHideRunnable.run()
         }
     val isAttached: Boolean
@@ -288,7 +284,7 @@ class FastScroller : View {
                         return false
                     } else {
                         mDragged = true
-                        mSimpleHandler!!.removeCallbacks(mHideRunnable)
+                        SimpleHandler.removeCallbacks(mHideRunnable)
                         // Update mLastMotionY
                         mLastMotionY =
                             if (mDownY < mHandlerOffset || mDownY >= mHandlerOffset + mHandlerHeight) {
@@ -320,7 +316,7 @@ class FastScroller : View {
                     mListener!!.onEndDragHandler()
                 }
                 mDragged = false
-                mSimpleHandler!!.postDelayed(mHideRunnable, SCROLL_BAR_DELAY.toLong())
+                SimpleHandler.postDelayed(mHideRunnable, SCROLL_BAR_DELAY.toLong())
             }
         }
         return true
