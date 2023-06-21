@@ -20,6 +20,7 @@ import android.util.Log
 import android.util.SparseLongArray
 import androidx.collection.LongSparseArray
 import androidx.collection.keyIterator
+import com.google.android.material.math.MathUtils
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
@@ -33,7 +34,6 @@ import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
 import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.spider.write
 import com.hippo.ehviewer.yorozuya.ConcurrentPool
-import com.hippo.ehviewer.yorozuya.MathUtils
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile

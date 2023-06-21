@@ -20,7 +20,7 @@ import android.graphics.PointF
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.hippo.ehviewer.yorozuya.MathUtils
+import com.google.android.material.math.MathUtils
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -112,7 +112,7 @@ object LayoutManagerUtils {
             if (offset < max && max > 0) {
                 smoothScrollToPosition(
                     layoutManager, context, position,
-                    MathUtils.lerp(100, 25, (offset / max).toFloat())
+                    MathUtils.lerp(100F, 25F, (offset / max).toFloat()).toInt()
                 )
             } else {
                 scrollToPositionWithOffset(layoutManager, position, 0)
@@ -126,7 +126,7 @@ object LayoutManagerUtils {
             is LinearLayoutManager -> layoutManager.findFirstVisibleItemPosition()
             is StaggeredGridLayoutManager -> {
                 val positions = layoutManager.findFirstVisibleItemPositions(null)
-                MathUtils.min(*positions)
+                positions.min()
             }
 
             else -> throw IllegalStateException("Can't do getFirstVisibleItemPosition for " + layoutManager.javaClass.name)
@@ -138,7 +138,7 @@ object LayoutManagerUtils {
             is LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
             is StaggeredGridLayoutManager -> {
                 val positions = layoutManager.findLastVisibleItemPositions(null)
-                MathUtils.max(*positions)
+                positions.max()
             }
 
             else -> throw IllegalStateException("Can't do getLastVisibleItemPosition for " + layoutManager.javaClass.name)

@@ -27,10 +27,10 @@ import android.view.View
 import android.view.ViewConfiguration
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
+import com.google.android.material.math.MathUtils.dist
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
-import com.hippo.ehviewer.yorozuya.MathUtils.dist
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import kotlin.math.abs
