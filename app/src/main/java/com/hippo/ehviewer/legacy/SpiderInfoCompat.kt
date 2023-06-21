@@ -1,12 +1,14 @@
 package com.hippo.ehviewer.legacy
 
 import com.hippo.ehviewer.spider.SpiderInfo
-import com.hippo.ehviewer.yorozuya.IOUtils
+import okio.buffer
+import okio.source
 import java.io.InputStream
 
 fun readLegacySpiderInfo(inputStream: InputStream): SpiderInfo {
+    val source = inputStream.source().buffer()
     fun read(): String {
-        return IOUtils.readAsciiLine(inputStream)
+        return source.readUtf8LineStrict()
     }
 
     fun readInt(): Int {
