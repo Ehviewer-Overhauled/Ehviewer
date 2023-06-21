@@ -14,7 +14,7 @@ private const val MIN_CACHE_SIZE = 128 * 1024 * 1024
 abstract class PageLoader {
 
     private val mImageCache = lruCache<Int, Image>(
-        maxSize = (OSUtils.getTotalMemory() / 16).toInt().coerceIn(MIN_CACHE_SIZE, MAX_CACHE_SIZE),
+        maxSize = (OSUtils.totalMemory / 16).toInt().coerceIn(MIN_CACHE_SIZE, MAX_CACHE_SIZE),
         sizeOf = { _, v -> v.size },
         onEntryRemoved = { _, _, o, _ -> o.recycle() },
     )
