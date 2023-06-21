@@ -1,227 +1,219 @@
-package com.hippo.ehviewer.ui.legacy;
+package com.hippo.ehviewer.ui.legacy
 
-import static androidx.core.util.ObjectsCompat.requireNonNull;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.AttributeSet
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.widget.FrameLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout.AttachedBehavior
+import androidx.core.util.ObjectsCompat
+import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.drakeet.drawer.FullDraggableHelper
+import com.google.android.material.snackbar.Snackbar.SnackbarLayout
+import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewParent;
-import android.widget.FrameLayout;
+class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Callback {
+    private val helper: FullDraggableHelper
+    private var drawerLayout: DrawerLayout? = null
+    private var mAboveSnackViewList: MutableList<View>? = null
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.math.MathUtils;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-
-import com.drakeet.drawer.FullDraggableHelper;
-import com.google.android.material.snackbar.Snackbar;
-import com.hippo.ehviewer.yorozuya.LayoutUtils;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-public class AboveSnackerLayout extends FrameLayout implements CoordinatorLayout.AttachedBehavior, FullDraggableHelper.Callback {
-    @NonNull
-    private final FullDraggableHelper helper;
-
-    private DrawerLayout drawerLayout;
-
-    private List<View> mAboveSnackViewList;
-
-    public AboveSnackerLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        helper = new FullDraggableHelper(context, this);
+    constructor(context: Context?, attrs: AttributeSet?) : super(
+        context!!, attrs
+    ) {
+        helper = FullDraggableHelper(context, this)
     }
 
-    public AboveSnackerLayout(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        helper = new FullDraggableHelper(context, this);
+    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
+        context!!, attrs, defStyle
+    ) {
+        helper = FullDraggableHelper(context, this)
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        ensureDrawerLayout();
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        ensureDrawerLayout()
     }
 
-    private void ensureDrawerLayout() {
-        ViewParent parent = getParent().getParent();
-        if (!(parent instanceof DrawerLayout)) {
-            throw new IllegalStateException("This " + this + " must be added to a DrawerLayout");
-        }
-        drawerLayout = (DrawerLayout) parent;
+    private fun ensureDrawerLayout() {
+        val parent = parent.parent
+        check(parent is DrawerLayout) { "This $this must be added to a DrawerLayout" }
+        drawerLayout = parent
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent event) {
-        return helper.onInterceptTouchEvent(event);
+    override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+        return helper.onInterceptTouchEvent(event)
     }
 
-    @Override
     @SuppressLint("ClickableViewAccessibility")
-    public boolean onTouchEvent(MotionEvent event) {
-        return helper.onTouchEvent(event);
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        return helper.onTouchEvent(event)
     }
 
-    @NonNull
-    @Override
-    public View getDrawerMainContainer() {
-        return this;
+    override fun getDrawerMainContainer(): View {
+        return this
     }
 
-    @Override
-    public boolean isDrawerOpen(int gravity) {
-        return drawerLayout.isDrawerOpen(gravity);
+    override fun isDrawerOpen(gravity: Int): Boolean {
+        return drawerLayout!!.isDrawerOpen(gravity)
     }
 
-    @Override
-    public boolean hasEnabledDrawer(int gravity) {
-        return drawerLayout.getDrawerLockMode(gravity) == DrawerLayout.LOCK_MODE_UNLOCKED
-                && findDrawerWithGravity(gravity) != null;
+    override fun hasEnabledDrawer(gravity: Int): Boolean {
+        return (drawerLayout!!.getDrawerLockMode(gravity) == DrawerLayout.LOCK_MODE_UNLOCKED
+                && findDrawerWithGravity(gravity) != null)
     }
 
-    @Override
-    public void offsetDrawer(int gravity, float offset) {
-        setDrawerToOffset(gravity, offset);
-        drawerLayout.invalidate();
+    override fun offsetDrawer(gravity: Int, offset: Float) {
+        setDrawerToOffset(gravity, offset)
+        drawerLayout!!.invalidate()
     }
 
-    @Override
-    public void smoothOpenDrawer(int gravity) {
-        drawerLayout.openDrawer(gravity, true);
+    override fun smoothOpenDrawer(gravity: Int) {
+        drawerLayout!!.openDrawer(gravity, true)
     }
 
-    @Override
-    public void smoothCloseDrawer(int gravity) {
-        drawerLayout.closeDrawer(gravity, true);
+    override fun smoothCloseDrawer(gravity: Int) {
+        drawerLayout!!.closeDrawer(gravity, true)
     }
 
-    @Override
-    public void onDrawerDragging() {
-        List<DrawerLayout.DrawerListener> drawerListeners = getDrawerListeners();
+    override fun onDrawerDragging() {
+        val drawerListeners = drawerListeners
         if (drawerListeners != null) {
-            int listenerCount = drawerListeners.size();
-            for (int i = listenerCount - 1; i >= 0; --i) {
-                drawerListeners.get(i).onDrawerStateChanged(DrawerLayout.STATE_DRAGGING);
+            val listenerCount = drawerListeners.size
+            for (i in listenerCount - 1 downTo 0) {
+                drawerListeners[i].onDrawerStateChanged(DrawerLayout.STATE_DRAGGING)
             }
         }
     }
 
-    @Nullable
-    protected List<DrawerLayout.DrawerListener> getDrawerListeners() {
-        try {
-            Field field = DrawerLayout.class.getDeclaredField("mListeners");
-            field.setAccessible(true);
-            // noinspection unchecked
-            return (List<DrawerLayout.DrawerListener>) field.get(drawerLayout);
-        } catch (Exception e) {
+    private val drawerListeners: List<DrawerListener>?
+        get() = try {
+            val listeners = DrawerLayout::class.java.getDeclaredField("mListeners")
+            listeners.isAccessible = true
+            listeners[drawerLayout] as List<DrawerListener>
+        } catch (e: Exception) {
             // throw to let developer know the api is changed
-            throw new RuntimeException(e);
+            throw RuntimeException(e)
         }
-    }
 
-    protected void setDrawerToOffset(int gravity, float offset) {
-        View drawerView = findDrawerWithGravity(gravity);
-        float slideOffsetPercent = MathUtils.clamp(offset / requireNonNull(drawerView).getWidth(), 0f, 1f);
+    private fun setDrawerToOffset(gravity: Int, offset: Float) {
+        val drawerView = findDrawerWithGravity(gravity)
+        val slideOffsetPercent =
+            (offset / ObjectsCompat.requireNonNull(drawerView).width).coerceIn(0f, 1f)
         try {
-            Method method = DrawerLayout.class.getDeclaredMethod("moveDrawerToOffset", View.class, float.class);
-            method.setAccessible(true);
-            method.invoke(drawerLayout, drawerView, slideOffsetPercent);
-            drawerView.setVisibility(VISIBLE);
-        } catch (Exception e) {
+            val method = DrawerLayout::class.java.getDeclaredMethod(
+                "moveDrawerToOffset",
+                View::class.java,
+                Float::class.javaPrimitiveType
+            )
+            method.isAccessible = true
+            method.invoke(drawerLayout, drawerView, slideOffsetPercent)
+            drawerView!!.visibility = VISIBLE
+        } catch (e: Exception) {
             // throw to let developer know the api is changed
-            throw new RuntimeException(e);
+            throw RuntimeException(e)
         }
     }
 
     // Copied from DrawerLayout
-    @Nullable
-    private View findDrawerWithGravity(int gravity) {
-        final int absHorizontalGravity = GravityCompat.getAbsoluteGravity(gravity, ViewCompat.getLayoutDirection(drawerLayout)) & Gravity.HORIZONTAL_GRAVITY_MASK;
-        final int childCount = drawerLayout.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            final View child = drawerLayout.getChildAt(i);
-            final int childAbsGravity = getDrawerViewAbsoluteGravity(child);
-            if ((childAbsGravity & Gravity.HORIZONTAL_GRAVITY_MASK) == absHorizontalGravity) {
-                return child;
+    private fun findDrawerWithGravity(gravity: Int): View? {
+        val absHorizontalGravity = GravityCompat.getAbsoluteGravity(
+            gravity, ViewCompat.getLayoutDirection(
+                drawerLayout!!
+            )
+        ) and Gravity.HORIZONTAL_GRAVITY_MASK
+        val childCount = drawerLayout!!.childCount
+        for (i in 0 until childCount) {
+            val child = drawerLayout!!.getChildAt(i)
+            val childAbsGravity = getDrawerViewAbsoluteGravity(child)
+            if (childAbsGravity and Gravity.HORIZONTAL_GRAVITY_MASK == absHorizontalGravity) {
+                return child
             }
         }
-        return null;
+        return null
     }
 
     // Copied from DrawerLayout
-    private int getDrawerViewAbsoluteGravity(View drawerView) {
-        final int gravity = ((DrawerLayout.LayoutParams) drawerView.getLayoutParams()).gravity;
-        return GravityCompat.getAbsoluteGravity(gravity, ViewCompat.getLayoutDirection(drawerLayout));
+    private fun getDrawerViewAbsoluteGravity(drawerView: View): Int {
+        val gravity = (drawerView.layoutParams as DrawerLayout.LayoutParams).gravity
+        return GravityCompat.getAbsoluteGravity(
+            gravity,
+            ViewCompat.getLayoutDirection(drawerLayout!!)
+        )
     }
 
-    public void addAboveSnackView(View view) {
+    fun addAboveSnackView(view: View) {
         if (null == mAboveSnackViewList) {
-            mAboveSnackViewList = new ArrayList<>();
+            mAboveSnackViewList = ArrayList()
         }
-        mAboveSnackViewList.add(view);
+        mAboveSnackViewList!!.add(view)
     }
 
-    public void removeAboveSnackView(View view) {
+    fun removeAboveSnackView(view: View) {
         if (null == mAboveSnackViewList) {
-            return;
+            return
         }
-        mAboveSnackViewList.remove(view);
+        mAboveSnackViewList!!.remove(view)
     }
 
-    public int getAboveSnackViewCount() {
-        return null == mAboveSnackViewList ? 0 : mAboveSnackViewList.size();
-    }
+    val aboveSnackViewCount: Int
+        get() = if (null == mAboveSnackViewList) 0 else mAboveSnackViewList!!.size
 
-    @Nullable
-    public View getAboveSnackViewAt(int index) {
-        if (null == mAboveSnackViewList || index < 0 || index >= mAboveSnackViewList.size()) {
-            return null;
+    fun getAboveSnackViewAt(index: Int): View? {
+        return if (null == mAboveSnackViewList || index < 0 || index >= mAboveSnackViewList!!.size) {
+            null
         } else {
-            return mAboveSnackViewList.get(index);
+            mAboveSnackViewList!![index]
         }
     }
 
-    @NonNull
-    @Override
-    public AboveSnackerLayout.Behavior getBehavior() {
-        return new AboveSnackerLayout.Behavior();
+    override fun getBehavior(): Behavior {
+        return Behavior()
     }
 
-    public static class Behavior extends CoordinatorLayout.Behavior<AboveSnackerLayout> {
-
-        @Override
-        public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull AboveSnackerLayout child, @NonNull View dependency) {
-            return dependency instanceof Snackbar.SnackbarLayout;
+    class Behavior : CoordinatorLayout.Behavior<AboveSnackerLayout>() {
+        override fun layoutDependsOn(
+            parent: CoordinatorLayout,
+            child: AboveSnackerLayout,
+            dependency: View
+        ): Boolean {
+            return dependency is SnackbarLayout
         }
 
-        @Override
-        public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, AboveSnackerLayout child, @NonNull View dependency) {
-            for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
-                View view = child.getAboveSnackViewAt(i);
+        override fun onDependentViewChanged(
+            parent: CoordinatorLayout,
+            child: AboveSnackerLayout,
+            dependency: View
+        ): Boolean {
+            for (i in 0 until child.aboveSnackViewCount) {
+                val view = child.getAboveSnackViewAt(i)
                 if (view != null) {
-                    float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight() - LayoutUtils.dp2pix(view.getContext(), 8));
-                    ViewCompat.animate(view).setInterpolator(new FastOutSlowInInterpolator()).translationY(translationY).setDuration(150).start();
+                    val translationY =
+                        (dependency.translationY - dependency.height - dp2pix(view.context, 8f))
+                            .coerceAtMost(0f)
+                    ViewCompat.animate(view).setInterpolator(FastOutSlowInInterpolator())
+                        .translationY(translationY).setDuration(150).start()
                 }
             }
-            return false;
+            return false
         }
 
-        @Override
-        public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull AboveSnackerLayout child, @NonNull View dependency) {
-            for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
-                View view = child.getAboveSnackViewAt(i);
+        override fun onDependentViewRemoved(
+            parent: CoordinatorLayout,
+            child: AboveSnackerLayout,
+            dependency: View
+        ) {
+            for (i in 0 until child.aboveSnackViewCount) {
+                val view = child.getAboveSnackViewAt(i)
                 if (view != null) {
-                    ViewCompat.animate(view).setInterpolator(new FastOutSlowInInterpolator()).translationY(0).setDuration(75).start();
+                    ViewCompat.animate(view).setInterpolator(FastOutSlowInInterpolator())
+                        .translationY(0f).setDuration(75).start()
                 }
             }
         }
