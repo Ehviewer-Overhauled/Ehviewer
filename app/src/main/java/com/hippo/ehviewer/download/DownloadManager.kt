@@ -34,7 +34,6 @@ import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.spider.write
 import com.hippo.ehviewer.yorozuya.ConcurrentPool
 import com.hippo.ehviewer.yorozuya.MathUtils
-import com.hippo.ehviewer.yorozuya.ObjectUtils
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
@@ -702,7 +701,7 @@ object DownloadManager : OnSpiderListener {
             return
         }
         for (info in list) {
-            if (ObjectUtils.equal(info.label, label)) {
+            if (info.label == label) {
                 continue
             }
             val srcList: MutableList<DownloadInfo>? = getInfoListForLabel(info.label)
