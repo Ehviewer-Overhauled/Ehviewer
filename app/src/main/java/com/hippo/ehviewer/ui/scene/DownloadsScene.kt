@@ -96,7 +96,6 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.CropDefaults
 import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
-import com.hippo.ehviewer.yorozuya.ObjectUtils
 import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -651,7 +650,7 @@ class DownloadsScene :
     }
 
     override fun onRenameLabel(from: String, to: String) {
-        if (!ObjectUtils.equal(mLabel, from)) {
+        if (mLabel != from) {
             return
         }
         mLabel = to
@@ -688,7 +687,7 @@ class DownloadsScene :
                 } else {
                     mLabels[position]
                 }
-                if (!ObjectUtils.equal(label1, mLabel)) {
+                if (mLabel != label1) {
                     mLabel = label1
                     updateForLabel()
                     updateView()
