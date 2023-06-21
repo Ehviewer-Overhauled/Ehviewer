@@ -13,119 +13,98 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.view.View
+import android.view.ViewPropertyAnimator
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.view.View;
-import android.view.ViewPropertyAnimator;
+open class ViewTransition(vararg views: View) {
+    private val mViews: Array<View>
+    protected var mAnimator1: ViewPropertyAnimator? = null
+    protected var mAnimator2: ViewPropertyAnimator? = null
+    var shownViewIndex = -1
+        private set
+    private var mOnShowViewListener: OnShowViewListener? = null
 
-public class ViewTransition {
-
-    protected static final long ANIMATE_TIME = 300L;
-
-    private final View[] mViews;
-    protected ViewPropertyAnimator mAnimator1;
-    protected ViewPropertyAnimator mAnimator2;
-    private int mShownView = -1;
-    private OnShowViewListener mOnShowViewListener;
-
-    public ViewTransition(View... views) {
-        if (views.length < 2) {
-            throw new IllegalStateException("You must pass view to ViewTransition");
-        }
-        for (View v : views) {
-            if (v == null) {
-                throw new IllegalStateException("Any View pass to ViewTransition must not be null");
-            }
-        }
-
-        mViews = views;
-        showView(0, false);
+    init {
+        check(views.size >= 2) { "You must pass view to ViewTransition" }
+        mViews = arrayOf(*views)
+        showView(0, false)
     }
 
-    public void setOnShowViewListener(OnShowViewListener listener) {
-        mOnShowViewListener = listener;
+    fun setOnShowViewListener(listener: OnShowViewListener?) {
+        mOnShowViewListener = listener
     }
 
-    public int getShownViewIndex() {
-        return mShownView;
-    }
-
-    public boolean showView(int shownView) {
-        return showView(shownView, true);
-    }
-
-    public boolean showView(int shownView, boolean animation) {
-        View[] views = mViews;
-        int length = views.length;
+    @JvmOverloads
+    fun showView(shownView: Int, animation: Boolean = true): Boolean {
+        val views = mViews
+        val length = views.size
         if (shownView >= length || shownView < 0) {
-            throw new IndexOutOfBoundsException("Only " + length + " view(s) in " +
-                    "the ViewTransition, but attempt to show " + shownView);
+            throw IndexOutOfBoundsException(
+                "Only " + length + " view(s) in " +
+                    "the ViewTransition, but attempt to show " + shownView,
+            )
         }
-
-        if (mShownView != shownView) {
-            int oldShownView = mShownView;
-            mShownView = shownView;
+        return if (shownViewIndex != shownView) {
+            val oldShownView = shownViewIndex
+            shownViewIndex = shownView
 
             // Cancel animation
             if (mAnimator1 != null) {
-                mAnimator1.cancel();
+                mAnimator1!!.cancel()
             }
             if (mAnimator2 != null) {
-                mAnimator2.cancel();
+                mAnimator2!!.cancel()
             }
-
             if (animation) {
-                startAnimations(views[oldShownView], views[shownView]);
+                startAnimations(views[oldShownView], views[shownView])
             } else {
-                for (int i = 0; i < length; i++) {
-                    View v = views[i];
+                for (i in 0 until length) {
+                    val v = views[i]
                     if (i == shownView) {
-                        v.setAlpha(1f);
-                        v.setVisibility(View.VISIBLE);
+                        v.alpha = 1f
+                        v.visibility = View.VISIBLE
                     } else {
-                        v.setAlpha(0f);
-                        v.setVisibility(View.GONE);
+                        v.alpha = 0f
+                        v.visibility = View.GONE
                     }
                 }
             }
-
             if (null != mOnShowViewListener) {
-                mOnShowViewListener.onShowView(views[oldShownView], views[shownView]);
+                mOnShowViewListener!!.onShowView(views[oldShownView], views[shownView])
             }
-
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 
-    protected void startAnimations(final View hiddenView, final View shownView) {
-        mAnimator1 = hiddenView.animate().alpha(0);
-        mAnimator1.setDuration(ANIMATE_TIME).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (hiddenView != null) {
-                    hiddenView.setVisibility(View.GONE);
-                }
-                mAnimator1 = null;
+    protected open fun startAnimations(hiddenView: View, shownView: View) {
+        mAnimator1 = hiddenView.animate().alpha(0f)
+        mAnimator1!!.setDuration(ANIMATE_TIME).setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                hiddenView.visibility = View.GONE
+                mAnimator1 = null
             }
-        }).start();
-
-        shownView.setAlpha(0);
-        shownView.setVisibility(View.VISIBLE);
-        mAnimator2 = shownView.animate().alpha(1);
-        mAnimator2.setDuration(ANIMATE_TIME).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mAnimator2 = null;
+        }).start()
+        shownView.alpha = 0f
+        shownView.visibility = View.VISIBLE
+        mAnimator2 = shownView.animate().alpha(1f)
+        mAnimator2!!.setDuration(ANIMATE_TIME).setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                mAnimator2 = null
             }
-        }).start();
+        }).start()
     }
 
-    public interface OnShowViewListener {
-        void onShowView(View hiddenView, View shownView);
+    interface OnShowViewListener {
+        fun onShowView(hiddenView: View, shownView: View)
+    }
+
+    companion object {
+        const val ANIMATE_TIME = 300L
     }
 }

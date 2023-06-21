@@ -13,42 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.view.View
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.view.View;
-
-public class BringOutTransition extends ViewTransition {
-
-    public BringOutTransition(ContentLayout contentLayout, SearchLayout mSearchLayout) {
-        super(contentLayout, mSearchLayout);
-    }
-
-    @Override
-    protected void startAnimations(final View hiddenView, final View shownView) {
-        mAnimator1 = hiddenView.animate().alpha(0).scaleY(0.7f).scaleX(0.7f);
-        mAnimator1.setDuration(ANIMATE_TIME).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (hiddenView != null) {
-                    hiddenView.setVisibility(View.GONE);
+class BringOutTransition(contentLayout: ContentLayout, mSearchLayout: SearchLayout) :
+    ViewTransition(contentLayout, mSearchLayout) {
+    override fun startAnimations(hiddenView: View, shownView: View) {
+        mAnimator1 = hiddenView.animate().alpha(0f).scaleY(0.7f).scaleX(0.7f).apply {
+            setDuration(ANIMATE_TIME).setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    hiddenView.visibility = View.GONE
+                    mAnimator1 = null
                 }
-                mAnimator1 = null;
-            }
-        }).start();
-
-        shownView.setAlpha(0);
-        shownView.setScaleX(0.7f);
-        shownView.setScaleY(0.7f);
-        shownView.setVisibility(View.VISIBLE);
-        mAnimator2 = shownView.animate().alpha(1f).scaleX(1).scaleY(1);
-        mAnimator2.setDuration(ANIMATE_TIME).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mAnimator2 = null;
-            }
-        }).start();
+            }).start()
+        }
+        shownView.alpha = 0f
+        shownView.scaleX = 0.7f
+        shownView.scaleY = 0.7f
+        shownView.visibility = View.VISIBLE
+        mAnimator2 = shownView.animate().alpha(1f).scaleX(1f).scaleY(1f).apply {
+            setDuration(ANIMATE_TIME).setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    mAnimator2 = null
+                }
+            }).start()
+        }
     }
 }
