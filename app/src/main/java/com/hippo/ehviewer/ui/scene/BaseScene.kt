@@ -38,14 +38,14 @@ import rikka.core.res.resolveDrawable
 abstract class BaseScene : Fragment() {
     private var drawerView: View? = null
     private var drawerViewState: SparseArray<Parcelable?>? = null
-    fun addAboveSnackView(view: View?) {
+    fun addAboveSnackView(view: View) {
         val activity = activity
         if (activity is MainActivity) {
             activity.addAboveSnackView(view)
         }
     }
 
-    fun removeAboveSnackView(view: View?) {
+    fun removeAboveSnackView(view: View) {
         val activity = activity
         if (activity is MainActivity) {
             activity.removeAboveSnackView(view)

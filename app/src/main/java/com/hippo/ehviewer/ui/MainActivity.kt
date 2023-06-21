@@ -396,11 +396,11 @@ class MainActivity : EhActivity() {
         }
     }
 
-    fun addAboveSnackView(view: View?) {
+    fun addAboveSnackView(view: View) {
         binding.absnacker.addAboveSnackView(view)
     }
 
-    fun removeAboveSnackView(view: View?) {
+    fun removeAboveSnackView(view: View) {
         binding.absnacker.removeAboveSnackView(view)
     }
 
