@@ -68,7 +68,6 @@ import com.hippo.ehviewer.ui.scene.ProgressScene
 import com.hippo.ehviewer.util.addTextToClipboard
 import com.hippo.ehviewer.util.getParcelableExtraCompat
 import com.hippo.ehviewer.util.getUrlFromClipboard
-import com.hippo.ehviewer.yorozuya.IOUtils
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
@@ -77,8 +76,6 @@ import splitties.systemservices.clipboardManager
 import splitties.systemservices.connectivityManager
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
 
 class MainActivity : EhActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -91,15 +88,12 @@ class MainActivity : EhActivity() {
             ImageDecoder.decodeBitmap(src, Image.imageSearchDecoderSampleListener)
         }.getOrNull() ?: return null
         val temp = AppConfig.createTempFile() ?: return null
-        var os: OutputStream? = null
-        return try {
-            os = FileOutputStream(temp)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, os)
+        return runCatching {
+            FileOutputStream(temp).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
             temp
-        } catch (e: IOException) {
+        }.getOrElse {
+            it.printStackTrace()
             null
-        } finally {
-            IOUtils.closeQuietly(os)
         }
     }
 
@@ -191,10 +185,15 @@ class MainActivity : EhActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         navController = navHostFragment.navController
         if (!EhUtils.needSignedIn()) setNavGraph()
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            binding.drawView.addDrawerListener(
+                mDrawerOnBackPressedCallback,
+            )
+        }
         binding.navView.setupWithNavController(navController)
 
         // Trick: Tweak NavigationUI to disable multiple backstack
