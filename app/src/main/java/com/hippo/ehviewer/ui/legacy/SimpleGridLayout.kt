@@ -42,7 +42,7 @@ open class SimpleGridLayout : ViewGroup {
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
-        defStyle
+        defStyle,
     ) {
         init(context, attrs)
     }
