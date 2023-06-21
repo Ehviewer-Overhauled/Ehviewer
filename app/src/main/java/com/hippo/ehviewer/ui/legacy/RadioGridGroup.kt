@@ -21,7 +21,6 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.RadioButton
 import androidx.annotation.IdRes
-import com.hippo.ehviewer.yorozuya.ViewUtils
 
 class RadioGridGroup : SimpleGridLayout {
     /**
@@ -219,7 +218,7 @@ class RadioGridGroup : SimpleGridLayout {
                 var id = child.getId()
                 // generates an id if it's missing
                 if (id == NO_ID) {
-                    id = ViewUtils.generateViewId()
+                    id = generateViewId()
                     child.setId(id)
                 }
                 child.setOnCheckedChangeListener(

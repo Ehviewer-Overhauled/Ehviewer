@@ -42,7 +42,7 @@ import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.databinding.SearchAdvanceBinding
 import com.hippo.ehviewer.databinding.SearchCategoryBinding
 import com.hippo.ehviewer.databinding.SearchNormalBinding
-import com.hippo.ehviewer.yorozuya.ViewUtils
+import com.hippo.ehviewer.yorozuya.removeFromParent
 
 @SuppressLint("InflateParams")
 class SearchLayout @JvmOverloads constructor(
@@ -285,7 +285,7 @@ class SearchLayout @JvmOverloads constructor(
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleHolder {
             val view: View?
             if (viewType == ITEM_TYPE_ACTION) {
-                ViewUtils.removeFromParent(mActionView)
+                mActionView.removeFromParent()
                 view = mActionView
             } else {
                 view = mInflater.inflate(R.layout.search_category, parent, false)
@@ -293,19 +293,19 @@ class SearchLayout @JvmOverloads constructor(
                     when (viewType) {
                         ITEM_TYPE_NORMAL -> {
                             categoryTitle.setText(R.string.search_normal)
-                            ViewUtils.removeFromParent(binding.root)
+                            binding.root.removeFromParent()
                             categoryContent.addView(binding.root)
                         }
 
                         ITEM_TYPE_NORMAL_ADVANCE -> {
                             categoryTitle.setText(R.string.search_advance)
-                            ViewUtils.removeFromParent(advanceBinding.root)
+                            advanceBinding.root.removeFromParent()
                             categoryContent.addView(advanceBinding.root)
                         }
 
                         ITEM_TYPE_IMAGE -> {
                             categoryTitle.setText(R.string.search_image)
-                            ViewUtils.removeFromParent(mImageView)
+                            mImageView.removeFromParent()
                             categoryContent.addView(mImageView)
                         }
                     }
