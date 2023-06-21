@@ -298,7 +298,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         val firstVisibleItem: GalleryInfo?
-            get() = getDataAtEx(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager))
+            get() = getDataAtEx(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager!!))
 
         fun size(): Int {
             return mData.size
@@ -410,7 +410,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                     if (mCurrentTaskType == TYPE_PRE_PAGE_KEEP_POS) {
                                         binding.recyclerView.stopScroll()
                                         LayoutManagerUtils.scrollToPositionProperly(
-                                            binding.recyclerView.layoutManager,
+                                            binding.recyclerView.layoutManager!!,
                                             context,
                                             dataSize - 1,
                                             mOnScrollToPositionListener,
@@ -573,7 +573,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         private fun scrollToPosition(position: Int) {
             binding.recyclerView.stopScroll()
             LayoutManagerUtils.scrollToPositionWithOffset(
-                binding.recyclerView.layoutManager,
+                binding.recyclerView.layoutManager!!,
                 position,
                 0,
             )
@@ -675,9 +675,9 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         val pageForTop: Int
-            get() = getPageForPosition(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager))
+            get() = getPageForPosition(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager!!))
         val pageForBottom: Int
-            get() = getPageForPosition(LayoutManagerUtils.getLastVisibleItemPosition(binding.recyclerView.layoutManager))
+            get() = getPageForPosition(LayoutManagerUtils.getLastVisibleItemPosition(binding.recyclerView.layoutManager!!))
 
         fun canGoTo(): Boolean {
             return isContentShowing
