@@ -818,7 +818,7 @@ object DownloadManager : OnSpiderListener {
             task = NotifyTask()
         }
         task.setOnGetPagesData(pages)
-        SimpleHandler.getInstance().post(task)
+        SimpleHandler.post(task)
     }
 
     override fun onGet509(index: Int) {
@@ -827,7 +827,7 @@ object DownloadManager : OnSpiderListener {
             task = NotifyTask()
         }
         task.setOnGet509Data(index)
-        SimpleHandler.getInstance().post(task)
+        SimpleHandler.post(task)
     }
 
     override fun onPageDownload(
@@ -841,7 +841,7 @@ object DownloadManager : OnSpiderListener {
             task = NotifyTask()
         }
         task.setOnPageDownloadData(index, contentLength, receivedSize, bytesRead)
-        SimpleHandler.getInstance().post(task)
+        SimpleHandler.post(task)
     }
 
     override fun onPageSuccess(index: Int, finished: Int, downloaded: Int, total: Int) {
@@ -850,7 +850,7 @@ object DownloadManager : OnSpiderListener {
             task = NotifyTask()
         }
         task.setOnPageSuccessData(index, finished, downloaded, total)
-        SimpleHandler.getInstance().post(task)
+        SimpleHandler.post(task)
     }
 
     override fun onPageFailure(
@@ -865,7 +865,7 @@ object DownloadManager : OnSpiderListener {
             task = NotifyTask()
         }
         task.setOnPageFailureDate(index, error, finished, downloaded, total)
-        SimpleHandler.getInstance().post(task)
+        SimpleHandler.post(task)
     }
 
     override fun onFinish(finished: Int, downloaded: Int, total: Int) {
@@ -874,7 +874,7 @@ object DownloadManager : OnSpiderListener {
             task = NotifyTask()
         }
         task.setOnFinishDate(finished, downloaded, total)
-        SimpleHandler.getInstance().post(task)
+        SimpleHandler.post(task)
     }
 
     override fun onGetImageSuccess(index: Int, image: Image?) {
@@ -1146,7 +1146,7 @@ object DownloadManager : OnSpiderListener {
         fun start() {
             if (mStop) {
                 mStop = false
-                SimpleHandler.getInstance().post(this)
+                SimpleHandler.post(this)
             }
         }
 
@@ -1157,7 +1157,7 @@ object DownloadManager : OnSpiderListener {
                 oldSpeed = -1
                 mContentLengthMap.clear()
                 mReceivedSizeMap.clear()
-                SimpleHandler.getInstance().removeCallbacks(this)
+                SimpleHandler.removeCallbacks(this)
             }
         }
 
@@ -1221,7 +1221,7 @@ object DownloadManager : OnSpiderListener {
             }
             mBytesRead = 0
             if (!mStop) {
-                SimpleHandler.getInstance().postDelayed(this, 2000)
+                SimpleHandler.postDelayed(this, 2000)
             }
         }
     }

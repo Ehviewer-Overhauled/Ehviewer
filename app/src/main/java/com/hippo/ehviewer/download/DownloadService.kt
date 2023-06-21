@@ -445,7 +445,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
                     // Too quick, post delay
                     mOps = OPS_NOTIFY
                     mPosted = true
-                    SimpleHandler.getInstance().postDelayed(this, DELAY)
+                    SimpleHandler.postDelayed(this, DELAY)
                 }
                 mLastTime = now
             }
@@ -463,7 +463,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
                     // Too quick, post delay
                     mOps = OPS_CANCEL
                     mPosted = true
-                    SimpleHandler.getInstance().postDelayed(this, DELAY)
+                    SimpleHandler.postDelayed(this, DELAY)
                 }
             }
         }
@@ -480,7 +480,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
                     // Too quick, post delay
                     mOps = OPS_START_FOREGROUND
                     mPosted = true
-                    SimpleHandler.getInstance().postDelayed(this, DELAY)
+                    SimpleHandler.postDelayed(this, DELAY)
                 }
             }
         }

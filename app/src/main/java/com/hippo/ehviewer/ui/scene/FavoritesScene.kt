@@ -544,12 +544,12 @@ class FavoritesScene :
 
     private fun showNormalFabs() {
         // Delay showing normal fabs to avoid mutation
-        SimpleHandler.getInstance().removeCallbacks(showNormalFabsRunnable)
-        SimpleHandler.getInstance().postDelayed(showNormalFabsRunnable, 300)
+        SimpleHandler.removeCallbacks(showNormalFabsRunnable)
+        SimpleHandler.postDelayed(showNormalFabsRunnable, 300)
     }
 
     private fun showSelectionFabs() {
-        SimpleHandler.getInstance().removeCallbacks(showNormalFabsRunnable)
+        SimpleHandler.removeCallbacks(showNormalFabsRunnable)
         binding.fabLayout.run {
             (0..2).forEach { setSecondaryFabVisibilityAt(it, false) }
             (3..6).forEach { setSecondaryFabVisibilityAt(it, true) }
@@ -560,7 +560,7 @@ class FavoritesScene :
         showSelectionFabs()
         binding.fabLayout.setAutoCancel(false)
         // Delay expanding action to make layout work fine
-        SimpleHandler.getInstance().post { binding.fabLayout.isExpanded = true }
+        SimpleHandler.post { binding.fabLayout.isExpanded = true }
         mHelper.setRefreshLayoutEnable(false)
         // Lock drawer
         setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
@@ -883,7 +883,7 @@ class FavoritesScene :
                 }
             } else if (mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                 val keyword = mUrlBuilder!!.keyword
-                SimpleHandler.getInstance().post { onGetFavoritesLocal(keyword, taskId) }
+                SimpleHandler.post { onGetFavoritesLocal(keyword, taskId) }
             } else {
                 mUrlBuilder!!.setIndex(index, isNext)
                 mUrlBuilder!!.jumpTo = jumpTo
