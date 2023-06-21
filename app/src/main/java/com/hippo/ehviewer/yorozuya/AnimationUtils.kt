@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.yorozuya
 
-package com.hippo.ehviewer.yorozuya;
+import android.view.animation.Interpolator
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 
-import android.view.animation.Interpolator;
-
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
-
-public final class AnimationUtils {
-    public static final Interpolator FAST_SLOW_INTERPOLATOR = new LinearOutSlowInInterpolator();
-    public static final Interpolator SLOW_FAST_INTERPOLATOR = new FastOutLinearInInterpolator();
-    public static final Interpolator SLOW_FAST_SLOW_INTERPOLATOR = new FastOutSlowInInterpolator();
-
-    private AnimationUtils() {
-    }
+object AnimationUtils {
+    val FAST_SLOW_INTERPOLATOR: Interpolator = LinearOutSlowInInterpolator()
+    val SLOW_FAST_INTERPOLATOR: Interpolator = FastOutLinearInInterpolator()
+    val SLOW_FAST_SLOW_INTERPOLATOR: Interpolator = FastOutSlowInInterpolator()
 }

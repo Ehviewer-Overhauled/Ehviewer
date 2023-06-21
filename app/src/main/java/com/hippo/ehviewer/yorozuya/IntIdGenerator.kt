@@ -13,39 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.yorozuya
 
-package com.hippo.ehviewer.yorozuya;
+import java.util.concurrent.atomic.AtomicInteger
 
-import java.util.concurrent.atomic.AtomicInteger;
+class IntIdGenerator {
+    private val mId = AtomicInteger()
 
-public final class IntIdGenerator {
-
-    public static final int INVALID_ID = -1;
-
-    private final AtomicInteger mId = new AtomicInteger();
-
-    public IntIdGenerator() {
+    constructor()
+    constructor(init: Int) {
+        setNextId(init)
     }
 
-    public IntIdGenerator(int init) {
-        setNextId(init);
+    fun nextId(): Int {
+        var id: Int
+        while (mId.getAndIncrement().also { id = it } == INVALID_ID);
+        return id
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    public int nextId() {
-        int id;
-        while ((id = mId.getAndIncrement()) == INVALID_ID) ;
-        return id;
+    fun setNextId(id: Int) {
+        checkInValidId(id)
+        mId.set(id)
     }
 
-    public void setNextId(int id) {
-        checkInValidId(id);
-        mId.set(id);
+    private fun checkInValidId(id: Int) {
+        check(INVALID_ID != id) { "Can't set INVALID_ID" }
     }
 
-    private void checkInValidId(int id) {
-        if (INVALID_ID == id) {
-            throw new IllegalStateException("Can't set INVALID_ID");
-        }
+    companion object {
+        const val INVALID_ID = -1
     }
 }
