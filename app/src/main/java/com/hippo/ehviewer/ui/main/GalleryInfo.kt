@@ -58,6 +58,7 @@ fun GalleryInfoListItem(
                     modifier = Modifier.aspectRatio(0.6666667F).fillMaxSize(),
                 )
             }
+            val showFav = info.favoriteSlot != -2 && !isInFavScene
             ConstraintLayout(modifier = Modifier.padding(8.dp, 4.dp).fillMaxSize()) {
                 val (titleRef, uploaderRef, ratingRef, categoryRef, postedRef, favRef, iconsRef) = createRefs()
                 Text(
@@ -105,7 +106,7 @@ fun GalleryInfoListItem(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.constrainAs(iconsRef) {
                             end.linkTo(parent.end)
-                            bottom.linkTo(postedRef.top)
+                            bottom.linkTo(if (showFav) favRef.top else postedRef.top)
                         },
                     ) {
                         if (DownloadManager.containDownloadInfo(info.gid)) {
@@ -125,10 +126,10 @@ fun GalleryInfoListItem(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.constrainAs(favRef) {
                             end.linkTo(parent.end)
-                            bottom.linkTo(iconsRef.top)
+                            bottom.linkTo(postedRef.top)
                         },
                     ) {
-                        if (info.favoriteSlot != -2 && !isInFavScene) {
+                        if (showFav) {
                             Icon(
                                 Icons.Default.Favorite,
                                 contentDescription = null,
