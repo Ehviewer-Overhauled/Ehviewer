@@ -13,31 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.graphics.Rect
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 
-import android.graphics.Rect;
-import android.view.View;
+class MarginItemDecoration(
+    margin: Int,
+    paddingLeft: Int,
+    paddingTop: Int,
+    paddingRight: Int,
+    paddingBottom: Int,
+) : ItemDecoration() {
+    private var mMargin = 0
+    private var mPaddingLeft = 0
+    private var mPaddingTop = 0
+    private var mPaddingRight = 0
+    private var mPaddingBottom = 0
 
-import androidx.recyclerview.widget.RecyclerView;
-
-public class MarginItemDecoration extends RecyclerView.ItemDecoration {
-
-    private int mMargin;
-    private int mPaddingLeft;
-    private int mPaddingTop;
-    private int mPaddingRight;
-    private int mPaddingBottom;
-
-    public MarginItemDecoration(int margin, int paddingLeft, int paddingTop,
-                                int paddingRight, int paddingBottom) {
-        setMargin(margin, paddingLeft, paddingTop, paddingRight, paddingBottom);
+    init {
+        setMargin(margin, paddingLeft, paddingTop, paddingRight, paddingBottom)
     }
 
-    @Override
-    public void getItemOffsets(Rect outRect, View view,
-                               RecyclerView parent, RecyclerView.State state) {
-        outRect.set(mMargin, mMargin, mMargin, mMargin);
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State,
+    ) {
+        outRect[mMargin, mMargin, mMargin] = mMargin
     }
 
     /**
@@ -47,17 +53,22 @@ public class MarginItemDecoration extends RecyclerView.ItemDecoration {
      * @param paddingRight  gap between RecyclerView right and right item right
      * @param paddingBottom gap between RecyclerView bottom and bottom item bottom
      */
-    public void setMargin(int margin, int paddingLeft, int paddingTop,
-                          int paddingRight, int paddingBottom) {
-        int halfMargin = margin / 2;
-        mMargin = halfMargin;
-        mPaddingLeft = paddingLeft - halfMargin;
-        mPaddingTop = paddingTop - halfMargin;
-        mPaddingRight = paddingRight - halfMargin;
-        mPaddingBottom = paddingBottom - halfMargin;
+    fun setMargin(
+        margin: Int,
+        paddingLeft: Int,
+        paddingTop: Int,
+        paddingRight: Int,
+        paddingBottom: Int,
+    ) {
+        val halfMargin = margin / 2
+        mMargin = halfMargin
+        mPaddingLeft = paddingLeft - halfMargin
+        mPaddingTop = paddingTop - halfMargin
+        mPaddingRight = paddingRight - halfMargin
+        mPaddingBottom = paddingBottom - halfMargin
     }
 
-    public void applyPaddings(View view) {
-        view.setPadding(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+    fun applyPaddings(view: View) {
+        view.setPadding(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom)
     }
 }

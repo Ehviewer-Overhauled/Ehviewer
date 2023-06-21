@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.content.Context
+import androidx.recyclerview.widget.LinearSmoothScroller
+import kotlin.math.abs
+import kotlin.math.ceil
 
-import android.content.Context;
+abstract class SimpleSmoothScroller(context: Context, millisecondsPerInch: Float) :
+    LinearSmoothScroller(context) {
+    private val mMillisecondsPerPx: Float
 
-import androidx.recyclerview.widget.LinearSmoothScroller;
-
-public abstract class SimpleSmoothScroller extends LinearSmoothScroller {
-
-    private final float mMillisecondsPerPx;
-
-    public SimpleSmoothScroller(Context context, float millisecondsPerInch) {
-        super(context);
-        mMillisecondsPerPx = millisecondsPerInch / context.getResources().getDisplayMetrics().densityDpi;
+    init {
+        mMillisecondsPerPx = millisecondsPerInch / context.resources.displayMetrics.densityDpi
     }
 
-    @Override
-    protected int calculateTimeForScrolling(int dx) {
-        if (mMillisecondsPerPx <= 0) {
-            return super.calculateTimeForScrolling(dx);
+    override fun calculateTimeForScrolling(dx: Int): Int {
+        return if (mMillisecondsPerPx <= 0) {
+            super.calculateTimeForScrolling(dx)
         } else {
-            return (int) Math.ceil(Math.abs(dx) * mMillisecondsPerPx);
+            ceil((abs(dx) * mMillisecondsPerPx).toDouble()).toInt()
         }
     }
 }
