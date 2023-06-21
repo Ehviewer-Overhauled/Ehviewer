@@ -53,24 +53,8 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
     }
 
     override fun getImageFilenameWithExtension(index: Int): String {
-        val extension = mSpiderQueen.getExtension(index)
-        if (extension != null) {
-            return String.format(
-                Locale.US,
-                "%d-%s-%08d.%s",
-                mGalleryInfo.gid,
-                mGalleryInfo.token,
-                index + 1,
-                extension,
-            )
-        }
-        return String.format(
-            Locale.US,
-            "%d-%s-%08d",
-            mGalleryInfo.gid,
-            mGalleryInfo.token,
-            index + 1,
-        )
+        val filename = getImageFilename(index)
+        return mSpiderQueen.getExtension(index)?.let { "$filename.$it" } ?: filename
     }
 
     override fun save(index: Int, file: UniFile): Boolean {

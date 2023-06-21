@@ -145,7 +145,7 @@ class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow
     }
 
     override fun getImageFilename(index: Int): String {
-        return FileUtils.getNameFromFilename(getImageFilenameWithExtension(index))
+        return FileUtils.getNameFromFilename(getImageFilenameWithExtension(index))!!
     }
 
     override fun getImageFilenameWithExtension(index: Int): String {
@@ -165,8 +165,7 @@ class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow
     }
 
     override fun save(index: Int, dir: UniFile, filename: String): UniFile {
-        val extension = FileUtils.getExtensionFromFilename(getImageFilenameWithExtension(index))
-        val dst = dir.subFile(if (null != extension) "$filename.$extension" else filename)
+        val dst = dir.subFile(filename)
         save(index, dst!!)
         return dst
     }

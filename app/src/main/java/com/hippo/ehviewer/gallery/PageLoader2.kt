@@ -36,7 +36,7 @@ abstract class PageLoader2 : PageLoader() {
     abstract fun save(index: Int, file: UniFile): Boolean
 
     /**
-     * @param filename without extension
+     * @param filename with extension
      */
     abstract fun save(index: Int, dir: UniFile, filename: String): UniFile?
 }

@@ -382,7 +382,7 @@ class ReaderActivity : EhActivity() {
         val file = mGalleryProvider!!.save(
             page,
             UniFile.fromFile(dir)!!,
-            mGalleryProvider!!.getImageFilename(page),
+            mGalleryProvider!!.getImageFilenameWithExtension(page),
         )
         if (file == null) {
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show()
@@ -440,7 +440,7 @@ class ReaderActivity : EhActivity() {
         val file = mGalleryProvider!!.save(
             page,
             UniFile.fromFile(dir)!!,
-            mGalleryProvider!!.getImageFilename(page),
+            mGalleryProvider!!.getImageFilenameWithExtension(page),
         )
         if (file == null) {
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show()
@@ -550,7 +550,7 @@ class ReaderActivity : EhActivity() {
         val file = mGalleryProvider!!.save(
             page,
             UniFile.fromFile(dir)!!,
-            mGalleryProvider!!.getImageFilename(page),
+            mGalleryProvider!!.getImageFilenameWithExtension(page),
         )
         if (file == null) {
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show()
