@@ -13,47 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.util
 
-package com.hippo.ehviewer.util;
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.URLSpan
+import java.util.regex.Pattern
 
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.URLSpan;
+object TextUrl {
+    private val URL_PATTERN =
+        Pattern.compile("(http|https)://[a-z0-9A-Z%-]+(\\.[a-z0-9A-Z%-]+)+(:\\d{1,5})?(/[a-zA-Z0-9-_~:#@!&',;=%/*.?+$\\[\\]()]+)?/?")
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public final class TextUrl {
-
-    private static final Pattern URL_PATTERN = Pattern.compile("(http|https)://[a-z0-9A-Z%-]+(\\.[a-z0-9A-Z%-]+)+(:\\d{1,5})?(/[a-zA-Z0-9-_~:#@!&',;=%/*.?+$\\[\\]()]+)?/?");
-
-    public static CharSequence handleTextUrl(CharSequence content) {
-        Matcher m = URL_PATTERN.matcher(content);
-
-        Spannable spannable = null;
+    fun handleTextUrl(content: CharSequence): CharSequence {
+        val m = URL_PATTERN.matcher(content)
+        var spannable: Spannable? = null
         while (m.find()) {
             // Ensure spannable
             if (spannable == null) {
-                if (content instanceof Spannable) {
-                    spannable = (Spannable) content;
+                spannable = if (content is Spannable) {
+                    content
                 } else {
-                    spannable = new SpannableString(content);
+                    SpannableString(content)
                 }
             }
-
-            int start = m.start();
-            int end = m.end();
-
-            URLSpan[] links = spannable.getSpans(start, end, URLSpan.class);
-            if (links.length > 0) {
+            val start = m.start()
+            val end = m.end()
+            val links = spannable.getSpans(start, end, URLSpan::class.java)
+            if (links.isNotEmpty()) {
                 // There has been URLSpan already, leave it alone
-                continue;
+                continue
             }
-
-            URLSpan urlSpan = new URLSpan(m.group(0));
-            spannable.setSpan(urlSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            val urlSpan = URLSpan(m.group(0))
+            spannable.setSpan(urlSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-
-        return spannable == null ? content : spannable;
+        return spannable ?: content
     }
 }
