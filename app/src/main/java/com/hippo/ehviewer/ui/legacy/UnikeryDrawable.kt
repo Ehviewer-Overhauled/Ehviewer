@@ -51,21 +51,23 @@ class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) :
         drawable = null
     }
 
-    override fun setDrawable(drawable: Drawable?) {
-        // Remove old callback
-        val oldDrawable = getDrawable()
-        if (oldDrawable != null) {
-            oldDrawable.callback = null
+    override var drawable: Drawable?
+        get() = super.drawable
+        set(drawable) {
+            // Remove old callback
+            val oldDrawable = drawable
+            if (oldDrawable != null) {
+                oldDrawable.callback = null
+            }
+            super.drawable = drawable
+            if (drawable != null) {
+                drawable.callback = mTextView
+            }
+            updateBounds()
+            if (drawable != null) {
+                invalidateSelf()
+            }
         }
-        super.setDrawable(drawable)
-        if (drawable != null) {
-            drawable.callback = mTextView
-        }
-        updateBounds()
-        if (drawable != null) {
-            invalidateSelf()
-        }
-    }
 
     override fun invalidateSelf() {
         val cs = mTextView.text
@@ -74,7 +76,7 @@ class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) :
 
     private fun onGetValue(drawable: Drawable) {
         clearDrawable()
-        setDrawable(drawable)
+        this.drawable = drawable
         if (drawable is AnimatedImageDrawable) {
             drawable.start()
         }

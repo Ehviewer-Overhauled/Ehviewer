@@ -394,8 +394,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         binding.fabLayout.addOnExpandListener(this)
         addAboveSnackView(binding.fabLayout)
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
-        mActionFabDrawable =
-            AddDeleteDrawable(context, colorID)
+        mActionFabDrawable = AddDeleteDrawable(requireContext(), colorID)
         binding.fabLayout.primaryFab!!.setImageDrawable(mActionFabDrawable)
         mSearchFab.setOnClickListener { onApplySearch() }
 
