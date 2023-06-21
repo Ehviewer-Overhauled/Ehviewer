@@ -13,161 +13,154 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
-
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.yorozuya.MathUtils;
-import com.hippo.ehviewer.yorozuya.ViewUtils;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.ViewGroup
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.yorozuya.MathUtils.ceilDivide
+import com.hippo.ehviewer.yorozuya.ViewUtils
 
 /**
  * not scrollable
  *
  * @author Hippo
  */
-public class SimpleGridLayout extends ViewGroup {
+open class SimpleGridLayout : ViewGroup {
+    private var mColumnCount = 0
+    private var mItemMargin = 0
+    private var mRowHeights: IntArray? = null
+    private var mItemWidth = 0
 
-    private static final int DEFAULT_COLUMN_COUNT = 3;
-
-    private int mColumnCount;
-    private int mItemMargin;
-
-    private int[] mRowHeights;
-    private int mItemWidth;
-
-    public SimpleGridLayout(Context context) {
-        super(context);
-        init(context, null);
+    constructor(context: Context) : super(context) {
+        init(context, null)
     }
 
-    public SimpleGridLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
     }
 
-    public SimpleGridLayout(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init(context, attrs);
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    ) {
+        init(context, attrs)
     }
 
-    private void init(Context context, AttributeSet attrs) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SimpleGridLayout);
-        mColumnCount = a.getInteger(R.styleable.SimpleGridLayout_columnCount, DEFAULT_COLUMN_COUNT);
-        mItemMargin = a.getDimensionPixelOffset(R.styleable.SimpleGridLayout_itemMargin, 0);
-        a.recycle();
+    private fun init(context: Context, attrs: AttributeSet?) {
+        val a = context.obtainStyledAttributes(attrs, R.styleable.SimpleGridLayout)
+        mColumnCount = a.getInteger(R.styleable.SimpleGridLayout_columnCount, DEFAULT_COLUMN_COUNT)
+        mItemMargin = a.getDimensionPixelOffset(R.styleable.SimpleGridLayout_itemMargin, 0)
+        a.recycle()
     }
 
-    public void setItemMargin(int itemMargin) {
+    fun setItemMargin(itemMargin: Int) {
         if (mItemMargin != itemMargin) {
-            mItemMargin = itemMargin;
-            requestLayout();
+            mItemMargin = itemMargin
+            requestLayout()
         }
     }
 
-    public void setColumnCount(int columnCount) {
-        if (columnCount <= 0) {
-            throw new IllegalStateException("Column count can't be " + columnCount);
-        }
-
+    fun setColumnCount(columnCount: Int) {
+        check(columnCount > 0) { "Column count can't be $columnCount" }
         if (mColumnCount != columnCount) {
-            mColumnCount = columnCount;
-            requestLayout();
+            mColumnCount = columnCount
+            requestLayout()
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int maxRowCount = MathUtils.ceilDivide(getChildCount(), mColumnCount);
-        if (mRowHeights == null || mRowHeights.length != maxRowCount) {
-            mRowHeights = new int[maxRowCount];
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val maxRowCount = ceilDivide(childCount, mColumnCount)
+        if (mRowHeights == null || mRowHeights!!.size != maxRowCount) {
+            mRowHeights = IntArray(maxRowCount)
         }
-
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int maxWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int maxHeight = MeasureSpec.getSize(heightMeasureSpec);
-
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        var maxWidth = MeasureSpec.getSize(widthMeasureSpec)
+        var maxHeight = MeasureSpec.getSize(heightMeasureSpec)
         if (widthMode == MeasureSpec.UNSPECIFIED) {
-            maxWidth = 300;
+            maxWidth = 300
         }
         if (heightMode == MeasureSpec.UNSPECIFIED) {
-            maxHeight = ViewUtils.MAX_SIZE;
+            maxHeight = ViewUtils.MAX_SIZE
         }
 
         // Get item width MeasureSpec
-        mItemWidth = Math.max(
-                (maxWidth - getPaddingLeft() - getPaddingRight() - ((mColumnCount - 1) * mItemMargin)) / mColumnCount, 1);
-        int itemWidthMeasureSpec = MeasureSpec.makeMeasureSpec(mItemWidth, MeasureSpec.EXACTLY);
-        int itemHeightMeasureSpec = MeasureSpec.UNSPECIFIED;
-
-        int measuredWidth = maxWidth;
-        int measuredHeight = 0;
-        int rowHeight = 0;
-        int row = 0;
-        int count = getChildCount();
-        for (int index = 0, indexInRow = 0; index < count; index++, indexInRow++) {
-            final View child = getChildAt(index);
-            if (child.getVisibility() == View.GONE) {
-                indexInRow--;
-                continue;
+        mItemWidth =
+            ((maxWidth - paddingLeft - paddingRight - (mColumnCount - 1) * mItemMargin) / mColumnCount)
+                .coerceAtLeast(1)
+        val itemWidthMeasureSpec = MeasureSpec.makeMeasureSpec(mItemWidth, MeasureSpec.EXACTLY)
+        val itemHeightMeasureSpec = MeasureSpec.UNSPECIFIED
+        val measuredWidth = maxWidth
+        var measuredHeight = 0
+        var rowHeight = 0
+        var row = 0
+        val count = childCount
+        var index = 0
+        var indexInRow = 0
+        while (index < count) {
+            val child = getChildAt(index)
+            if (child.visibility == GONE) {
+                indexInRow--
+                index++
+                indexInRow++
+                continue
             }
-
-            child.measure(itemWidthMeasureSpec, itemHeightMeasureSpec);
-
+            child.measure(itemWidthMeasureSpec, itemHeightMeasureSpec)
             if (indexInRow == mColumnCount) {
                 // New row
-                indexInRow = 0;
-                rowHeight = 0;
-                row++;
+                indexInRow = 0
+                rowHeight = 0
+                row++
             }
-
-            rowHeight = Math.max(rowHeight, child.getMeasuredHeight());
-
+            rowHeight = rowHeight.coerceAtLeast(child.measuredHeight)
             if (indexInRow == mColumnCount - 1 || index == count - 1) {
-                mRowHeights[row] = rowHeight;
-                measuredHeight += rowHeight + mItemMargin;
+                mRowHeights!![row] = rowHeight
+                measuredHeight += rowHeight + mItemMargin
             }
+            index++
+            indexInRow++
         }
-        measuredHeight -= mItemMargin;
-        measuredHeight = Math.max(0, Math.min(measuredHeight + getPaddingTop() + getPaddingBottom(), maxHeight));
-
-        setMeasuredDimension(measuredWidth, measuredHeight);
+        measuredHeight -= mItemMargin
+        measuredHeight = (measuredHeight + paddingTop + paddingBottom).coerceIn(0, maxHeight)
+        setMeasuredDimension(measuredWidth, measuredHeight)
     }
 
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int itemWidth = mItemWidth;
-        int itemMargin = mItemMargin;
-        int paddingLeft = getPaddingLeft();
-        int left = paddingLeft;
-        int top = getPaddingTop();
-        int row = 0;
-        int count = getChildCount();
-        for (int index = 0, indexInRow = 0; index < count; index++, indexInRow++) {
-            final View child = getChildAt(index);
-            if (child.getVisibility() == View.GONE) {
-                indexInRow--;
-                continue;
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        val itemWidth = mItemWidth
+        val itemMargin = mItemMargin
+        val paddingLeft = paddingLeft
+        var left = paddingLeft
+        var top = paddingTop
+        var row = 0
+        val count = childCount
+        var index = 0
+        var indexInRow = 0
+        while (index < count) {
+            val child = getChildAt(index)
+            if (child.visibility == GONE) {
+                indexInRow--
+                index++
+                indexInRow++
+                continue
             }
-
             if (indexInRow == mColumnCount) {
                 // New row
-                left = paddingLeft;
-                top += mRowHeights[row] + itemMargin;
-
-                indexInRow = 0;
-                row++;
+                left = paddingLeft
+                top += mRowHeights!![row] + itemMargin
+                indexInRow = 0
+                row++
             }
-
-            child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight());
-
-            left += itemWidth + itemMargin;
+            child.layout(left, top, left + child.measuredWidth, top + child.measuredHeight)
+            left += itemWidth + itemMargin
+            index++
+            indexInRow++
         }
+    }
+
+    companion object {
+        private const val DEFAULT_COLUMN_COUNT = 3
     }
 }
