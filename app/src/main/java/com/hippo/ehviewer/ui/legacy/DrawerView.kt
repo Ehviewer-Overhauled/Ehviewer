@@ -13,58 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.content.Context
+import android.util.AttributeSet
+import android.widget.FrameLayout
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-import android.widget.FrameLayout;
+class DrawerView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : FrameLayout(context, attrs) {
+    private var mMaxWidth = 0
 
-public class DrawerView extends FrameLayout {
-
-    private static final int[] SIZE_ATTRS = new int[]{
-            android.R.attr.maxWidth
-    };
-
-    private int mMaxWidth;
-
-    public DrawerView(Context context) {
-        super(context);
-        init(context, null);
+    init {
+        val a = context.obtainStyledAttributes(attrs, SIZE_ATTRS)
+        mMaxWidth = a.getDimensionPixelOffset(0, 0)
+        a.recycle()
     }
 
-    public DrawerView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
-    }
+    override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+        var widthSpec = widthSpec
+        when (MeasureSpec.getMode(widthSpec)) {
+            MeasureSpec.EXACTLY -> {}
+            MeasureSpec.AT_MOST -> widthSpec = MeasureSpec.makeMeasureSpec(
+                MeasureSpec.getSize(widthSpec).coerceAtMost(mMaxWidth),
+                MeasureSpec.EXACTLY,
+            )
 
-    public DrawerView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context, attrs);
-    }
-
-    private void init(Context context, AttributeSet attrs) {
-        TypedArray a = context.obtainStyledAttributes(attrs, SIZE_ATTRS);
-        mMaxWidth = a.getDimensionPixelOffset(0, 0);
-        a.recycle();
-    }
-
-    @Override
-    protected void onMeasure(int widthSpec, int heightSpec) {
-        switch (MeasureSpec.getMode(widthSpec)) {
-            case MeasureSpec.EXACTLY:
-                // Nothing to do
-                break;
-            case MeasureSpec.AT_MOST:
-                widthSpec = MeasureSpec.makeMeasureSpec(
-                        Math.min(MeasureSpec.getSize(widthSpec), mMaxWidth), MeasureSpec.EXACTLY);
-                break;
-            case MeasureSpec.UNSPECIFIED:
-                widthSpec = MeasureSpec.makeMeasureSpec(mMaxWidth, MeasureSpec.EXACTLY);
-                break;
+            MeasureSpec.UNSPECIFIED ->
+                widthSpec = MeasureSpec.makeMeasureSpec(mMaxWidth, MeasureSpec.EXACTLY)
         }
         // Let super sort out the height
-        super.onMeasure(widthSpec, heightSpec);
+        super.onMeasure(widthSpec, heightSpec)
+    }
+
+    companion object {
+        private val SIZE_ATTRS = intArrayOf(android.R.attr.maxWidth)
     }
 }

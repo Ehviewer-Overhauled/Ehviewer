@@ -13,55 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.content.Context
+import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatTextView
 
-import android.content.Context;
-import android.util.AttributeSet;
+open class ObservedTextView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : AppCompatTextView(context, attrs) {
+    private var mOnWindowAttachListener: OnWindowAttachListener? = null
 
-import androidx.appcompat.widget.AppCompatTextView;
-
-public class ObservedTextView extends AppCompatTextView {
-
-    private OnWindowAttachListener mOnWindowAttachListener;
-
-    public ObservedTextView(Context context) {
-        super(context);
-    }
-
-    public ObservedTextView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public ObservedTextView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
         if (mOnWindowAttachListener != null) {
-            mOnWindowAttachListener.onAttachedToWindow();
+            mOnWindowAttachListener!!.onAttachedToWindow()
         }
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
         if (mOnWindowAttachListener != null) {
-            mOnWindowAttachListener.onDetachedFromWindow();
+            mOnWindowAttachListener!!.onDetachedFromWindow()
         }
     }
 
-    public void setOnWindowAttachListener(OnWindowAttachListener onWindowAttachListener) {
-        mOnWindowAttachListener = onWindowAttachListener;
+    fun setOnWindowAttachListener(onWindowAttachListener: OnWindowAttachListener?) {
+        mOnWindowAttachListener = onWindowAttachListener
     }
 
-    public interface OnWindowAttachListener {
-        void onAttachedToWindow();
-
-        void onDetachedFromWindow();
+    interface OnWindowAttachListener {
+        fun onAttachedToWindow()
+        fun onDetachedFromWindow()
     }
 }

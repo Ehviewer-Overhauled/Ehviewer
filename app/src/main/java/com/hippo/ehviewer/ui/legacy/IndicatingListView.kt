@@ -13,85 +13,69 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
+import android.util.AttributeSet
+import android.widget.ListView
+import com.hippo.ehviewer.R
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.util.AttributeSet;
-import android.widget.ListView;
+@SuppressLint("CustomViewStyleable")
+class IndicatingListView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : ListView(context, attrs) {
+    private val mPaint = Paint()
+    private val mTemp = Rect()
+    private var mIndicatorHeight = 0
 
-import androidx.annotation.NonNull;
-
-import com.hippo.ehviewer.R;
-
-public class IndicatingListView extends ListView {
-
-    private final Paint mPaint = new Paint();
-    private final Rect mTemp = new Rect();
-    private int mIndicatorHeight;
-
-    public IndicatingListView(Context context) {
-        super(context);
-        init(context, null);
+    init {
+        val a = context.obtainStyledAttributes(attrs, R.styleable.Indicating)
+        mIndicatorHeight = a.getDimensionPixelOffset(R.styleable.Indicating_indicatorHeight, 1)
+        mPaint.color = a.getColor(
+            R.styleable.Indicating_indicatorColor,
+            Color.BLACK,
+        )
+        mPaint.style = Paint.Style.FILL
+        a.recycle()
     }
 
-    public IndicatingListView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+    private fun fillTopIndicatorDrawRect() {
+        mTemp[0, 0, width] = mIndicatorHeight
     }
 
-    public IndicatingListView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context, attrs);
+    private fun fillBottomIndicatorDrawRect() {
+        mTemp[0, height - mIndicatorHeight, width] = height
     }
 
-    private void init(Context context, AttributeSet attrs) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Indicating);
-        mIndicatorHeight = a.getDimensionPixelOffset(R.styleable.Indicating_indicatorHeight, 1);
-        mPaint.setColor(a.getColor(R.styleable.Indicating_indicatorColor, Color.BLACK));
-        mPaint.setStyle(Paint.Style.FILL);
-        a.recycle();
+    private fun needShowTopIndicator(): Boolean {
+        return canScrollVertically(-1)
     }
 
-    private void fillTopIndicatorDrawRect() {
-        mTemp.set(0, 0, getWidth(), mIndicatorHeight);
+    private fun needShowBottomIndicator(): Boolean {
+        return canScrollVertically(1)
     }
 
-    private void fillBottomIndicatorDrawRect() {
-        mTemp.set(0, getHeight() - mIndicatorHeight, getWidth(), getHeight());
-    }
-
-    private boolean needShowTopIndicator() {
-        return canScrollVertically(-1);
-    }
-
-    private boolean needShowBottomIndicator() {
-        return canScrollVertically(1);
-    }
-
-    @Override
-    public void draw(@NonNull Canvas canvas) {
-        super.draw(canvas);
-
-        final int restoreCount = canvas.save();
-        canvas.translate(getScrollX(), getScrollY());
+    override fun draw(canvas: Canvas) {
+        super.draw(canvas)
+        val restoreCount = canvas.save()
+        canvas.translate(scrollX.toFloat(), scrollY.toFloat())
 
         // Draw top indicator
         if (needShowTopIndicator()) {
-            fillTopIndicatorDrawRect();
-            canvas.drawRect(mTemp, mPaint);
+            fillTopIndicatorDrawRect()
+            canvas.drawRect(mTemp, mPaint)
         }
         // Draw bottom indicator
         if (needShowBottomIndicator()) {
-            fillBottomIndicatorDrawRect();
-            canvas.drawRect(mTemp, mPaint);
+            fillBottomIndicatorDrawRect()
+            canvas.drawRect(mTemp, mPaint)
         }
-
-        canvas.restoreToCount(restoreCount);
+        canvas.restoreToCount(restoreCount)
     }
 }
