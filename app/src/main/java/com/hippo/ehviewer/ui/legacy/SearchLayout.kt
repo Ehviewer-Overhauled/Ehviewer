@@ -42,7 +42,6 @@ import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.databinding.SearchAdvanceBinding
 import com.hippo.ehviewer.databinding.SearchCategoryBinding
 import com.hippo.ehviewer.databinding.SearchNormalBinding
-import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.ehviewer.yorozuya.ViewUtils
 
 @SuppressLint("InflateParams")
@@ -97,7 +96,7 @@ class SearchLayout @JvmOverloads constructor(
             mChip.isCheckable = true
             mChip.setText(mPair.second)
             mChip.idt = mPair.first
-            mChip.isChecked = NumberUtils.int2boolean(mPair.first and mCategoryStored)
+            mChip.isChecked = mPair.first and mCategoryStored != 0
             mChip.setOnLongClickListener {
                 if (mChip.isChecked) {
                     binding.searchCategoryChipgroup.forEach {

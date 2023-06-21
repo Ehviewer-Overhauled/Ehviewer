@@ -23,7 +23,7 @@ import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.network.UrlBuilder
 import com.hippo.ehviewer.ui.legacy.AdvanceSearchTable
 import com.hippo.ehviewer.util.encodeUTF8
-import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import kotlinx.parcelize.Parcelize
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
@@ -158,7 +158,7 @@ data class ListUrlBuilder(
             val value = str.substring(index + 1)
             when (key) {
                 "f_cats" -> {
-                    val cats = NumberUtils.parseIntSafely(value, EhUtils.ALL_CATEGORY)
+                    val cats = value.toIntOrDefault(EhUtils.ALL_CATEGORY)
                     category = category or (cats.inv() and EhUtils.ALL_CATEGORY)
                 }
 
@@ -237,13 +237,13 @@ data class ListUrlBuilder(
                     enableMinRating = true
                 }
 
-                "f_srdd" -> minRating = NumberUtils.parseIntSafely(value, -1)
+                "f_srdd" -> minRating = value.toIntOrDefault(-1)
                 "f_sp" -> if ("on" == value) {
                     enablePage = true
                 }
 
-                "f_spf" -> pageFrom = NumberUtils.parseIntSafely(value, -1)
-                "f_spt" -> pageTo = NumberUtils.parseIntSafely(value, -1)
+                "f_spf" -> pageFrom = value.toIntOrDefault(-1)
+                "f_spt" -> pageTo = value.toIntOrDefault(-1)
                 "f_shash" -> hash = value
             }
         }

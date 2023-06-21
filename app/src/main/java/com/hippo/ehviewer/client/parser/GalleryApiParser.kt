@@ -19,7 +19,8 @@ import com.hippo.ehviewer.client.EhUtils.getCategory
 import com.hippo.ehviewer.client.EhUtils.handleThumbUrlResolution
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.getThumbKey
-import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.toFloatOrDefault
+import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import org.json.JSONObject
 
 object GalleryApiParser {
@@ -37,11 +38,12 @@ object GalleryApiParser {
             gi.uploader = g.getString("uploader")
             gi.posted =
                 ParserUtils.formatDate(ParserUtils.parseLong(g.getString("posted"), 0) * 1000)
-            gi.rating = NumberUtils.parseFloatSafely(g.getString("rating"), 0.0f)
+            gi.rating = g.getString("rating").toFloatOrDefault(0.0f)
             // tags
             val tagJa = g.getJSONArray("tags")
-            gi.simpleTags = (0 until tagJa.length()).map { tagJa.getString(it) }.let { arrayListOf<String>().apply { addAll(it) } }
-            gi.pages = NumberUtils.parseIntSafely(g.getString("filecount"), 0)
+            gi.simpleTags = (0 until tagJa.length()).map { tagJa.getString(it) }
+                .let { arrayListOf<String>().apply { addAll(it) } }
+            gi.pages = g.getString("filecount").toIntOrDefault(0)
             gi.generateSLang()
         }
     }

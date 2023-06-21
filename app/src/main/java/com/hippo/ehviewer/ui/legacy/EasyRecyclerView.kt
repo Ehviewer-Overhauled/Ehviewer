@@ -28,8 +28,6 @@ import android.widget.Checkable
 import androidx.collection.LongSparseArray
 import androidx.core.os.ParcelCompat.readParcelable
 import androidx.recyclerview.widget.RecyclerView
-import com.hippo.ehviewer.yorozuya.NumberUtils.boolean2int
-import com.hippo.ehviewer.yorozuya.NumberUtils.int2boolean
 
 /**
  * Add setChoiceMode for RecyclerView
@@ -513,7 +511,7 @@ open class EasyRecyclerView : RecyclerView {
                 readParcelable(`in`, RecyclerView::class.java.classLoader, Parcelable::class.java)
             this.superState = superState ?: EMPTY_STATE
             choiceMode = `in`.readInt()
-            customChoice = int2boolean(`in`.readInt())
+            customChoice = `in`.readInt() != 0
             checkedItemCount = `in`.readInt()
             checkState = `in`.readSparseBooleanArray()
             val n = `in`.readInt()
@@ -534,7 +532,7 @@ open class EasyRecyclerView : RecyclerView {
         override fun writeToParcel(out: Parcel, flags: Int) {
             out.writeParcelable(superState, flags)
             out.writeInt(choiceMode)
-            out.writeInt(boolean2int(customChoice))
+            out.writeInt(customChoice.compareTo(false))
             out.writeInt(checkedItemCount)
             out.writeSparseBooleanArray(checkState)
             val n = if (checkIdState != null) checkIdState!!.size() else 0
