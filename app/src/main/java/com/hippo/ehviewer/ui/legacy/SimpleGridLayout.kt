@@ -19,7 +19,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.yorozuya.ViewUtils
 
 /**
  * not scrollable
@@ -83,7 +82,7 @@ open class SimpleGridLayout : ViewGroup {
             maxWidth = 300
         }
         if (heightMode == MeasureSpec.UNSPECIFIED) {
-            maxHeight = ViewUtils.MAX_SIZE
+            maxHeight = Int.MAX_VALUE and (0x3 shl 30).inv()
         }
 
         // Get item width MeasureSpec
