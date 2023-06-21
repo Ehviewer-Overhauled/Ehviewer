@@ -3,7 +3,6 @@ package eu.kanade.tachiyomi.ui.reader.loader
 import androidx.annotation.CallSuper
 import androidx.collection.lruCache
 import com.hippo.ehviewer.image.Image
-import com.hippo.ehviewer.yorozuya.MathUtils
 import com.hippo.ehviewer.yorozuya.OSUtils
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
@@ -23,7 +22,7 @@ abstract class PageLoader {
         (0 until size).map { ReaderPage(it) }
     }
 
-    private val mPreloads = MathUtils.clamp(com.hippo.ehviewer.Settings.preloadImage, 0, 100)
+    private val mPreloads = com.hippo.ehviewer.Settings.preloadImage.coerceIn(0, 100)
 
     abstract suspend fun awaitReady(): Boolean
     abstract val isReady: Boolean

@@ -29,8 +29,8 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.Keep;
 
+import com.google.android.material.math.MathUtils;
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.yorozuya.MathUtils;
 
 public class AddDeleteDrawable extends Drawable {
 

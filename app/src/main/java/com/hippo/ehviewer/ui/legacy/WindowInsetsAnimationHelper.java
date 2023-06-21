@@ -24,7 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.hippo.ehviewer.yorozuya.MathUtils;
+import com.google.android.material.math.MathUtils;
 
 import java.util.HashMap;
 import java.util.List;

@@ -19,7 +19,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.yorozuya.MathUtils.ceilDivide
 import com.hippo.ehviewer.yorozuya.ViewUtils
 
 /**
@@ -72,7 +71,7 @@ open class SimpleGridLayout : ViewGroup {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val maxRowCount = ceilDivide(childCount, mColumnCount)
+        val maxRowCount = (childCount + mColumnCount - 1) / mColumnCount
         if (mRowHeights == null || mRowHeights!!.size != maxRowCount) {
             mRowHeights = IntArray(maxRowCount)
         }
