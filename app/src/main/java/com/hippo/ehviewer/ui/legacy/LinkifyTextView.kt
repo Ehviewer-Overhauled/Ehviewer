@@ -13,80 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.text.Spanned
+import android.text.style.ClickableSpan
+import android.util.AttributeSet
+import android.view.MotionEvent
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.text.Layout;
-import android.text.Spanned;
-import android.text.style.ClickableSpan;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
+class LinkifyTextView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : ObservedTextView(context, attrs) {
+    var currentSpan: ClickableSpan? = null
+        private set
 
-import androidx.annotation.NonNull;
-
-public class LinkifyTextView extends ObservedTextView {
-
-    private ClickableSpan mCurrentSpan;
-
-    public LinkifyTextView(Context context) {
-        super(context);
-    }
-
-    public LinkifyTextView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public LinkifyTextView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    public ClickableSpan getCurrentSpan() {
-        return mCurrentSpan;
-    }
-
-    public void clearCurrentSpan() {
-        mCurrentSpan = null;
+    fun clearCurrentSpan() {
+        currentSpan = null
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(@NonNull MotionEvent event) {
+    override fun onTouchEvent(event: MotionEvent): Boolean {
         // Let the parent or grandparent of TextView to handles click aciton.
         // Otherwise click effect like ripple will not work, and if touch area
         // do not contain a url, the TextView will still get MotionEvent.
         // onTouchEven must be called with MotionEvent.ACTION_DOWN for each touch
         // action on it, so we analyze touched url here.
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mCurrentSpan = null;
-
-            if (getText() instanceof Spanned) {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            currentSpan = null
+            if (text is Spanned) {
                 // Get this code from android.text.method.LinkMovementMethod.
                 // Work fine !
-                int x = (int) event.getX();
-                int y = (int) event.getY();
-
-                x -= getTotalPaddingLeft();
-                y -= getTotalPaddingTop();
-
-                x += getScrollX();
-                y += getScrollY();
-
-                Layout layout = getLayout();
+                var x = event.x.toInt()
+                var y = event.y.toInt()
+                x -= totalPaddingLeft
+                y -= totalPaddingTop
+                x += scrollX
+                y += scrollY
+                val layout = layout
                 if (null != layout) {
-                    int line = layout.getLineForVertical(y);
-                    int off = layout.getOffsetForHorizontal(line, x);
-
-                    ClickableSpan[] spans = ((Spanned) getText()).getSpans(off, off, ClickableSpan.class);
-
-                    if (spans.length > 0) {
-                        mCurrentSpan = spans[0];
+                    val line = layout.getLineForVertical(y)
+                    val off = layout.getOffsetForHorizontal(line, x.toFloat())
+                    val spans = (text as Spanned).getSpans(off, off, ClickableSpan::class.java)
+                    if (spans.isNotEmpty()) {
+                        currentSpan = spans[0]
                     }
                 }
             }
         }
-
-        return super.onTouchEvent(event);
+        return super.onTouchEvent(event)
     }
 }

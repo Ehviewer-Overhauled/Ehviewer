@@ -13,62 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.legacy
 
-package com.hippo.ehviewer.ui.legacy;
+import android.content.Context
+import android.graphics.Canvas
+import android.util.AttributeSet
+import android.widget.RatingBar
+import android.widget.RatingBar.OnRatingBarChangeListener
+import androidx.appcompat.widget.AppCompatRatingBar
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.util.AttributeSet;
-import android.widget.RatingBar;
+class GalleryRatingBar @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : AppCompatRatingBar(context, attrs), OnRatingBarChangeListener {
+    private var mListener: OnUserRateListener? = null
 
-import androidx.appcompat.widget.AppCompatRatingBar;
-
-public class GalleryRatingBar extends AppCompatRatingBar
-        implements RatingBar.OnRatingBarChangeListener {
-
-    private OnUserRateListener mListener;
-
-    public GalleryRatingBar(Context context) {
-        super(context);
-        init();
+    init {
+        onRatingBarChangeListener = this
     }
 
-    public GalleryRatingBar(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public GalleryRatingBar(Context context, AttributeSet attrs,
-                            int defStyle) {
-        super(context, attrs, defStyle);
-        init();
-    }
-
-    private void init() {
-        setOnRatingBarChangeListener(this);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
         if (mListener != null) {
-            mListener.onUserRate(getRating());
+            mListener!!.onUserRate(rating)
         }
     }
 
-    public void setOnUserRateListener(OnUserRateListener l) {
-        mListener = l;
+    fun setOnUserRateListener(l: OnUserRateListener?) {
+        mListener = l
     }
 
-    @Override
-    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+    override fun onRatingChanged(ratingBar: RatingBar, rating: Float, fromUser: Boolean) {
         if (rating <= 0.0f) {
-            setRating(0.5f);
+            setRating(0.5f)
         }
     }
 
-    public interface OnUserRateListener {
-        void onUserRate(float rating);
+    interface OnUserRateListener {
+        fun onUserRate(rating: Float)
     }
 }
