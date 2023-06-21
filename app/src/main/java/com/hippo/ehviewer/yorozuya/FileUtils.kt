@@ -80,7 +80,7 @@ object FileUtils {
     fun sanitizeFilename(rawFilename: String): String {
         // Remove forbidden_filename_characters
         var filename = rawFilename
-        filename = StringUtils.remove(filename, FORBIDDEN_FILENAME_CHARACTERS)
+        filename = filename.filterNot { FORBIDDEN_FILENAME_CHARACTERS.contains(it) }
 
         // Ensure utf-8 byte count <= 255
         var byteCount = 0
@@ -107,7 +107,7 @@ object FileUtils {
         }
 
         // Trim
-        return StringUtils.trim(filename)
+        return filename.trim()
     }
 
     /**

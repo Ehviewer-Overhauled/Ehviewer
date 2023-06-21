@@ -89,7 +89,6 @@ import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.util.toBBCode
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
-import com.hippo.ehviewer.yorozuya.StringUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -357,21 +356,21 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     @SuppressLint("InflateParams")
-    fun showVoteStatusDialog(context: Context, voteStatus: String?) {
-        val temp = StringUtils.split(voteStatus, ',')
+    fun showVoteStatusDialog(context: Context, voteStatus: String) {
+        val temp = voteStatus.split(',')
         val length = temp.size
         val userArray = arrayOfNulls<String>(length)
         val voteArray = arrayOfNulls<String>(length)
         for (i in 0 until length) {
-            val str = StringUtils.trim(temp[i])
+            val str = temp[i].trim()
             val index = str.lastIndexOf(' ')
             if (index < 0) {
                 Log.d(TAG, "Something wrong happened about vote state")
                 userArray[i] = str
                 voteArray[i] = ""
             } else {
-                userArray[i] = StringUtils.trim(str.substring(0, index))
-                voteArray[i] = StringUtils.trim(str.substring(index + 1))
+                userArray[i] = str.substring(0, index).trim()
+                voteArray[i] = str.substring(index + 1).trim()
             }
         }
         val builder = BaseDialogBuilder(context)
@@ -442,7 +441,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 } else if (id == R.id.vote_down) {
                     voteComment(comment.id, -1)
                 } else if (id == R.id.check_vote_status) {
-                    showVoteStatusDialog(context, comment.voteState)
+                    showVoteStatusDialog(context, comment.voteState!!)
                 } else if (id == R.id.edit_comment) {
                     prepareEditComment(comment.id, text)
                     if (!mInAnimation && binding.editPanel.visibility != View.VISIBLE) {
@@ -539,7 +538,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                         hypot(halfW.toDouble(), halfH.toDouble()).toFloat(),
                     ).setDuration(300L)
                     animator.addListener(object : SimpleAnimatorListener() {
-                        override fun onAnimationEnd(a: Animator) {
+                        override fun onAnimationEnd(animation: Animator) {
                             mInAnimation = false
                         }
                     })
@@ -570,7 +569,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             0.0f,
         ).setDuration(300L)
         animator.addListener(object : SimpleAnimatorListener() {
-            override fun onAnimationEnd(a: Animator) {
+            override fun onAnimationEnd(animation: Animator) {
                 if (Looper.myLooper() != Looper.getMainLooper()) {
                     // Some devices may run this block in non-UI thread.
                     // It might be a bug of Android OS.
