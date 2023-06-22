@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.hippo.unifile;
+package com.hippo.unifile
 
 /**
- * An interface for filtering {@link UniFile} objects based on their names
+ * An interface for filtering [UniFile] objects based on their names
  * or the directory they reside in.
  *
  * @see UniFile
- * @see UniFile#listFiles(FilenameFilter)
+ *
+ * @see UniFile.listFiles
  */
-public interface FilenameFilter {
-
+interface FilenameFilter {
     /**
      * Indicates if a specific filename matches this filter.
      *
-     * @param dir      the directory in which the {@code filename} was found.
-     * @param filename the name of the file in {@code dir} to test.
-     * @return {@code true} if the filename matches the filter
-     * and can be included in the list, {@code false}
+     * @param dir      the directory in which the `filename` was found.
+     * @param filename the name of the file in `dir` to test.
+     * @return `true` if the filename matches the filter
+     * and can be included in the list, `false`
      * otherwise.
      */
-    boolean accept(UniFile dir, String filename);
+    fun accept(dir: UniFile?, filename: String?): Boolean
 }

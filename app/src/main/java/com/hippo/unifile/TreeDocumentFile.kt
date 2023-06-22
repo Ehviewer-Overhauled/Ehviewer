@@ -13,248 +13,239 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
+import android.content.Context
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.ParcelFileDescriptor
+import android.util.Log
+import android.webkit.MimeTypeMap
 
-import android.content.Context;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
-import android.text.TextUtils;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
+internal class TreeDocumentFile : UniFile {
+    private val mContext: Context
+    override var uri: Uri
+        private set
+    private var mFilename: String? = null
 
-import androidx.annotation.NonNull;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
-class TreeDocumentFile extends UniFile {
-
-    private static final String TAG = TreeDocumentFile.class.getSimpleName();
-
-    private final Context mContext;
-    private Uri mUri;
-    private String mFilename;
-
-    TreeDocumentFile(UniFile parent, Context context, Uri uri) {
-        super(parent);
-        mContext = context.getApplicationContext();
-        mUri = uri;
+    constructor(parent: UniFile?, context: Context, uri: Uri) : super(parent) {
+        mContext = context.applicationContext
+        this.uri = uri
     }
 
-    private TreeDocumentFile(UniFile parent, Context context, Uri uri, String filename) {
-        super(parent);
-        mContext = context.getApplicationContext();
-        mUri = uri;
-        mFilename = filename;
+    private constructor(parent: UniFile, context: Context, uri: Uri, filename: String?) : super(
+        parent,
+    ) {
+        mContext = context.applicationContext
+        this.uri = uri
+        mFilename = filename
     }
 
-    @Override
-    public UniFile createFile(String displayName) {
-        UniFile child = findFile(displayName);
-
-        if (child != null) {
-            if (child.isFile()) {
-                return child;
+    override fun createFile(displayName: String): UniFile? {
+        val child = findFile(displayName)
+        return if (child != null) {
+            if (child.isFile) {
+                child
             } else {
-                Log.w(TAG, "Try to create file " + displayName + ", but it is not file");
-                return null;
+                Log.w(
+                    TAG,
+                    "Try to create file $displayName, but it is not file",
+                )
+                null
             }
         } else {
-            int index = displayName.lastIndexOf('.');
+            val index = displayName.lastIndexOf('.')
             if (index > 0) {
-                String name = displayName.substring(0, index);
-                String extension = displayName.substring(index + 1);
-                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-                if (!TextUtils.isEmpty(mimeType)) {
-                    final Uri result = DocumentsContractApi21.createFile(mContext, mUri, mimeType, name);
-                    return (result != null) ? new TreeDocumentFile(this, mContext, result, displayName) : null;
+                val name = displayName.substring(0, index)
+                val extension = displayName.substring(index + 1)
+                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+                if (!mimeType.isNullOrEmpty()) {
+                    val result = DocumentsContractApi21.createFile(mContext, uri, mimeType, name)
+                    return if (result != null) {
+                        TreeDocumentFile(
+                            this,
+                            mContext,
+                            result,
+                            displayName,
+                        )
+                    } else {
+                        null
+                    }
                 }
             }
 
             // Not dot in displayName or dot is the first char or can't get MimeType
-            final Uri result = DocumentsContractApi21.createFile(mContext, mUri, "application/octet-stream", displayName);
-            return (result != null) ? new TreeDocumentFile(this, mContext, result, displayName) : null;
-        }
-    }
-
-    @Override
-    public UniFile createDirectory(String displayName) {
-        UniFile child = findFile(displayName);
-
-        if (child != null) {
-            if (child.isDirectory()) {
-                return child;
+            val result = DocumentsContractApi21.createFile(
+                mContext,
+                uri,
+                "application/octet-stream",
+                displayName,
+            )
+            if (result != null) {
+                TreeDocumentFile(
+                    this,
+                    mContext,
+                    result,
+                    displayName,
+                )
             } else {
-                return null;
+                null
+            }
+        }
+    }
+
+    override fun createDirectory(displayName: String): UniFile? {
+        val child = findFile(displayName)
+        return if (child != null) {
+            if (child.isDirectory) {
+                child
+            } else {
+                null
             }
         } else {
-            final Uri result = DocumentsContractApi21.createDirectory(mContext, mUri, displayName);
-            return (result != null) ? new TreeDocumentFile(this, mContext, result, displayName) : null;
+            val result = DocumentsContractApi21.createDirectory(mContext, uri, displayName)
+            if (result != null) {
+                TreeDocumentFile(
+                    this,
+                    mContext,
+                    result,
+                    displayName,
+                )
+            } else {
+                null
+            }
         }
     }
 
-    @NonNull
-    @Override
-    public Uri getUri() {
-        return mUri;
+    override val name: String?
+        get() = DocumentsContractApi19.getName(mContext, uri)
+    override val type: String?
+        get() = DocumentsContractApi19.getType(mContext, uri)
+    override val isDirectory: Boolean
+        get() = DocumentsContractApi19.isDirectory(mContext, uri)
+    override val isFile: Boolean
+        get() = DocumentsContractApi19.isFile(mContext, uri)
+
+    override fun lastModified(): Long {
+        return DocumentsContractApi19.lastModified(mContext, uri)
     }
 
-    @Override
-    public String getName() {
-        return DocumentsContractApi19.getName(mContext, mUri);
+    override fun length(): Long {
+        return DocumentsContractApi19.length(mContext, uri)
     }
 
-    @Override
-    public String getType() {
-        return DocumentsContractApi19.getType(mContext, mUri);
+    override fun canRead(): Boolean {
+        return DocumentsContractApi19.canRead(mContext, uri)
     }
 
-    @Override
-    public boolean isDirectory() {
-        return DocumentsContractApi19.isDirectory(mContext, mUri);
+    override fun canWrite(): Boolean {
+        return DocumentsContractApi19.canWrite(mContext, uri)
     }
 
-    @Override
-    public boolean isFile() {
-        return DocumentsContractApi19.isFile(mContext, mUri);
-    }
-
-    @Override
-    public long lastModified() {
-        return DocumentsContractApi19.lastModified(mContext, mUri);
-    }
-
-    @Override
-    public long length() {
-        return DocumentsContractApi19.length(mContext, mUri);
-    }
-
-    @Override
-    public boolean canRead() {
-        return DocumentsContractApi19.canRead(mContext, mUri);
-    }
-
-    @Override
-    public boolean canWrite() {
-        return DocumentsContractApi19.canWrite(mContext, mUri);
-    }
-
-    @Override
-    public boolean ensureDir() {
-        if (isDirectory()) {
-            return true;
-        } else if (isFile()) {
-            return false;
+    override fun ensureDir(): Boolean {
+        if (isDirectory) {
+            return true
+        } else if (isFile) {
+            return false
         }
-
-        UniFile parent = getParentFile();
-        if (parent != null && parent.ensureDir() && mFilename != null) {
-            return parent.createDirectory(mFilename) != null;
+        val parent = parentFile
+        return if (parent != null && parent.ensureDir() && mFilename != null) {
+            parent.createDirectory(mFilename!!) != null
         } else {
-            return false;
+            false
         }
     }
 
-    @Override
-    public boolean ensureFile() {
-        if (isFile()) {
-            return true;
-        } else if (isDirectory()) {
-            return false;
+    override fun ensureFile(): Boolean {
+        if (isFile) {
+            return true
+        } else if (isDirectory) {
+            return false
         }
-
-        UniFile parent = getParentFile();
-        if (parent != null && parent.ensureDir() && mFilename != null) {
-            return parent.createFile(mFilename) != null;
+        val parent = parentFile
+        return if (parent != null && parent.ensureDir() && mFilename != null) {
+            parent.createFile(mFilename!!) != null
         } else {
-            return false;
+            false
         }
     }
 
-    @Override
-    public UniFile subFile(String displayName) {
-        Uri childUri = DocumentsContractApi21.buildChildUri(mUri, displayName);
-        return new TreeDocumentFile(this, mContext, childUri, displayName);
+    override fun subFile(displayName: String): UniFile {
+        val childUri = DocumentsContractApi21.buildChildUri(uri, displayName)
+        return TreeDocumentFile(this, mContext, childUri, displayName)
     }
 
-    @Override
-    public boolean delete() {
-        return DocumentsContractApi19.delete(mContext, mUri);
+    override fun delete(): Boolean {
+        return DocumentsContractApi19.delete(mContext, uri)
     }
 
-    @Override
-    public boolean exists() {
-        return DocumentsContractApi19.exists(mContext, mUri);
+    override fun exists(): Boolean {
+        return DocumentsContractApi19.exists(mContext, uri)
     }
 
-    private String getFilenameForUri(Uri uri) {
-        String path = uri.getPath();
+    private fun getFilenameForUri(uri: Uri): String? {
+        val path = uri.path
         if (path != null) {
-            int index = path.lastIndexOf('/');
+            val index = path.lastIndexOf('/')
             if (index >= 0) {
-                return path.substring(index + 1);
+                return path.substring(index + 1)
             }
         }
-        return null;
+        return null
     }
 
-    @Override
-    public UniFile[] listFiles() {
-        final Uri[] result = DocumentsContractApi21.listFiles(mContext, mUri);
-        final UniFile[] resultFiles = new UniFile[result.length];
-        for (int i = 0, n = result.length; i < n; i++) {
-            Uri uri = result[i];
-            resultFiles[i] = new TreeDocumentFile(this, mContext, uri, getFilenameForUri(uri));
-        }
-        return resultFiles;
+    override fun listFiles(): Array<UniFile> {
+        val result = DocumentsContractApi21.listFiles(mContext, uri)
+        return result.map { TreeDocumentFile(this, mContext, it, getFilenameForUri(it)) }.toTypedArray()
     }
 
-    @Override
-    public UniFile[] listFiles(FilenameFilter filter) {
+    override fun listFiles(filter: FilenameFilter?): Array<UniFile> {
         if (filter == null) {
-            return listFiles();
+            return listFiles()
         }
-
-        final Uri[] result = DocumentsContractApi21.listFiles(mContext, mUri);
-        final ArrayList<UniFile> results = new ArrayList<>();
-        for (Uri uri : result) {
-            String name = getFilenameForUri(uri);
+        val result = DocumentsContractApi21.listFiles(mContext, uri)
+        val results = ArrayList<UniFile>()
+        for (uri in result) {
+            val name = getFilenameForUri(uri)
             if (filter.accept(this, name)) {
-                results.add(new TreeDocumentFile(this, mContext, uri, name));
+                results.add(TreeDocumentFile(this, mContext, uri, name))
             }
         }
-        return results.toArray(new UniFile[0]);
+        return results.toTypedArray<UniFile>()
     }
 
-    @Override
-    public UniFile findFile(String displayName) {
-        Uri childUri = DocumentsContractApi21.buildChildUri(mUri, displayName);
-        return DocumentsContractApi19.exists(mContext, childUri) ?
-                new TreeDocumentFile(this, mContext, childUri, displayName) : null;
-    }
-
-    @Override
-    public boolean renameTo(String displayName) {
-        final Uri result = DocumentsContractApi21.renameTo(mContext, mUri, displayName);
-        if (result != null) {
-            mUri = result;
-            return true;
+    override fun findFile(displayName: String): UniFile? {
+        val childUri = DocumentsContractApi21.buildChildUri(uri, displayName)
+        return if (DocumentsContractApi19.exists(mContext, childUri)) {
+            TreeDocumentFile(
+                this,
+                mContext,
+                childUri,
+                displayName,
+            )
         } else {
-            return false;
+            null
         }
     }
 
-    @NonNull
-    @Override
-    public ImageDecoder.Source getImageSource() {
-        return Contracts.getImageSource(mContext, mUri);
+    override fun renameTo(displayName: String): Boolean {
+        val result = DocumentsContractApi21.renameTo(mContext, uri, displayName)
+        return if (result != null) {
+            uri = result
+            true
+        } else {
+            false
+        }
     }
 
-    @NonNull
-    @Override
-    public ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException {
-        return Contracts.openFileDescriptor(mContext, mUri, mode);
+    override val imageSource: ImageDecoder.Source
+        get() = Contracts.getImageSource(mContext, uri)
+
+    override fun openFileDescriptor(mode: String): ParcelFileDescriptor {
+        return Contracts.openFileDescriptor(mContext, uri, mode)
+    }
+
+    companion object {
+        private val TAG = TreeDocumentFile::class.java.simpleName
     }
 }

@@ -13,30 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
+import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
 
-import android.content.Context;
-import android.net.Uri;
-import android.provider.MediaStore;
-
-final class MediaContract {
-    private MediaContract() {
+internal object MediaContract {
+    fun getName(context: Context, self: Uri): String? {
+        return Contracts.queryForString(context, self, MediaStore.MediaColumns.DISPLAY_NAME, null)
     }
 
-    public static String getName(Context context, Uri self) {
-        return Contracts.queryForString(context, self, MediaStore.MediaColumns.DISPLAY_NAME, null);
+    fun getType(context: Context, self: Uri): String? {
+        return Contracts.queryForString(context, self, MediaStore.MediaColumns.MIME_TYPE, null)
     }
 
-    public static String getType(Context context, Uri self) {
-        return Contracts.queryForString(context, self, MediaStore.MediaColumns.MIME_TYPE, null);
+    fun lastModified(context: Context, self: Uri): Long {
+        return Contracts.queryForLong(context, self, MediaStore.MediaColumns.DATE_MODIFIED, 0)
     }
 
-    public static long lastModified(Context context, Uri self) {
-        return Contracts.queryForLong(context, self, MediaStore.MediaColumns.DATE_MODIFIED, 0);
-    }
-
-    public static long length(Context context, Uri self) {
-        return Contracts.queryForLong(context, self, MediaStore.MediaColumns.SIZE, 0);
+    fun length(context: Context, self: Uri): Long {
+        return Contracts.queryForLong(context, self, MediaStore.MediaColumns.SIZE, 0)
     }
 }

@@ -13,80 +13,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
+import android.content.Context
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.ParcelFileDescriptor
+import java.io.IOException
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
-
-import androidx.annotation.NonNull;
-
-import java.io.IOException;
-
-final class Contracts {
-    private Contracts() {
-    }
-
-    static String queryForString(Context context, Uri self, String column,
-                                 String defaultValue) {
-        final ContentResolver resolver = context.getContentResolver();
-
-        Cursor c = null;
-        try {
-            c = resolver.query(self, new String[]{column}, null, null, null);
-            if (c != null && c.moveToFirst() && !c.isNull(0)) {
-                return c.getString(0);
-            } else {
-                return defaultValue;
+internal object Contracts {
+    fun queryForString(
+        context: Context,
+        self: Uri,
+        column: String,
+        defaultValue: String?,
+    ): String? {
+        return runCatching {
+            context.contentResolver.query(self, arrayOf(column), null, null, null).use {
+                if (it != null && it.moveToFirst() && !it.isNull(0)) {
+                    it.getString(0)
+                } else {
+                    defaultValue
+                }
             }
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-            return defaultValue;
-        } finally {
-            Utils.closeQuietly(c);
+        }.getOrElse {
+            Utils.throwIfFatal(it)
+            defaultValue
         }
     }
 
-    static int queryForInt(Context context, Uri self, String column,
-                           int defaultValue) {
-        return (int) queryForLong(context, self, column, defaultValue);
+    fun queryForInt(context: Context, self: Uri, column: String?, defaultValue: Int): Int {
+        return queryForLong(context, self, column, defaultValue.toLong()).toInt()
     }
 
-    static long queryForLong(Context context, Uri self, String column,
-                             long defaultValue) {
-        final ContentResolver resolver = context.getContentResolver();
-
-        Cursor c = null;
-        try {
-            c = resolver.query(self, new String[]{column}, null, null, null);
-            if (c != null && c.moveToFirst() && !c.isNull(0)) {
-                return c.getLong(0);
-            } else {
-                return defaultValue;
+    fun queryForLong(context: Context, self: Uri, column: String?, defaultValue: Long): Long {
+        return runCatching {
+            context.contentResolver.query(self, arrayOf(column), null, null, null).use {
+                if (it != null && it.moveToFirst() && !it.isNull(0)) {
+                    it.getLong(0)
+                } else {
+                    defaultValue
+                }
             }
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-            return defaultValue;
-        } finally {
-            Utils.closeQuietly(c);
+        }.getOrElse {
+            Utils.throwIfFatal(it)
+            defaultValue
         }
     }
 
-    @NonNull
-    static ParcelFileDescriptor openFileDescriptor(Context context, Uri uri, String mode) throws IOException {
-        ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(uri, mode);
-        if (pfd == null) {
-            throw new IOException("Can't open ParcelFileDescriptor");
-        }
-        return pfd;
+    fun openFileDescriptor(
+        context: Context,
+        uri: Uri?,
+        mode: String?,
+    ): ParcelFileDescriptor {
+        return context.contentResolver.openFileDescriptor(uri!!, mode!!)
+            ?: throw IOException("Can't open ParcelFileDescriptor")
     }
 
-    @NonNull
-    static ImageDecoder.Source getImageSource(Context context, Uri uri) {
-        return ImageDecoder.createSource(context.getContentResolver(), uri);
+    fun getImageSource(context: Context, uri: Uri?): ImageDecoder.Source {
+        return ImageDecoder.createSource(context.contentResolver, uri!!)
     }
 }

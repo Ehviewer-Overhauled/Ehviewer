@@ -95,7 +95,7 @@ class ImageSearchLayout @JvmOverloads constructor(
     fun formatListUrlBuilder(lub: ListUrlBuilder) {
         if (path.isBlank()) throw EhException(context.getString(R.string.select_image_first))
         val uri = Uri.parse(path)
-        val src = UniFile.fromUri(context, uri).imageSource
+        val src = UniFile.fromUri(context, uri)?.imageSource ?: return
         val temp = AppConfig.createTempFile() ?: return
         val bitmap = ImageDecoder.decodeBitmap(src, Image.imageSearchDecoderSampleListener)
         temp.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }

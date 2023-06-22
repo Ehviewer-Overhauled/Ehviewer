@@ -13,139 +13,94 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
+import android.content.Context
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.ParcelFileDescriptor
 
-import android.content.Context;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
+internal class SingleDocumentFile(parent: UniFile?, context: Context, override val uri: Uri) :
+    UniFile(parent) {
+    private val mContext: Context
 
-import androidx.annotation.NonNull;
-
-import java.io.IOException;
-
-class SingleDocumentFile extends UniFile {
-
-    private final Context mContext;
-    private final Uri mUri;
-
-    SingleDocumentFile(UniFile parent, Context context, Uri uri) {
-        super(parent);
-        mContext = context.getApplicationContext();
-        mUri = uri;
+    init {
+        mContext = context.applicationContext
     }
 
-    @Override
-    public UniFile createFile(String displayName) {
-        return null;
+    override fun createFile(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    public UniFile createDirectory(String displayName) {
-        return null;
+    override fun createDirectory(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    @NonNull
-    public Uri getUri() {
-        return mUri;
+    override val name: String?
+        get() = DocumentsContractApi19.getName(mContext, uri)
+    override val type: String?
+        get() = DocumentsContractApi19.getType(mContext, uri)
+    override val isDirectory: Boolean
+        get() = DocumentsContractApi19.isDirectory(mContext, uri)
+    override val isFile: Boolean
+        get() = DocumentsContractApi19.isFile(mContext, uri)
+
+    override fun lastModified(): Long {
+        return DocumentsContractApi19.lastModified(mContext, uri)
     }
 
-    @Override
-    public String getName() {
-        return DocumentsContractApi19.getName(mContext, mUri);
+    override fun length(): Long {
+        return DocumentsContractApi19.length(mContext, uri)
     }
 
-    @Override
-    public String getType() {
-        return DocumentsContractApi19.getType(mContext, mUri);
+    override fun canRead(): Boolean {
+        return DocumentsContractApi19.canRead(mContext, uri)
     }
 
-    @Override
-    public boolean isDirectory() {
-        return DocumentsContractApi19.isDirectory(mContext, mUri);
+    override fun canWrite(): Boolean {
+        return DocumentsContractApi19.canWrite(mContext, uri)
     }
 
-    @Override
-    public boolean isFile() {
-        return DocumentsContractApi19.isFile(mContext, mUri);
+    override fun ensureDir(): Boolean {
+        return isDirectory
     }
 
-    @Override
-    public long lastModified() {
-        return DocumentsContractApi19.lastModified(mContext, mUri);
+    override fun ensureFile(): Boolean {
+        return isFile
     }
 
-    @Override
-    public long length() {
-        return DocumentsContractApi19.length(mContext, mUri);
+    override fun subFile(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    public boolean canRead() {
-        return DocumentsContractApi19.canRead(mContext, mUri);
+    override fun delete(): Boolean {
+        return DocumentsContractApi19.delete(mContext, uri)
     }
 
-    @Override
-    public boolean canWrite() {
-        return DocumentsContractApi19.canWrite(mContext, mUri);
+    override fun exists(): Boolean {
+        return DocumentsContractApi19.exists(mContext, uri)
     }
 
-    @Override
-    public boolean ensureDir() {
-        return isDirectory();
+    override fun listFiles(): Array<UniFile>? {
+        return null
     }
 
-    @Override
-    public boolean ensureFile() {
-        return isFile();
+    override fun listFiles(filter: FilenameFilter?): Array<UniFile>? {
+        return null
     }
 
-    @Override
-    public UniFile subFile(String displayName) {
-        return null;
+    override fun findFile(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    public boolean delete() {
-        return DocumentsContractApi19.delete(mContext, mUri);
+    override fun renameTo(displayName: String): Boolean {
+        return false
     }
 
-    @Override
-    public boolean exists() {
-        return DocumentsContractApi19.exists(mContext, mUri);
-    }
+    override val imageSource: ImageDecoder.Source
+        get() = Contracts.getImageSource(mContext, uri)
 
-    @Override
-    public UniFile[] listFiles() {
-        return null;
-    }
-
-    @Override
-    public UniFile[] listFiles(FilenameFilter filter) {
-        return null;
-    }
-
-    @Override
-    public UniFile findFile(String displayName) {
-        return null;
-    }
-
-    @Override
-    public boolean renameTo(String displayName) {
-        return false;
-    }
-
-    @NonNull
-    @Override
-    public ImageDecoder.Source getImageSource() {
-        return Contracts.getImageSource(mContext, mUri);
-    }
-
-    @NonNull
-    @Override
-    public ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException {
-        return Contracts.openFileDescriptor(mContext, mUri, mode);
+    override fun openFileDescriptor(mode: String): ParcelFileDescriptor {
+        return Contracts.openFileDescriptor(mContext, uri, mode)
     }
 }

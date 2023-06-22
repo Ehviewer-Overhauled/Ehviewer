@@ -13,150 +13,106 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
+import android.content.Context
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.ParcelFileDescriptor
+import java.io.IOException
 
-import android.content.Context;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
+internal class MediaFile(context: Context, override val uri: Uri) : UniFile(null) {
+    private val mContext: Context
 
-import androidx.annotation.NonNull;
-
-import java.io.IOException;
-
-class MediaFile extends UniFile {
-
-    private final Context mContext;
-    private final Uri mUri;
-
-    MediaFile(Context context, Uri uri) {
-        super(null);
-
-        mContext = context.getApplicationContext();
-        mUri = uri;
+    init {
+        mContext = context.applicationContext
     }
 
-    static boolean isMediaUri(Context context, Uri uri) {
-        return null != MediaContract.getName(context, uri);
+    override fun createFile(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    public UniFile createFile(String displayName) {
-        return null;
+    override fun createDirectory(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    public UniFile createDirectory(String displayName) {
-        return null;
+    override val name: String?
+        get() = MediaContract.getName(mContext, uri)
+    override val type: String?
+        get() = MediaContract.getType(mContext, uri)
+    override val isDirectory: Boolean
+        get() = false
+    override val isFile: Boolean
+        get() = DocumentsContractApi19.isFile(mContext, uri)
+
+    override fun lastModified(): Long {
+        return MediaContract.lastModified(mContext, uri)
     }
 
-    @Override
-    @NonNull
-    public Uri getUri() {
-        return mUri;
+    override fun length(): Long {
+        return MediaContract.length(mContext, uri)
     }
 
-    @Override
-    public String getName() {
-        return MediaContract.getName(mContext, mUri);
+    override fun canRead(): Boolean {
+        return isFile
     }
 
-    @Override
-    public String getType() {
-        return MediaContract.getType(mContext, mUri);
-    }
-
-    @Override
-    public boolean isDirectory() {
-        return false;
-    }
-
-    @Override
-    public boolean isFile() {
-        return DocumentsContractApi19.isFile(mContext, mUri);
-    }
-
-    @Override
-    public long lastModified() {
-        return MediaContract.lastModified(mContext, mUri);
-    }
-
-    @Override
-    public long length() {
-        return MediaContract.length(mContext, mUri);
-    }
-
-    @Override
-    public boolean canRead() {
-        return isFile();
-    }
-
-    @Override
-    public boolean canWrite() {
+    override fun canWrite(): Boolean {
         try {
-            var fd = openFileDescriptor("w");
-            fd.close();
-        } catch (IOException e) {
-            return false;
+            val fd = openFileDescriptor("w")
+            fd.close()
+        } catch (e: IOException) {
+            return false
         }
-        return true;
+        return true
     }
 
-    @Override
-    public boolean ensureDir() {
-        return false;
+    override fun ensureDir(): Boolean {
+        return false
     }
 
-    @Override
-    public boolean ensureFile() {
-        return isFile();
+    override fun ensureFile(): Boolean {
+        return isFile
     }
 
-    @Override
-    public UniFile subFile(String displayName) {
-        return null;
+    override fun subFile(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    public boolean delete() {
-        return false;
+    override fun delete(): Boolean {
+        return false
     }
 
-    @Override
-    public boolean exists() {
-        return isFile();
+    override fun exists(): Boolean {
+        return isFile
     }
 
-    @Override
-    public UniFile[] listFiles() {
-        return null;
+    override fun listFiles(): Array<UniFile>? {
+        return null
     }
 
-    @Override
-    public UniFile[] listFiles(FilenameFilter filter) {
-        return null;
+    override fun listFiles(filter: FilenameFilter?): Array<UniFile>? {
+        return null
     }
 
-    @Override
-    public UniFile findFile(String displayName) {
-        return null;
+    override fun findFile(displayName: String): UniFile? {
+        return null
     }
 
-    @Override
-    public boolean renameTo(String displayName) {
-        return false;
+    override fun renameTo(displayName: String): Boolean {
+        return false
     }
 
-    @NonNull
-    @Override
-    public ImageDecoder.Source getImageSource() {
-        return Contracts.getImageSource(mContext, mUri);
+    override val imageSource: ImageDecoder.Source
+        get() = Contracts.getImageSource(mContext, uri)
+
+    override fun openFileDescriptor(mode: String): ParcelFileDescriptor {
+        return Contracts.openFileDescriptor(mContext, uri, mode)
     }
 
-    @NonNull
-    @Override
-    public ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException {
-        return Contracts.openFileDescriptor(mContext, mUri, mode);
+    companion object {
+        fun isMediaUri(context: Context, uri: Uri): Boolean {
+            return null != MediaContract.getName(context, uri)
+        }
     }
 }
