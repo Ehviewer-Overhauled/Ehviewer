@@ -47,6 +47,12 @@ private typealias TagGroups = Map<String, TagGroup>
 
 object EhTagDatabase : CoroutineScope {
     private const val NAMESPACE_PREFIX = "n"
+    private val PREFIXES = arrayOf(
+        "-",
+        "~",
+        "tag:",
+        "weak:",
+    )
     private lateinit var tagGroups: TagGroups
     private val updateLock = Mutex()
     private val dbLock = Mutex()
@@ -101,22 +107,25 @@ object EhTagDatabase : CoroutineScope {
         translate: Boolean,
         exactly: Boolean = false,
     ): Flow<Pair<String?, String>> = flow {
-        val keywordPrefix = keyword.substringBefore(':')
-        val keywordTag = keyword.drop(keywordPrefix.length + 1)
-        val prefix = namespaceToPrefix(keywordPrefix) ?: keywordPrefix
-        val tags = tagGroups[prefix.takeIf { keywordTag.isNotEmpty() && it != NAMESPACE_PREFIX }]
+        var mKeyword = keyword
+        PREFIXES.forEach { mKeyword = mKeyword.removePrefix(it) }
+        val prefix = keyword.dropLast(mKeyword.length)
+        val namespace = mKeyword.substringBefore(':')
+        val tagKeyword = mKeyword.drop(namespace.length + 1)
+        val namespacePrefix = namespaceToPrefix(namespace) ?: namespace
+        val tags = tagGroups[namespacePrefix.takeIf { tagKeyword.isNotEmpty() && it != NAMESPACE_PREFIX }]
         tags?.let {
-            internalSuggestFlow(it, keywordTag, translate, exactly).collect { (hint, tag) ->
-                emit(Pair(hint, "$prefix:$tag"))
+            internalSuggestFlow(it, tagKeyword, translate, exactly).collect { (hint, tag) ->
+                emit(Pair(hint, "$prefix$namespacePrefix:$tag"))
             }
-        } ?: tagGroups.forEach { (prefix, tags) ->
-            if (prefix != NAMESPACE_PREFIX) {
-                internalSuggestFlow(tags, keyword, translate, exactly).collect { (hint, tag) ->
-                    emit(Pair(hint, "$prefix:$tag"))
+        } ?: tagGroups.forEach { (namespacePrefix, tags) ->
+            if (namespacePrefix != NAMESPACE_PREFIX) {
+                internalSuggestFlow(tags, mKeyword, translate, exactly).collect { (hint, tag) ->
+                    emit(Pair(hint, "$prefix$namespacePrefix:$tag"))
                 }
             } else {
-                internalSuggestFlow(tags, keyword, translate, exactly).collect { (hint, tag) ->
-                    emit(Pair(hint, "$tag:"))
+                internalSuggestFlow(tags, mKeyword, translate, exactly).collect { (hint, namespacePrefix) ->
+                    emit(Pair(hint, "$prefix$namespacePrefix:"))
                 }
             }
         }
@@ -208,7 +217,9 @@ object EhTagDatabase : CoroutineScope {
                 val dir = AppConfig.getFilesDir("tag-translations")
                 val dataFile = File(dir, dataName).takeIf { it.exists() } ?: return
                 runSuspendCatching {
-                    tagGroups = JSONObject(dataFile.source().buffer().readString(StandardCharsets.UTF_8)).toTagGroups()
+                    tagGroups = JSONObject(
+                        dataFile.source().buffer().readString(StandardCharsets.UTF_8),
+                    ).toTagGroups()
                 }.onFailure {
                     it.printStackTrace()
                 }

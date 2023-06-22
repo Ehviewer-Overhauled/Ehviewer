@@ -263,11 +263,12 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         override fun onClick() {
             val edittext = binding.searchview.editText
             edittext.let {
-                val keywords = it.text.toString().substringBeforeLast(' ', "")
-                val keyword = wrapTagKeyword(mKeyword)
-                val newKeywords = if (keywords.isNotEmpty()) "$keywords $keyword " else "$keyword "
-                it.setText(newKeywords)
-                it.setSelection(newKeywords.length)
+                var keywords = it.text.toString().substringBeforeLast(' ', "")
+                if (keywords.isNotEmpty()) keywords += ' '
+                keywords += wrapTagKeyword(mKeyword)
+                if (!keywords.endsWith(':')) keywords += ' '
+                it.setText(keywords)
+                it.setSelection(keywords.length)
             }
         }
     }
