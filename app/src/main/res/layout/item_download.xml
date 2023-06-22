@@ -113,7 +113,7 @@
             android:layout_above="@id/actions"
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="4dp"
-            android:paddingRight="16dp" />
+            android:paddingEnd="16dp" />
 
         <ProgressBar
             android:id="@+id/progress_bar"

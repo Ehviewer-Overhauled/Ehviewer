@@ -21,7 +21,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -1055,7 +1054,7 @@ class DownloadsScene :
         override fun onClick(v: View) {
             context ?: return
             val text = mBuilder.text
-            if (TextUtils.isEmpty(text)) {
+            if (text.isEmpty()) {
                 mBuilder.setError(getString(R.string.label_text_is_empty))
             } else if (getString(R.string.default_download_label_name) == text) {
                 mBuilder.setError(getString(R.string.label_text_is_invalid))
@@ -1085,7 +1084,7 @@ class DownloadsScene :
         override fun onClick(v: View) {
             context ?: return
             val text = mBuilder.text
-            if (TextUtils.isEmpty(text)) {
+            if (text.isEmpty()) {
                 mBuilder.setError(getString(R.string.label_text_is_empty))
             } else if (getString(R.string.default_download_label_name) == text) {
                 mBuilder.setError(getString(R.string.label_text_is_invalid))

@@ -23,7 +23,6 @@ import android.os.Bundle
 import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.TextUtils
 import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -488,7 +487,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 var text = builder.text.trim { it <= ' ' }
 
                 // Check name empty
-                if (TextUtils.isEmpty(text)) {
+                if (text.isEmpty()) {
                     withUIContext {
                         builder.setError(getString(R.string.name_is_empty))
                     }

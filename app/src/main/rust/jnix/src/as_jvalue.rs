@@ -2,11 +2,11 @@ use jni::objects::{AutoLocal, JValue};
 
 /// Returns a value as its [`JValue`] representation.
 ///
-/// [`JValue`]: jni::objects::JValue
+/// [`JValue`]: JValue
 pub trait AsJValue<'env> {
     /// Returns the [`JValue`] representation of the type.
     ///
-    /// [`JValue`]: jni::objects::JValue
+    /// [`JValue`]: JValue
     fn as_jvalue<'borrow>(&'borrow self) -> JValue<'borrow>
     where
         'env: 'borrow;

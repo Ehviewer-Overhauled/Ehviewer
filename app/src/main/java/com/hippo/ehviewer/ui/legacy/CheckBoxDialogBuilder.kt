@@ -20,7 +20,7 @@ import android.view.LayoutInflater
 import android.widget.CheckBox
 import com.hippo.ehviewer.R
 
-class CheckBoxDialogBuilder constructor(
+class CheckBoxDialogBuilder(
     context: Context,
     message: String?,
     checkText: String?,

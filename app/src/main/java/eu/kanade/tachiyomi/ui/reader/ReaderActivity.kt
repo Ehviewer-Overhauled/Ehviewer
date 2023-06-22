@@ -35,7 +35,6 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -397,7 +396,7 @@ class ReaderActivity : EhActivity() {
         var mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
             MimeTypeMap.getFileExtensionFromUrl(filename),
         )
-        if (TextUtils.isEmpty(mimeType)) {
+        if (mimeType.isNullOrEmpty()) {
             mimeType = "image/jpeg"
         }
 
@@ -482,7 +481,7 @@ class ReaderActivity : EhActivity() {
         var mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
             MimeTypeMap.getFileExtensionFromUrl(filename),
         )
-        if (TextUtils.isEmpty(mimeType)) {
+        if (mimeType.isNullOrEmpty()) {
             mimeType = "image/jpeg"
         }
 

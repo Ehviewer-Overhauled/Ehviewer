@@ -209,7 +209,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
     }
 
-    private inner class SuggestionAdapter constructor(private val mInflater: LayoutInflater) :
+    private inner class SuggestionAdapter(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<SuggestionHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionHolder {
@@ -246,7 +246,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
     }
 
-    inner class TagSuggestion constructor(
+    inner class TagSuggestion(
         private var mHint: String?,
         private var mKeyword: String,
     ) :
@@ -272,7 +272,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
     }
 
-    inner class KeywordSuggestion constructor(private val mKeyword: String) : Suggestion() {
+    inner class KeywordSuggestion(private val mKeyword: String) : Suggestion() {
 
         override fun getText(textView: TextView): CharSequence? {
             return if (textView.id == android.R.id.text1) {

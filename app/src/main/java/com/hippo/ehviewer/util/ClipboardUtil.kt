@@ -23,7 +23,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.os.PersistableBundle
-import android.text.TextUtils
 import android.view.textclassifier.TextClassifier
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.MainActivity
@@ -64,5 +63,5 @@ fun ClipboardManager.getUrlFromClipboard(context: Context): String? {
     }
     val item = primaryClip?.getItemAt(0)
     val string = item?.coerceToText(context).toString()
-    return if (!TextUtils.isEmpty(string)) string else null
+    return string.ifEmpty { null }
 }

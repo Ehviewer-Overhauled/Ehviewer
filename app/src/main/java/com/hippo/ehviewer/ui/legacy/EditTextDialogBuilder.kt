@@ -26,7 +26,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.textfield.TextInputLayout
 import com.hippo.ehviewer.R
 
-class EditTextDialogBuilder constructor(
+class EditTextDialogBuilder(
     context: Context,
     text: String?,
     hint: String?,

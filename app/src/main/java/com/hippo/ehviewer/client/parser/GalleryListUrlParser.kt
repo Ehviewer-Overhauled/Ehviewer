@@ -17,7 +17,6 @@ package com.hippo.ehviewer.client.parser
 
 import android.net.Uri
 import android.os.Build
-import android.text.TextUtils
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import java.io.UnsupportedEncodingException
@@ -87,7 +86,7 @@ object GalleryListUrlParser {
                 return null
             }
         }
-        if (TextUtils.isEmpty(uploader)) {
+        if (uploader.isNullOrEmpty()) {
             return null
         }
         val builder = ListUrlBuilder()
@@ -116,7 +115,7 @@ object GalleryListUrlParser {
                 return null
             }
         }
-        if (TextUtils.isEmpty(tag)) {
+        if (tag.isNullOrEmpty()) {
             return null
         }
         val builder = ListUrlBuilder()
@@ -128,7 +127,7 @@ object GalleryListUrlParser {
     // TODO get page
     private fun parseToplist(path: String): ListUrlBuilder? {
         val uri = Uri.parse(path)
-        if (uri == null || TextUtils.isEmpty(uri.getQueryParameter("tl"))) {
+        if (uri == null || uri.getQueryParameter("tl").isNullOrEmpty()) {
             return null
         }
         val tl = uri.getQueryParameter("tl")!!.toInt()
