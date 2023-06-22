@@ -13,408 +13,382 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
-
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
-import android.os.Build;
-import android.os.ParcelFileDescriptor;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.os.ParcelFileDescriptor
+import java.io.File
 
 /**
- * In Android files can be accessed via {@link java.io.File} and {@link android.net.Uri}.
+ * In Android files can be accessed via [java.io.File] and [android.net.Uri].
  * The UniFile is designed to emulate File interface for both File and Uri.
  */
-public abstract class UniFile {
-
-    private static List<UriHandler> sUriHandlerArray;
-
-    private final UniFile mParent;
-
-    UniFile(UniFile parent) {
-        mParent = parent;
-    }
-
-    /**
-     * Add a UriHandler to get UniFile from uri
-     */
-    public static void addUriHandler(@NonNull UriHandler handler) {
-        if (sUriHandlerArray == null) {
-            sUriHandlerArray = new ArrayList<>();
-        }
-        sUriHandlerArray.add(handler);
-    }
-
-    /**
-     * Remove the UriHandler added before
-     */
-    public static void removeUriHandler(UriHandler handler) {
-        if (sUriHandlerArray != null) {
-            sUriHandlerArray.remove(handler);
-        }
-    }
-
-    /**
-     * Create a {@link UniFile} representing the given {@link File}.
-     *
-     * @param file the file to wrap
-     * @return the {@link UniFile} representing the given {@link File}.
-     */
-    @Nullable
-    public static UniFile fromFile(@Nullable File file) {
-        return file != null ? new RawFile(null, file) : null;
-    }
-
-    /**
-     * Create a {@link UniFile} representing the single document at the
-     * given {@link Uri}. This is only useful on devices running
-     * {@link android.os.Build.VERSION_CODES#KITKAT} or later, and will return
-     * {@code null} when called on earlier platform versions.
-     *
-     * @param singleUri the {@link Intent#getData()} from a successful
-     *                  {@link Intent#ACTION_OPEN_DOCUMENT} or
-     *                  {@link Intent#ACTION_CREATE_DOCUMENT} request.
-     * @return the {@link UniFile} representing the given {@link Uri}.
-     */
-    public static UniFile fromSingleUri(Context context, Uri singleUri) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 19) {
-            return new SingleDocumentFile(null, context, singleUri);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Create a {@link UniFile} representing the document tree rooted at
-     * the given {@link Uri}. This is only useful on devices running
-     * {@link Build.VERSION_CODES#LOLLIPOP} or later, and will return
-     * {@code null} when called on earlier platform versions.
-     *
-     * @param treeUri the {@link Intent#getData()} from a successful
-     *                {@link Intent#ACTION_OPEN_DOCUMENT_TREE} request.
-     * @return the {@link UniFile} representing the given {@link Uri}.
-     */
-    public static UniFile fromTreeUri(Context context, Uri treeUri) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 21) {
-            return new TreeDocumentFile(null, context,
-                    DocumentsContractApi21.prepareTreeUri(treeUri));
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Create a {@link UniFile} representing the media file rooted at
-     * the given {@link Uri}.
-     *
-     * @param mediaUri the media uri to wrap
-     * @return the {@link UniFile} representing the given {@link Uri}.
-     */
-    public static UniFile fromMediaUri(Context context, Uri mediaUri) {
-        return new MediaFile(context, mediaUri);
-    }
-
-    /**
-     * Create a {@link UniFile} representing the given {@link Uri}.
-     */
-    public static UniFile fromUri(Context context, Uri uri) {
-        if (context == null || uri == null) {
-            return null;
-        }
-
-        // Custom handler
-        if (sUriHandlerArray != null) {
-            for (int i = 0, size = sUriHandlerArray.size(); i < size; i++) {
-                UniFile file = sUriHandlerArray.get(i).fromUri(context, uri);
-                if (file != null) {
-                    return file;
-                }
-            }
-        }
-
-        if (isFileUri(uri)) {
-            return fromFile(new File(uri.getPath()));
-        } else if (isDocumentUri(context, uri)) {
-            if (isTreeUri(uri)) {
-                return fromTreeUri(context, uri);
-            } else {
-                return fromSingleUri(context, uri);
-            }
-        } else if (MediaFile.isMediaUri(context, uri)) {
-            return new MediaFile(context, uri);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Test if given Uri is FileUri
-     */
-    public static boolean isFileUri(Uri uri) {
-        return uri != null && ContentResolver.SCHEME_FILE.equals(uri.getScheme());
-    }
-
-    /**
-     * Test if given Uri is backed by a
-     * {@link android.provider.DocumentsProvider}.
-     */
-    public static boolean isDocumentUri(Context context, Uri uri) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 19) {
-            return DocumentsContractApi19.isDocumentUri(context, uri);
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Test if given Uri is TreeUri
-     */
-    public static boolean isTreeUri(Uri uri) {
-        if (uri == null) {
-            return false;
-        }
-        final List<String> paths = uri.getPathSegments();
-        return (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())
-                && paths.size() >= 2 && "tree".equals(paths.get(0)));
-    }
-
+abstract class UniFile internal constructor(private val parent: UniFile?) {
     /**
      * Create a new file as a direct child of this directory.
      *
      * @param displayName name of new file
      * @return file representing newly created document, or null if failed
-     * @see android.provider.DocumentsContract#createDocument(ContentResolver,
-     * Uri, String, String)
+     * @see android.provider.DocumentsContract.createDocument
      */
-    public abstract UniFile createFile(String displayName);
+    abstract fun createFile(displayName: String): UniFile?
 
     /**
      * Create a new directory as a direct child of this directory.
      *
      * @param displayName name of new directory
      * @return file representing newly created directory, or null if failed
-     * @see android.provider.DocumentsContract#createDocument(ContentResolver,
-     * Uri, String, String)
+     * @see android.provider.DocumentsContract.createDocument
      */
-    public abstract UniFile createDirectory(String displayName);
+    abstract fun createDirectory(displayName: String): UniFile?
 
     /**
      * Return a Uri for the underlying document represented by this file. This
      * can be used with other platform APIs to manipulate or share the
-     * underlying content. You can use {@link #isTreeUri(Uri)} to
+     * underlying content. You can use [.isTreeUri] to
      * test if the returned Uri is backed by a
-     * {@link android.provider.DocumentsProvider}.
+     * [android.provider.DocumentsProvider].
      *
      * @return uri of the file
-     * @see Intent#setData(Uri)
-     * @see Intent#setClipData(android.content.ClipData)
-     * @see ContentResolver#openInputStream(Uri)
-     * @see ContentResolver#openOutputStream(Uri)
-     * @see ContentResolver#openFileDescriptor(Uri, String)
+     * @see Intent.setData
+     * @see Intent.setClipData
+     * @see ContentResolver.openInputStream
+     * @see ContentResolver.openOutputStream
+     * @see ContentResolver.openFileDescriptor
      */
-    @NonNull
-    public abstract Uri getUri();
+    abstract val uri: Uri
 
     /**
      * Return the display name of this file.
      *
      * @return name of the file, or null if failed
-     * @see android.provider.DocumentsContract.Document#COLUMN_DISPLAY_NAME
+     * @see android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME
      */
-    @Nullable
-    public abstract String getName();
+    abstract val name: String?
 
     /**
      * Return the MIME type of this file.
      *
      * @return MIME type of the file, or null if failed
-     * @see android.provider.DocumentsContract.Document#COLUMN_MIME_TYPE
+     * @see android.provider.DocumentsContract.Document.COLUMN_MIME_TYPE
      */
-    @Nullable
-    public abstract String getType();
+    abstract val type: String?
 
     /**
      * Return the parent file of this file. Only defined inside of the
      * user-selected tree; you can never escape above the top of the tree.
-     * <p>
-     * The underlying {@link android.provider.DocumentsProvider} only defines a
+     *
+     *
+     * The underlying [android.provider.DocumentsProvider] only defines a
      * forward mapping from parent to child, so the reverse mapping of child to
      * parent offered here is purely a convenience method, and it may be
      * incorrect if the underlying tree structure changes.
      *
      * @return parent of the file, or null if it is the top of the file tree
      */
-    @Nullable
-    public UniFile getParentFile() {
-        return mParent;
-    }
+    val parentFile: UniFile?
+        get() = parent
 
     /**
-     * Indicates if this file represents a <em>directory</em>.
+     * Indicates if this file represents a *directory*.
      *
-     * @return {@code true} if this file is a directory, {@code false}
+     * @return `true` if this file is a directory, `false`
      * otherwise.
-     * @see android.provider.DocumentsContract.Document#MIME_TYPE_DIR
+     * @see android.provider.DocumentsContract.Document.MIME_TYPE_DIR
      */
-    public abstract boolean isDirectory();
+    abstract val isDirectory: Boolean
 
     /**
-     * Indicates if this file represents a <em>file</em>.
+     * Indicates if this file represents a *file*.
      *
-     * @return {@code true} if this file is a file, {@code false} otherwise.
-     * @see android.provider.DocumentsContract.Document#COLUMN_MIME_TYPE
+     * @return `true` if this file is a file, `false` otherwise.
+     * @see android.provider.DocumentsContract.Document.COLUMN_MIME_TYPE
      */
-    public abstract boolean isFile();
+    abstract val isFile: Boolean
 
     /**
      * Returns the time when this file was last modified, measured in
      * milliseconds since January 1st, 1970, midnight. Returns -1 if the file
      * does not exist, or if the modified time is unknown.
      *
-     * @return the time when this file was last modified, <code>-1L</code> if can't get it
-     * @see android.provider.DocumentsContract.Document#COLUMN_LAST_MODIFIED
+     * @return the time when this file was last modified, `-1L` if can't get it
+     * @see android.provider.DocumentsContract.Document.COLUMN_LAST_MODIFIED
      */
-    public abstract long lastModified();
+    abstract fun lastModified(): Long
 
     /**
      * Returns the length of this file in bytes. Returns -1 if the file does not
      * exist, or if the length is unknown. The result for a directory is not
      * defined.
      *
-     * @return the number of bytes in this file, <code>-1L</code> if can't get it
-     * @see android.provider.DocumentsContract.Document#COLUMN_SIZE
+     * @return the number of bytes in this file, `-1L` if can't get it
+     * @see android.provider.DocumentsContract.Document.COLUMN_SIZE
      */
-    public abstract long length();
+    abstract fun length(): Long
 
     /**
      * Indicates whether the current context is allowed to read from this file.
      *
-     * @return {@code true} if this file can be read, {@code false} otherwise.
+     * @return `true` if this file can be read, `false` otherwise.
      */
-    public abstract boolean canRead();
+    abstract fun canRead(): Boolean
 
     /**
      * Indicates whether the current context is allowed to write to this file.
      *
-     * @return {@code true} if this file can be written, {@code false}
+     * @return `true` if this file can be written, `false`
      * otherwise.
-     * @see android.provider.DocumentsContract.Document#COLUMN_FLAGS
-     * @see android.provider.DocumentsContract.Document#FLAG_SUPPORTS_DELETE
-     * @see android.provider.DocumentsContract.Document#FLAG_SUPPORTS_WRITE
-     * @see android.provider.DocumentsContract.Document#FLAG_DIR_SUPPORTS_CREATE
+     * @see android.provider.DocumentsContract.Document.COLUMN_FLAGS
+     *
+     * @see android.provider.DocumentsContract.Document.FLAG_SUPPORTS_DELETE
+     *
+     * @see android.provider.DocumentsContract.Document.FLAG_SUPPORTS_WRITE
+     *
+     * @see android.provider.DocumentsContract.Document.FLAG_DIR_SUPPORTS_CREATE
      */
-    public abstract boolean canWrite();
+    abstract fun canWrite(): Boolean
 
     /**
      * It works like mkdirs, but it will return true if the UniFile is directory
      *
-     * @return {@code true} if the directory was created
+     * @return `true` if the directory was created
      * or if the directory already existed.
      */
-    public abstract boolean ensureDir();
+    abstract fun ensureDir(): Boolean
 
     /**
      * Make sure the UniFile is file
      *
-     * @return {@code true} if the file can be created
+     * @return `true` if the file can be created
      * or if the file already existed.
      */
-    public abstract boolean ensureFile();
+    abstract fun ensureFile(): Boolean
 
     /**
      * Get child file of this directory, the child might not exist.
      *
-     * @return the child file, {@code null} if not supported
+     * @return the child file, `null` if not supported
      */
-    @Nullable
-    public abstract UniFile subFile(String displayName);
+    abstract fun subFile(displayName: String): UniFile?
 
     /**
      * Deletes this file.
-     * <p>
-     * Note that this method does <i>not</i> throw {@code IOException} on
+     *
+     *
+     * Note that this method does *not* throw `IOException` on
      * failure. Callers must check the return value.
      *
-     * @return {@code true} if this file was deleted, {@code false} otherwise.
-     * @see android.provider.DocumentsContract#deleteDocument(ContentResolver,
-     * Uri)
+     * @return `true` if this file was deleted, `false` otherwise.
+     * @see android.provider.DocumentsContract.deleteDocument
      */
-    public abstract boolean delete();
+    abstract fun delete(): Boolean
 
     /**
      * Returns a boolean indicating whether this file can be found.
      *
-     * @return {@code true} if this file exists, {@code false} otherwise.
+     * @return `true` if this file exists, `false` otherwise.
      */
-    public abstract boolean exists();
+    abstract fun exists(): Boolean
 
     /**
      * Returns an array of files contained in the directory represented by this
      * file.
      *
-     * @return an array of files or {@code null}.
-     * @see android.provider.DocumentsContract#buildChildDocumentsUriUsingTree(Uri,
-     * String)
+     * @return an array of files or `null`.
+     * @see android.provider.DocumentsContract.buildChildDocumentsUriUsingTree
      */
-    @Nullable
-    public abstract UniFile[] listFiles();
+    abstract fun listFiles(): Array<UniFile>?
 
     /**
      * Gets a list of the files in the directory represented by this file. This
      * list is then filtered through a FilenameFilter and the names of files
      * with matching names are returned as an array of strings.
      *
-     * @param filter the filter to match names against, may be {@code null}.
-     * @return an array of files or {@code null}.
+     * @param filter the filter to match names against, may be `null`.
+     * @return an array of files or `null`.
      */
-    @Nullable
-    public abstract UniFile[] listFiles(FilenameFilter filter);
+    abstract fun listFiles(filter: FilenameFilter?): Array<UniFile>?
 
     /**
      * Test there is a file with the display name in the directory.
      *
-     * @return the file if found it, or {@code null}.
+     * @return the file if found it, or `null`.
      */
-    @Nullable
-    public abstract UniFile findFile(String displayName);
+    abstract fun findFile(displayName: String): UniFile?
 
     /**
-     * Renames this file to {@code displayName}.
-     * <p>
-     * Note that this method does <i>not</i> throw {@code IOException} on
+     * Renames this file to `displayName`.
+     *
+     *
+     * Note that this method does *not* throw `IOException` on
      * failure. Callers must check the return value.
-     * <p>
+     *
+     *
      * Some providers may need to create a new file to reflect the rename,
-     * potentially with a different MIME type, so {@link #getUri()} and
-     * {@link #getType()} may change to reflect the rename.
-     * <p>
+     * potentially with a different MIME type, so [.getUri] and
+     * [.getType] may change to reflect the rename.
+     *
+     *
      * When renaming a directory, children previously enumerated through
-     * {@link #listFiles()} may no longer be valid.
+     * [.listFiles] may no longer be valid.
      *
      * @param displayName the new display name.
      * @return true on success.
-     * @see android.provider.DocumentsContract#renameDocument(ContentResolver,
-     * Uri, String)
+     * @see android.provider.DocumentsContract.renameDocument
      */
-    public abstract boolean renameTo(String displayName);
+    abstract fun renameTo(displayName: String): Boolean
+    abstract val imageSource: ImageDecoder.Source
 
-    @NonNull
-    public abstract ImageDecoder.Source getImageSource();
+    abstract fun openFileDescriptor(mode: String): ParcelFileDescriptor
 
-    @NonNull
-    public abstract ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException;
+    companion object {
+        private var sUriHandlerArray: MutableList<UriHandler>? = null
+
+        /**
+         * Add a UriHandler to get UniFile from uri
+         */
+        fun addUriHandler(handler: UriHandler) {
+            if (sUriHandlerArray == null) {
+                sUriHandlerArray = ArrayList()
+            }
+            sUriHandlerArray!!.add(handler)
+        }
+
+        /**
+         * Remove the UriHandler added before
+         */
+        fun removeUriHandler(handler: UriHandler) {
+            if (sUriHandlerArray != null) {
+                sUriHandlerArray!!.remove(handler)
+            }
+        }
+
+        /**
+         * Create a [UniFile] representing the given [File].
+         *
+         * @param file the file to wrap
+         * @return the [UniFile] representing the given [File].
+         */
+        fun fromFile(file: File?): UniFile? {
+            return if (file != null) RawFile(null, file) else null
+        }
+
+        /**
+         * Create a [UniFile] representing the single document at the
+         * given [Uri]. This is only useful on devices running
+         * [android.os.Build.VERSION_CODES.KITKAT] or later, and will return
+         * `null` when called on earlier platform versions.
+         *
+         * @param singleUri the [Intent.getData] from a successful
+         * [Intent.ACTION_OPEN_DOCUMENT] or
+         * [Intent.ACTION_CREATE_DOCUMENT] request.
+         * @return the [UniFile] representing the given [Uri].
+         */
+        fun fromSingleUri(context: Context, singleUri: Uri): UniFile? {
+            val version = Build.VERSION.SDK_INT
+            return if (version >= 19) {
+                SingleDocumentFile(null, context, singleUri)
+            } else {
+                null
+            }
+        }
+
+        /**
+         * Create a [UniFile] representing the document tree rooted at
+         * the given [Uri]. This is only useful on devices running
+         * [Build.VERSION_CODES.LOLLIPOP] or later, and will return
+         * `null` when called on earlier platform versions.
+         *
+         * @param treeUri the [Intent.getData] from a successful
+         * [Intent.ACTION_OPEN_DOCUMENT_TREE] request.
+         * @return the [UniFile] representing the given [Uri].
+         */
+        fun fromTreeUri(context: Context, treeUri: Uri): UniFile? {
+            val version = Build.VERSION.SDK_INT
+            return if (version >= 21) {
+                TreeDocumentFile(
+                    null,
+                    context,
+                    DocumentsContractApi21.prepareTreeUri(treeUri),
+                )
+            } else {
+                null
+            }
+        }
+
+        /**
+         * Create a [UniFile] representing the media file rooted at
+         * the given [Uri].
+         *
+         * @param mediaUri the media uri to wrap
+         * @return the [UniFile] representing the given [Uri].
+         */
+        fun fromMediaUri(context: Context, mediaUri: Uri): UniFile {
+            return MediaFile(context, mediaUri)
+        }
+
+        /**
+         * Create a [UniFile] representing the given [Uri].
+         */
+        fun fromUri(context: Context, uri: Uri): UniFile? {
+            // Custom handler
+            if (sUriHandlerArray != null) {
+                var i = 0
+                val size = sUriHandlerArray!!.size
+                while (i < size) {
+                    val file = sUriHandlerArray!![i].fromUri(context, uri)
+                    if (file != null) {
+                        return file
+                    }
+                    i++
+                }
+            }
+            return if (isFileUri(uri)) {
+                fromFile(File(uri.path!!))
+            } else if (isDocumentUri(context, uri)) {
+                if (isTreeUri(uri)) {
+                    fromTreeUri(context, uri)
+                } else {
+                    fromSingleUri(context, uri)
+                }
+            } else if (MediaFile.isMediaUri(context, uri)) {
+                MediaFile(context, uri)
+            } else {
+                null
+            }
+        }
+
+        /**
+         * Test if given Uri is FileUri
+         */
+        fun isFileUri(uri: Uri): Boolean {
+            return ContentResolver.SCHEME_FILE == uri.scheme
+        }
+
+        /**
+         * Test if given Uri is backed by a
+         * [android.provider.DocumentsProvider].
+         */
+        fun isDocumentUri(context: Context, uri: Uri): Boolean {
+            val version = Build.VERSION.SDK_INT
+            return if (version >= 19) {
+                DocumentsContractApi19.isDocumentUri(context, uri)
+            } else {
+                false
+            }
+        }
+
+        /**
+         * Test if given Uri is TreeUri
+         */
+        fun isTreeUri(uri: Uri): Boolean {
+            val paths = uri.pathSegments
+            return ContentResolver.SCHEME_CONTENT == uri.scheme && paths.size >= 2 && "tree" == paths[0]
+        }
+    }
 }

@@ -13,91 +13,92 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
+import android.content.Context
+import android.net.Uri
+import android.provider.DocumentsContract
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.DocumentsContract;
-
-import java.util.ArrayList;
-import java.util.List;
-
-final class DocumentsContractApi21 {
-    private static final String PATH_DOCUMENT = "document";
-    private static final String PATH_TREE = "tree";
-
-    private DocumentsContractApi21() {
-    }
-
-    public static Uri createFile(Context context, Uri self, String mimeType,
-                                 String displayName) {
-        try {
-            return DocumentsContract.createDocument(context.getContentResolver(), self, mimeType,
-                    displayName);
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-            return null;
+internal object DocumentsContractApi21 {
+    private const val PATH_DOCUMENT = "document"
+    private const val PATH_TREE = "tree"
+    fun createFile(context: Context, self: Uri, mimeType: String, displayName: String): Uri? {
+        return try {
+            DocumentsContract.createDocument(
+                context.contentResolver,
+                self,
+                mimeType,
+                displayName,
+            )
+        } catch (e: Throwable) {
+            Utils.throwIfFatal(e)
+            null
         }
     }
 
-    public static Uri createDirectory(Context context, Uri self, String displayName) {
-        return createFile(context, self, DocumentsContract.Document.MIME_TYPE_DIR, displayName);
+    fun createDirectory(context: Context, self: Uri, displayName: String): Uri? {
+        return createFile(context, self, DocumentsContract.Document.MIME_TYPE_DIR, displayName)
     }
 
-    public static Uri prepareTreeUri(Uri treeUri) {
-        return DocumentsContract.buildDocumentUriUsingTree(treeUri,
-                DocumentsContract.getTreeDocumentId(treeUri));
+    fun prepareTreeUri(treeUri: Uri?): Uri {
+        return DocumentsContract.buildDocumentUriUsingTree(
+            treeUri,
+            DocumentsContract.getTreeDocumentId(treeUri),
+        )
     }
 
-    public static String getTreeDocumentPath(Uri documentUri) {
-        final List<String> paths = documentUri.getPathSegments();
-        if (paths.size() >= 4 && PATH_TREE.equals(paths.get(0)) && PATH_DOCUMENT.equals(paths.get(2))) {
-            return paths.get(3);
+    fun getTreeDocumentPath(documentUri: Uri): String {
+        val paths = documentUri.pathSegments
+        if (paths.size >= 4 && PATH_TREE == paths[0] && PATH_DOCUMENT == paths[2]) {
+            return paths[3]
         }
-        throw new IllegalArgumentException("Invalid URI: " + documentUri);
+        throw IllegalArgumentException("Invalid URI: $documentUri")
     }
 
-    public static Uri buildChildUri(Uri uri, String displayName) {
-        return DocumentsContract.buildDocumentUriUsingTree(uri,
-                getTreeDocumentPath(uri) + "/" + displayName);
+    fun buildChildUri(uri: Uri, displayName: String): Uri {
+        return DocumentsContract.buildDocumentUriUsingTree(
+            uri,
+            getTreeDocumentPath(uri) + "/" + displayName,
+        )
     }
 
-    public static Uri[] listFiles(Context context, Uri self) {
-        final ContentResolver resolver = context.getContentResolver();
-        final Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(self,
-                DocumentsContract.getDocumentId(self));
-        final ArrayList<Uri> results = new ArrayList<>();
-
-        Cursor c = null;
-        try {
-            c = resolver.query(childrenUri, new String[]{
-                    DocumentsContract.Document.COLUMN_DOCUMENT_ID}, null, null, null);
-            if (null != c) {
-                while (c.moveToNext()) {
-                    final String documentId = c.getString(0);
-                    final Uri documentUri = DocumentsContract.buildDocumentUriUsingTree(self,
-                            documentId);
-                    results.add(documentUri);
+    fun listFiles(context: Context, self: Uri): Array<Uri> {
+        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+            self,
+            DocumentsContract.getDocumentId(self),
+        )
+        val results = ArrayList<Uri>()
+        runCatching {
+            context.contentResolver.query(
+                childrenUri,
+                arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID),
+                null,
+                null,
+                null,
+            ).use {
+                if (null != it) {
+                    while (it.moveToNext()) {
+                        val documentId = it.getString(0)
+                        val documentUri = DocumentsContract.buildDocumentUriUsingTree(
+                            self,
+                            documentId,
+                        )
+                        results.add(documentUri)
+                    }
                 }
             }
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-        } finally {
-            Utils.closeQuietly(c);
+        }.onFailure {
+            Utils.throwIfFatal(it)
         }
-
-        return results.toArray(new Uri[0]);
+        return results.toTypedArray<Uri>()
     }
 
-    public static Uri renameTo(Context context, Uri self, String displayName) {
-        try {
-            return DocumentsContract.renameDocument(context.getContentResolver(), self, displayName);
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-            return null;
+    fun renameTo(context: Context, self: Uri, displayName: String): Uri? {
+        return try {
+            DocumentsContract.renameDocument(context.contentResolver, self, displayName)
+        } catch (e: Throwable) {
+            Utils.throwIfFatal(e)
+            null
         }
     }
 }

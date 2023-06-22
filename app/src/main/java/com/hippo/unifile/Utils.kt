@@ -15,45 +15,13 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
-
-import android.database.Cursor;
-
-import androidx.annotation.NonNull;
-
-import java.io.Closeable;
-
-class Utils {
-
-    static void closeQuietly(Cursor c) {
-        if (c != null) {
-            try {
-                c.close();
-            } catch (Throwable e) {
-                throwIfFatal(e);
-            }
-        }
-    }
-
-    static void closeQuietly(Closeable is) {
-        if (is != null) {
-            try {
-                is.close();
-            } catch (Throwable e) {
-                throwIfFatal(e);
-            }
-        }
-    }
-
-    static void throwIfFatal(@NonNull Throwable t) {
+internal object Utils {
+    fun throwIfFatal(t: Throwable) {
         // values here derived from https://github.com/ReactiveX/RxJava/issues/748#issuecomment-32471495
-        if (t instanceof VirtualMachineError) {
-            throw (VirtualMachineError) t;
-        } else if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        } else if (t instanceof LinkageError) {
-            throw (LinkageError) t;
+        when (t) {
+            is VirtualMachineError, is ThreadDeath, is LinkageError -> throw t
         }
     }
 }

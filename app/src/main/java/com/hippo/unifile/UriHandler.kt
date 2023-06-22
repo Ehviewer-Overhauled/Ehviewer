@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.unifile
 
-package com.hippo.unifile;
+import android.content.Context
+import android.net.Uri
 
 /*
  * Created by Hippo on 8/16/2016.
  */
-
-import android.content.Context;
-import android.net.Uri;
-
 /**
  * A UriHandler is to get UniFile from custom uri for extensions
  */
-public interface UriHandler {
-
+interface UriHandler {
     /**
-     * Create a {@link UniFile} representing the uri
+     * Create a [UniFile] representing the uri
      */
-    UniFile fromUri(Context context, Uri uri);
+    fun fromUri(context: Context?, uri: Uri?): UniFile?
 }
