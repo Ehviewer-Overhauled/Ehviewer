@@ -27,7 +27,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:paddingLeft="?attr/listPreferredItemPaddingLeft"
+        android:paddingStart="?attr/listPreferredItemPaddingLeft"
         android:textAppearance="?attr/textAppearanceListItemSmall"
         android:textColor="?android:attr/textColorPrimary" />
 
@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:paddingRight="?attr/listPreferredItemPaddingRight"
+        android:paddingEnd="?attr/listPreferredItemPaddingRight"
         android:textAppearance="?attr/textAppearanceListItemSmall"
         android:textColor="?android:attr/textColorPrimary" />
 

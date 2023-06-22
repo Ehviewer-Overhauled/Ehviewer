@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
@@ -15,7 +15,7 @@ class SimpleRatingView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : AbstractComposeView(context, attrs, defStyle) {
-    var rating by mutableStateOf(0f)
+    var rating by mutableFloatStateOf(0f)
 
     @Composable
     override fun Content() {

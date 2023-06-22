@@ -19,9 +19,9 @@
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
     android:orientation="vertical"
-    android:paddingLeft="?attr/listPreferredItemPaddingLeft"
+    android:paddingStart="?attr/listPreferredItemPaddingLeft"
     android:paddingTop="8dp"
-    android:paddingRight="?attr/listPreferredItemPaddingRight"
+    android:paddingEnd="?attr/listPreferredItemPaddingRight"
     android:paddingBottom="8dp">
 
     <TextView

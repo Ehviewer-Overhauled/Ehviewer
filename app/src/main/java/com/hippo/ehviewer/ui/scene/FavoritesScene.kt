@@ -20,7 +20,6 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.res.Resources
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -265,7 +264,7 @@ class FavoritesScene :
             }
         }
         val keyword = mUrlBuilder!!.keyword
-        if (TextUtils.isEmpty(keyword)) {
+        if (keyword.isNullOrEmpty()) {
             if (favCatName != mOldFavCat) {
                 setSearchBarHint(getString(R.string.favorites_title, favCatName))
             }
@@ -622,7 +621,7 @@ class FavoritesScene :
             } else {
                 mHelper.onGetPageData(taskId, 1, 0, null, null, list)
             }
-            if (TextUtils.isEmpty(keyword)) {
+            if (keyword.isNullOrEmpty()) {
                 mFavLocalCount = list.size
                 Settings.favLocalCount = mFavLocalCount
                 if (mDrawerAdapter != null) {

@@ -69,12 +69,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:gravity="left|center_vertical"
+                android:gravity="start|center_vertical"
                 android:inputType="textMultiLine"
                 android:maxHeight="168dp"
                 android:minHeight="56dp"
                 android:textSize="16sp"
                 android:padding="@dimen/keyline_margin"
+                android:importantForAutofill="no"
                 android:textColor="?colorOnPrimaryContainer" />
 
             <ImageView
@@ -95,7 +96,7 @@
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingRight="@dimen/corner_fab_margin"
+        android:paddingEnd="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin"
         app:fitsSystemWindowsInsets="bottom">
 
