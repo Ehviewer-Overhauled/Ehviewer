@@ -38,7 +38,6 @@ infix fun Context.whisperClipboard(text: String?) {
     addTextToClipboard(text, true, false)
 }
 
-@JvmOverloads
 fun Context.addTextToClipboard(text: CharSequence?, isSensitive: Boolean, useToast: Boolean = false) {
     clipboardManager.apply {
         setPrimaryClip(

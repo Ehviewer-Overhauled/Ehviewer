@@ -5,8 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.Rect
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
-import java.lang.Exception
-import kotlin.Throws
 
 /**
  * Interface for image decoding classes.
@@ -21,7 +19,6 @@ interface Decoder {
      * @return Dimensions of the image.
      * @throws Exception if initialisation fails.
      */
-    @Throws(Exception::class)
     fun init(context: Context, provider: InputProvider): Point
 
     /**

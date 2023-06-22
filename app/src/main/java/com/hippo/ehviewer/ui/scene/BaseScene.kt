@@ -31,7 +31,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.MainActivity
 import rikka.core.res.resolveDrawable
 
@@ -204,7 +203,6 @@ abstract class BaseScene : Fragment() {
         get() = requireActivity().theme
 
     @SuppressLint("PrivateResource")
-    @JvmOverloads
     fun navigate(id: Int, args: Bundle?, singleTop: Boolean = false) {
         val options: NavOptions = NavOptions.Builder().setLaunchSingleTop(singleTop)
             .setEnterAnim(androidx.fragment.R.animator.fragment_open_enter)

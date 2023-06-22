@@ -141,7 +141,6 @@ object EhTagDatabase : CoroutineScope {
         it["reclass"] = "r"
     }
 
-    @JvmStatic
     fun namespaceToPrefix(namespace: String): String? {
         return NAMESPACE_TO_PREFIX[namespace]
     }

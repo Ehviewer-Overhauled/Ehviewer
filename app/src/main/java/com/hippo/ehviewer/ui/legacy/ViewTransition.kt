@@ -38,7 +38,6 @@ open class ViewTransition(vararg views: View) {
         mOnShowViewListener = listener
     }
 
-    @JvmOverloads
     fun showView(shownView: Int, animation: Boolean = true): Boolean {
         val views = mViews
         val length = views.size

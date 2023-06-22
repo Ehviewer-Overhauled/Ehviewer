@@ -29,42 +29,37 @@ import javax.net.ssl.SSLException
 object ExceptionUtils {
     fun getReadableString(e: Throwable): String {
         e.printStackTrace()
-        return if (e is MalformedURLException) {
-            appCtx.getString(R.string.error_invalid_url)
-        } else if (e is SocketTimeoutException) {
-            appCtx.getString(R.string.error_timeout)
-        } else if (e is UnknownHostException) {
-            appCtx.getString(R.string.error_unknown_host)
-        } else if (e is StatusCodeException) {
-            val sb = StringBuilder()
-            sb.append(appCtx.getString(R.string.error_bad_status_code, e.responseCode))
-            if (e.isIdentifiedResponseCode) {
-                sb.append(", ").append(e.message)
+        return when (e) {
+            is MalformedURLException -> appCtx.getString(R.string.error_invalid_url)
+            is SocketTimeoutException -> appCtx.getString(R.string.error_timeout)
+            is UnknownHostException -> appCtx.getString(R.string.error_unknown_host)
+            is StatusCodeException -> {
+                val sb = StringBuilder()
+                sb.append(appCtx.getString(R.string.error_bad_status_code, e.responseCode))
+                if (e.isIdentifiedResponseCode) {
+                    sb.append(", ").append(e.message)
+                }
+                sb.toString()
             }
-            sb.toString()
-        } else if (e is ProtocolException && e.message!!.startsWith("Too many follow-up requests:")) {
-            appCtx.getString(R.string.error_redirection)
-        } else if (e is ProtocolException || e is SocketException || e is SSLException) {
-            appCtx.getString(R.string.error_socket)
-        } else if (e is EhException) {
-            e.message!!
-        } else {
-            appCtx.getString(R.string.error_unknown)
+
+            is ProtocolException -> {
+                if (e.message!!.startsWith("Too many follow-up requests:")) {
+                    appCtx.getString(R.string.error_redirection)
+                } else {
+                    appCtx.getString(R.string.error_socket)
+                }
+            }
+
+            is SocketException, is SSLException -> appCtx.getString(R.string.error_socket)
+            is EhException -> e.message!!
+            else -> appCtx.getString(R.string.error_unknown)
         }
     }
 
     fun throwIfFatal(t: Throwable) {
         // values here derived from https://github.com/ReactiveX/RxJava/issues/748#issuecomment-32471495
         when (t) {
-            is VirtualMachineError -> {
-                throw t
-            }
-
-            is ThreadDeath -> {
-                throw t
-            }
-
-            is LinkageError -> {
+            is VirtualMachineError, is ThreadDeath, is LinkageError -> {
                 throw t
             }
         }

@@ -173,7 +173,6 @@ class SearchLayout @JvmOverloads constructor(
     }
 
     @SuppressLint("NonConstantResourceId")
-    @Throws(EhException::class)
     fun formatListUrlBuilder(urlBuilder: ListUrlBuilder, query: String?) {
         urlBuilder.reset()
         when (mSearchMode) {

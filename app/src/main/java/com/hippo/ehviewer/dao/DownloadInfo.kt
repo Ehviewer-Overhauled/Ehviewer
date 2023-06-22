@@ -8,39 +8,30 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 
 @Entity(tableName = "DOWNLOADS")
 class DownloadInfo() : BaseGalleryInfo() {
-    @JvmField
     @ColumnInfo(name = "STATE")
     var state = 0
 
-    @JvmField
     @ColumnInfo(name = "LEGACY")
     var legacy = 0
 
-    @JvmField
     @ColumnInfo(name = "TIME")
     var time: Long = 0
 
-    @JvmField
     @ColumnInfo(name = "LABEL")
     var label: String? = null
 
-    @JvmField
     @Ignore
     var speed: Long = 0
 
-    @JvmField
     @Ignore
     var remaining: Long = 0
 
-    @JvmField
     @Ignore
     var finished = 0
 
-    @JvmField
     @Ignore
     var downloaded = 0
 
-    @JvmField
     @Ignore
     var total = 0
 

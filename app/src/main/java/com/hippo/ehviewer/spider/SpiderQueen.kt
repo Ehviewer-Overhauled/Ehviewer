@@ -338,7 +338,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             ?: readFromCache(galleryInfo.gid)?.takeIf { it.gid == galleryInfo.gid && it.token == galleryInfo.token }
     }
 
-    @Throws(ParseException::class)
     private fun readPreviews(body: String, index: Int, spiderInfo: SpiderInfo) {
         spiderInfo.previewPages = parsePreviewPages(body)
         val (previewList, pageUrlList) = parsePreviewList(body)
@@ -436,7 +435,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         return state == STATE_FINISHED || state == STATE_FAILED
     }
 
-    @JvmOverloads
     fun updatePageState(index: Int, @State state: Int, error: String? = null) {
         var oldState: Int
         synchronized(mPageStateLock) {
@@ -503,7 +501,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         const val SPIDER_INFO_FILENAME = ".ehviewer"
         private val sQueenMap = LongSparseArray<SpiderQueen>()
 
-        @JvmStatic
         fun obtainSpiderQueen(galleryInfo: GalleryInfo, @Mode mode: Int): SpiderQueen {
             val gid = galleryInfo.gid
             return (sQueenMap[gid] ?: SpiderQueen(galleryInfo).also { sQueenMap[gid] = it }).apply {
@@ -512,7 +509,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             }
         }
 
-        @JvmStatic
         fun releaseSpiderQueen(queen: SpiderQueen, @Mode mode: Int) {
             queen.run {
                 clearMode(mode)

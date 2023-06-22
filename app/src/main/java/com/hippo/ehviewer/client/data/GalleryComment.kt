@@ -21,30 +21,17 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class GalleryComment(
     // 0 for uploader comment. can't vote
-    @JvmField
     var id: Long = 0,
-    @JvmField
     var score: Int = 0,
-    @JvmField
     var editable: Boolean = false,
-    @JvmField
     var voteUpAble: Boolean = false,
-    @JvmField
     var voteUpEd: Boolean = false,
-    @JvmField
     var voteDownAble: Boolean = false,
-    @JvmField
     var voteDownEd: Boolean = false,
-    @JvmField
     var uploader: Boolean = false,
-    @JvmField
     var voteState: String? = null,
-    @JvmField
     var time: Long = 0,
-    @JvmField
     var user: String? = null,
-    @JvmField
     var comment: String? = null,
-    @JvmField
     var lastEdited: Long = 0,
 ) : Parcelable

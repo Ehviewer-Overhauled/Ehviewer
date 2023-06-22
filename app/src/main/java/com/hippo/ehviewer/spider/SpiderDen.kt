@@ -40,7 +40,6 @@ import okhttp3.Response
 import okio.Buffer
 import okio.ForwardingSink
 import okio.sink
-import java.io.IOException
 import java.util.Locale
 import kotlin.io.path.readText
 import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
@@ -124,7 +123,6 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         return dir.createFile(perFilename(index, ext))
     }
 
-    @Throws(IOException::class)
     suspend fun makeHttpCallAndSaveImage(
         index: Int,
         url: String,
