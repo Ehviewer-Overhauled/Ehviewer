@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application") version "8.0.2" apply false
-    kotlin("android") version "1.9.0-Beta" apply false
+    kotlin("android") version "1.9.0-RC" apply false
     kotlin("plugin.serialization") version "1.9.0-RC" apply false
     id("com.google.devtools.ksp") version "1.9.0-RC-1.0.11" apply false
     id("com.mikepenz.aboutlibraries.plugin") version "10.7.0" apply false
