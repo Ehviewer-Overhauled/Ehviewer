@@ -65,7 +65,6 @@ object ArchiveParser {
         return result
     }
 
-    @Throws(NoHAtHClientException::class)
     fun parseArchiveUrl(body: String): String? {
         if (PATTERN_NEED_HATH_CLIENT.containsMatchIn(body)) throw NoHAtHClientException("No H@H client")
         return Jsoup.parse(body).selectFirst("#continue>a[href]")

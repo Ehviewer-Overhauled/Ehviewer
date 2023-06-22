@@ -205,6 +205,7 @@ class MainActivity : EhActivity() {
                 if (parent is Openable) {
                     parent.close()
                 } else {
+                    @SuppressLint("RestrictedApi")
                     val bottomSheetBehavior = NavigationUI.findBottomSheetBehavior(navigationView)
                     if (bottomSheetBehavior != null) {
                         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
@@ -235,7 +236,6 @@ class MainActivity : EhActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    @Throws(PackageManager.NameNotFoundException::class)
     private fun checkAppLinkVerify() {
         val manager = getSystemService(DomainVerificationManager::class.java)
         val userState = manager.getDomainVerificationUserState(packageName) ?: return
@@ -432,7 +432,6 @@ class MainActivity : EhActivity() {
         }
     }
 
-    @JvmOverloads
     fun showTip(@StringRes id: Int, length: Int, useToast: Boolean = false) {
         showTip(getString(id), length, useToast)
     }
@@ -440,7 +439,6 @@ class MainActivity : EhActivity() {
     /**
      * If activity is running, show snack bar, otherwise show toast
      */
-    @JvmOverloads
     fun showTip(message: CharSequence, length: Int, useToast: Boolean = false) {
         findViewById<View>(R.id.snackbar)?.takeUnless { useToast }?.apply {
             Snackbar.make(

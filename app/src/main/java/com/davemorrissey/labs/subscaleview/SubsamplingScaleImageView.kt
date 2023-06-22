@@ -31,7 +31,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.ArrayList
 import java.util.Locale
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -1713,7 +1712,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
      * @param sTarget target object for result. The same instance is also returned.
      * @return a coordinate representing the corresponding source coordinate. This is the same instance passed to the sTarget param.
      */
-    @JvmOverloads
     fun viewToSourceCoord(vx: Float, vy: Float, sTarget: PointF = PointF()): PointF? {
         if (vTranslate == null) {
             return null
@@ -1765,7 +1763,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
      * @param vTarget target object for result. The same instance is also returned.
      * @return view coordinates. This is the same instance passed to the vTarget param.
      */
-    @JvmOverloads
     fun sourceToViewCoord(sx: Float, sy: Float, vTarget: PointF = PointF()): PointF? {
         if (vTranslate == null) {
             return null

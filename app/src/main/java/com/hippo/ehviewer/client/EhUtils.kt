@@ -79,7 +79,6 @@ object EhUtils {
     val isExHentai: Boolean
         get() = Settings.gallerySite == EhUrl.SITE_EX
 
-    @JvmStatic
     fun getCategory(type: String?): Int {
         for (entry in CATEGORY_STRINGS) {
             for (str in entry.first)
@@ -122,7 +121,6 @@ object EhUtils {
         return Settings.needSignIn
     }
 
-    @JvmStatic
     fun getSuitableTitle(gi: GalleryInfo): String {
         return if (Settings.showJpnTitle) {
             if (TextUtils.isEmpty(gi.titleJpn)) gi.title else gi.titleJpn
@@ -145,7 +143,6 @@ object EhUtils {
         return title.ifEmpty { null }
     }
 
-    @JvmStatic
     fun handleThumbUrlResolution(url: String?): String? {
         if (null == url) {
             return null

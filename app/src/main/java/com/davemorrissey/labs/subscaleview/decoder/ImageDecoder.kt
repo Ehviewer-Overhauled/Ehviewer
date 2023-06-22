@@ -7,10 +7,7 @@ import android.graphics.Rect
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
 
-class ImageDecoder @JvmOverloads constructor(
-    private val cropBorders: Boolean,
-    bitmapConfig: Bitmap.Config? = null,
-) : Decoder {
+class ImageDecoder(private val cropBorders: Boolean, bitmapConfig: Bitmap.Config? = null) : Decoder {
     init {
         val globalBitmapConfig = SubsamplingScaleImageView.preferredBitmapConfig
     }
@@ -24,7 +21,6 @@ class ImageDecoder @JvmOverloads constructor(
      * @return Dimensions of the image.
      * @throws Exception if initialisation fails.
      */
-    @Throws(Exception::class)
     override fun init(context: Context, provider: InputProvider): Point {
         TODO()
     }

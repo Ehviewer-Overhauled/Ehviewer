@@ -542,7 +542,6 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
         private var sFinishedCount = 0
         private var sDownloadedCount = 0
 
-        @JvmStatic
         fun clear() {
             sFailedCount = 0
             sFinishedCount = 0

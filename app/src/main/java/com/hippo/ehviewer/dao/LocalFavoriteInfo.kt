@@ -7,7 +7,6 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 
 @Entity(tableName = "LOCAL_FAVORITES")
 class LocalFavoriteInfo() : BaseGalleryInfo() {
-    @JvmField
     @ColumnInfo(name = "TIME")
     var time: Long = 0
 

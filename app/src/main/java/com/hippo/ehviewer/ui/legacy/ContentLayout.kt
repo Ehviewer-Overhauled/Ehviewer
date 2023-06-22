@@ -607,7 +607,6 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         private val isContentShowing: Boolean
             get() = mViewTransition.shownViewIndex == 0
 
-        @JvmOverloads
         fun showProgressBar(animation: Boolean = true) {
             mViewTransition.showView(1, animation)
         }
@@ -689,7 +688,6 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
          * @param page the target page
          * @throws IndexOutOfBoundsException if page < 0 or page >= mPages
          */
-        @Throws(IndexOutOfBoundsException::class)
         fun goTo(page: Int) {
             if (page < 0 || page >= pages) {
                 throw IndexOutOfBoundsException("Page count is $pages, page is $page")

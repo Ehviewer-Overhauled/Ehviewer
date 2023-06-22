@@ -16,7 +16,7 @@ import splitties.init.appCtx
 import java.io.File
 
 @Serializable
-class SpiderInfo @JvmOverloads constructor(
+class SpiderInfo(
     val gid: Long,
 
     val pages: Int,

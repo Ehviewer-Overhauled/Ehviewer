@@ -81,7 +81,6 @@ object GalleryDetailParser {
         "<p>(And if you choose to ignore this warning, you lose all rights to complain about it in the future.)</p>"
     private const val PINING_STRING = "<p>This gallery is pining for the fjords.</p>"
 
-    @Throws(EhException::class)
     fun parse(body: String): GalleryDetail {
         if (body.contains(OFFENSIVE_STRING)) {
             throw OffensiveException()
@@ -107,7 +106,6 @@ object GalleryDetailParser {
         return galleryDetail
     }
 
-    @Throws(ParseException::class)
     private fun parseDetail(gd: GalleryDetail, d: Document, body: String) {
         PATTERN_DETAIL.find(body)?.apply {
             gd.gid = groupValues[1].toLongOrNull() ?: -1L
@@ -453,7 +451,6 @@ object GalleryDetailParser {
     /**
      * Parse preview pages with regular expressions
      */
-    @Throws(ParseException::class)
     fun parsePreviewPages(body: String): Int {
         return PATTERN_PREVIEW_PAGES.find(body)?.groupValues?.get(1)?.toIntOrNull()
             ?: throw ParseException("Parse preview page count error", body)
@@ -462,7 +459,6 @@ object GalleryDetailParser {
     /**
      * Parse pages with regular expressions
      */
-    @Throws(ParseException::class)
     fun parsePages(body: String): Int {
         return PATTERN_PAGES.find(body)?.groupValues?.get(1)?.toIntOrNull()
             ?: throw ParseException("Parse pages error", body)

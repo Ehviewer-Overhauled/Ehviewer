@@ -336,7 +336,6 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    @JvmOverloads
     fun addDownload(downloadInfoList: List<DownloadInfo>, notify: Boolean = true) {
         for (info in downloadInfoList) {
             if (containDownloadInfo(info.gid)) {

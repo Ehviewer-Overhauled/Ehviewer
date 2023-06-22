@@ -69,7 +69,6 @@ class Image private constructor(private val src: CloseableSource) {
 
         private val imageSearchMaxSize = appCtx.resources.getDimensionPixelOffset(R.dimen.image_search_max_size)
 
-        @JvmStatic
         val imageSearchDecoderSampleListener =
             ImageDecoder.OnHeaderDecodedListener { decoder, info, _ ->
                 decoder.setTargetSampleSize(
@@ -87,7 +86,6 @@ class Image private constructor(private val src: CloseableSource) {
             },
         )
 
-        @JvmStatic
         fun decode(src: CloseableSource): Image? {
             return runCatching {
                 Image(src)
