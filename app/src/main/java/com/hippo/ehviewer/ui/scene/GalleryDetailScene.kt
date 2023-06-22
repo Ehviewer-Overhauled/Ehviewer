@@ -165,6 +165,7 @@ import com.hippo.ehviewer.ui.tools.CrystalCard
 import com.hippo.ehviewer.ui.tools.FilledTertiaryIconButton
 import com.hippo.ehviewer.ui.tools.FilledTertiaryIconToggleButton
 import com.hippo.ehviewer.ui.tools.GalleryDetailRating
+import com.hippo.ehviewer.ui.tools.includeFontPadding
 import com.hippo.ehviewer.util.AppHelper
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.ReadableTime
@@ -1006,7 +1007,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     text = text,
                     modifier = modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                     color = MaterialTheme.colorScheme.onSurface.let { if (weak) it.copy(0.5F) else it },
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelLarge.includeFontPadding,
                 )
             }
         }
