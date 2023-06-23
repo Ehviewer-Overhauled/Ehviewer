@@ -229,7 +229,7 @@ dependencies {
 
     implementation("com.squareup.okio:okio-jvm:3.3.0")
 
-    implementation("com.mikepenz:aboutlibraries-core:10.7.0")
+    implementation("com.mikepenz:aboutlibraries-core:10.8.0")
 
     implementation("dev.chrisbanes.insetter:insetter:0.6.1") // Dead Dependency
     implementation("dev.rikka.rikkax.core:core-ktx:1.4.1")
