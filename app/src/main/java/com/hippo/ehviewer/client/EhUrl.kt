@@ -26,14 +26,14 @@ object EhUrl {
     const val DOMAIN_LOFI = "lofi.e-hentai.org"
     const val HOST_EX = "https://$DOMAIN_EX/"
     const val API_EX = HOST_EX + "api.php"
+    const val FAV_PATH = "favorites.php"
+    const val WATCHED_PATH = "watched"
     const val URL_UCONFIG_EX = HOST_EX + "uconfig.php"
     const val URL_MY_TAGS_EX = HOST_EX + "mytags"
-    const val URL_WATCHED_EX = HOST_EX + "watched"
     const val HOST_E = "https://$DOMAIN_E/"
     const val API_E = HOST_E + "api.php"
     const val URL_UCONFIG_E = HOST_E + "uconfig.php"
     const val URL_MY_TAGS_E = HOST_E + "mytags"
-    const val URL_WATCHED_E = HOST_E + "watched"
     const val API_SIGN_IN = "https://forums.e-hentai.org/index.php?act=Login&CODE=01"
     const val URL_POPULAR_E = "https://e-hentai.org/popular"
     const val URL_POPULAR_EX = "https://exhentai.org/popular"
@@ -113,26 +113,17 @@ object EhUrl {
             else -> URL_IMAGE_SEARCH_E
         }
 
-    val watchedUrl: String
-        get() = when (Settings.gallerySite) {
-            SITE_E -> URL_WATCHED_E
-            SITE_EX -> URL_WATCHED_EX
-            else -> URL_WATCHED_E
-        }
-
     fun getGalleryDetailUrl(gid: Long, token: String?): String {
         return getGalleryDetailUrl(gid, token, 0, false)
     }
 
-    fun getGalleryDetailUrl(gid: Long, token: String?, index: Int, allComment: Boolean) = httpsUrl {
-        host(domain)
+    fun getGalleryDetailUrl(gid: Long, token: String?, index: Int, allComment: Boolean) = ehUrl {
         addPathSegments("g/$gid/$token/")
         if (index != 0) addEncodedQueryParameter("p", index.toString())
         if (allComment) addEncodedQueryParameter("hc", 1.toString())
     }.toString()
 
-    fun getGalleryMultiPageViewerUrl(gid: Long, token: String) = httpsUrl {
-        host(domain)
+    fun getGalleryMultiPageViewerUrl(gid: Long, token: String) = ehUrl {
         addPathSegments("mpv/$gid/$token/")
     }.toString()
 
@@ -154,3 +145,4 @@ object EhUrl {
 }
 
 inline fun httpsUrl(builder: HttpUrl.Builder.() -> Unit) = HttpUrl.Builder().apply(builder).scheme("https").build()
+inline fun ehUrl(builder: HttpUrl.Builder.() -> Unit) = httpsUrl { apply(builder).host(EhUrl.domain) }

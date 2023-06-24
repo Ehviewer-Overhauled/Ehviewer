@@ -19,13 +19,12 @@ import android.os.Parcelable
 import androidx.annotation.IntDef
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.ehUrl
 import com.hippo.ehviewer.dao.QuickSearch
-import com.hippo.ehviewer.network.UrlBuilder
 import com.hippo.ehviewer.ui.legacy.AdvanceSearchTable
 import com.hippo.ehviewer.util.encodeUTF8
 import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import kotlinx.parcelize.Parcelize
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 
@@ -271,72 +270,66 @@ data class ListUrlBuilder(
 
     fun build(): String {
         return when (mode) {
-            MODE_NORMAL, MODE_SUBSCRIPTION -> {
-                val url: String = if (mode == MODE_NORMAL) {
-                    EhUrl.host
-                } else {
-                    EhUrl.watchedUrl
+            MODE_NORMAL, MODE_SUBSCRIPTION -> ehUrl {
+                if (mode == MODE_SUBSCRIPTION) addPathSegment(EhUrl.WATCHED_PATH)
+                if (category != EhUtils.NONE) {
+                    addEncodedQueryParameter("f_cats", (category.inv() and EhUtils.ALL_CATEGORY).toString())
                 }
-                val ub = UrlBuilder(url.toHttpUrl().newBuilder())
-                if (this.category != EhUtils.NONE) {
-                    ub.url.addEncodedQueryParameter("f_cats", (category.inv() and EhUtils.ALL_CATEGORY).toString())
-                }
-                hash?.let { ub.url.addEncodedQueryParameter("f_shash", it) }
-                mJumpTo?.let { ub.url.addEncodedQueryParameter("seek", it) }
-                mPrev?.let { ub.url.addEncodedQueryParameter("prev", it) }
-                mNext?.let { ub.url.addEncodedQueryParameter("next", it) }
+                hash?.let { addEncodedQueryParameter("f_shash", it) }
+                mJumpTo?.let { addEncodedQueryParameter("seek", it) }
+                mPrev?.let { addEncodedQueryParameter("prev", it) }
+                mNext?.let { addEncodedQueryParameter("next", it) }
                 // Search key
                 // the settings of ub:UrlBuilder may be overwritten by following Advance search
                 mKeyword?.split('|')?.forEachIndexed { idx, kwd ->
                     val keyword = kwd.trim { it <= ' ' }
                     when (idx) {
-                        0 -> keyword.takeIf { it.isNotEmpty() }?.let { ub.url.addEncodedQueryParameter("f_search", encodeUTF8(it)) }
+                        0 -> keyword.takeIf { it.isNotEmpty() }?.let { addEncodedQueryParameter("f_search", encodeUTF8(it)) }
 
                         else -> keyword.indexOf(':').takeIf { it >= 0 }?.run {
                             val key = keyword.substring(0, this).trim { it <= ' ' }
                             val value = keyword.substring(this + 1).trim { it <= ' ' }
-                            ub.url.addEncodedQueryParameter(key, encodeUTF8(value))
+                            addEncodedQueryParameter(key, encodeUTF8(value))
                         }
                     }
                 }
                 // Advance search
                 if (advanceSearch != -1) {
-                    ub.url.addEncodedQueryParameter("advsearch", "1")
+                    addEncodedQueryParameter("advsearch", "1")
                     if (advanceSearch and AdvanceSearchTable.SH != 0) {
-                        ub.url.addEncodedQueryParameter("f_sh", "on")
+                        addEncodedQueryParameter("f_sh", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.STO != 0) {
-                        ub.url.addEncodedQueryParameter("f_sto", "on")
+                        addEncodedQueryParameter("f_sto", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.SFL != 0) {
-                        ub.url.addEncodedQueryParameter("f_sfl", "on")
+                        addEncodedQueryParameter("f_sfl", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.SFU != 0) {
-                        ub.url.addEncodedQueryParameter("f_sfu", "on")
+                        addEncodedQueryParameter("f_sfu", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.SFT != 0) {
-                        ub.url.addEncodedQueryParameter("f_sft", "on")
+                        addEncodedQueryParameter("f_sft", "on")
                     }
                     // Set min star
                     if (minRating != -1) {
-                        ub.url.addEncodedQueryParameter("f_sr", "on")
-                        ub.url.addEncodedQueryParameter("f_srdd", minRating.toString())
+                        addEncodedQueryParameter("f_sr", "on")
+                        addEncodedQueryParameter("f_srdd", minRating.toString())
                     }
                     // Pages
                     if (pageFrom != -1 || pageTo != -1) {
-                        ub.url.addEncodedQueryParameter("f_sp", "on")
-                        ub.url.addEncodedQueryParameter(
+                        addEncodedQueryParameter("f_sp", "on")
+                        addEncodedQueryParameter(
                             "f_spf",
                             (if (pageFrom != -1) pageFrom.toString() else "").toString(),
                         )
-                        ub.url.addEncodedQueryParameter(
+                        addEncodedQueryParameter(
                             "f_spt",
                             (if (pageTo != -1) pageTo.toString() else "").toString(),
                         )
                     }
                 }
-                ub.url.toString()
-            }
+            }.toString()
 
             MODE_UPLOADER -> {
                 val sb = StringBuilder(EhUrl.host)

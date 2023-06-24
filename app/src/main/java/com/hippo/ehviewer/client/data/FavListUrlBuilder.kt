@@ -17,7 +17,7 @@ package com.hippo.ehviewer.client.data
 
 import android.os.Parcelable
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.client.httpsUrl
+import com.hippo.ehviewer.client.ehUrl
 import com.hippo.ehviewer.util.encodeUTF8
 import kotlinx.parcelize.Parcelize
 
@@ -34,9 +34,8 @@ class FavListUrlBuilder(
         mPrev = index.takeUnless { isNext }
     }
 
-    fun build() = httpsUrl {
-        host(EhUrl.domain)
-        addPathSegment("favorites.php")
+    fun build() = ehUrl {
+        addPathSegment(EhUrl.FAV_PATH)
         if (isValidFavCat(favCat)) {
             addEncodedQueryParameter("favcat", favCat.toString())
         } else if (favCat == FAV_CAT_ALL) {
