@@ -45,6 +45,7 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.httpsUrl
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.ItemDrawerFavoritesBinding
@@ -820,7 +821,10 @@ class FavoritesScene :
                     mModifyGiList.clear()
                     val url: String = if (local) {
                         // Local fav is shown now, but operation need be done for cloud fav
-                        EhUrl.favoritesUrl
+                        httpsUrl {
+                            host(EhUrl.domain)
+                            addPathSegments("favorites.php")
+                        }.toString()
                     } else {
                         mUrlBuilder!!.build()
                     }

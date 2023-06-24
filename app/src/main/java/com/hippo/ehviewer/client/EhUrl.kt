@@ -26,13 +26,11 @@ object EhUrl {
     const val DOMAIN_LOFI = "lofi.e-hentai.org"
     const val HOST_EX = "https://$DOMAIN_EX/"
     const val API_EX = HOST_EX + "api.php"
-    const val URL_FAVORITES_EX = HOST_EX + "favorites.php"
     const val URL_UCONFIG_EX = HOST_EX + "uconfig.php"
     const val URL_MY_TAGS_EX = HOST_EX + "mytags"
     const val URL_WATCHED_EX = HOST_EX + "watched"
     const val HOST_E = "https://$DOMAIN_E/"
     const val API_E = HOST_E + "api.php"
-    const val URL_FAVORITES_E = HOST_E + "favorites.php"
     const val URL_UCONFIG_E = HOST_E + "uconfig.php"
     const val URL_MY_TAGS_E = HOST_E + "mytags"
     const val URL_WATCHED_E = HOST_E + "watched"
@@ -64,13 +62,6 @@ object EhUrl {
             SITE_E -> DOMAIN_E
             SITE_EX -> DOMAIN_EX
             else -> HOST_E
-        }
-
-    val favoritesUrl: String
-        get() = when (Settings.gallerySite) {
-            SITE_E -> URL_FAVORITES_E
-            SITE_EX -> URL_FAVORITES_EX
-            else -> URL_FAVORITES_E
         }
 
     val apiUrl: String
@@ -162,4 +153,4 @@ object EhUrl {
     }
 }
 
-inline fun httpsUrl(builder: HttpUrl.Builder.() -> Unit) = HttpUrl.Builder().apply(builder).host("https").build()
+inline fun httpsUrl(builder: HttpUrl.Builder.() -> Unit) = HttpUrl.Builder().apply(builder).scheme("https").build()

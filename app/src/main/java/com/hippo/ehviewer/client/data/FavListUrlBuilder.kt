@@ -17,10 +17,9 @@ package com.hippo.ehviewer.client.data
 
 import android.os.Parcelable
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.network.UrlBuilder
+import com.hippo.ehviewer.client.httpsUrl
 import com.hippo.ehviewer.util.encodeUTF8
 import kotlinx.parcelize.Parcelize
-import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Parcelize
 class FavListUrlBuilder(
@@ -35,19 +34,19 @@ class FavListUrlBuilder(
         mPrev = index.takeUnless { isNext }
     }
 
-    fun build(): String {
-        val ub = UrlBuilder(EhUrl.favoritesUrl.toHttpUrl().newBuilder())
+    fun build() = httpsUrl {
+        host(EhUrl.domain)
+        addPathSegment("favorites.php")
         if (isValidFavCat(favCat)) {
-            ub.url.addEncodedQueryParameter("favcat", favCat.toString())
+            addEncodedQueryParameter("favcat", favCat.toString())
         } else if (favCat == FAV_CAT_ALL) {
-            ub.url.addEncodedQueryParameter("favcat", "all")
+            addEncodedQueryParameter("favcat", "all")
         }
-        keyword?.takeIf { it.isNotBlank() }?.let { ub.url.addEncodedQueryParameter("f_search", encodeUTF8(it)) }
-        mPrev?.takeIf { it.isNotEmpty() }?.let { ub.url.addEncodedQueryParameter("prev", it) }
-        mNext?.takeIf { it.isNotEmpty() }?.let { ub.url.addEncodedQueryParameter("next", it) }
-        jumpTo?.takeIf { it.isNotEmpty() }?.let { ub.url.addEncodedQueryParameter("seek", it) }
-        return ub.url.toString()
-    }
+        keyword?.takeIf { it.isNotBlank() }?.let { addEncodedQueryParameter("f_search", encodeUTF8(it)) }
+        mPrev?.takeIf { it.isNotEmpty() }?.let { addEncodedQueryParameter("prev", it) }
+        mNext?.takeIf { it.isNotEmpty() }?.let { addEncodedQueryParameter("next", it) }
+        jumpTo?.takeIf { it.isNotEmpty() }?.let { addEncodedQueryParameter("seek", it) }
+    }.toString()
 
     companion object {
         const val FAV_CAT_ALL = -1
