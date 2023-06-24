@@ -119,8 +119,8 @@ object EhUrl {
 
     fun getGalleryDetailUrl(gid: Long, token: String?, index: Int, allComment: Boolean) = ehUrl {
         addPathSegments("g/$gid/$token/")
-        if (index != 0) addEncodedQueryParameter("p", index.toString())
-        if (allComment) addEncodedQueryParameter("hc", 1.toString())
+        if (index != 0) addQueryParameter("p", "$index")
+        if (allComment) addQueryParameter("hc", "1")
     }.toString()
 
     fun getGalleryMultiPageViewerUrl(gid: Long, token: String) = ehUrl {
@@ -146,3 +146,6 @@ object EhUrl {
 
 inline fun httpsUrl(builder: HttpUrl.Builder.() -> Unit) = HttpUrl.Builder().apply(builder).scheme("https").build()
 inline fun ehUrl(builder: HttpUrl.Builder.() -> Unit) = httpsUrl { apply(builder).host(EhUrl.domain) }
+fun HttpUrl.Builder.addQueryParameterIfNotBlank(name: String, value: String?) = apply {
+    if (!value.isNullOrBlank()) addQueryParameter(name, value)
+}

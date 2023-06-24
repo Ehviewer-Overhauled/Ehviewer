@@ -19,6 +19,7 @@ import android.os.Parcelable
 import androidx.annotation.IntDef
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.addQueryParameterIfNotBlank
 import com.hippo.ehviewer.client.ehUrl
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.ui.legacy.AdvanceSearchTable
@@ -275,55 +276,55 @@ data class ListUrlBuilder(
                 if (category != EhUtils.NONE) {
                     addEncodedQueryParameter("f_cats", (category.inv() and EhUtils.ALL_CATEGORY).toString())
                 }
-                hash?.let { addEncodedQueryParameter("f_shash", it) }
-                mJumpTo?.let { addEncodedQueryParameter("seek", it) }
-                mPrev?.let { addEncodedQueryParameter("prev", it) }
-                mNext?.let { addEncodedQueryParameter("next", it) }
+                addQueryParameterIfNotBlank("f_shash", hash)
+                addQueryParameterIfNotBlank("prev", mPrev)
+                addQueryParameterIfNotBlank("next", mNext)
+                addQueryParameterIfNotBlank("seek", mJumpTo)
                 // Search key
                 // the settings of ub:UrlBuilder may be overwritten by following Advance search
                 mKeyword?.split('|')?.forEachIndexed { idx, kwd ->
                     val keyword = kwd.trim { it <= ' ' }
                     when (idx) {
-                        0 -> keyword.takeIf { it.isNotEmpty() }?.let { addEncodedQueryParameter("f_search", encodeUTF8(it)) }
+                        0 -> addQueryParameterIfNotBlank("f_search", keyword)
 
                         else -> keyword.indexOf(':').takeIf { it >= 0 }?.run {
                             val key = keyword.substring(0, this).trim { it <= ' ' }
                             val value = keyword.substring(this + 1).trim { it <= ' ' }
-                            addEncodedQueryParameter(key, encodeUTF8(value))
+                            addQueryParameterIfNotBlank(key, value)
                         }
                     }
                 }
                 // Advance search
                 if (advanceSearch != -1) {
-                    addEncodedQueryParameter("advsearch", "1")
+                    addQueryParameter("advsearch", "1")
                     if (advanceSearch and AdvanceSearchTable.SH != 0) {
-                        addEncodedQueryParameter("f_sh", "on")
+                        addQueryParameter("f_sh", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.STO != 0) {
-                        addEncodedQueryParameter("f_sto", "on")
+                        addQueryParameter("f_sto", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.SFL != 0) {
-                        addEncodedQueryParameter("f_sfl", "on")
+                        addQueryParameter("f_sfl", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.SFU != 0) {
-                        addEncodedQueryParameter("f_sfu", "on")
+                        addQueryParameter("f_sfu", "on")
                     }
                     if (advanceSearch and AdvanceSearchTable.SFT != 0) {
-                        addEncodedQueryParameter("f_sft", "on")
+                        addQueryParameter("f_sft", "on")
                     }
                     // Set min star
                     if (minRating != -1) {
-                        addEncodedQueryParameter("f_sr", "on")
-                        addEncodedQueryParameter("f_srdd", minRating.toString())
+                        addQueryParameter("f_sr", "on")
+                        addQueryParameter("f_srdd", "$minRating")
                     }
                     // Pages
                     if (pageFrom != -1 || pageTo != -1) {
-                        addEncodedQueryParameter("f_sp", "on")
-                        addEncodedQueryParameter(
+                        addQueryParameter("f_sp", "on")
+                        addQueryParameter(
                             "f_spf",
                             (if (pageFrom != -1) pageFrom.toString() else "").toString(),
                         )
-                        addEncodedQueryParameter(
+                        addQueryParameter(
                             "f_spt",
                             (if (pageTo != -1) pageTo.toString() else "").toString(),
                         )
