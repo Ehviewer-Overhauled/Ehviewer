@@ -17,6 +17,7 @@ package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.network.UrlBuilder
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 object EhUrl {
     const val SITE_E = 0
@@ -127,7 +128,7 @@ object EhUrl {
     }
 
     fun getGalleryDetailUrl(gid: Long, token: String?, index: Int, allComment: Boolean): String {
-        val builder = UrlBuilder(host + "g/" + gid + '/' + token + '/')
+        val builder = UrlBuilder((host + "g/" + gid + '/' + token + '/').toHttpUrl().newBuilder())
         if (index != 0) {
             builder.addQuery("p", index)
         }
@@ -138,7 +139,7 @@ object EhUrl {
     }
 
     fun getGalleryMultiPageViewerUrl(gid: Long, token: String): String {
-        val builder = UrlBuilder(host + "mpv/" + gid + '/' + token + '/')
+        val builder = UrlBuilder((host + "mpv/" + gid + '/' + token + '/').toHttpUrl().newBuilder())
         return builder.build()
     }
 

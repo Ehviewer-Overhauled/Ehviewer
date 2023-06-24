@@ -20,6 +20,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.network.UrlBuilder
 import com.hippo.ehviewer.util.encodeUTF8
 import kotlinx.parcelize.Parcelize
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Parcelize
 class FavListUrlBuilder(
@@ -35,7 +36,7 @@ class FavListUrlBuilder(
     }
 
     fun build(): String {
-        val ub = UrlBuilder(EhUrl.favoritesUrl)
+        val ub = UrlBuilder(EhUrl.favoritesUrl.toHttpUrl().newBuilder())
         if (isValidFavCat(favCat)) {
             ub.addQuery("favcat", favCat.toString())
         } else if (favCat == FAV_CAT_ALL) {

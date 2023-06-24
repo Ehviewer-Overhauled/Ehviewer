@@ -25,6 +25,7 @@ import com.hippo.ehviewer.ui.legacy.AdvanceSearchTable
 import com.hippo.ehviewer.util.encodeUTF8
 import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import kotlinx.parcelize.Parcelize
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 
@@ -276,7 +277,7 @@ data class ListUrlBuilder(
                 } else {
                     EhUrl.watchedUrl
                 }
-                val ub = UrlBuilder(url)
+                val ub = UrlBuilder(url.toHttpUrl().newBuilder())
                 if (this.category != EhUtils.NONE) {
                     ub.addQuery("f_cats", category.inv() and EhUtils.ALL_CATEGORY)
                 }

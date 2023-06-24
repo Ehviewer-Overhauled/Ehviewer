@@ -1,9 +1,9 @@
 package com.hippo.ehviewer.network
 
-import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl
 
-class UrlBuilder(mRootUrl: String) {
-    private val url = mRootUrl.toHttpUrl().newBuilder()
+@JvmInline
+value class UrlBuilder(val url: HttpUrl.Builder) {
     fun addQuery(key: String, value: Any) {
         url.addEncodedQueryParameter(key, value.toString())
     }
