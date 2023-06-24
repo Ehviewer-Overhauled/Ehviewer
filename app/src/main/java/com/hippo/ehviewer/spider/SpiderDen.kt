@@ -132,6 +132,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             cronetRequest(url) {
                 referer?.let { addHeader("Referer", it) }
+                disableCache()
             }.execute { info ->
                 val headers = info.allHeaders
                 val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"

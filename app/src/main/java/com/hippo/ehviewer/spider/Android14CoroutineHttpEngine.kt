@@ -5,6 +5,7 @@ import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import okio.Path.Companion.toOkioPath
 import org.chromium.net.CronetEngine
 import org.chromium.net.CronetException
 import org.chromium.net.UrlRequest
@@ -18,10 +19,10 @@ import kotlin.coroutines.resumeWithException
 private val pool = DirectByteBufferPool(32)
 
 val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
-    enableHttp2(true)
     enableBrotli(true)
-    enableHttpCache(CronetEngine.Builder.HTTP_CACHE_DISABLED, 0)
-    enableQuic(true)
+    val cache = (appCtx.cacheDir.toOkioPath() / "http_cache").toFile().apply { mkdirs() }
+    setStoragePath(cache.absolutePath)
+    enableHttpCache(CronetEngine.Builder.HTTP_CACHE_DISK_NO_HTTP, 100 * 1024)
 }.build()
 
 val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.executorService
