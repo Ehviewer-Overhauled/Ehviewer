@@ -92,20 +92,16 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
 
     val noCookies = stringResource(R.string.from_clipboard_error)
 
-    fun newCookie(name: String, value: String, domain: String): Cookie {
-        return Cookie.Builder().name(name).value(value).domain(domain).expiresAt(Long.MAX_VALUE)
-            .build()
-    }
+    fun newCookie(name: String, value: String, domain: String) = Cookie.Builder().name(name).value(value).domain(domain).expiresAt(Long.MAX_VALUE).build()
 
     fun storeCookie(id: String, hash: String, igneous: String) {
         EhUtils.signOut()
-        val store = EhCookieStore
-        store.addCookie(newCookie(EhCookieStore.KEY_IPB_MEMBER_ID, id, EhUrl.DOMAIN_E))
-        store.addCookie(newCookie(EhCookieStore.KEY_IPB_MEMBER_ID, id, EhUrl.DOMAIN_EX))
-        store.addCookie(newCookie(EhCookieStore.KEY_IPB_PASS_HASH, hash, EhUrl.DOMAIN_E))
-        store.addCookie(newCookie(EhCookieStore.KEY_IPB_PASS_HASH, hash, EhUrl.DOMAIN_EX))
-        if (igneous.isBlank()) return
-        store.addCookie(newCookie(EhCookieStore.KEY_IGNEOUS, igneous, EhUrl.DOMAIN_EX))
+        EhCookieStore.addCookie(newCookie(EhCookieStore.KEY_IPB_MEMBER_ID, id, EhUrl.DOMAIN_E))
+        EhCookieStore.addCookie(newCookie(EhCookieStore.KEY_IPB_MEMBER_ID, id, EhUrl.DOMAIN_EX))
+        EhCookieStore.addCookie(newCookie(EhCookieStore.KEY_IPB_PASS_HASH, hash, EhUrl.DOMAIN_E))
+        EhCookieStore.addCookie(newCookie(EhCookieStore.KEY_IPB_PASS_HASH, hash, EhUrl.DOMAIN_EX))
+        if (igneous.isNotBlank()) EhCookieStore.addCookie(newCookie(EhCookieStore.KEY_IGNEOUS, igneous, EhUrl.DOMAIN_EX))
+        EhCookieStore.flush()
     }
 
     fun login() {

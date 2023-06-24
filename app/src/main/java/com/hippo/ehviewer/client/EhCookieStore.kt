@@ -71,6 +71,8 @@ object EhCookieStore : CookieJar {
         if (EhUrl.DOMAIN_E in cookie.domain) manager.setCookie(EhUrl.HOST_E, cookie.toString()) else manager.setCookie(EhUrl.DOMAIN_EX, cookie.toString())
     }
 
+    fun flush() = manager.flush()
+
     fun getCookieHeader(url: HttpUrl): String {
         val cookies = get(url)
         val cookieHeader = StringBuilder()
