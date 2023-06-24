@@ -130,17 +130,17 @@ object EhUrl {
     fun getGalleryDetailUrl(gid: Long, token: String?, index: Int, allComment: Boolean): String {
         val builder = UrlBuilder((host + "g/" + gid + '/' + token + '/').toHttpUrl().newBuilder())
         if (index != 0) {
-            builder.addQuery("p", index)
+            builder.url.addEncodedQueryParameter("p", index.toString())
         }
         if (allComment) {
-            builder.addQuery("hc", 1)
+            builder.url.addEncodedQueryParameter("hc", 1.toString())
         }
-        return builder.build()
+        return builder.url.toString()
     }
 
     fun getGalleryMultiPageViewerUrl(gid: Long, token: String): String {
         val builder = UrlBuilder((host + "mpv/" + gid + '/' + token + '/').toHttpUrl().newBuilder())
-        return builder.build()
+        return builder.url.toString()
     }
 
     fun getPageUrl(gid: Long, index: Int, pToken: String): String {

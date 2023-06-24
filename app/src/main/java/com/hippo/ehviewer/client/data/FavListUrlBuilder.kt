@@ -38,15 +38,15 @@ class FavListUrlBuilder(
     fun build(): String {
         val ub = UrlBuilder(EhUrl.favoritesUrl.toHttpUrl().newBuilder())
         if (isValidFavCat(favCat)) {
-            ub.addQuery("favcat", favCat.toString())
+            ub.url.addEncodedQueryParameter("favcat", favCat.toString())
         } else if (favCat == FAV_CAT_ALL) {
-            ub.addQuery("favcat", "all")
+            ub.url.addEncodedQueryParameter("favcat", "all")
         }
-        keyword?.takeIf { it.isNotBlank() }?.let { ub.addQuery("f_search", encodeUTF8(it)) }
-        mPrev?.takeIf { it.isNotEmpty() }?.let { ub.addQuery("prev", it) }
-        mNext?.takeIf { it.isNotEmpty() }?.let { ub.addQuery("next", it) }
-        jumpTo?.takeIf { it.isNotEmpty() }?.let { ub.addQuery("seek", it) }
-        return ub.build()
+        keyword?.takeIf { it.isNotBlank() }?.let { ub.url.addEncodedQueryParameter("f_search", encodeUTF8(it)) }
+        mPrev?.takeIf { it.isNotEmpty() }?.let { ub.url.addEncodedQueryParameter("prev", it) }
+        mNext?.takeIf { it.isNotEmpty() }?.let { ub.url.addEncodedQueryParameter("next", it) }
+        jumpTo?.takeIf { it.isNotEmpty() }?.let { ub.url.addEncodedQueryParameter("seek", it) }
+        return ub.url.toString()
     }
 
     companion object {
