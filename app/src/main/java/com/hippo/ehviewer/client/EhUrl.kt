@@ -17,6 +17,7 @@ package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.network.UrlBuilder
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 object EhUrl {
@@ -57,6 +58,13 @@ object EhUrl {
         get() = when (Settings.gallerySite) {
             SITE_E -> HOST_E
             SITE_EX -> HOST_EX
+            else -> HOST_E
+        }
+
+    val domain: String
+        get() = when (Settings.gallerySite) {
+            SITE_E -> DOMAIN_E
+            SITE_EX -> DOMAIN_EX
             else -> HOST_E
         }
 
@@ -127,16 +135,17 @@ object EhUrl {
         return getGalleryDetailUrl(gid, token, 0, false)
     }
 
-    fun getGalleryDetailUrl(gid: Long, token: String?, index: Int, allComment: Boolean): String {
-        val builder = UrlBuilder((host + "g/" + gid + '/' + token + '/').toHttpUrl().newBuilder())
+    fun getGalleryDetailUrl(gid: Long, token: String?, index: Int, allComment: Boolean) = HttpUrl.Builder().apply {
+        host(domain)
+        scheme("https")
+        addPathSegments("g/$gid/$token/")
         if (index != 0) {
-            builder.url.addEncodedQueryParameter("p", index.toString())
+            addEncodedQueryParameter("p", index.toString())
         }
         if (allComment) {
-            builder.url.addEncodedQueryParameter("hc", 1.toString())
+            addEncodedQueryParameter("hc", 1.toString())
         }
-        return builder.url.toString()
-    }
+    }.toString()
 
     fun getGalleryMultiPageViewerUrl(gid: Long, token: String): String {
         val builder = UrlBuilder((host + "mpv/" + gid + '/' + token + '/').toHttpUrl().newBuilder())
