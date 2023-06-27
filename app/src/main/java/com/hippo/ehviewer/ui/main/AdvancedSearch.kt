@@ -72,6 +72,21 @@ fun SearchAdvanced(
                     }
                 }
             }
+            Text(text = stringResource(id = R.string.search_sf))
+            Row {
+                Row(modifier = Modifier.weight(1f)) {
+                    Checkbox(checked = checked(AdvanceTable.SFL), onCheckedChange = { state.inv(it, AdvanceTable.SFL) })
+                    Text(text = stringResource(id = R.string.search_sfl), modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Row(modifier = Modifier.weight(1f)) {
+                    Checkbox(checked = checked(AdvanceTable.SFU), onCheckedChange = { state.inv(it, AdvanceTable.SFU) })
+                    Text(text = stringResource(id = R.string.search_sfu), modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Row(modifier = Modifier.weight(1f)) {
+                    Checkbox(checked = checked(AdvanceTable.SFT), onCheckedChange = { state.inv(it, AdvanceTable.SFT) })
+                    Text(text = stringResource(id = R.string.search_sft), modifier = Modifier.align(Alignment.CenterVertically))
+                }
+            }
         }
     }
 }
