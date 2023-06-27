@@ -34,7 +34,7 @@
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/gallery_search_bar_margin_v"
         android:layout_marginEnd="@dimen/gallery_search_bar_margin_v"
-        app:layout_fitsSystemWindowsInsets="top|bottom" />
+        app:layout_fitsSystemWindowsInsets="top" />
 
     <com.hippo.ehviewer.ui.legacy.FabLayout
         android:id="@+id/fab_layout"
