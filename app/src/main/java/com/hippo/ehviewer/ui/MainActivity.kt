@@ -65,6 +65,8 @@ import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.scene.ProgressScene
+import com.hippo.ehviewer.ui.scene.navAnimated
+import com.hippo.ehviewer.ui.scene.navWithUrl
 import com.hippo.ehviewer.util.addTextToClipboard
 import com.hippo.ehviewer.util.getParcelableExtraCompat
 import com.hippo.ehviewer.util.getUrlFromClipboard
@@ -130,7 +132,7 @@ class MainActivity : EhActivity() {
             if ("text/plain" == type) {
                 val builder = ListUrlBuilder()
                 builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
-                navController.navigate(
+                navController.navAnimated(
                     R.id.galleryListScene,
                     builder.toStartArgs(),
                 )
@@ -144,7 +146,7 @@ class MainActivity : EhActivity() {
                         builder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
                         builder.imagePath = temp.path
                         builder.isUseSimilarityScan = true
-                        navController.navigate(
+                        navController.navAnimated(
                             R.id.galleryListScene,
                             builder.toStartArgs(),
                         )
@@ -154,7 +156,7 @@ class MainActivity : EhActivity() {
             }
         } else if (action == DownloadService.ACTION_START_DOWNLOADSCENE) {
             val args = intent.getBundleExtra(DownloadService.ACTION_START_DOWNLOADSCENE_ARGS)
-            navController.navigate(R.id.nav_downloads, args)
+            navController.navAnimated(R.id.nav_downloads, args)
         }
 
         return false
@@ -344,7 +346,7 @@ class MainActivity : EhActivity() {
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
                 args.putLong(GalleryDetailScene.KEY_GID, result1.gid)
                 args.putString(GalleryDetailScene.KEY_TOKEN, result1.token)
-                launch = { navController.navigate(R.id.galleryDetailScene, args) }
+                launch = { navController.navAnimated(R.id.galleryDetailScene, args) }
             }
             val result2 = GalleryPageUrlParser.parse(text, false)
             if (result2 != null) {
@@ -353,7 +355,7 @@ class MainActivity : EhActivity() {
                 args.putLong(ProgressScene.KEY_GID, result2.gid)
                 args.putString(ProgressScene.KEY_PTOKEN, result2.pToken)
                 args.putInt(ProgressScene.KEY_PAGE, result2.page)
-                launch = { navController.navigate(R.id.progressScene, args) }
+                launch = { navController.navAnimated(R.id.progressScene, args) }
             }
             launch?.let {
                 withUIContext {

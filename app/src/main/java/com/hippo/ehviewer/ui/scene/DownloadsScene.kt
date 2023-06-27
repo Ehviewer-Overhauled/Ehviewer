@@ -834,7 +834,7 @@ class DownloadsScene :
                     GalleryDetailScene.ACTION_GALLERY_INFO,
                 )
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index])
-                navigate(R.id.galleryDetailScene, args)
+                navAnimated(R.id.galleryDetailScene, args)
             } else if (binding.start === v) {
                 val intent = Intent(activity, DownloadService::class.java)
                 intent.action = DownloadService.ACTION_START

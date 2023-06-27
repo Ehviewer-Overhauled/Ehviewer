@@ -399,7 +399,7 @@ class FavoritesScene :
                     GalleryDetailScene.ACTION_GALLERY_INFO,
                 )
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-                navigate(R.id.galleryDetailScene, args)
+                navAnimated(R.id.galleryDetailScene, args)
             }
         }
         return true

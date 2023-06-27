@@ -585,7 +585,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        navigate(R.id.galleryDetailScene, args)
+        navAnimated(R.id.galleryDetailScene, args)
     }
 
     override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
@@ -982,7 +982,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     val args = ListUrlBuilder().apply {
                         set(q)
                     }.toStartArgs().apply { putString(KEY_GOTO, goto) }
-                    navigate(R.id.galleryListScene, args, true)
+                    navAnimated(R.id.galleryListScene, args, true)
                     setState(STATE_NORMAL)
                     closeDrawer(GravityCompat.END)
                 }
@@ -1050,7 +1050,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onClick() {
-            navigate(getDestination(), getArgs())
+            navAnimated(getDestination(), getArgs())
             if (mState == STATE_SIMPLE_SEARCH) {
                 setState(STATE_NORMAL)
             } else if (mState == STATE_SEARCH_SHOW_LIST) {

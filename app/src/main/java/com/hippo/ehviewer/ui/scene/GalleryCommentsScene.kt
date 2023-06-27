@@ -78,7 +78,6 @@ import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
-import com.hippo.ehviewer.ui.navWithUrl
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.util.ExceptionUtils
@@ -815,7 +814,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                             mode = ListUrlBuilder.MODE_UPLOADER
                             keyword = it
                         }
-                        navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                        navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
                     }
                 }
                 time.text = ReadableTime.getTimeAgo(value.time)

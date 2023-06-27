@@ -18,19 +18,12 @@ package com.hippo.ehviewer.ui
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.net.Uri
-import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.navigation.NavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
-import com.hippo.ehviewer.client.parser.GalleryListUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
-import com.hippo.ehviewer.ui.scene.GalleryDetailScene
-import com.hippo.ehviewer.ui.scene.GalleryListScene
-import com.hippo.ehviewer.ui.scene.ProgressScene
 
 private val intent = CustomTabsIntent.Builder().apply { setShowTitle(true) }.build()
 
@@ -56,41 +49,6 @@ fun Context.jumpToReaderByPage(url: String, detail: GalleryDetail): Boolean {
             navToReader(detail, url.replace("#c", "").toInt() - 1)
             return true
         }
-    }
-    return false
-}
-
-@MainThread
-fun NavController.navWithUrl(url: String): Boolean {
-    if (url.isEmpty()) return false
-    GalleryListUrlParser.parse(url)?.let { lub ->
-        Bundle().apply {
-            putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_LIST_URL_BUILDER)
-            putParcelable(GalleryListScene.KEY_LIST_URL_BUILDER, lub)
-            navigate(R.id.galleryListScene, this)
-        }
-        return true
-    }
-
-    GalleryDetailUrlParser.parse(url)?.apply {
-        Bundle().apply {
-            putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-            putLong(GalleryDetailScene.KEY_GID, gid)
-            putString(GalleryDetailScene.KEY_TOKEN, token)
-            navigate(R.id.galleryDetailScene, this)
-        }
-        return true
-    }
-
-    GalleryPageUrlParser.parse(url)?.apply {
-        Bundle().apply {
-            putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
-            putLong(ProgressScene.KEY_GID, gid)
-            putString(ProgressScene.KEY_PTOKEN, pToken)
-            putInt(ProgressScene.KEY_PAGE, page)
-            navigate(R.id.progressScene, this)
-        }
-        return true
     }
     return false
 }

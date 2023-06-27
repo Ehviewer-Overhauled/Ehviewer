@@ -61,7 +61,7 @@ class ProgressScene : BaseScene() {
                                 arg.putInt(GalleryDetailScene.KEY_PAGE, page)
                                 withUIContext {
                                     findNavController().popBackStack()
-                                    navigate(R.id.galleryDetailScene, arg)
+                                    navAnimated(R.id.galleryDetailScene, arg)
                                 }
                             }.onFailure {
                                 error = ExceptionUtils.getReadableString(it)

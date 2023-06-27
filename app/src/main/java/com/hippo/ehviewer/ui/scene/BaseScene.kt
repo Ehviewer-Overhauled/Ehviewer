@@ -29,8 +29,6 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.SoftwareKeyboardControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.NavHostFragment
 import com.hippo.ehviewer.ui.MainActivity
 import rikka.core.res.resolveDrawable
 
@@ -201,17 +199,6 @@ abstract class BaseScene : Fragment() {
 
     val theme: Theme
         get() = requireActivity().theme
-
-    @SuppressLint("PrivateResource")
-    fun navigate(id: Int, args: Bundle?, singleTop: Boolean = false) {
-        val options: NavOptions = NavOptions.Builder().setLaunchSingleTop(singleTop)
-            .setEnterAnim(androidx.fragment.R.animator.fragment_open_enter)
-            .setExitAnim(androidx.fragment.R.animator.fragment_open_exit)
-            .setPopEnterAnim(androidx.fragment.R.animator.fragment_close_enter)
-            .setPopExitAnim(androidx.fragment.R.animator.fragment_close_exit)
-            .build()
-        NavHostFragment.findNavController(this).navigate(id, args, options)
-    }
 
     companion object {
         const val LENGTH_SHORT = 0

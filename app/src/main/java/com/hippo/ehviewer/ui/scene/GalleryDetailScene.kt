@@ -776,7 +776,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
         val lub = ListUrlBuilder()
         lub.category = category
-        navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+        navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
     }
 
     private fun onUploaderChipClick() {
@@ -786,7 +786,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         val lub = ListUrlBuilder()
         lub.mode = ListUrlBuilder.MODE_UPLOADER
         lub.keyword = uploader
-        navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+        navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
     }
 
     private fun onDownloadButtonClick() {
@@ -945,7 +945,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 args.putString(KEY_ACTION, ACTION_GID_TOKEN)
                 args.putLong(KEY_GID, newerVersion.gid)
                 args.putString(KEY_TOKEN, newerVersion.token)
-                navigate(R.id.galleryDetailScene, args)
+                navAnimated(R.id.galleryDetailScene, args)
             }
             .show()
     }
@@ -1041,7 +1041,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 val lub = ListUrlBuilder()
                                 lub.mode = ListUrlBuilder.MODE_TAG
                                 lub.keyword = tag
-                                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                                navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
                             }
 
                             val hapticFeedback = LocalHapticFeedback.current
@@ -1083,7 +1083,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             GalleryCommentsScene.KEY_GALLERY_DETAIL,
             galleryDetail,
         )
-        navigate(R.id.galleryCommentsScene, args)
+        navAnimated(R.id.galleryCommentsScene, args)
     }
 
     @SuppressLint("InflateParams")
@@ -1146,7 +1146,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_NORMAL
             lub.keyword = "\"" + keyword + "\""
-            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+            navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
             return
         }
         val artist = getArtist(gd.tags)
@@ -1154,14 +1154,14 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_TAG
             lub.keyword = "artist:$artist"
-            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+            navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
             return
         }
         if (null != gd.uploader) {
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_UPLOADER
             lub.keyword = gd.uploader
-            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+            navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
         }
     }
 
@@ -1176,7 +1176,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_NORMAL
             lub.hash = key.substringAfterLast('/').substringBefore('-')
-            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+            navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
         } catch (e: Throwable) {
             e.printStackTrace()
         }
@@ -1187,7 +1187,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             val args = Bundle()
             args.putParcelable(KEY_GALLERY_DETAIL, it)
             args.putBoolean(KEY_NEXT_PAGE, nextPage)
-            navigate(R.id.galleryPreviewsScene, args)
+            navAnimated(R.id.galleryPreviewsScene, args)
         }
     }
 

@@ -202,7 +202,7 @@ class HistoryScene : BaseScene() {
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        navigate(R.id.galleryDetailScene, args)
+        navAnimated(R.id.galleryDetailScene, args)
     }
 
     private val cardHeight = (3 * listThumbSize * 3).pxToDp.dp
