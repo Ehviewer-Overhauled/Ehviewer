@@ -2,6 +2,8 @@ package com.hippo.ehviewer.ui.main
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -14,11 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import com.hippo.ehviewer.R
 
 @Composable
@@ -71,6 +75,25 @@ fun SearchAdvanced(
                         )
                     }
                 }
+            }
+            Row {
+                var enabled by rememberSaveable { mutableStateOf(false) }
+                Checkbox(checked = enabled, onCheckedChange = { enabled = it })
+                Text(text = stringResource(id = R.string.search_sp), modifier = Modifier.align(Alignment.CenterVertically))
+                BasicTextField(
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    value = if (enabled && state.fromPage != -1) state.fromPage.toString() else "",
+                    onValueChange = { onStateChanged(state.copy(fromPage = it.toInt())) },
+                    enabled = enabled,
+                )
+                Text(text = stringResource(id = R.string.search_sp_to), modifier = Modifier.align(Alignment.CenterVertically))
+                BasicTextField(
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    value = if (enabled && state.toPage != -1) state.toPage.toString() else "",
+                    onValueChange = { onStateChanged(state.copy(toPage = it.toInt())) },
+                    enabled = enabled,
+                )
+                Text(text = stringResource(id = R.string.search_sp_suffix), modifier = Modifier.align(Alignment.CenterVertically))
             }
             Text(text = stringResource(id = R.string.search_sf))
             Row {

@@ -159,8 +159,8 @@ class SearchLayout @JvmOverloads constructor(
                 if (isAdvancedMode) {
                     urlBuilder.advanceSearch = advancedState.advanceSearch
                     urlBuilder.minRating = advancedState.minRating
-                    val pageFrom = advancedState.page.first
-                    val pageTo = advancedState.page.last
+                    val pageFrom = advancedState.fromPage
+                    val pageTo = advancedState.toPage
                     if (pageTo != -1 && pageTo < 10) {
                         throw EhException(context.getString(R.string.search_sp_err1))
                     } else if (pageFrom != -1 && pageTo != -1 && pageTo - pageFrom < 20) {
