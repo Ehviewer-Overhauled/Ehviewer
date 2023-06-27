@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
@@ -71,7 +72,7 @@ class SearchLayout @JvmOverloads constructor(
                 AnimatedVisibility(visible = isNormalMode) {
                     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
-                            Text(text = stringResource(id = R.string.search_normal), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), style = MaterialTheme.typography.titleMedium)
+                            Text(text = stringResource(id = R.string.search_normal), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                             NormalSearch(
                                 category = mCategory,
                                 onCategoryChanged = {
@@ -94,7 +95,7 @@ class SearchLayout @JvmOverloads constructor(
                 AnimatedVisibility(visible = !isNormalMode) {
                     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
-                            Text(text = stringResource(id = R.string.search_image), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), style = MaterialTheme.typography.titleMedium)
+                            Text(text = stringResource(id = R.string.search_image), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                             ImageSearch(
                                 imagePath = path,
                                 onSelectImage = ::selectImage,

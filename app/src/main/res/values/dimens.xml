@@ -80,7 +80,7 @@
     <dimen name="search_item_interval">8dp</dimen>
     <dimen name="search_category_padding_h">@dimen/keyline_margin</dimen>
     <dimen name="search_category_padding_v">@dimen/keyline_margin</dimen>
-    <dimen name="search_category_title_height">48dp</dimen>
+    <dimen name="search_category_title_height">24dp</dimen>
 
     <dimen name="image_search_max_size">240dp</dimen>
 
