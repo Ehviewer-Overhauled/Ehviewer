@@ -21,7 +21,7 @@ fun SearchAdvanced(
         ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
             val adv = state.advanceSearch
             fun checked(bit: Int) = adv and bit != 0
-            fun AdvancedSearchOption.inv(checked: Boolean, bit: Int) = onStateChanged(copy(advanceSearch = if (checked) advanceSearch xor bit else advanceSearch or bit))
+            fun AdvancedSearchOption.inv(checked: Boolean, bit: Int) = onStateChanged(copy(advanceSearch = if (!checked) advanceSearch xor bit else advanceSearch or bit))
             Row {
                 Row(modifier = Modifier.weight(1f)) {
                     Checkbox(checked = checked(AdvanceTable.SH), onCheckedChange = { state.inv(it, AdvanceTable.SH) })
