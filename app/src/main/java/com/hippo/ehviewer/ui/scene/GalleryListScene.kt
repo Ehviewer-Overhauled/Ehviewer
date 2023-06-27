@@ -89,7 +89,6 @@ import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
-import com.hippo.ehviewer.ui.legacy.SearchLayout
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
@@ -109,7 +108,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
-class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.Helper, OnClickFabListener, OnExpandListener {
+class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener, OnExpandListener {
     private val mCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             when (mState) {
@@ -309,7 +308,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         binding.fabLayout.setSecondaryFabVisibilityAt(2, !isPopular)
 
         // Update normal search mode and category
-        binding.searchLayout.setNormalSearchMode(if (mode == MODE_SUBSCRIPTION) R.id.search_subscription_search else R.id.search_normal_search)
+        binding.searchLayout.setSearchMyTags(mode == MODE_SUBSCRIPTION)
         if (category != EhUtils.NONE) {
             binding.searchLayout.setCategory(category)
         }
@@ -378,7 +377,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
         setSearchBarHint()
         setSearchBarSuggestionProvider()
-        binding.searchLayout.setHelper(this)
+        binding.searchLayout.setHelper { showSearchBar() }
         binding.searchLayout.run {
             setPadding(
                 paddingLeft,
@@ -831,13 +830,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
                     STATE_SEARCH -> {
                         mViewTransition!!.showView(1, animation)
-                        binding.searchLayout.scrollSearchContainerToTop()
                         selectSearchFab(animation)
                     }
 
                     STATE_SEARCH_SHOW_LIST -> {
                         mViewTransition!!.showView(1, animation)
-                        binding.searchLayout.scrollSearchContainerToTop()
                         selectSearchFab(animation)
                     }
                 }
@@ -847,15 +844,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                         selectActionFab(animation)
                     }
 
-                    STATE_SEARCH -> {
-                        mViewTransition!!.showView(1, animation)
-                        binding.searchLayout.scrollSearchContainerToTop()
-                    }
+                    STATE_SEARCH -> mViewTransition!!.showView(1, animation)
 
-                    STATE_SEARCH_SHOW_LIST -> {
-                        mViewTransition!!.showView(1, animation)
-                        binding.searchLayout.scrollSearchContainerToTop()
-                    }
+                    STATE_SEARCH_SHOW_LIST -> mViewTransition!!.showView(1, animation)
                 }
 
                 STATE_SEARCH, STATE_SEARCH_SHOW_LIST -> if (state == STATE_NORMAL) {
@@ -924,10 +915,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
         }
-    }
-
-    override fun onChangeSearchMode() {
-        showSearchBar()
     }
 
     private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {

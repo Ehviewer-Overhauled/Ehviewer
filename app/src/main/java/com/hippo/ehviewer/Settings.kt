@@ -2,6 +2,7 @@
 
 package com.hippo.ehviewer
 
+import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -59,6 +60,7 @@ object Settings : DataStorePreferences(null) {
     var securityDelay by intPref("require_unlock_delay", 0)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
     var listThumbSize by intPref("list_tile_size", 40)
+    var searchCategory by intPref("search_pref", EhUtils.ALL_CATEGORY)
     var requestNewsTimerHour by intPref("request_news_timer_hour", -1)
     var requestNewsTimerMinute by intPref("request_news_timer_minute", -1)
     var dataMapNextId by intPref("data_map_next_id", 0)
@@ -66,7 +68,6 @@ object Settings : DataStorePreferences(null) {
     var defaultDownloadLabel by stringOrNullPref("default_download_label", null)
     var displayName by stringOrNullPref("display_name", null)
     var avatar by stringOrNullPref("avatar", null)
-    var dohUrl by stringPref("doh_url", "")
     var language by stringPref("app_language", "system").observed { updateWhenLocaleChanges() }
     var lastDawnDay by longPref("last_dawn_day", 0)
 

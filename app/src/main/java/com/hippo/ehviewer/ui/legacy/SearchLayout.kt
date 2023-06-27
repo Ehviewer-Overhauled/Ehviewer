@@ -1,375 +1,167 @@
-/*
- * Copyright 2022 Tarsin Norbin
- *
- * This file is part of EhViewer
- *
- * EhViewer is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * EhViewer is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with EhViewer.
- * If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.hippo.ehviewer.ui.legacy
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.CompoundButton
-import androidx.annotation.IntDef
-import androidx.core.content.edit
-import androidx.core.view.forEach
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.chip.Chip
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
+import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.ehviewer.databinding.SearchAdvanceBinding
-import com.hippo.ehviewer.databinding.SearchCategoryBinding
-import com.hippo.ehviewer.databinding.SearchNormalBinding
-import com.hippo.ehviewer.yorozuya.removeFromParent
+import com.hippo.ehviewer.image.Image
+import com.hippo.ehviewer.ui.main.ImageSearch
+import com.hippo.ehviewer.ui.main.NormalSearch
+import com.hippo.ehviewer.util.pickVisualMedia
+import com.hippo.unifile.UniFile
+import kotlinx.coroutines.launch
 
-@SuppressLint("InflateParams")
 class SearchLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : EasyRecyclerView(context, attrs),
-    CompoundButton.OnCheckedChangeListener,
-    View.OnClickListener,
-    OnTabSelectedListener {
+    defStyle: Int = 0,
+) : AbstractComposeView(context, attrs, defStyle) {
+    private var isNormalMode by mutableStateOf(true) // else ImageSearch mode
+    private var isAdvancedMode by mutableStateOf(false)
 
-    @SearchMode
-    private var mSearchMode = SEARCH_MODE_NORMAL
-    private var mEnableAdvance = false
-    private val binding: SearchNormalBinding
-    private val advanceBinding: SearchAdvanceBinding
-    private val mImageView: ImageSearchLayout
-    private val mActionView: View
-    private val mAction: TabLayout
-    private val mAdapter: SearchAdapter
-    private var mHelper: Helper? = null
-    private val mSharePref: SharedPreferences = Settings.prefs
-    private val mInflater: LayoutInflater
+    private var mCategory by mutableIntStateOf(Settings.searchCategory)
+    private var mSearchMode by mutableIntStateOf(1)
 
-    init {
-        mInflater = LayoutInflater.from(context)
-        val resources = context.resources
-        layoutManager = SearchLayoutManager(context)
-        mAdapter = SearchAdapter()
-        mAdapter.setHasStableIds(true)
-        adapter = mAdapter
-        setHasFixedSize(true)
-        clipToPadding = false
-        (itemAnimator as DefaultItemAnimator?)?.supportsChangeAnimations = false
-        val interval = resources.getDimensionPixelOffset(R.dimen.search_layout_interval)
-        val paddingH = resources.getDimensionPixelOffset(R.dimen.search_layout_margin_h)
-        val paddingV = resources.getDimensionPixelOffset(R.dimen.search_layout_margin_v)
-        val decoration = MarginItemDecoration(
-            interval,
-            paddingH,
-            paddingV,
-            paddingH,
-            paddingV,
-        )
-        addItemDecoration(decoration)
-        decoration.applyPaddings(this)
-        // Create normal view
-        binding = SearchNormalBinding.inflate(mInflater)
-        val mCategoryStored = mSharePref.getInt(SEARCH_CATEGORY_PREF, EhUtils.ALL_CATEGORY)
-        for (mPair in mCategoryTable) {
-            val mChip = inflate(context, R.layout.filter_chip, null) as IdentifiedChip
-            mChip.isCheckable = true
-            mChip.setText(mPair.second)
-            mChip.idt = mPair.first
-            mChip.isChecked = mPair.first and mCategoryStored != 0
-            mChip.setOnLongClickListener {
-                if (mChip.isChecked) {
-                    binding.searchCategoryChipgroup.forEach {
-                        (it as IdentifiedChip).isChecked = true
+    private var uss by mutableStateOf(false)
+    private var osc by mutableStateOf(false)
+    private var path by mutableStateOf("")
+
+    @Composable
+    override fun Content() {
+        val coroutineScope = rememberCoroutineScope()
+        fun selectImage() = coroutineScope.launch {
+            context.pickVisualMedia(ActivityResultContracts.PickVisualMedia.ImageOnly)?.let {
+                path = it.toString()
+            }
+        }
+        Mdc3Theme {
+            Column(
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_layout_margin_h)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.search_layout_margin_v)),
+            ) {
+                AnimatedVisibility(visible = isNormalMode) {
+                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
+                            Text(text = stringResource(id = R.string.search_normal), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), style = MaterialTheme.typography.titleMedium)
+                            NormalSearch(
+                                category = mCategory,
+                                onCategoryChanged = {
+                                    Settings.searchCategory = it
+                                    mCategory = it
+                                },
+                                searchMode = mSearchMode,
+                                onSearchModeChanged = { mSearchMode = it },
+                                isAdvanced = isAdvancedMode,
+                                onAdvancedChanged = { isAdvancedMode = it },
+                                showInfo = { BaseDialogBuilder(context).setMessage(R.string.search_tip).show() },
+                            )
+                        }
                     }
-                    mChip.isChecked = false
-                } else {
-                    binding.searchCategoryChipgroup.clearCheck()
-                    mChip.isChecked = true
                 }
-                true
+                AnimatedVisibility(visible = isNormalMode && isAdvancedMode) {
+                    ElevatedCard {
+                    }
+                }
+                AnimatedVisibility(visible = !isNormalMode) {
+                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
+                            Text(text = stringResource(id = R.string.search_image), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), style = MaterialTheme.typography.titleMedium)
+                            ImageSearch(
+                                imagePath = path,
+                                onSelectImage = ::selectImage,
+                                uss = uss,
+                                onUssChecked = { uss = it },
+                                osc = osc,
+                                onOscChecked = { osc = it },
+                            )
+                        }
+                    }
+                }
+                TabRow(
+                    selectedTabIndex = if (isNormalMode) 0 else 1,
+                    divider = {},
+                ) {
+                    Tab(
+                        selected = isNormalMode,
+                        onClick = { isNormalMode = true },
+                        text = { Text(text = stringResource(id = R.string.keyword_search)) },
+                    )
+                    Tab(
+                        selected = !isNormalMode,
+                        onClick = { isNormalMode = false },
+                        text = { Text(text = stringResource(id = R.string.search_image)) },
+                    )
+                }
             }
-            binding.searchCategoryChipgroup.addView(mChip)
         }
-        binding.searchCategoryChipgroup.setOnCheckedStateChangeListener { group, checkedIds ->
-            var mCategory = 0
-            for (index in checkedIds) {
-                mCategory = mCategory or group.findViewById<IdentifiedChip>(index).idt
-            }
-            mSharePref.edit { putInt(SEARCH_CATEGORY_PREF, mCategory) }
-        }
-        binding.normalSearchModeHelp.setOnClickListener(this)
-        binding.searchEnableAdvance.setOnCheckedChangeListener(this)
-        // Create advance view
-        advanceBinding = SearchAdvanceBinding.inflate(mInflater)
-        // Create image view
-        mImageView = mInflater.inflate(R.layout.search_image, null) as ImageSearchLayout
-        // Create action view
-        mActionView = mInflater.inflate(R.layout.search_action, null)
-        mActionView.layoutParams = LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
-        mAction = mActionView.findViewById(R.id.action)
-        mAction.addOnTabSelectedListener(this)
     }
 
-    fun setHelper(helper: Helper?) {
-        mHelper = helper
-    }
-
-    fun scrollSearchContainerToTop() {
-        (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
-    }
-
-    fun setNormalSearchMode(id: Int) {
-        binding.normalSearchMode.check(id)
+    fun setSearchMyTags(isMyTags: Boolean) {
+        if (isMyTags) mSearchMode = 2
     }
 
     fun setCategory(category: Int) {
-        binding.searchCategoryChipgroup.forEach {
-            (it as IdentifiedChip).apply {
-                isChecked = idt and category != 0
-            }
-        }
+        mCategory = category
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-        if (buttonView === binding.searchEnableAdvance) {
-            post {
-                mEnableAdvance = isChecked
-                if (mSearchMode == SEARCH_MODE_NORMAL) {
-                    if (mEnableAdvance) {
-                        mAdapter.notifyItemInserted(1)
-                    } else {
-                        mAdapter.notifyItemRemoved(1)
-                    }
-                    if (mHelper != null) {
-                        mHelper!!.onChangeSearchMode()
-                    }
-                }
-            }
-        }
-    }
-
-    @SuppressLint("NonConstantResourceId")
     fun formatListUrlBuilder(urlBuilder: ListUrlBuilder, query: String?) {
         urlBuilder.reset()
-        when (mSearchMode) {
-            SEARCH_MODE_NORMAL -> {
-                when (binding.normalSearchMode.checkedRadioButtonId) {
-                    R.id.search_subscription_search -> {
-                        urlBuilder.mode = ListUrlBuilder.MODE_SUBSCRIPTION
-                    }
-
-                    R.id.search_specify_uploader -> {
-                        urlBuilder.mode = ListUrlBuilder.MODE_UPLOADER
-                    }
-
-                    R.id.search_specify_tag -> {
-                        urlBuilder.mode = ListUrlBuilder.MODE_TAG
-                    }
-
-                    else -> {
-                        urlBuilder.mode = ListUrlBuilder.MODE_NORMAL
-                    }
+        when (isNormalMode) {
+            true -> {
+                when (mSearchMode) {
+                    1 -> urlBuilder.mode = ListUrlBuilder.MODE_NORMAL
+                    2 -> urlBuilder.mode = ListUrlBuilder.MODE_SUBSCRIPTION
+                    3 -> urlBuilder.mode = ListUrlBuilder.MODE_UPLOADER
+                    4 -> urlBuilder.mode = ListUrlBuilder.MODE_TAG
                 }
                 urlBuilder.keyword = query
-                urlBuilder.category = Settings.prefs.getInt(
-                    SEARCH_CATEGORY_PREF,
-                    0,
-                )
-                if (mEnableAdvance) {
-                    urlBuilder.advanceSearch = advanceBinding.searchAdvanceSearchTable.advanceSearch
-                    urlBuilder.minRating = advanceBinding.searchAdvanceSearchTable.minRating
-                    val pageFrom = advanceBinding.searchAdvanceSearchTable.pageFrom
-                    val pageTo = advanceBinding.searchAdvanceSearchTable.pageTo
-                    if (pageTo != -1 && pageTo < 10) {
-                        throw EhException(context.getString(R.string.search_sp_err1))
-                    } else if (pageFrom != -1 && pageTo != -1 && pageTo - pageFrom < 20) {
-                        throw EhException(context.getString(R.string.search_sp_err2))
-                    }
-                    urlBuilder.pageFrom = pageFrom
-                    urlBuilder.pageTo = pageTo
-                }
+                urlBuilder.category = mCategory
             }
 
-            SEARCH_MODE_IMAGE -> {
+            false -> {
                 urlBuilder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
-                mImageView.formatListUrlBuilder(urlBuilder)
+                if (path.isBlank()) throw EhException(context.getString(R.string.select_image_first))
+                val uri = Uri.parse(path)
+                val src = UniFile.fromUri(context, uri)?.imageSource ?: return
+                val temp = AppConfig.createTempFile() ?: return
+                val bitmap = ImageDecoder.decodeBitmap(src, Image.imageSearchDecoderSampleListener)
+                temp.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+                urlBuilder.imagePath = temp.path
+                urlBuilder.isUseSimilarityScan = uss
+                urlBuilder.isOnlySearchCovers = osc
             }
         }
     }
 
-    override fun onClick(v: View) {
-        if (binding.normalSearchModeHelp === v) {
-            BaseDialogBuilder(context)
-                .setMessage(R.string.search_tip)
-                .show()
-        }
+    fun setHelper(helper: () -> Unit) {
     }
-
-    override fun onTabSelected(tab: TabLayout.Tab) {
-        post { setSearchMode(tab.position) }
-    }
-
-    private fun setSearchMode(@SearchMode mode: Int) {
-        val oldItemCount = mAdapter.itemCount
-        mSearchMode = mode
-        val newItemCount = mAdapter.itemCount
-        mAdapter.notifyItemRangeRemoved(0, oldItemCount - 1)
-        mAdapter.notifyItemRangeInserted(0, newItemCount - 1)
-        if (mHelper != null) {
-            mHelper!!.onChangeSearchMode()
-        }
-    }
-
-    override fun onTabUnselected(tab: TabLayout.Tab) {}
-    override fun onTabReselected(tab: TabLayout.Tab) {}
-
-    @IntDef(SEARCH_MODE_NORMAL, SEARCH_MODE_IMAGE)
-    @Retention(AnnotationRetention.SOURCE)
-    private annotation class SearchMode
-    interface Helper {
-        fun onChangeSearchMode()
-    }
-
-    internal class SearchLayoutManager(context: Context?) : LinearLayoutManager(context!!) {
-        override fun onLayoutChildren(recycler: Recycler, state: State) {
-            try {
-                super.onLayoutChildren(recycler, state)
-            } catch (e: IndexOutOfBoundsException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private inner class SimpleHolder(itemView: View) : ViewHolder(itemView)
-
-    private inner class SearchAdapter : Adapter<SimpleHolder>() {
-        override fun getItemCount(): Int {
-            var count = SEARCH_ITEM_COUNT_ARRAY[mSearchMode]
-            if (mSearchMode == SEARCH_MODE_NORMAL && !mEnableAdvance) {
-                count--
-            }
-            return count
-        }
-
-        override fun getItemViewType(position: Int): Int {
-            var type = SEARCH_ITEM_TYPE[mSearchMode][position]
-            if (mSearchMode == SEARCH_MODE_NORMAL && position == 1 && !mEnableAdvance) {
-                type = ITEM_TYPE_ACTION
-            }
-            return type
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleHolder {
-            val view: View
-            if (viewType == ITEM_TYPE_ACTION) {
-                mActionView.removeFromParent()
-                view = mActionView
-            } else {
-                view = mInflater.inflate(R.layout.search_category, parent, false)
-                SearchCategoryBinding.bind(view).run {
-                    when (viewType) {
-                        ITEM_TYPE_NORMAL -> {
-                            categoryTitle.setText(R.string.search_normal)
-                            binding.root.removeFromParent()
-                            categoryContent.addView(binding.root)
-                        }
-
-                        ITEM_TYPE_NORMAL_ADVANCE -> {
-                            categoryTitle.setText(R.string.search_advance)
-                            advanceBinding.root.removeFromParent()
-                            categoryContent.addView(advanceBinding.root)
-                        }
-
-                        ITEM_TYPE_IMAGE -> {
-                            categoryTitle.setText(R.string.search_image)
-                            mImageView.removeFromParent()
-                            categoryContent.addView(mImageView)
-                        }
-                    }
-                }
-            }
-            return SimpleHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: SimpleHolder, position: Int) {
-            if (holder.itemViewType == ITEM_TYPE_ACTION) {
-                mAction.selectTab(mAction.getTabAt(mSearchMode))
-            }
-        }
-
-        override fun getItemId(position: Int): Long {
-            var type = SEARCH_ITEM_TYPE[mSearchMode][position]
-            if (mSearchMode == SEARCH_MODE_NORMAL && position == 1 && !mEnableAdvance) {
-                type = ITEM_TYPE_ACTION
-            }
-            return type.toLong()
-        }
-    }
-
-    companion object {
-        const val SEARCH_MODE_NORMAL = 0
-        const val SEARCH_MODE_IMAGE = 1
-        const val SEARCH_CATEGORY_PREF = "search_pref"
-        private const val ITEM_TYPE_NORMAL = 0
-        private const val ITEM_TYPE_NORMAL_ADVANCE = 1
-        private const val ITEM_TYPE_IMAGE = 2
-        private const val ITEM_TYPE_ACTION = 3
-        private val SEARCH_ITEM_COUNT_ARRAY = intArrayOf(
-            3,
-            2,
-        )
-        private val mCategoryTable: ArrayList<Pair<Int, Int>> = arrayListOf(
-            Pair(EhUtils.DOUJINSHI, R.string.doujinshi),
-            Pair(EhUtils.MANGA, R.string.manga),
-            Pair(EhUtils.ARTIST_CG, R.string.artist_cg),
-            Pair(EhUtils.GAME_CG, R.string.game_cg),
-            Pair(EhUtils.WESTERN, R.string.western),
-            Pair(EhUtils.NON_H, R.string.non_h),
-            Pair(EhUtils.IMAGE_SET, R.string.image_set),
-            Pair(EhUtils.COSPLAY, R.string.cosplay),
-            Pair(EhUtils.ASIAN_PORN, R.string.asian_porn),
-            Pair(EhUtils.MISC, R.string.misc),
-        )
-        private val SEARCH_ITEM_TYPE = arrayOf(
-            intArrayOf(ITEM_TYPE_NORMAL, ITEM_TYPE_NORMAL_ADVANCE, ITEM_TYPE_ACTION),
-            intArrayOf(
-                ITEM_TYPE_IMAGE,
-                ITEM_TYPE_ACTION,
-            ),
-        )
-    }
-}
-
-class IdentifiedChip @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-) : Chip(
-    context,
-    attrs,
-) {
-    var idt = 0
 }
