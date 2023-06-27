@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
 import android.content.res.Resources.Theme
 import android.os.Bundle
 import android.os.Parcelable
@@ -105,9 +104,7 @@ abstract class BaseScene : Fragment() {
         }
     }
 
-    open fun needShowLeftDrawer(): Boolean {
-        return true
-    }
+    open val showLeftDrawer = true
 
     fun recreateDrawerView() {
         val activity = mainActivity
@@ -157,7 +154,7 @@ abstract class BaseScene : Fragment() {
         view.background = requireActivity().theme.resolveDrawable(android.R.attr.windowBackground)
 
         // Update left drawer locked state
-        if (needShowLeftDrawer()) {
+        if (showLeftDrawer) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
         } else {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
@@ -171,11 +168,6 @@ abstract class BaseScene : Fragment() {
         destroyDrawerView()
     }
 
-    val resourcesOrNull: Resources?
-        get() {
-            val context = context
-            return context?.resources
-        }
     val mainActivity: MainActivity?
         get() {
             val activity = activity
