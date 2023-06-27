@@ -3,6 +3,7 @@ package com.hippo.ehviewer.ui.scene
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.annotation.MainThread
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -27,33 +28,39 @@ fun NavController.navAnimated(id: Int, args: Bundle?, singleTop: Boolean = false
 @MainThread
 fun NavController.navWithUrl(url: String): Boolean {
     if (url.isEmpty()) return false
-    GalleryListUrlParser.parse(url)?.let { lub ->
-        Bundle().apply {
-            putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_LIST_URL_BUILDER)
-            putParcelable(GalleryListScene.KEY_LIST_URL_BUILDER, lub)
-            navAnimated(R.id.galleryListScene, this)
-        }
+    GalleryListUrlParser.parse(url)?.let {
+        navAnimated(
+            R.id.galleryListScene,
+            bundleOf(
+                GalleryListScene.KEY_ACTION to GalleryListScene.ACTION_LIST_URL_BUILDER,
+                GalleryListScene.KEY_LIST_URL_BUILDER to it,
+            ),
+        )
         return true
     }
 
     GalleryDetailUrlParser.parse(url)?.apply {
-        Bundle().apply {
-            putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-            putLong(GalleryDetailScene.KEY_GID, gid)
-            putString(GalleryDetailScene.KEY_TOKEN, token)
-            navAnimated(R.id.galleryDetailScene, this)
-        }
+        navAnimated(
+            R.id.galleryDetailScene,
+            bundleOf(
+                GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GID_TOKEN,
+                GalleryDetailScene.KEY_GID to gid,
+                GalleryDetailScene.KEY_TOKEN to token,
+            ),
+        )
         return true
     }
 
     GalleryPageUrlParser.parse(url)?.apply {
-        Bundle().apply {
-            putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
-            putLong(ProgressScene.KEY_GID, gid)
-            putString(ProgressScene.KEY_PTOKEN, pToken)
-            putInt(ProgressScene.KEY_PAGE, page)
-            navAnimated(R.id.progressScene, this)
-        }
+        navAnimated(
+            R.id.progressScene,
+            bundleOf(
+                ProgressScene.KEY_ACTION to ProgressScene.ACTION_GALLERY_TOKEN,
+                ProgressScene.KEY_GID to gid,
+                ProgressScene.KEY_PTOKEN to pToken,
+                ProgressScene.KEY_PAGE to page,
+            ),
+        )
         return true
     }
     return false

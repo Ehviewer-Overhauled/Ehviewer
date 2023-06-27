@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
@@ -52,14 +53,17 @@ class ProgressScene : BaseScene() {
                             runSuspendCatching {
                                 EhEngine.getGalleryToken(gid, token, page)
                             }.onSuccess {
-                                val arg = Bundle()
-                                arg.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-                                arg.putLong(GalleryDetailScene.KEY_GID, gid)
-                                arg.putString(GalleryDetailScene.KEY_TOKEN, it)
-                                arg.putInt(GalleryDetailScene.KEY_PAGE, page)
                                 withUIContext {
                                     findNavController().popBackStack()
-                                    navAnimated(R.id.galleryDetailScene, arg)
+                                    navAnimated(
+                                        R.id.galleryDetailScene,
+                                        bundleOf(
+                                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GID_TOKEN,
+                                            GalleryDetailScene.KEY_GID to gid,
+                                            GalleryDetailScene.KEY_TOKEN to it,
+                                            GalleryDetailScene.KEY_PAGE to page,
+                                        ),
+                                    )
                                 }
                             }.onFailure {
                                 error = ExceptionUtils.getReadableString(it)

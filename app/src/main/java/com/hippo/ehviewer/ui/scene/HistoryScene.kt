@@ -52,6 +52,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
@@ -199,10 +200,13 @@ class HistoryScene : BaseScene() {
     }
 
     private fun onItemClick(gi: GalleryInfo) {
-        val args = Bundle()
-        args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
-        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        navAnimated(R.id.galleryDetailScene, args)
+        navAnimated(
+            R.id.galleryDetailScene,
+            bundleOf(
+                GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                GalleryDetailScene.KEY_GALLERY_INFO to gi,
+            ),
+        )
     }
 
     private val cardHeight = (3 * listThumbSize * 3).pxToDp.dp

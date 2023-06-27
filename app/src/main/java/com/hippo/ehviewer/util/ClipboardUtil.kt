@@ -22,8 +22,8 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
-import android.os.PersistableBundle
 import android.view.textclassifier.TextClassifier
+import androidx.core.os.persistableBundleOf
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
@@ -42,9 +42,7 @@ fun Context.addTextToClipboard(text: CharSequence?, isSensitive: Boolean, useToa
         setPrimaryClip(
             ClipData.newPlainText(null, text).apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive) {
-                    description.extras = PersistableBundle().apply {
-                        putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
-                    }
+                    description.extras = persistableBundleOf(ClipDescription.EXTRA_IS_SENSITIVE to true)
                 }
             },
         )

@@ -35,6 +35,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IntDef
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
@@ -1089,14 +1090,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             return R.id.progressScene
         }
 
-        override fun getArgs(): Bundle {
-            val args = Bundle()
-            args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
-            args.putLong(ProgressScene.KEY_GID, mGid)
-            args.putString(ProgressScene.KEY_PTOKEN, mPToken)
-            args.putInt(ProgressScene.KEY_PAGE, mPage)
-            return args
-        }
+        override fun getArgs() = bundleOf(
+            ProgressScene.KEY_ACTION to ProgressScene.ACTION_GALLERY_TOKEN,
+            ProgressScene.KEY_GID to mGid,
+            ProgressScene.KEY_PTOKEN to mPToken,
+            ProgressScene.KEY_PAGE to mPage,
+        )
     }
 
     private inner class GalleryListAdapter(
@@ -1266,12 +1265,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         private const val STATE_SEARCH = 2
         private const val STATE_SEARCH_SHOW_LIST = 3
         private const val ANIMATE_TIME = 300L
-        fun ListUrlBuilder.toStartArgs(): Bundle {
-            val args = Bundle()
-            args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER)
-            args.putParcelable(KEY_LIST_URL_BUILDER, this)
-            return args
-        }
+        fun ListUrlBuilder.toStartArgs() = bundleOf(
+            KEY_ACTION to ACTION_LIST_URL_BUILDER,
+            KEY_LIST_URL_BUILDER to this,
+        )
     }
 }
 
