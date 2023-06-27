@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -67,7 +69,7 @@ class SearchLayout @JvmOverloads constructor(
         }
         Mdc3Theme {
             Column(
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_layout_margin_h)),
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_layout_margin_h)).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.search_layout_margin_v)),
             ) {
                 AnimatedVisibility(visible = isNormalMode) {

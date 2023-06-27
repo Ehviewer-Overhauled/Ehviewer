@@ -11,5 +11,5 @@ object AdvanceTable {
 data class AdvancedSearchOption(
     val advanceSearch: Int = 0,
     val minRating: Int = 0,
-    val page: IntRange = 0..1,
+    val page: IntRange = -1..-1,
 )
