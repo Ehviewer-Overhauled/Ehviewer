@@ -42,7 +42,6 @@ fun SearchAdvanced(
                 }
             }
             val minRatingItems = stringArrayResource(id = R.array.search_min_rating)
-            var selected by remember { mutableStateOf(minRatingItems[0]) }
             var expanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -51,8 +50,8 @@ fun SearchAdvanced(
                 OutlinedTextField(
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
-                    value = selected,
-                    onValueChange = { onStateChanged(state.copy(minRating = minRatingItems.indexOf(it))) },
+                    value = minRatingItems[state.minRating],
+                    onValueChange = {},
                     label = { Text(stringResource(id = R.string.search_sr)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
@@ -65,8 +64,8 @@ fun SearchAdvanced(
                         DropdownMenuItem(
                             text = { Text(selectionOption) },
                             onClick = {
-                                selected = selectionOption
                                 expanded = false
+                                onStateChanged(state.copy(minRating = minRatingItems.indexOf(selectionOption)))
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
