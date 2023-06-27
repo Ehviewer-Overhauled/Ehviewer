@@ -106,6 +106,7 @@ android {
             "-progressive",
             "-Xjvm-default=all",
             "-Xlambdas=indy",
+            "-XXLanguage:+BreakContinueInInlineLambdas",
 
             "-opt-in=coil.annotation.ExperimentalCoilApi",
             "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
