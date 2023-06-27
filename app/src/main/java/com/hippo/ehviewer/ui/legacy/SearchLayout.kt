@@ -35,8 +35,10 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.image.Image
+import com.hippo.ehviewer.ui.main.AdvancedSearchOption
 import com.hippo.ehviewer.ui.main.ImageSearch
 import com.hippo.ehviewer.ui.main.NormalSearch
+import com.hippo.ehviewer.ui.main.SearchAdvanced
 import com.hippo.ehviewer.util.pickVisualMedia
 import com.hippo.unifile.UniFile
 import kotlinx.coroutines.launch
@@ -48,10 +50,9 @@ class SearchLayout @JvmOverloads constructor(
 ) : AbstractComposeView(context, attrs, defStyle) {
     private var isNormalMode by mutableStateOf(true) // else ImageSearch mode
     private var isAdvancedMode by mutableStateOf(false)
-
     private var mCategory by mutableIntStateOf(Settings.searchCategory)
     private var mSearchMode by mutableIntStateOf(1)
-
+    private var advancedState by mutableStateOf(AdvancedSearchOption())
     private var uss by mutableStateOf(false)
     private var osc by mutableStateOf(false)
     private var path by mutableStateOf("")
@@ -89,7 +90,14 @@ class SearchLayout @JvmOverloads constructor(
                     }
                 }
                 AnimatedVisibility(visible = isNormalMode && isAdvancedMode) {
-                    ElevatedCard {
+                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
+                            Text(text = stringResource(id = R.string.search_advance), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                            SearchAdvanced(
+                                state = advancedState,
+                                onStateChanged = { advancedState = it },
+                            )
+                        }
                     }
                 }
                 AnimatedVisibility(visible = !isNormalMode) {
@@ -146,6 +154,19 @@ class SearchLayout @JvmOverloads constructor(
                 }
                 urlBuilder.keyword = query
                 urlBuilder.category = mCategory
+                if (isAdvancedMode) {
+                    urlBuilder.advanceSearch = advancedState.advanceSearch
+                    urlBuilder.minRating = advancedState.minRating
+                    val pageFrom = advancedState.page.first
+                    val pageTo = advancedState.page.last
+                    if (pageTo != -1 && pageTo < 10) {
+                        throw EhException(context.getString(R.string.search_sp_err1))
+                    } else if (pageFrom != -1 && pageTo != -1 && pageTo - pageFrom < 20) {
+                        throw EhException(context.getString(R.string.search_sp_err2))
+                    }
+                    urlBuilder.pageFrom = pageFrom
+                    urlBuilder.pageTo = pageTo
+                }
             }
 
             false -> {

@@ -22,7 +22,7 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.addQueryParameterIfNotBlank
 import com.hippo.ehviewer.client.ehUrl
 import com.hippo.ehviewer.dao.QuickSearch
-import com.hippo.ehviewer.ui.legacy.AdvanceSearchTable
+import com.hippo.ehviewer.ui.main.AdvanceTable
 import com.hippo.ehviewer.util.encodeUTF8
 import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import kotlinx.parcelize.Parcelize
@@ -215,23 +215,23 @@ data class ListUrlBuilder(
                 }
 
                 "f_sh" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SH
+                    advanceSearch = advanceSearch or AdvanceTable.SH
                 }
 
                 "f_sto" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.STO
+                    advanceSearch = advanceSearch or AdvanceTable.STO
                 }
 
                 "f_sfl" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SFL
+                    advanceSearch = advanceSearch or AdvanceTable.SFL
                 }
 
                 "f_sfu" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SFU
+                    advanceSearch = advanceSearch or AdvanceTable.SFU
                 }
 
                 "f_sft" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SFT
+                    advanceSearch = advanceSearch or AdvanceTable.SFT
                 }
 
                 "f_sr" -> if ("on" == value) {
@@ -297,19 +297,19 @@ data class ListUrlBuilder(
                 // Advance search
                 if (advanceSearch != -1) {
                     addQueryParameter("advsearch", "1")
-                    if (advanceSearch and AdvanceSearchTable.SH != 0) {
+                    if (advanceSearch and AdvanceTable.SH != 0) {
                         addQueryParameter("f_sh", "on")
                     }
-                    if (advanceSearch and AdvanceSearchTable.STO != 0) {
+                    if (advanceSearch and AdvanceTable.STO != 0) {
                         addQueryParameter("f_sto", "on")
                     }
-                    if (advanceSearch and AdvanceSearchTable.SFL != 0) {
+                    if (advanceSearch and AdvanceTable.SFL != 0) {
                         addQueryParameter("f_sfl", "on")
                     }
-                    if (advanceSearch and AdvanceSearchTable.SFU != 0) {
+                    if (advanceSearch and AdvanceTable.SFU != 0) {
                         addQueryParameter("f_sfu", "on")
                     }
-                    if (advanceSearch and AdvanceSearchTable.SFT != 0) {
+                    if (advanceSearch and AdvanceTable.SFT != 0) {
                         addQueryParameter("f_sft", "on")
                     }
                     // Set min star
