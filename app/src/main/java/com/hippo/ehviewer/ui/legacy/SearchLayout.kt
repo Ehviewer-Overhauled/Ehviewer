@@ -7,7 +7,6 @@ import android.net.Uri
 import android.util.AttributeSet
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -68,12 +67,9 @@ class SearchLayout @JvmOverloads constructor(
             }
         }
         Mdc3Theme {
-            Column(
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_layout_margin_h)).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.search_layout_margin_v)),
-            ) {
+            Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_layout_margin_h)).verticalScroll(rememberScrollState())) {
                 AnimatedVisibility(visible = isNormalMode) {
-                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                    ElevatedCard(modifier = Modifier.fillMaxWidth().padding(vertical = dimensionResource(id = R.dimen.search_layout_margin_v))) {
                         Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
                             Text(text = stringResource(id = R.string.search_normal), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                             NormalSearch(
@@ -92,7 +88,7 @@ class SearchLayout @JvmOverloads constructor(
                     }
                 }
                 AnimatedVisibility(visible = isNormalMode && isAdvancedMode) {
-                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                    ElevatedCard(modifier = Modifier.fillMaxWidth().padding(vertical = dimensionResource(id = R.dimen.search_layout_margin_v))) {
                         Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
                             Text(text = stringResource(id = R.string.search_advance), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                             SearchAdvanced(
@@ -103,7 +99,7 @@ class SearchLayout @JvmOverloads constructor(
                     }
                 }
                 AnimatedVisibility(visible = !isNormalMode) {
-                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                    ElevatedCard(modifier = Modifier.fillMaxWidth().padding(vertical = dimensionResource(id = R.dimen.search_layout_margin_v))) {
                         Column(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.search_category_padding_h), vertical = dimensionResource(id = R.dimen.search_category_padding_v))) {
                             Text(text = stringResource(id = R.string.search_image), modifier = Modifier.height(dimensionResource(id = R.dimen.search_category_title_height)), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                             ImageSearch(
