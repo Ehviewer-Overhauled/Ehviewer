@@ -29,7 +29,6 @@
     <!-- 24dp - 4dp, 4dp for card padding -->
 
     <!-- 8dp - 4dp, 4dp for card padding -->
-    <dimen name="search_layout_interval">4dp</dimen>
     <!-- 24dp - 4dp, 4dp for card padding -->
     <dimen name="search_layout_margin_h">20dp</dimen>
 

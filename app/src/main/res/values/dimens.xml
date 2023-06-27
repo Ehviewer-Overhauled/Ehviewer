@@ -59,7 +59,6 @@
     <dimen name="gallery_list_column_width_short">320dp</dimen>
 
     <!-- 4dp - 4dp, 4dp for card padding -->
-    <dimen name="search_layout_interval">0dp</dimen>
     <!-- 8dp - 4dp, 4dp for card padding -->
     <dimen name="search_layout_margin_h">4dp</dimen>
     <!-- 8dp - 4dp, 4dp for card padding -->
@@ -74,10 +73,8 @@
     <!-- CategoryTable -->
 
     <!-- AdvanceSearchTable -->
-    <dimen name="advance_search_table_item_margin">4dp</dimen>
 
     <!-- Search item -->
-    <dimen name="search_item_interval">8dp</dimen>
     <dimen name="search_category_padding_h">@dimen/keyline_margin</dimen>
     <dimen name="search_category_padding_v">@dimen/keyline_margin</dimen>
     <dimen name="search_category_title_height">24dp</dimen>

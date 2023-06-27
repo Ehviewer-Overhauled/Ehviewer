@@ -37,17 +37,6 @@
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="TextAppearance.CategoryTitle" parent="TextAppearance.Material3.TitleMedium">
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="CategoryTitle">
-        <item name="android:textAppearance">@style/TextAppearance.CategoryTitle</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">marquee</item>
-        <item name="android:gravity">center_vertical</item>
-    </style>
-
     <style name="Indicating">
         <item name="indicatorHeight">1dp</item>
         <item name="indicatorColor">?attr/dividerColor</item>
