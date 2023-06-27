@@ -23,6 +23,9 @@ val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
     val cache = (appCtx.cacheDir.toOkioPath() / "http_cache").toFile().apply { mkdirs() }
     setStoragePath(cache.absolutePath)
     enableHttpCache(CronetEngine.Builder.HTTP_CACHE_DISK_NO_HTTP, 100 * 1024)
+    addQuicHint("e-hentai.org", 443, 443)
+    addQuicHint("forums.e-hentai.org", 443, 443)
+    addQuicHint("exhentai.org", 443, 443)
 }.build()
 
 val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.executorService
