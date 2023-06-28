@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.ui.login.CookieSignInScene
 import com.hippo.ehviewer.ui.login.SelectSiteScreen
 import com.hippo.ehviewer.ui.login.SignInScreen
@@ -40,7 +41,11 @@ class ConfigureActivity : EhActivity() {
             CompositionLocalProvider(LocalNavController provides navController) {
                 NavHost(
                     navController = navController,
-                    startDestination = if (Settings.needSignIn) SIGN_IN_ROUTE_NAME else BASE_SETTINGS_SCREEN,
+                    startDestination = if (Settings.needSignIn) {
+                        if (EhCookieStore.hasSignedIn()) SELECT_SITE_ROUTE_NAME else SIGN_IN_ROUTE_NAME
+                    } else {
+                        BASE_SETTINGS_SCREEN
+                    },
                     enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(200)) },
                     exitTransition = { ExitTransition.None },
                     popEnterTransition = { EnterTransition.None },

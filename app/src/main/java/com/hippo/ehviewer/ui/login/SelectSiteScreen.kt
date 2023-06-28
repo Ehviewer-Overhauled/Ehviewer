@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,15 +36,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
 import com.hippo.ehviewer.ui.LocalNavController
-import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 @Composable
 fun SelectSiteScreen() {
-    val coroutineScope = rememberCoroutineScope()
     var siteEx by remember { mutableStateOf(true) }
     val navController = LocalNavController.current
 
@@ -101,20 +97,9 @@ fun SelectSiteScreen() {
         Box(modifier = Modifier.padding(horizontal = 12.dp).padding(top = 4.dp, bottom = 20.dp).fillMaxWidth()) {
             Button(
                 onClick = {
+                    // Gallery site was set to ex in sad panda check
+                    if (!siteEx) Settings.gallerySite = EhUrl.SITE_E
                     Settings.needSignIn = false
-                    coroutineScope.launchNonCancellable {
-                        runCatching {
-                            if (!siteEx) {
-                                Settings.gallerySite = EhUrl.SITE_E
-                                EhEngine.getUConfig()
-                            } else {
-                                // Get cookies for image limits
-                                EhEngine.getUConfig(EhUrl.URL_UCONFIG_E)
-                            }
-                        }.onFailure {
-                            it.printStackTrace()
-                        }
-                    }
                     navController.navigate(FINISH_ROUTE_NAME)
                 },
                 modifier = Modifier.fillMaxWidth(),

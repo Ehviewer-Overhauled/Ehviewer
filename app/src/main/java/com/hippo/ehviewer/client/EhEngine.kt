@@ -156,12 +156,12 @@ object EhEngine {
 
     suspend fun getUConfig(url: String = EhUrl.uConfigUrl) {
         runSuspendCatching {
-            ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
+            ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "Unable to load config from $url!" } }
         }.onFailure {
             // It may get redirected when accessing ex for the first time
-            if (EhUtils.isExHentai) {
+            if (url == EhUrl.URL_UCONFIG_EX) {
                 it.printStackTrace()
-                ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
+                ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "Unable to load config from $url!" } }
             } else {
                 throw it
             }
