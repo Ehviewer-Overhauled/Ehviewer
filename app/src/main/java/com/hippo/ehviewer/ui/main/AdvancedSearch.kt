@@ -58,7 +58,7 @@ fun SearchAdvanced(
                     onValueChange = {},
                     label = { Text(stringResource(id = R.string.search_sr)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
