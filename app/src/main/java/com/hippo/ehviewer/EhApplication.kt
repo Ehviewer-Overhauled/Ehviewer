@@ -49,6 +49,7 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.AsyncDns
+import okhttp3.Cookie
 import okhttp3.android.AndroidAsyncDns
 import okio.Path.Companion.toOkioPath
 import splitties.arch.room.roomDb
@@ -158,6 +159,13 @@ class EhApplication : Application(), ImageLoaderFactory {
                 )
 
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
+                addInterceptor { chain ->
+                    val request = chain.request()
+                    val response = chain.proceed(request)
+                    val url = request.url
+                    EhCookieStore.saveFromResponse(url, Cookie.parseAll(url, response.headers))
+                    response
+                }
                 addInterceptor(CronetInterceptor.newBuilder(cronetHttpClient).build())
             }
         }
