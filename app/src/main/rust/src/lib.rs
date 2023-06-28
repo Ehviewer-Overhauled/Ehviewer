@@ -102,10 +102,10 @@ pub fn parseFav(env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) 
                 env.set_object_array_element(str, i as i32, env.new_string(name.trim()).ok()?)
                     .ok()?;
                 children[1]
-                        .get(parser)?
-                        .inner_text(parser)
-                        .parse::<i32>()
-                        .ok()
+                    .get(parser)?
+                    .inner_text(parser)
+                    .parse::<i32>()
+                    .ok()
             })
             .collect();
         if vec.len() == 10 {

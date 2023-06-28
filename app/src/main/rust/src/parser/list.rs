@@ -58,13 +58,7 @@ fn to_category_i32(category: &str) -> i32 {
 fn parse_rating(str: &str) -> f32 {
     let reg = regex!("\\d+px");
     let mut iter = reg.find_iter(str);
-    let mut next = || {
-        iter.next()?
-                .as_str()
-                .replace("px", "")
-                .parse::<i32>()
-                .ok()
-    };
+    let mut next = || iter.next()?.as_str().replace("px", "").parse::<i32>().ok();
     match (next(), next()) {
         (Some(num1), Some(num2)) => {
             let rate = 5 - num1 / 16;
