@@ -3,6 +3,7 @@ package com.hippo.ehviewer
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.core.os.LocaleListCompat
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
@@ -57,11 +58,13 @@ fun updateWhenRequestNewsChanges() {
 }
 
 fun updateWhenGallerySiteChanges() {
-    collectScope.launchIO {
-        runCatching {
-            EhEngine.getUConfig()
-        }.onFailure {
-            it.printStackTrace()
+    if (!Settings.needSignIn && EhCookieStore.hasSignedIn()) {
+        collectScope.launchIO {
+            runCatching {
+                EhEngine.getUConfig()
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
     }
 }

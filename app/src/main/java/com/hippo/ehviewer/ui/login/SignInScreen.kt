@@ -117,7 +117,6 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
             runCatching {
                 EhEngine.signIn(username, password)
             }.onFailure {
-                it.printStackTrace()
                 withUIContext {
                     focusManager.clearFocus()
                     dialogState.show(

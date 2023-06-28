@@ -23,17 +23,19 @@ suspend fun postLogin() = coroutineScope {
         EhEngine.getNews(false)
         EhCookieStore.copyNecessaryCookies()
 
+        // Get cookies for image limits
+        launch {
+            runCatching {
+                EhEngine.getUConfig(EhUrl.URL_UCONFIG_E)
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
+
         // Sad panda check
         Settings.gallerySite = EhUrl.SITE_EX
         EhEngine.getUConfig()
     }.onFailure {
         Settings.gallerySite = EhUrl.SITE_E
-        launch {
-            runCatching {
-                EhEngine.getUConfig()
-            }.onFailure {
-                it.printStackTrace()
-            }
-        }
     }.isSuccess
 }
