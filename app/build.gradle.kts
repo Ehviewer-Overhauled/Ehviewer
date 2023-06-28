@@ -245,7 +245,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose")
     implementation("io.coil-kt:coil-gif")
 
-    val ktor = "2.3.1"
+    val ktor = "2.3.2"
     implementation("io.ktor:ktor-io-jvm:$ktor")
     implementation("io.ktor:ktor-utils-jvm:$ktor")
 
