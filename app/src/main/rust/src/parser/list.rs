@@ -59,13 +59,11 @@ fn parse_rating(str: &str) -> f32 {
     let reg = regex!("\\d+px");
     let mut iter = reg.find_iter(str);
     let mut next = || {
-        Some(
-            iter.next()?
+        iter.next()?
                 .as_str()
                 .replace("px", "")
                 .parse::<i32>()
-                .ok()?,
-        )
+                .ok()
     };
     match (next(), next()) {
         (Some(num1), Some(num2)) => {
@@ -168,7 +166,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             None => ("".to_string(), None),
             Some(node) => (
                 node.inner_text(parser).trim().to_string(),
-                get_node_attr(&node, "title").map(str::to_string),
+                get_node_attr(node, "title").map(str::to_string),
             ),
         };
         let ir = dom

@@ -28,7 +28,7 @@ pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
             .as_tag()?
             .query_selector(parser, "strong")?;
         let vec: Vec<i32> = iter
-            .filter_map(|e| Some(e.get(parser)?.inner_text(parser).parse::<i32>().ok()?))
+            .filter_map(|e| e.get(parser)?.inner_text(parser).parse::<i32>().ok())
             .collect();
         Some(Limits {
             current: vec[0],

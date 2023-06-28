@@ -43,7 +43,7 @@ trait Anon {
 impl<'a> Anon for VDom<'a> {
     fn get_first_element_by_class_name(&self, name: &str) -> Option<&Node> {
         let handle = self.get_elements_by_class_name(name).next()?;
-        Some(handle.get(self.parser())?)
+        handle.get(self.parser())
     }
 }
 
@@ -54,7 +54,7 @@ where
     let html = env.get_string(*str).ok()?;
     let dom = tl::parse(html.to_str().ok()?, tl::ParserOptions::default()).ok()?;
     let parser = dom.parser();
-    Some(f(&dom, parser, env)?)
+    f(&dom, parser, env)
 }
 
 fn get_node_handle_attr<'a>(
@@ -62,7 +62,7 @@ fn get_node_handle_attr<'a>(
     parser: &'a Parser,
     attr: &'a str,
 ) -> Option<&'a str> {
-    Some(get_node_attr(node.get(parser)?, attr)?)
+    get_node_attr(node.get(parser)?, attr)
 }
 
 fn get_node_attr<'a>(node: &'a Node<'_>, attr: &'a str) -> Option<&'a str> {
@@ -78,7 +78,7 @@ fn query_childs_first_match_attr<'a>(
 ) -> Option<&'a str> {
     let selector = format!("[{}]", attr);
     let mut iter = node.as_tag()?.query_selector(parser, &selector)?;
-    Some(get_node_handle_attr(&iter.next()?, parser, attr)?)
+    get_node_handle_attr(&iter.next()?, parser, attr)
 }
 
 #[no_mangle]
@@ -101,13 +101,11 @@ pub fn parseFav(env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) 
                 let name = decode_html_entities(&cat);
                 env.set_object_array_element(str, i as i32, env.new_string(name.trim()).ok()?)
                     .ok()?;
-                Some(
-                    children[1]
+                children[1]
                         .get(parser)?
                         .inner_text(parser)
                         .parse::<i32>()
-                        .ok()?,
-                )
+                        .ok()
             })
             .collect();
         if vec.len() == 10 {
