@@ -33,5 +33,6 @@ suspend fun migrateCookies() {
         database.cookiesDao().list().forEach {
             EhCookieStore.addCookie(it.toOkHttp3Cookie())
         }
+        EhCookieStore.flush()
     }
 }

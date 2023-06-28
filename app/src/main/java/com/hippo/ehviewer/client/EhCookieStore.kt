@@ -60,6 +60,7 @@ object EhCookieStore : CookieJar {
     fun copyNecessaryCookies() {
         val cookie = get(EhUrl.HOST_E.toHttpUrl()).filter { it.name == KEY_STAR || it.name == KEY_IPB_MEMBER_ID || it.name == KEY_IPB_PASS_HASH || it.name == KEY_IGNEOUS }
         cookie.forEach { manager.setCookie(EhUrl.HOST_EX, it.toString()) }
+        flush()
     }
 
     fun deleteCookie(url: HttpUrl, name: String) {
@@ -90,7 +91,7 @@ object EhCookieStore : CookieJar {
     }
 
     // See https://github.com/Ehviewer-Overhauled/Ehviewer/issues/873
-    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) = cookies.filterNot { it.name == KEY_UTMP_NAME }.forEach { manager.setCookie(url.toString(), it.toString()) }
+    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) = cookies.filterNot { it.name == KEY_UTMP_NAME }.forEach { manager.setCookie(url.toString(), it.toString()) }.also { flush() }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         val checkTips = EhUrl.DOMAIN_E in url.host

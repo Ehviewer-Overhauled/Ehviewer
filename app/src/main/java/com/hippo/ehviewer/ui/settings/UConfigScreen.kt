@@ -80,6 +80,7 @@ fun UConfigScreen() {
         DisposableEffect(Unit) {
             onDispose {
                 EhCookieStore.deleteCookie(EhUrl.host.toHttpUrl(), KEY_SETTINGS_PROFILE)
+                EhCookieStore.flush()
             }
         }
     }
