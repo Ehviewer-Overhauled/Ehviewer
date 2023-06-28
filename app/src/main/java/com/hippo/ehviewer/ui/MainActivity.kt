@@ -24,7 +24,6 @@ import android.content.pm.verify.domain.DomainVerificationManager
 import android.content.pm.verify.domain.DomainVerificationUserState
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
-import android.net.Network
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -82,7 +81,6 @@ import java.io.FileOutputStream
 class MainActivity : EhActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private val availableNetworks = mutableListOf<Network>()
 
     private fun saveImageToTempFile(uri: Uri): File? {
         val src = ImageDecoder.createSource(contentResolver, uri)
@@ -313,15 +311,11 @@ class MainActivity : EhActivity() {
 
     private val loginLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (availableNetworks.isNotEmpty()) {
-                connectivityManager.bindProcessToNetwork(availableNetworks.last())
-            }
             setNavGraph()
         }
 
     override fun onResume() {
         if (EhUtils.needSignedIn()) {
-            connectivityManager.bindProcessToNetwork(null)
             loginLauncher.launch(Intent(this, ConfigureActivity::class.java))
         }
         super.onResume()
