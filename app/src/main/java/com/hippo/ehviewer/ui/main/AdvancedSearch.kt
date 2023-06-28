@@ -2,7 +2,8 @@ package com.hippo.ehviewer.ui.main
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
@@ -25,6 +26,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.R
 
 @Composable
@@ -81,21 +83,25 @@ fun SearchAdvanced(
                 }
             }
         }
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             var enabled by rememberSaveable { mutableStateOf(false) }
             Checkbox(checked = enabled, onCheckedChange = { enabled = it })
             Text(text = stringResource(id = R.string.search_sp), modifier = Modifier.align(Alignment.CenterVertically))
-            BasicTextField(
+            OutlinedTextField(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 value = if (enabled && state.fromPage != -1) state.fromPage.toString() else "",
                 onValueChange = { onStateChanged(state.copy(fromPage = it.toInt())) },
+                modifier = Modifier.width(96.dp).padding(16.dp),
+                singleLine = true,
                 enabled = enabled,
             )
             Text(text = stringResource(id = R.string.search_sp_to), modifier = Modifier.align(Alignment.CenterVertically))
-            BasicTextField(
+            OutlinedTextField(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 value = if (enabled && state.toPage != -1) state.toPage.toString() else "",
                 onValueChange = { onStateChanged(state.copy(toPage = it.toInt())) },
+                modifier = Modifier.width(96.dp).padding(16.dp),
+                singleLine = true,
                 enabled = enabled,
             )
             Text(text = stringResource(id = R.string.search_sp_suffix), modifier = Modifier.align(Alignment.CenterVertically))
