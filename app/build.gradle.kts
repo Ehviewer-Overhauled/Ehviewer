@@ -256,7 +256,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
     implementation("org.jsoup:jsoup:1.16.1")
 
-    val chunker = "3.5.2"
+    val chunker = "4.0.0"
     debugImplementation("com.github.chuckerteam.chucker:library:$chunker")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:$chunker")
 }
