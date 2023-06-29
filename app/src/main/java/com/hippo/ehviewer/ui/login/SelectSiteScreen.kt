@@ -1,5 +1,7 @@
 package com.hippo.ehviewer.ui.login
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -44,6 +47,11 @@ import com.hippo.ehviewer.ui.LocalNavController
 fun SelectSiteScreen() {
     var siteEx by remember { mutableStateOf(true) }
     val navController = LocalNavController.current
+    val context = LocalContext.current
+
+    BackHandler {
+        (context as Activity).moveTaskToBack(true)
+    }
 
     Column(
         modifier = Modifier.padding(WindowInsets.systemBars.asPaddingValues()).padding(horizontal = dimensionResource(R.dimen.keyline_margin)).padding(top = dimensionResource(R.dimen.keyline_margin)).fillMaxSize(),
