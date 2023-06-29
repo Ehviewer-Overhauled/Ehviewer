@@ -4,15 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import eu.kanade.tachiyomi.util.lang.withIOContext
 
 @Composable
-fun Deferred(block: suspend () -> Unit, content: @Composable () -> Unit) {
-    var completed by rememberSaveable { mutableStateOf(false) }
+fun <T> Deferred(block: suspend () -> T, content: @Composable (T) -> Unit) {
+    var completed by remember { mutableStateOf<T?>(null) }
     LaunchedEffect(key1 = Unit) {
-        block()
-        completed = true
+        completed = withIOContext { block() }
     }
-    if (completed) content()
+    completed?.let { content(it) }
 }
