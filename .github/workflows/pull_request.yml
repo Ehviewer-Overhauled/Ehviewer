@@ -23,7 +23,15 @@ jobs:
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.2.9519653" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
 
       - name: Install Rust Toolchain
-        run: rustup update && rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android
+        run: rustup update && rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android && rustup component add rustfmt clippy
+
+      - name: Rustfmt Check
+        working-directory: ./app/src/main/rust
+        run: cargo fmt --all -- --check
+
+      - name: Clippy Check
+        working-directory: ./app/src/main/rust
+        run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Ktlint Check
         run: ./gradlew ktlintCheck
