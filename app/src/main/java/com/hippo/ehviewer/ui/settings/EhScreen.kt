@@ -241,6 +241,11 @@ fun EhScreen() {
                 value = thumbResolution,
             )
             SwitchPreference(
+                title = stringResource(id = R.string.settings_eh_force_eh_thumb),
+                summary = stringResource(id = R.string.settings_eh_force_eh_thumb_summary),
+                value = Settings::forceEhThumb,
+            )
+            SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_show_gallery_pages),
                 summary = stringResource(id = R.string.settings_eh_show_gallery_pages_summary),
                 value = Settings::showGalleryPages,

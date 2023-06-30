@@ -32,6 +32,7 @@ object Settings : DataStorePreferences(null) {
     var thumbResolution by intFromStrPref("thumb_resolution", 0)
     var readCacheSize by intFromStrPref("read_cache_size", 640)
     var launchPage by intFromStrPref("launch_page", 0)
+    var forceEhThumb by boolPref("force_eh_thumb", false)
     var showComments by boolPref("show_gallery_comments", true)
     var requestNews by boolPref("request_news", false).observed { updateWhenRequestNewsChanges() }
     var hideHvEvents by boolPref("hide_hv_events", false)
