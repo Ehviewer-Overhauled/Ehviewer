@@ -26,7 +26,7 @@ import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
 object GalleryListUrlParser {
-    private val VALID_HOSTS = arrayOf(EhUrl.DOMAIN_EX, EhUrl.DOMAIN_E, EhUrl.DOMAIN_LOFI)
+    private val VALID_HOSTS = arrayOf(EhUrl.DOMAIN_EX, EhUrl.DOMAIN_E)
     private const val PATH_NORMAL = "/"
     private const val PATH_UPLOADER = "/uploader/"
     private const val PATH_TAG = "/tag/"
