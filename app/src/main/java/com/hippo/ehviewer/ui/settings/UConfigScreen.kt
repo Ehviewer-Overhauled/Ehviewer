@@ -25,10 +25,8 @@ import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhCookieStore
-import com.hippo.ehviewer.client.EhCookieStore.KEY_SETTINGS_PROFILE
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.LocalNavController
-import okhttp3.HttpUrl.Companion.toHttpUrl
 
 private const val applyJs = "javascript:(function(){var apply = document.getElementById(\"apply\").children[0];apply.click();})();"
 
@@ -79,7 +77,6 @@ fun UConfigScreen() {
         LaunchedEffect(Unit) { snackbarHostState.showSnackbar(applyTip) }
         DisposableEffect(Unit) {
             onDispose {
-                EhCookieStore.deleteCookie(EhUrl.host.toHttpUrl(), KEY_SETTINGS_PROFILE)
                 EhCookieStore.flush()
             }
         }
