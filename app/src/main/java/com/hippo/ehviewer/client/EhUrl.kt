@@ -23,7 +23,6 @@ object EhUrl {
     const val SITE_EX = 1
     const val DOMAIN_EX = "exhentai.org"
     const val DOMAIN_E = "e-hentai.org"
-    const val DOMAIN_LOFI = "lofi.e-hentai.org"
     const val HOST_EX = "https://$DOMAIN_EX/"
     const val API_EX = HOST_EX + "api.php"
     const val FAV_PATH = "favorites.php"

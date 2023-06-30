@@ -25,7 +25,7 @@ import java.util.regex.Pattern
  */
 object GalleryPageUrlParser {
     private val URL_STRICT_PATTERN = Pattern.compile(
-        "https?://(?:" + EhUrl.DOMAIN_EX + "|" + EhUrl.DOMAIN_E + "|" + EhUrl.DOMAIN_LOFI + ")/s/([0-9a-f]{10})/(\\d+)-(\\d+)",
+        "https?://(?:${EhUrl.DOMAIN_EX}|${EhUrl.DOMAIN_E}(?:/lofi)?)/s/([0-9a-f]{10})/(\\d+)-(\\d+)",
     )
     private val URL_PATTERN = Pattern.compile("([0-9a-f]{10})/(\\d+)-(\\d+)")
 
