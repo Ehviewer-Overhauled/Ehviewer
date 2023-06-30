@@ -44,7 +44,6 @@ object EhCookieStore : CookieJar {
     const val KEY_IPB_MEMBER_ID = "ipb_member_id"
     const val KEY_IPB_PASS_HASH = "ipb_pass_hash"
     const val KEY_IGNEOUS = "igneous"
-    const val KEY_SETTINGS_PROFILE = "sp"
     private const val KEY_STAR = "star"
     private const val KEY_CONTENT_WARNING = "nw"
     private const val CONTENT_WARNING_NOT_SHOW = "1"
@@ -61,11 +60,6 @@ object EhCookieStore : CookieJar {
         val cookie = get(EhUrl.HOST_E.toHttpUrl()).filter { it.name == KEY_STAR || it.name == KEY_IPB_MEMBER_ID || it.name == KEY_IPB_PASS_HASH || it.name == KEY_IGNEOUS }
         cookie.forEach { manager.setCookie(EhUrl.HOST_EX, it.toString()) }
         flush()
-    }
-
-    fun deleteCookie(url: HttpUrl, name: String) {
-        val deletedCookie = Cookie.Builder().name(name).value("deleted").domain(url.host).expiresAt(0).build()
-        manager.setCookie(url.toString(), deletedCookie.toString())
     }
 
     fun addCookie(cookie: Cookie) {
