@@ -32,6 +32,21 @@ object EhFilter {
     val commenterFilterList = mutableStateListOf<Filter>()
     val commentFilterList = mutableStateListOf<Filter>()
 
+    fun Filter.remember() = EhDB.addFilter(this).also { if (it) memorizeFilter(this) }
+    fun Filter.trigger() = EhDB.triggerFilter(this)
+    fun Filter.forget() {
+        EhDB.deleteFilter(this)
+        when (mode) {
+            MODE_TITLE -> titleFilterList.remove(this)
+            MODE_TAG -> tagFilterList.remove(this)
+            MODE_TAG_NAMESPACE -> tagNamespaceFilterList.remove(this)
+            MODE_UPLOADER -> uploaderFilterList.remove(this)
+            MODE_COMMENTER -> commenterFilterList.remove(this)
+            MODE_COMMENT -> commentFilterList.remove(this)
+            else -> error("Unknown mode: " + mode)
+        }
+    }
+
     const val MODE_TITLE = 0
     const val MODE_UPLOADER = 1
     const val MODE_TAG = 2
@@ -51,22 +66,6 @@ object EhFilter {
             MODE_UPLOADER -> uploaderFilterList.add(filter)
             MODE_COMMENTER -> commenterFilterList.add(filter)
             MODE_COMMENT -> commentFilterList.add(filter)
-            else -> error("Unknown mode: " + filter.mode)
-        }
-    }
-
-    fun addFilter(filter: Filter) = EhDB.addFilter(filter).also { if (it) memorizeFilter(filter) }
-    fun triggerFilter(filter: Filter) = EhDB.triggerFilter(filter)
-
-    fun deleteFilter(filter: Filter) {
-        EhDB.deleteFilter(filter)
-        when (filter.mode) {
-            MODE_TITLE -> titleFilterList.remove(filter)
-            MODE_TAG -> tagFilterList.remove(filter)
-            MODE_TAG_NAMESPACE -> tagNamespaceFilterList.remove(filter)
-            MODE_UPLOADER -> uploaderFilterList.remove(filter)
-            MODE_COMMENTER -> commenterFilterList.remove(filter)
-            MODE_COMMENT -> commentFilterList.remove(filter)
             else -> error("Unknown mode: " + filter.mode)
         }
     }

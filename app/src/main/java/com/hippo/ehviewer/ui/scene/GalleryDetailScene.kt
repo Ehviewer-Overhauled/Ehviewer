@@ -116,6 +116,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
+import com.hippo.ehviewer.client.EhFilter.remember
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.EhTagDatabase.isTranslatable
 import com.hippo.ehviewer.client.EhTagDatabase.namespaceToPrefix
@@ -1227,8 +1228,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         BaseDialogBuilder(context)
             .setMessage(getString(R.string.filter_the_tag, tag))
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                val filter = Filter(EhFilter.MODE_TAG, tag)
-                EhFilter.addFilter(filter)
+                Filter(EhFilter.MODE_TAG, tag).remember()
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -1334,8 +1334,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         BaseDialogBuilder(context)
             .setMessage(getString(R.string.filter_the_uploader, uploader))
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                val filter = Filter(EhFilter.MODE_UPLOADER, uploader)
-                EhFilter.addFilter(filter)
+                Filter(EhFilter.MODE_UPLOADER, uploader).remember()
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }
             .setNegativeButton(android.R.string.cancel, null)

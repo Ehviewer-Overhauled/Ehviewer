@@ -40,6 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
+import com.hippo.ehviewer.client.EhFilter.forget
+import com.hippo.ehviewer.client.EhFilter.remember
+import com.hippo.ehviewer.client.EhFilter.trigger
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.databinding.DialogAddFilterBinding
 import com.hippo.ehviewer.ui.LocalNavController
@@ -80,7 +83,7 @@ fun FilterScreen() {
                 }
             }
             binding.textInputLayout.run {
-                if (!EhFilter.addFilter(Filter(mArray.indexOf(text1), text!!))) {
+                if (!Filter(mArray.indexOf(text1), text!!).remember()) {
                     error = context.getString(R.string.label_text_exist)
                     return
                 } else {
@@ -138,7 +141,7 @@ fun FilterScreen() {
                             checked = filter.enable,
                             onCheckedChange = {
                                 coroutineScope.launch {
-                                    EhFilter.triggerFilter(filter)
+                                    filter.trigger()
                                     filterCheckBoxRecomposeScope.invalidate()
                                 }
                             },
@@ -146,7 +149,7 @@ fun FilterScreen() {
                         Text(text = filter.text)
                         Spacer(modifier = Modifier.weight(1F))
                         IconButton(
-                            onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { coroutineScope.launch { EhFilter.deleteFilter(filter) } } }.setNegativeButton(android.R.string.cancel, null).show() },
+                            onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { coroutineScope.launch { filter.forget() } } }.setNegativeButton(android.R.string.cancel, null).show() },
                         ) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                         }

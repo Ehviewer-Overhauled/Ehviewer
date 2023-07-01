@@ -58,6 +58,7 @@ import androidx.viewbinding.ViewBinding
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
+import com.hippo.ehviewer.client.EhFilter.remember
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryCommentList
@@ -304,8 +305,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         BaseDialogBuilder(context)
             .setMessage(getString(R.string.filter_the_commenter, commenter))
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                val filter = Filter(EhFilter.MODE_COMMENTER, commenter)
-                EhFilter.addFilter(filter)
+                Filter(EhFilter.MODE_COMMENTER, commenter).remember()
                 hideComment(position)
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }
