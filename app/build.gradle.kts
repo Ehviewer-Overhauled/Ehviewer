@@ -100,7 +100,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-        languageVersion = "2.0"
         freeCompilerArgs = listOf(
             // https://kotlinlang.org/docs/compiler-reference.html#progressive
             "-progressive",
