@@ -1,11 +1,16 @@
 package com.hippo.ehviewer.spider
 
 import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.client.CHROME_ACCEPT
+import com.hippo.ehviewer.client.CHROME_ACCEPT_LANGUAGE
+import com.hippo.ehviewer.client.CHROME_USER_AGENT
+import com.hippo.ehviewer.client.EhCookieStore
 import eu.kanade.tachiyomi.util.system.logcat
 import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okio.Path.Companion.toOkioPath
 import org.chromium.net.CronetEngine
 import org.chromium.net.CronetException
@@ -72,8 +77,14 @@ class CronetRequest : AutoCloseable {
     override fun close() = pool.recycle(buffer)
 }
 
-inline fun cronetRequest(url: String, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
-    request = cronetHttpClient.newUrlRequestBuilder(url, callback, cronetHttpClientExecutor).apply(conf).build()
+inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
+    request = cronetHttpClient.newUrlRequestBuilder(url, callback, cronetHttpClientExecutor).apply {
+        addHeader("Cookie", EhCookieStore.getCookieHeader(url.toHttpUrl()))
+        addHeader("User-Agent", CHROME_USER_AGENT)
+        addHeader("Accept", CHROME_ACCEPT)
+        addHeader("Accept-Language", CHROME_ACCEPT_LANGUAGE)
+        referer?.let { addHeader("Referer", it) }
+    }.apply(conf).build()
 }
 
 suspend infix fun CronetRequest.awaitBodyFully(consumer: (ByteBuffer) -> Unit) = run {
