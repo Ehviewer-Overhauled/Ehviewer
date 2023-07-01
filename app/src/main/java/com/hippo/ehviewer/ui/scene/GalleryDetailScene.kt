@@ -27,7 +27,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -104,6 +103,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.text.parseAsHtml
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import arrow.core.partially1
@@ -1109,12 +1109,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 user.setBackgroundColor(Color.TRANSPARENT)
                                 time.text = ReadableTime.getTimeAgo(comment.time)
                                 this.comment.maxLines = 5
-                                this.comment.text = Html.fromHtml(
-                                    comment.comment,
-                                    Html.FROM_HTML_MODE_LEGACY,
-                                    URLImageGetter(this.comment),
-                                    null,
-                                )
+                                this.comment.text = comment.comment.orEmpty().parseAsHtml(imageGetter = URLImageGetter(this.comment))
                             }.root
                     })
                 }

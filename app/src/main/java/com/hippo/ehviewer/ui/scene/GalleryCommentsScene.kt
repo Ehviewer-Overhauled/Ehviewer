@@ -23,7 +23,6 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Looper
-import android.text.Html
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.CharacterStyle
@@ -45,6 +44,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.text.getSpans
 import androidx.core.text.inSpans
+import androidx.core.text.parseAsHtml
 import androidx.core.text.set
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
@@ -767,12 +767,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             textView: ObservedTextView,
             comment: GalleryComment,
         ): CharSequence {
-            sp = Html.fromHtml(
-                comment.comment,
-                Html.FROM_HTML_MODE_LEGACY,
-                URLImageGetter(textView),
-                null,
-            )
+            sp = comment.comment.orEmpty().parseAsHtml(imageGetter = URLImageGetter(textView))
             val ssb = SpannableStringBuilder(sp)
             if (0L != comment.id && 0 != comment.score) {
                 val score = comment.score

@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import androidx.core.text.parseAsHtml
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.ui.compose.util.htmlReadyLicenseContent
@@ -190,7 +191,7 @@ fun HtmlText(
     AndroidView(
         modifier = modifier,
         factory = { context -> TextView(context) },
-        update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) },
+        update = { it.text = html.parseAsHtml(flags = HtmlCompat.FROM_HTML_MODE_COMPACT) },
     )
 }
 

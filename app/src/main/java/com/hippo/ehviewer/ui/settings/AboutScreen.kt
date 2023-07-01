@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.settings
 
-import android.text.Html
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -16,6 +15,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.core.text.parseAsHtml
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
@@ -31,7 +31,7 @@ private fun versionCode() = "${BuildConfig.VERSION_NAME} (${BuildConfig.COMMIT_S
 
 @Composable
 @Stable
-private fun author() = stringResource(R.string.settings_about_author_summary).replace('$', '@').let { Html.fromHtml(it, Html.FROM_HTML_MODE_LEGACY).toAnnotatedString() }
+private fun author() = stringResource(R.string.settings_about_author_summary).replace('$', '@').parseAsHtml().toAnnotatedString()
 
 @Composable
 fun AboutScreen() {

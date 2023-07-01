@@ -4,13 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.text.Html
 import android.text.style.URLSpan
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
 import androidx.core.text.getSpans
+import androidx.core.text.parseAsHtml
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -109,7 +109,7 @@ fun showEventNotification(html: String) {
         .setName(CHANNEL_ID)
         .build()
     notificationManager.createNotificationChannel(chan)
-    val text = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
+    val text = html.parseAsHtml()
     val msg = NotificationCompat.Builder(appCtx, CHANNEL_ID)
         .setAutoCancel(true)
         .setSmallIcon(R.drawable.ic_launcher_monochrome)

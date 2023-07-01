@@ -2,7 +2,6 @@ package com.hippo.ehviewer.ui.settings
 
 import android.content.DialogInterface
 import android.os.Build
-import android.text.Html
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +33,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.text.parseAsHtml
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
@@ -107,7 +107,7 @@ fun EhScreen() {
                 BaseDialogBuilder(context).apply {
                     if (ipbMemberId != null || ipbPassHash != null || igneous != null) {
                         val str = EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>" + EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>" + EhCookieStore.KEY_IGNEOUS + ": " + igneous
-                        val spanned = Html.fromHtml(context.getString(R.string.settings_eh_identity_cookies_signed, str), Html.FROM_HTML_MODE_LEGACY)
+                        val spanned = context.getString(R.string.settings_eh_identity_cookies_signed, str).parseAsHtml()
                         setMessage(spanned)
                         setNeutralButton(R.string.settings_eh_identity_cookies_copy) { _, _ ->
                             context whisperClipboard str.replace("<br>", "\n")
