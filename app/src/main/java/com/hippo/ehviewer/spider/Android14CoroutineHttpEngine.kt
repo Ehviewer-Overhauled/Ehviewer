@@ -1,6 +1,7 @@
 package com.hippo.ehviewer.spider
 
 import com.hippo.ehviewer.EhApplication
+import eu.kanade.tachiyomi.util.system.logcat
 import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+private const val TAG = "CronetRequest"
 private val pool = DirectByteBufferPool(32)
 
 val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
@@ -39,7 +41,8 @@ class CronetRequest : AutoCloseable {
     lateinit var readerCont: Continuation<Long>
     val callback = object : UrlRequest.Callback() {
         override fun onRedirectReceived(req: UrlRequest, info: UrlResponseInfo, url: String) {
-            // No-op
+            logcat(tag = TAG) { "Redirected to $url" }
+            req.followRedirect()
         }
 
         override fun onResponseStarted(req: UrlRequest, info: UrlResponseInfo) {
@@ -61,10 +64,6 @@ class CronetRequest : AutoCloseable {
 
         override fun onFailed(req: UrlRequest, info: UrlResponseInfo?, e: CronetException) {
             daemonCont.resumeWithException(e)
-        }
-
-        override fun onCanceled(req: UrlRequest, info: UrlResponseInfo?) {
-            // No-op
         }
     }
 
