@@ -23,6 +23,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.Filter
 
 private val regex = { p: Filter -> Regex(p.text) }.memoize()
+private inline fun List<Filter>.anyActive(predicate: (Filter) -> Boolean) = any { it.enable && predicate(it) }
 
 object EhFilter {
     val titleFilterList = mutableStateListOf<Filter>()
@@ -113,10 +114,10 @@ object EhFilter {
     }
 
     fun needTags() = tagFilterList.isNotEmpty() || tagNamespaceFilterList.isNotEmpty()
-    fun filterTitle(info: GalleryInfo) = titleFilterList.any { it.enable && it.text in info.title.orEmpty().lowercase() }
-    fun filterUploader(info: GalleryInfo) = uploaderFilterList.any { it.enable && it.text == info.uploader }
-    fun filterTag(info: GalleryInfo) = info.simpleTags?.any { tag -> tagFilterList.any { it.enable && matchTag(tag, it.text) } } ?: false
-    fun filterTagNamespace(info: GalleryInfo) = info.simpleTags?.any { tag -> tagNamespaceFilterList.any { it.enable && matchTagNamespace(tag, it.text) } } ?: false
-    fun filterCommenter(commenter: String) = commenterFilterList.any { it.enable && it.text == commenter }
-    fun filterComment(comment: String) = commentFilterList.any { it.enable && regex(it).containsMatchIn(comment) }
+    fun filterTitle(info: GalleryInfo) = titleFilterList.anyActive { it.text in info.title.orEmpty().lowercase() }
+    fun filterUploader(info: GalleryInfo) = uploaderFilterList.anyActive { it.text == info.uploader }
+    fun filterTag(info: GalleryInfo) = info.simpleTags?.any { tag -> tagFilterList.anyActive { matchTag(tag, it.text) } } ?: false
+    fun filterTagNamespace(info: GalleryInfo) = info.simpleTags?.any { tag -> tagNamespaceFilterList.anyActive { matchTagNamespace(tag, it.text) } } ?: false
+    fun filterCommenter(commenter: String) = commenterFilterList.anyActive { it.text == commenter }
+    fun filterComment(comment: String) = commentFilterList.anyActive { regex(it).containsMatchIn(comment) }
 }
