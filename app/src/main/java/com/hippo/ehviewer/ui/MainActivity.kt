@@ -120,41 +120,45 @@ class MainActivity : EhActivity() {
     }
 
     private fun handleIntent(intent: Intent?): Boolean {
-        intent ?: return false
-        val action = intent.action
-        if (Intent.ACTION_VIEW == action) {
-            val uri = intent.data ?: return false
-            return navController.navWithUrl(uri.toString())
-        } else if (Intent.ACTION_SEND == action) {
-            val type = intent.type
-            if ("text/plain" == type) {
-                val builder = ListUrlBuilder()
-                builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
-                navController.navAnimated(
-                    R.id.galleryListScene,
-                    builder.toStartArgs(),
-                )
-                return true
-            } else if (type != null && type.startsWith("image/")) {
-                val uri = intent.getParcelableExtraCompat<Uri>(Intent.EXTRA_STREAM)
-                if (null != uri) {
-                    val temp = saveImageToTempFile(uri)
-                    if (null != temp) {
-                        val builder = ListUrlBuilder()
-                        builder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
-                        builder.imagePath = temp.path
-                        builder.isUseSimilarityScan = true
-                        navController.navAnimated(
-                            R.id.galleryListScene,
-                            builder.toStartArgs(),
-                        )
-                        return true
+        when (intent?.action) {
+            Intent.ACTION_VIEW -> {
+                val uri = intent.data ?: return false
+                return navController.navWithUrl(uri.toString())
+            }
+
+            Intent.ACTION_SEND -> {
+                val type = intent.type
+                if ("text/plain" == type) {
+                    val builder = ListUrlBuilder()
+                    builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
+                    navController.navAnimated(
+                        R.id.galleryListScene,
+                        builder.toStartArgs(),
+                    )
+                    return true
+                } else if (type != null && type.startsWith("image/")) {
+                    val uri = intent.getParcelableExtraCompat<Uri>(Intent.EXTRA_STREAM)
+                    if (null != uri) {
+                        val temp = saveImageToTempFile(uri)
+                        if (null != temp) {
+                            val builder = ListUrlBuilder()
+                            builder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
+                            builder.imagePath = temp.path
+                            builder.isUseSimilarityScan = true
+                            navController.navAnimated(
+                                R.id.galleryListScene,
+                                builder.toStartArgs(),
+                            )
+                            return true
+                        }
                     }
                 }
             }
-        } else if (action == DownloadService.ACTION_START_DOWNLOADSCENE) {
-            val args = intent.getBundleExtra(DownloadService.ACTION_START_DOWNLOADSCENE_ARGS)
-            navController.navAnimated(R.id.nav_downloads, args)
+
+            DownloadService.ACTION_START_DOWNLOADSCENE -> {
+                val args = intent.getBundleExtra(DownloadService.ACTION_START_DOWNLOADSCENE_ARGS)
+                navController.navAnimated(R.id.nav_downloads, args)
+            }
         }
 
         return false
