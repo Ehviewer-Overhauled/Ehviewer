@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.login
 
-import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,12 +17,12 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.SELECT_SITE_ROUTE_NAME
+import com.hippo.ehviewer.util.setDefaultSettings
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebviewSignInScreen() {
     val navController = LocalNavController.current
@@ -68,11 +67,7 @@ fun WebviewSignInScreen() {
         state = state,
         modifier = Modifier.fillMaxSize(),
         onCreated = {
-            it.settings.run {
-                builtInZoomControls = true
-                displayZoomControls = true
-                javaScriptEnabled = true
-            }
+            it.setDefaultSettings()
         },
         client = client,
     )

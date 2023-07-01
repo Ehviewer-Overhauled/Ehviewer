@@ -45,6 +45,7 @@ import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.lockObserver
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.yorozuya.FileUtils
+import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -157,6 +158,8 @@ class EhApplication : Application(), ImageLoaderFactory {
                         alwaysReadResponseBody(false)
                     }.build(),
                 )
+
+                addInterceptor(CloudflareInterceptor(appCtx))
 
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
                 addInterceptor { chain ->

@@ -62,6 +62,10 @@ object EhCookieStore : CookieJar {
         flush()
     }
 
+    fun deleteCookie(url: HttpUrl, name: String) {
+        manager.setCookie(url.toString(), "$name=;Max-Age=0")
+    }
+
     fun addCookie(cookie: Cookie) {
         if (EhUrl.DOMAIN_E in cookie.domain) manager.setCookie(EhUrl.HOST_E, cookie.toString()) else manager.setCookie(EhUrl.DOMAIN_EX, cookie.toString())
     }
