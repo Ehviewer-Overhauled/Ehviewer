@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.settings
 
-import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,10 +26,10 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.LocalNavController
+import com.hippo.ehviewer.util.setDefaultSettings
 
 private const val applyJs = "javascript:(function(){var apply = document.getElementById(\"apply\").children[0];apply.click();})();"
 
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun UConfigScreen() {
     val navController = LocalNavController.current
@@ -65,11 +64,7 @@ fun UConfigScreen() {
             state = state,
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).fillMaxSize(),
             onCreated = {
-                it.settings.run {
-                    builtInZoomControls = true
-                    displayZoomControls = false
-                    javaScriptEnabled = true
-                }
+                it.setDefaultSettings()
             },
             factory = { WebView(it).apply { webview.set(this) } },
         )

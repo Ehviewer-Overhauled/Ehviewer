@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.settings
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,8 +17,8 @@ import com.google.accompanist.web.rememberWebViewState
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.LocalNavController
+import com.hippo.ehviewer.util.setDefaultSettings
 
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun MyTagsScreen() {
     val navController = LocalNavController.current
@@ -41,11 +40,7 @@ fun MyTagsScreen() {
             state = state,
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).fillMaxSize(),
             onCreated = {
-                it.settings.run {
-                    builtInZoomControls = true
-                    displayZoomControls = false
-                    javaScriptEnabled = true
-                }
+                it.setDefaultSettings()
             },
         )
     }
