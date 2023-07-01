@@ -18,7 +18,6 @@ package com.google.net.cronet.okhttptransport;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.hippo.ehviewer.client.EhCookieStore;
 
 import org.chromium.net.CronetEngine;
 import org.chromium.net.UrlRequest;
@@ -95,8 +94,6 @@ final class RequestResponseConverter {
         for (int i = 0; i < okHttpRequest.headers().size(); i++) {
             builder.addHeader(okHttpRequest.headers().name(i), okHttpRequest.headers().value(i));
         }
-        var cookies = EhCookieStore.INSTANCE.getCookieHeader(okHttpRequest.url());
-        builder.addHeader("Cookie", cookies);
 
         RequestBody body = okHttpRequest.body();
 
