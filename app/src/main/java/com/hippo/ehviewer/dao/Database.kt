@@ -32,7 +32,7 @@ class ThumbKeyMigration : AutoMigrationSpec {
 
 @Database(
     entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 7,
+    version = 8,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -48,6 +48,10 @@ class ThumbKeyMigration : AutoMigrationSpec {
             from = 6,
             to = 7,
             spec = DropBookMarkDao::class,
+        ),
+        AutoMigration(
+            from = 7,
+            to = 8,
         ),
     ],
 )

@@ -10,10 +10,10 @@ data class Filter(
     var mode: Int = 0,
 
     @ColumnInfo(name = "TEXT")
-    var text: String? = null,
+    var text: String = "INVALID",
 
     @ColumnInfo(name = "ENABLE")
-    var enable: Boolean? = null,
+    var enable: Boolean = true,
 
     @PrimaryKey
     @ColumnInfo(name = "_id")

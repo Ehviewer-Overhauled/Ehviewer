@@ -22,7 +22,7 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.Filter
 
-private val regex = { p: Filter -> Regex(p.text!!) }.memoize()
+private val regex = { p: Filter -> Regex(p.text) }.memoize()
 
 object EhFilter {
     val titleFilterList = mutableStateListOf<Filter>()
@@ -47,17 +47,17 @@ object EhFilter {
     private fun memorizeFilter(filter: Filter) {
         when (filter.mode) {
             MODE_TITLE -> {
-                filter.text = filter.text!!.lowercase()
+                filter.text = filter.text.lowercase()
                 titleFilterList.add(filter)
             }
 
             MODE_TAG -> {
-                filter.text = filter.text!!.lowercase()
+                filter.text = filter.text.lowercase()
                 tagFilterList.add(filter)
             }
 
             MODE_TAG_NAMESPACE -> {
-                filter.text = filter.text!!.lowercase()
+                filter.text = filter.text.lowercase()
                 tagNamespaceFilterList.add(filter)
             }
 
@@ -113,10 +113,10 @@ object EhFilter {
     }
 
     fun needTags() = tagFilterList.isNotEmpty() || tagNamespaceFilterList.isNotEmpty()
-    fun filterTitle(info: GalleryInfo) = titleFilterList.any { it.enable!! && it.text!! in info.title.orEmpty().lowercase() }
-    fun filterUploader(info: GalleryInfo) = uploaderFilterList.any { it.enable!! && it.text == info.uploader }
-    fun filterTag(info: GalleryInfo) = info.simpleTags?.any { tag -> tagFilterList.any { it.enable!! && matchTag(tag, it.text!!) } } ?: false
-    fun filterTagNamespace(info: GalleryInfo) = info.simpleTags?.any { tag -> tagNamespaceFilterList.any { it.enable!! && matchTagNamespace(tag, it.text!!) } } ?: false
-    fun filterCommenter(commenter: String) = commenterFilterList.any { it.enable!! && it.text == commenter }
-    fun filterComment(comment: String) = commentFilterList.any { it.enable!! && regex(it).containsMatchIn(comment) }
+    fun filterTitle(info: GalleryInfo) = titleFilterList.any { it.enable && it.text in info.title.orEmpty().lowercase() }
+    fun filterUploader(info: GalleryInfo) = uploaderFilterList.any { it.enable && it.text == info.uploader }
+    fun filterTag(info: GalleryInfo) = info.simpleTags?.any { tag -> tagFilterList.any { it.enable && matchTag(tag, it.text) } } ?: false
+    fun filterTagNamespace(info: GalleryInfo) = info.simpleTags?.any { tag -> tagNamespaceFilterList.any { it.enable && matchTagNamespace(tag, it.text) } } ?: false
+    fun filterCommenter(commenter: String) = commenterFilterList.any { it.enable && it.text == commenter }
+    fun filterComment(comment: String) = commentFilterList.any { it.enable && regex(it).containsMatchIn(comment) }
 }
