@@ -43,6 +43,7 @@ import com.hippo.ehviewer.client.EhFilter.forget
 import com.hippo.ehviewer.client.EhFilter.remember
 import com.hippo.ehviewer.client.EhFilter.trigger
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.dao.FilterMode
 import com.hippo.ehviewer.databinding.DialogAddFilterBinding
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -79,7 +80,7 @@ fun FilterScreen() {
                 }
             }
             binding.textInputLayout.run {
-                Filter(mArray.indexOf(text1), text!!).remember {
+                Filter(FilterMode.entries[mArray.indexOf(text1)], text!!).remember {
                     if (it) {
                         post { dialog.dismiss() }
                     } else {

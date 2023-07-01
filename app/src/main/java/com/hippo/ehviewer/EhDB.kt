@@ -335,7 +335,7 @@ object EhDB {
     @Synchronized
     fun addFilter(filter: Filter): Boolean {
         val existFilter: Filter? = try {
-            db.filterDao().load(filter.text, filter.mode)
+            db.filterDao().load(filter.text, filter.mode.field)
         } catch (e: Exception) {
             null
         }

@@ -4,6 +4,7 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteTable
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -55,6 +56,7 @@ class ThumbKeyMigration : AutoMigrationSpec {
         ),
     ],
 )
+@TypeConverters(FilterModeConverter::class)
 abstract class EhDatabase : RoomDatabase() {
     abstract fun downloadDirnameDao(): DownloadDirnameDao
     abstract fun downloadLabelDao(): DownloadLabelDao

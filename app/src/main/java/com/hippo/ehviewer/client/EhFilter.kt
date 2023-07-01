@@ -20,6 +20,7 @@ import arrow.core.memoize
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.dao.FilterMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,22 +47,14 @@ object EhFilter : CoroutineScope {
     fun Filter.forget() = launchOps {
         EhDB.deleteFilter(this)
         when (mode) {
-            MODE_TITLE -> titleFilterList.remove(this)
-            MODE_TAG -> tagFilterList.remove(this)
-            MODE_TAG_NAMESPACE -> tagNamespaceFilterList.remove(this)
-            MODE_UPLOADER -> uploaderFilterList.remove(this)
-            MODE_COMMENTER -> commenterFilterList.remove(this)
-            MODE_COMMENT -> commentFilterList.remove(this)
-            else -> error("Unknown mode: $mode")
+            FilterMode.TITLE -> titleFilterList.remove(this)
+            FilterMode.TAG -> tagFilterList.remove(this)
+            FilterMode.TAG_NAMESPACE -> tagNamespaceFilterList.remove(this)
+            FilterMode.UPLOADER -> uploaderFilterList.remove(this)
+            FilterMode.COMMENTER -> commenterFilterList.remove(this)
+            FilterMode.COMMENT -> commentFilterList.remove(this)
         }
     }
-
-    const val MODE_TITLE = 0
-    const val MODE_UPLOADER = 1
-    const val MODE_TAG = 2
-    const val MODE_TAG_NAMESPACE = 3
-    const val MODE_COMMENTER = 4
-    const val MODE_COMMENT = 5
 
     init {
         EhDB.allFilter.forEach(::memorizeFilter)
@@ -69,13 +62,12 @@ object EhFilter : CoroutineScope {
 
     private fun memorizeFilter(filter: Filter) {
         when (filter.mode) {
-            MODE_TITLE -> titleFilterList.add(filter.apply { text = text.lowercase() })
-            MODE_TAG -> tagFilterList.add(filter.apply { text = text.lowercase() })
-            MODE_TAG_NAMESPACE -> tagNamespaceFilterList.add(filter.apply { text = text.lowercase() })
-            MODE_UPLOADER -> uploaderFilterList.add(filter)
-            MODE_COMMENTER -> commenterFilterList.add(filter)
-            MODE_COMMENT -> commentFilterList.add(filter)
-            else -> error("Unknown mode: " + filter.mode)
+            FilterMode.TITLE -> titleFilterList.add(filter.apply { text = text.lowercase() })
+            FilterMode.TAG -> tagFilterList.add(filter.apply { text = text.lowercase() })
+            FilterMode.TAG_NAMESPACE -> tagNamespaceFilterList.add(filter.apply { text = text.lowercase() })
+            FilterMode.UPLOADER -> uploaderFilterList.add(filter)
+            FilterMode.COMMENTER -> commenterFilterList.add(filter)
+            FilterMode.COMMENT -> commentFilterList.add(filter)
         }
     }
 
