@@ -20,6 +20,7 @@ import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
 import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehRequest
@@ -35,6 +36,7 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
 import okio.Buffer
@@ -131,6 +133,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     ): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             cronetRequest(url) {
+                addHeader("Cookie", EhCookieStore.getCookieHeader(url.toHttpUrl()))
                 referer?.let { addHeader("Referer", it) }
                 disableCache()
             }.execute { info ->
