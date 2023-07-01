@@ -27,18 +27,18 @@ import kotlinx.coroutines.launch
 private val regex = { p: Filter -> Regex(p.text) }.memoize()
 private inline fun List<Filter>.anyActive(predicate: (Filter) -> Boolean) = any { it.enable && predicate(it) }
 
-object EhFilter {
+object EhFilter : CoroutineScope {
     val titleFilterList = mutableStateListOf<Filter>()
     val uploaderFilterList = mutableStateListOf<Filter>()
     val tagFilterList = mutableStateListOf<Filter>()
     val tagNamespaceFilterList = mutableStateListOf<Filter>()
     val commenterFilterList = mutableStateListOf<Filter>()
     val commentFilterList = mutableStateListOf<Filter>()
-    private val opScope = CoroutineScope(Dispatchers.IO.limitedParallelism(1))
-    private fun <R> Filter.launchOps(callback: ((R) -> Unit)? = null, ops: Filter.() -> R) = opScope.launch {
-        val r = ops()
-        callback?.invoke(r)
-    }
+    override val coroutineContext = Dispatchers.IO.limitedParallelism(1)
+    private fun <R> Filter.launchOps(
+        callback: ((R) -> Unit)? = null,
+        ops: Filter.() -> R,
+    ) = launch { ops().let { callback?.invoke(it) } }
     fun Filter.remember(callback: ((Boolean) -> Unit)? = null) = launchOps(callback) {
         EhDB.addFilter(this).also { if (it) memorizeFilter(this) }
     }

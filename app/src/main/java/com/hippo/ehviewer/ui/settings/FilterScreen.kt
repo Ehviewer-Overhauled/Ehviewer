@@ -31,7 +31,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -47,13 +46,11 @@ import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.databinding.DialogAddFilterBinding
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun FilterScreen() {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     class AddFilterDialogHelper(private val dialog: AlertDialog) : View.OnClickListener {
         private val mArray = dialog.context.resources.getStringArray(R.array.filter_entries)
