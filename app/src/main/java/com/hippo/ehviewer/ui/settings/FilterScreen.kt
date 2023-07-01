@@ -48,7 +48,6 @@ import com.hippo.ehviewer.databinding.DialogAddFilterBinding
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun FilterScreen() {
@@ -83,14 +82,14 @@ fun FilterScreen() {
                 }
             }
             binding.textInputLayout.run {
-                if (!Filter(mArray.indexOf(text1), text!!).remember()) {
-                    error = context.getString(R.string.label_text_exist)
-                    return
-                } else {
-                    error = null
+                Filter(mArray.indexOf(text1), text!!).remember {
+                    if (it) {
+                        post { dialog.dismiss() }
+                    } else {
+                        post { error = context.getString(R.string.label_text_exist) }
+                    }
                 }
             }
-            dialog.dismiss()
         }
     }
 
@@ -139,17 +138,12 @@ fun FilterScreen() {
                         val filterCheckBoxRecomposeScope = currentRecomposeScope
                         Checkbox(
                             checked = filter.enable,
-                            onCheckedChange = {
-                                coroutineScope.launch {
-                                    filter.trigger()
-                                    filterCheckBoxRecomposeScope.invalidate()
-                                }
-                            },
+                            onCheckedChange = { filter.trigger { filterCheckBoxRecomposeScope.invalidate() } },
                         )
                         Text(text = filter.text)
                         Spacer(modifier = Modifier.weight(1F))
                         IconButton(
-                            onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { coroutineScope.launch { filter.forget() } } }.setNegativeButton(android.R.string.cancel, null).show() },
+                            onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { filter.forget() } }.setNegativeButton(android.R.string.cancel, null).show() },
                         ) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                         }

@@ -20,6 +20,9 @@ import arrow.core.memoize
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.Filter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private val regex = { p: Filter -> Regex(p.text) }.memoize()
 private inline fun List<Filter>.anyActive(predicate: (Filter) -> Boolean) = any { it.enable && predicate(it) }
@@ -31,10 +34,16 @@ object EhFilter {
     val tagNamespaceFilterList = mutableStateListOf<Filter>()
     val commenterFilterList = mutableStateListOf<Filter>()
     val commentFilterList = mutableStateListOf<Filter>()
-
-    fun Filter.remember() = EhDB.addFilter(this).also { if (it) memorizeFilter(this) }
-    fun Filter.trigger() = EhDB.triggerFilter(this)
-    fun Filter.forget() {
+    private val opScope = CoroutineScope(Dispatchers.IO.limitedParallelism(1))
+    private fun <R> Filter.launchOps(callback: ((R) -> Unit)? = null, ops: Filter.() -> R) = opScope.launch {
+        val r = ops()
+        callback?.invoke(r)
+    }
+    fun Filter.remember(callback: ((Boolean) -> Unit)? = null) = launchOps(callback) {
+        EhDB.addFilter(this).also { if (it) memorizeFilter(this) }
+    }
+    fun Filter.trigger(callback: ((Unit) -> Unit)? = null) = launchOps(callback) { EhDB.triggerFilter(this) }
+    fun Filter.forget() = launchOps {
         EhDB.deleteFilter(this)
         when (mode) {
             MODE_TITLE -> titleFilterList.remove(this)
@@ -43,7 +52,7 @@ object EhFilter {
             MODE_UPLOADER -> uploaderFilterList.remove(this)
             MODE_COMMENTER -> commenterFilterList.remove(this)
             MODE_COMMENT -> commentFilterList.remove(this)
-            else -> error("Unknown mode: " + mode)
+            else -> error("Unknown mode: $mode")
         }
     }
 
