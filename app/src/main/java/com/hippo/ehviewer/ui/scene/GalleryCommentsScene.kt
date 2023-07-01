@@ -304,9 +304,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         BaseDialogBuilder(context)
             .setMessage(getString(R.string.filter_the_commenter, commenter))
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                val filter = Filter()
-                filter.mode = EhFilter.MODE_COMMENTER
-                filter.text = commenter
+                val filter = Filter(EhFilter.MODE_COMMENTER, commenter)
                 EhFilter.addFilter(filter)
                 hideComment(position)
                 showTip(R.string.filter_added, LENGTH_SHORT)

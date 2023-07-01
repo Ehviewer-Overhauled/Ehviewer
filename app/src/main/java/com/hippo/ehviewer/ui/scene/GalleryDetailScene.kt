@@ -1232,9 +1232,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         BaseDialogBuilder(context)
             .setMessage(getString(R.string.filter_the_tag, tag))
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                val filter = Filter()
-                filter.mode = EhFilter.MODE_TAG
-                filter.text = tag
+                val filter = Filter(EhFilter.MODE_TAG, tag)
                 EhFilter.addFilter(filter)
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }
@@ -1341,9 +1339,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         BaseDialogBuilder(context)
             .setMessage(getString(R.string.filter_the_uploader, uploader))
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                val filter = Filter()
-                filter.mode = EhFilter.MODE_UPLOADER
-                filter.text = uploader
+                val filter = Filter(EhFilter.MODE_UPLOADER, uploader)
                 EhFilter.addFilter(filter)
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }

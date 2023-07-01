@@ -7,10 +7,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "FILTER")
 data class Filter(
     @ColumnInfo(name = "MODE")
-    var mode: Int = 0,
+    val mode: Int,
 
     @ColumnInfo(name = "TEXT")
-    var text: String = "INVALID",
+    var text: String,
 
     @ColumnInfo(name = "ENABLE")
     var enable: Boolean = true,
