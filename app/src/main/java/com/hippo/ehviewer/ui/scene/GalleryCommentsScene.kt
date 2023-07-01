@@ -428,21 +428,17 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 if (which < 0 || which >= menuId.size) {
                     return@setItems
                 }
-                val id = menuId[which]
-                if (id == R.id.copy) {
-                    requireActivity().addTextToClipboard(text, false)
-                } else if (id == R.id.block_commenter) {
-                    showFilterCommenterDialog(comment.user, position)
-                } else if (id == R.id.vote_up) {
-                    voteComment(comment.id, 1)
-                } else if (id == R.id.vote_down) {
-                    voteComment(comment.id, -1)
-                } else if (id == R.id.check_vote_status) {
-                    showVoteStatusDialog(context, comment.voteState!!)
-                } else if (id == R.id.edit_comment) {
-                    prepareEditComment(comment.id, text)
-                    if (!mInAnimation && binding.editPanel.visibility != View.VISIBLE) {
-                        showEditPanel(true)
+                when (menuId[which]) {
+                    R.id.copy -> requireActivity().addTextToClipboard(text, false)
+                    R.id.block_commenter -> showFilterCommenterDialog(comment.user, position)
+                    R.id.vote_up -> voteComment(comment.id, 1)
+                    R.id.vote_down -> voteComment(comment.id, -1)
+                    R.id.check_vote_status -> showVoteStatusDialog(context, comment.voteState!!)
+                    R.id.edit_comment -> {
+                        prepareEditComment(comment.id, text)
+                        if (!mInAnimation && binding.editPanel.visibility != View.VISIBLE) {
+                            showEditPanel(true)
+                        }
                     }
                 }
             }.show()

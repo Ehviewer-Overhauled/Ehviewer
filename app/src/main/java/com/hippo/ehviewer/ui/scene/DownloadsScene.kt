@@ -193,15 +193,21 @@ class DownloadsScene :
     @SuppressLint("NotifyDataSetChanged")
     private fun updateForLabel() {
         var list: List<DownloadInfo>?
-        if (mLabel == null) {
-            list = DownloadManager.allDownloadInfoList
-        } else if (mLabel == getString(R.string.default_download_label_name)) {
-            list = DownloadManager.defaultDownloadInfoList
-        } else {
-            list = DownloadManager.getLabelDownloadInfoList(mLabel)
-            if (list == null) {
-                mLabel = null
+        when (mLabel) {
+            null -> {
                 list = DownloadManager.allDownloadInfoList
+            }
+
+            getString(R.string.default_download_label_name) -> {
+                list = DownloadManager.defaultDownloadInfoList
+            }
+
+            else -> {
+                list = DownloadManager.getLabelDownloadInfoList(mLabel)
+                if (list == null) {
+                    mLabel = null
+                    list = DownloadManager.allDownloadInfoList
+                }
             }
         }
         mList = if (mType != -1) {
@@ -827,21 +833,27 @@ class DownloadsScene :
             if (index < 0 || index >= size) {
                 return
             }
-            if (binding.thumb === v) {
-                val args = Bundle()
-                args.putString(
-                    GalleryDetailScene.KEY_ACTION,
-                    GalleryDetailScene.ACTION_GALLERY_INFO,
-                )
-                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index])
-                navAnimated(R.id.galleryDetailScene, args)
-            } else if (binding.start === v) {
-                val intent = Intent(activity, DownloadService::class.java)
-                intent.action = DownloadService.ACTION_START
-                intent.putExtra(DownloadService.KEY_GALLERY_INFO, list[index])
-                ContextCompat.startForegroundService(activity, intent)
-            } else if (binding.stop === v) {
-                DownloadManager.stopDownload(list[index].gid)
+            when (v) {
+                binding.thumb -> {
+                    val args = Bundle()
+                    args.putString(
+                        GalleryDetailScene.KEY_ACTION,
+                        GalleryDetailScene.ACTION_GALLERY_INFO,
+                    )
+                    args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index])
+                    navAnimated(R.id.galleryDetailScene, args)
+                }
+
+                binding.start -> {
+                    val intent = Intent(activity, DownloadService::class.java)
+                    intent.action = DownloadService.ACTION_START
+                    intent.putExtra(DownloadService.KEY_GALLERY_INFO, list[index])
+                    ContextCompat.startForegroundService(activity, intent)
+                }
+
+                binding.stop -> {
+                    DownloadManager.stopDownload(list[index].gid)
+                }
             }
         }
 

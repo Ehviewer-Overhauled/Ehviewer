@@ -233,6 +233,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                     }
                 }
             }
+
         fun init(contentLayout: ContentLayout) {
             binding = contentLayout.binding
             mNextPageScrollSize = dp2px(contentLayout.context, 48f)
@@ -689,30 +690,40 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
          * @throws IndexOutOfBoundsException if page < 0 or page >= mPages
          */
         fun goTo(page: Int) {
-            if (page < 0 || page >= pages) {
-                throw IndexOutOfBoundsException("Page count is $pages, page is $page")
-            } else if (page in mStartPage until mEndPage) {
-                cancelCurrentTask()
-                val position = getPageStart(page)
-                scrollToPosition(position)
-            } else if (page == mStartPage - 1) {
-                showProgress(PROGRESS_TOP)
-                mCurrentTaskId = mIdGenerator.nextId()
-                mCurrentTaskType = TYPE_PRE_PAGE
-                mCurrentTaskPage = page
-                getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
-            } else if (page == mEndPage) {
-                showProgress(PROGRESS_BOTTOM)
-                mCurrentTaskId = mIdGenerator.nextId()
-                mCurrentTaskType = TYPE_NEXT_PAGE
-                mCurrentTaskPage = page
-                getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
-            } else {
-                showProgress(PROGRESS_TOP)
-                mCurrentTaskId = mIdGenerator.nextId()
-                mCurrentTaskType = TYPE_SOMEWHERE
-                mCurrentTaskPage = page
-                getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
+            when (page) {
+                !in 0 until pages -> {
+                    throw IndexOutOfBoundsException("Page count is $pages, page is $page")
+                }
+
+                in mStartPage until mEndPage -> {
+                    cancelCurrentTask()
+                    val position = getPageStart(page)
+                    scrollToPosition(position)
+                }
+
+                mStartPage - 1 -> {
+                    showProgress(PROGRESS_TOP)
+                    mCurrentTaskId = mIdGenerator.nextId()
+                    mCurrentTaskType = TYPE_PRE_PAGE
+                    mCurrentTaskPage = page
+                    getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
+                }
+
+                mEndPage -> {
+                    showProgress(PROGRESS_BOTTOM)
+                    mCurrentTaskId = mIdGenerator.nextId()
+                    mCurrentTaskType = TYPE_NEXT_PAGE
+                    mCurrentTaskPage = page
+                    getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
+                }
+
+                else -> {
+                    showProgress(PROGRESS_TOP)
+                    mCurrentTaskId = mIdGenerator.nextId()
+                    mCurrentTaskType = TYPE_SOMEWHERE
+                    mCurrentTaskPage = page
+                    getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
+                }
             }
         }
 
