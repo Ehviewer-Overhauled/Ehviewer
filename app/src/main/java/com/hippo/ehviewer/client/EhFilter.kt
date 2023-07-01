@@ -40,7 +40,9 @@ object EhFilter {
     const val MODE_COMMENT = 5
     private const val TAG = "EhFilter"
 
-    init { EhDB.allFilter.forEach(::memorizeFilter) }
+    init {
+        EhDB.allFilter.forEach(::memorizeFilter)
+    }
 
     private fun memorizeFilter(filter: Filter) {
         when (filter.mode) {
@@ -74,10 +76,7 @@ object EhFilter {
         return true
     }
 
-    @Synchronized
-    fun triggerFilter(filter: Filter) {
-        EhDB.triggerFilter(filter)
-    }
+    fun triggerFilter(filter: Filter) = EhDB.triggerFilter(filter)
 
     @Synchronized
     fun deleteFilter(filter: Filter) {
@@ -91,23 +90,6 @@ object EhFilter {
             MODE_COMMENT -> commentFilterList.remove(filter)
             else -> Log.d(TAG, "Unknown mode: " + filter.mode)
         }
-    }
-
-    @Synchronized
-    fun needTags(): Boolean {
-        return 0 != tagFilterList.size || 0 != tagNamespaceFilterList.size
-    }
-
-    @Synchronized
-    fun filterTitle(info: GalleryInfo): Boolean {
-        val title = info.title ?: return false
-        return titleFilterList.any { it.enable!! && it.text!! in title.lowercase() }
-    }
-
-    @Synchronized
-    fun filterUploader(info: GalleryInfo): Boolean {
-        val uploader = info.uploader ?: return false
-        return uploaderFilterList.any { it.enable!! && it.text == uploader }
     }
 
     private fun spiltTag(tag: String) = tag.run {
@@ -125,30 +107,16 @@ object EhFilter {
         }
     }
 
-    @Synchronized
-    fun filterTag(info: GalleryInfo): Boolean {
-        val tags = info.simpleTags ?: return false
-        return tags.any { tag -> tagFilterList.any { it.enable!! && matchTag(tag, it.text!!) } }
-    }
-
     private fun matchTagNamespace(tag: String, filter: String): Boolean {
         val (nameSpace, _) = spiltTag(tag)
         return nameSpace == filter
     }
 
-    @Synchronized
-    fun filterTagNamespace(info: GalleryInfo): Boolean {
-        val tags = info.simpleTags ?: return false
-        return tags.any { tag -> tagNamespaceFilterList.any { it.enable!! && matchTagNamespace(tag, it.text!!) } }
-    }
-
-    @Synchronized
-    fun filterCommenter(commenter: String): Boolean {
-        return commenterFilterList.any { it.enable!! && it.text == commenter }
-    }
-
-    @Synchronized
-    fun filterComment(comment: String): Boolean {
-        return commentFilterList.any { it.enable!! && regex(it).containsMatchIn(comment) }
-    }
+    fun needTags() = tagFilterList.isNotEmpty() || tagNamespaceFilterList.isNotEmpty()
+    fun filterTitle(info: GalleryInfo) = titleFilterList.any { it.enable!! && it.text!! in info.title.orEmpty().lowercase() }
+    fun filterUploader(info: GalleryInfo) = uploaderFilterList.any { it.enable!! && it.text == info.uploader }
+    fun filterTag(info: GalleryInfo) = info.simpleTags?.any { tag -> tagFilterList.any { it.enable!! && matchTag(tag, it.text!!) } } ?: false
+    fun filterTagNamespace(info: GalleryInfo) = info.simpleTags?.any { tag -> tagNamespaceFilterList.any { it.enable!! && matchTagNamespace(tag, it.text!!) } } ?: false
+    fun filterCommenter(commenter: String) = commenterFilterList.any { it.enable!! && it.text == commenter }
+    fun filterComment(comment: String) = commentFilterList.any { it.enable!! && regex(it).containsMatchIn(comment) }
 }
