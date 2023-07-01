@@ -34,7 +34,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,7 +48,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -98,7 +96,6 @@ import androidx.compose.ui.layout.LocalPinnableContainer
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -156,6 +153,7 @@ import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
+import com.hippo.ehviewer.ui.main.GalleryDetailErrorTip
 import com.hippo.ehviewer.ui.main.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
@@ -468,39 +466,20 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     },
                 ) {
                     Surface {
-                        if (getDetailError.isNotBlank()) {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.big_sad_pandroid),
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable(onClick = ::actionRefresh),
-                                )
-                                Spacer(modifier = Modifier.size(8.dp))
-                                Text(
-                                    text = getDetailError,
-                                    modifier = Modifier.widthIn(max = 228.dp),
-                                )
-                            }
+                        val gi = composeBindingGI
+                        if (gi != null) {
+                            GalleryDetailContent(
+                                galleryInfo = gi,
+                                galleryDetail = composeBindingGD,
+                                contentPadding = it,
+                                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                            )
                         } else {
-                            val gi = composeBindingGI
-                            if (gi != null) {
-                                GalleryDetailContent(
-                                    galleryInfo = gi,
-                                    galleryDetail = composeBindingGD,
-                                    contentPadding = it,
-                                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    CircularProgressIndicator()
-                                }
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator()
                             }
                         }
                     }
@@ -570,7 +549,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 Text(text = readButtonText)
                             }
                         }
-                        if (galleryDetail != null) {
+                        if (getDetailError.isNotBlank()) {
+                            GalleryDetailErrorTip(error = getDetailError, onClick = ::actionRefresh)
+                        } else if (galleryDetail != null) {
                             BelowHeader(galleryDetail)
                         } else {
                             Box(
@@ -636,7 +617,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 }
                             }
                         }
-                        if (galleryDetail != null) {
+                        if (getDetailError.isNotBlank()) {
+                            GalleryDetailErrorTip(error = getDetailError, onClick = ::actionRefresh)
+                        } else if (galleryDetail != null) {
                             BelowHeader(galleryDetail)
                         } else {
                             Box(
@@ -861,7 +844,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 updateDownloadState()
                 bindViewSecond()
             }.onFailure {
-                it.printStackTrace()
                 getDetailError = ExceptionUtils.getReadableString(it)
             }
         }
