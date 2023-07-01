@@ -80,7 +80,7 @@ fun FilterScreen() {
                 }
             }
             binding.textInputLayout.run {
-                if (!EhFilter.addFilter(Filter(mArray.indexOf(text1), text))) {
+                if (!EhFilter.addFilter(Filter(mArray.indexOf(text1), text!!))) {
                     error = context.getString(R.string.label_text_exist)
                     return
                 } else {
@@ -135,7 +135,7 @@ fun FilterScreen() {
                     ) {
                         val filterCheckBoxRecomposeScope = currentRecomposeScope
                         Checkbox(
-                            checked = filter.enable ?: false,
+                            checked = filter.enable,
                             onCheckedChange = {
                                 coroutineScope.launch {
                                     EhFilter.triggerFilter(filter)
@@ -143,7 +143,7 @@ fun FilterScreen() {
                                 }
                             },
                         )
-                        Text(text = filter.text.orEmpty())
+                        Text(text = filter.text)
                         Spacer(modifier = Modifier.weight(1F))
                         IconButton(
                             onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { coroutineScope.launch { EhFilter.deleteFilter(filter) } } }.setNegativeButton(android.R.string.cancel, null).show() },
