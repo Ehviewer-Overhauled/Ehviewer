@@ -126,6 +126,11 @@ fun AdvancedScreen() {
                 value = Settings::language,
             )
             SwitchPreference(
+                title = stringResource(id = R.string.settings_advanced_bypass_cloudflare),
+                summary = stringResource(id = R.string.settings_advanced_bypass_cloudflare_summary),
+                value = Settings::bypassCloudflare,
+            )
+            SwitchPreference(
                 title = stringResource(id = R.string.preload_thumb_aggressively),
                 value = Settings::preloadThumbAggressively,
             )

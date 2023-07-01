@@ -159,7 +159,7 @@ class EhApplication : Application(), ImageLoaderFactory {
                     }.build(),
                 )
 
-                addInterceptor(CloudflareInterceptor(appCtx))
+                if (Settings.bypassCloudflare) addInterceptor(CloudflareInterceptor(appCtx))
 
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
                 addInterceptor { chain ->
