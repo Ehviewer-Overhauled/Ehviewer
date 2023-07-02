@@ -33,33 +33,31 @@ fun GalleryTags(
     fun String.translate() = ehTags?.takeIf { it.initialized }?.getTranslation(tag = this) ?: this
     fun String.translate(prefix: String?) = ehTags?.takeIf { it.initialized }?.getTranslation(prefix = prefix, tag = this) ?: this
     Column(modifier) {
-        tags.forEach {
+        tags.forEach { tagGroup ->
             Row {
-                it.groupName?.run {
-                    BaseRoundText(
-                        text = translate(),
-                        isGroup = true,
-                    )
-                    val prefix = EhTagDatabase.namespaceToPrefix(this)
-                    FlowRow {
-                        it.forEach {
-                            val weak = it.startsWith('_')
-                            val real = it.removePrefix("_")
-                            val translated = real.translate(prefix)
-                            val tag = this@run + ":" + real
-                            val hapticFeedback = LocalHapticFeedback.current
-                            BaseRoundText(
-                                text = translated,
-                                weak = weak,
-                                modifier = Modifier.combinedClickable(
-                                    onClick = { onTagClick(tag) },
-                                    onLongClick = {
-                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        onTagLongClick(translated, tag)
-                                    },
-                                ),
-                            )
-                        }
+                BaseRoundText(
+                    text = tagGroup.groupName.translate(),
+                    isGroup = true,
+                )
+                val prefix = EhTagDatabase.namespaceToPrefix(tagGroup.groupName)
+                FlowRow {
+                    tagGroup.forEach {
+                        val weak = it.startsWith('_')
+                        val real = it.removePrefix("_")
+                        val translated = real.translate(prefix)
+                        val tag = tagGroup.groupName + ":" + real
+                        val hapticFeedback = LocalHapticFeedback.current
+                        BaseRoundText(
+                            text = translated,
+                            weak = weak,
+                            modifier = Modifier.combinedClickable(
+                                onClick = { onTagClick(tag) },
+                                onLongClick = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onTagLongClick(translated, tag)
+                                },
+                            ),
+                        )
                     }
                 }
             }

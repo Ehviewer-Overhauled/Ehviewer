@@ -281,11 +281,10 @@ object GalleryDetailParser {
 
     private fun parseTagGroup(element: Element): GalleryTagGroup? {
         return try {
-            val group = GalleryTagGroup()
             var nameSpace = element.child(0).text()
             // Remove last ':'
             nameSpace = nameSpace.substring(0, nameSpace.length - 1)
-            group.groupName = nameSpace
+            val group = GalleryTagGroup(nameSpace)
             val tags = element.child(1).children()
             tags.forEach {
                 var tag = it.text()
