@@ -162,17 +162,19 @@ class EhApplication : Application(), ImageLoaderFactory {
                 if (Settings.bypassCloudflare) addInterceptor(CloudflareInterceptor(appCtx))
 
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
-                addInterceptor { chain ->
-                    val request = chain.request()
-                    val url = request.url
-                    val newRequest = request.newBuilder()
-                        .addHeader("Cookie", EhCookieStore.getCookieHeader(url))
-                        .build()
-                    val response = chain.proceed(newRequest)
-                    EhCookieStore.saveFromResponse(url, Cookie.parseAll(url, response.headers))
-                    response
+                if (Settings.enableQuic) {
+                    addInterceptor { chain ->
+                        val request = chain.request()
+                        val url = request.url
+                        val newRequest = request.newBuilder()
+                            .addHeader("Cookie", EhCookieStore.getCookieHeader(url))
+                            .build()
+                        val response = chain.proceed(newRequest)
+                        EhCookieStore.saveFromResponse(url, Cookie.parseAll(url, response.headers))
+                        response
+                    }
+                    addInterceptor(CronetInterceptor.newBuilder(cronetHttpClient).build())
                 }
-                addInterceptor(CronetInterceptor.newBuilder(cronetHttpClient).build())
             }
         }
 

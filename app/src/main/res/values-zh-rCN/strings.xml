@@ -371,6 +371,8 @@
     <string name="settings_advanced_dump_logcat_to">已保存日志至 %s</string>
     <string name="settings_advanced_read_cache_size">阅读缓存大小</string>
     <string name="settings_advanced_app_language_title">App 界面语言</string>
+    <string name="settings_advanced_enable_quic">[实验性] QUIC 支持</string>
+    <string name="settings_advanced_enable_quic_summary">启用 QUIC 协议支持（需要重启应用）</string>
     <string name="settings_advanced_bypass_cloudflare">[实验性] 绕过 Cloudflare</string>
     <string name="settings_advanced_bypass_cloudflare_summary">若持续遇到 403 错误可尝试此项（需要重启应用）</string>
     <string name="settings_advanced_export_data">导出数据</string>
