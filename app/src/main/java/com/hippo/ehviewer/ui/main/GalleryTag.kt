@@ -80,7 +80,7 @@ private fun BaseRoundText(
     Surface(
         modifier = Modifier.padding(4.dp),
         color = bgColor,
-        shape = RoundedCornerShape(64.dp),
+        shape = GalleryTagCorner,
     ) {
         Text(
             text = text,
@@ -90,3 +90,5 @@ private fun BaseRoundText(
         )
     }
 }
+
+private val GalleryTagCorner = RoundedCornerShape(64.dp)
