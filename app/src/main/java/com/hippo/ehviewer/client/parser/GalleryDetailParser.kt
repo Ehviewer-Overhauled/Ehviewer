@@ -201,9 +201,7 @@ object GalleryDetailParser {
             gd.isFavorited = false
             if (gdf != null) {
                 val favoriteName = gdf.text().trim()
-                if (favoriteName == "Add to Favorites") {
-                    gd.favoriteName = null
-                } else {
+                if (favoriteName != "Add to Favorites") {
                     gd.isFavorited = true
                     gd.favoriteName = gdf.text().trim()
                     PATTERN_FAVORITE_SLOT.find(body)?.run {

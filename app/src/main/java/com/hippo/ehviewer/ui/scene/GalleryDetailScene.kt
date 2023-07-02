@@ -150,10 +150,10 @@ import com.hippo.ehviewer.ui.main.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.main.GalleryTags
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
-import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.CrystalCard
+import com.hippo.ehviewer.ui.tools.DialogState
 import com.hippo.ehviewer.ui.tools.FilledTertiaryIconButton
 import com.hippo.ehviewer.ui.tools.FilledTertiaryIconToggleButton
 import com.hippo.ehviewer.ui.tools.GalleryDetailRating
@@ -168,6 +168,8 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import splitties.systemservices.downloadManager
@@ -209,7 +211,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private var mArchiveFormParamOr: String? = null
     private var mArchiveList: List<ArchiveParser.Archive>? = null
     private var mCurrentFunds: HomeParser.Funds? = null
-    private var mModifyingFavorites = false
+    private var favoritesLock = Mutex()
 
     @StringRes
     private fun getRatingText(rating: Float): Int {
@@ -276,6 +278,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     // -1 for error
     private val category: Int
         get() = composeBindingGD?.category ?: composeBindingGI?.category ?: -1
+
+    private val dialogState = DialogState()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -396,6 +400,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
         return ComposeView(requireContext()).apply {
             setMD3Content {
+                dialogState.Handler()
                 val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                 Scaffold(
                     topBar = {
@@ -872,37 +877,26 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private fun modifyFavourite() {
         val galleryDetail = composeBindingGD ?: return
         lifecycleScope.launchIO {
-            if (!mModifyingFavorites) {
+            favoritesLock.withLock {
                 var remove = false
-                val containLocalFavorites = EhDB.containLocalFavorites(galleryDetail.gid)
-                if (containLocalFavorites || galleryDetail.isFavorited) {
-                    mModifyingFavorites = true
-                    runCatching {
-                        removeFromFavorites(galleryDetail)
+                runCatching {
+                    remove = !dialogState.addToFavorites(galleryDetail)
+                    if (remove) {
                         showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
-                        onModifyFavoritesSuccess(true)
-                    }.onFailure {
-                        if (it !is CancellationException) {
-                            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
-                        }
-                    }
-                    mModifyingFavorites = false
-                    remove = true
-                }
-                if (!remove) {
-                    mModifyingFavorites = true
-                    runCatching {
-                        requireContext().addToFavorites(galleryDetail)
+                    } else {
                         showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
-                        withUIContext {
-                            onModifyFavoritesSuccess(false)
-                        }
-                    }.onFailure {
-                        if (it !is CancellationException) {
+                    }
+                    withUIContext {
+                        onModifyFavoritesSuccess()
+                    }
+                }.onFailure {
+                    if (it !is CancellationException) {
+                        if (remove) {
+                            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                        } else {
                             showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
                         }
                     }
-                    mModifyingFavorites = false
                 }
                 withUIContext {
                     // Update UI
@@ -1245,47 +1239,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             .show()
     }
 
-    private fun modifyFavouriteLongClick() {
-        lifecycleScope.launchIO {
-            if (composeBindingGD != null && !mModifyingFavorites) {
-                var remove = false
-                if (EhDB.containLocalFavorites(composeBindingGD!!.gid) || composeBindingGD!!.isFavorited) {
-                    mModifyingFavorites = true
-                    runCatching {
-                        removeFromFavorites(composeBindingGD!!)
-                        showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
-                        onModifyFavoritesSuccess(true)
-                    }.onFailure {
-                        if (it !is CancellationException) {
-                            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
-                        }
-                    }
-                    mModifyingFavorites = false
-                    remove = true
-                }
-                if (!remove) {
-                    mModifyingFavorites = true
-                    runCatching {
-                        requireContext().addToFavorites(composeBindingGD!!, true)
-                        showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
-                        withUIContext {
-                            onModifyFavoritesSuccess(false)
-                        }
-                    }.onFailure {
-                        if (it !is CancellationException) {
-                            showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
-                        }
-                    }
-                    mModifyingFavorites = false
-                }
-                withUIContext {
-                    // Update UI
-                    updateFavoriteDrawable()
-                }
-            }
-        }
-    }
-
     private fun updateDownloadText() {
         downloadButtonText = when (mDownloadState) {
             DownloadInfo.STATE_INVALID -> getString(R.string.download)
@@ -1339,9 +1292,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     override fun onRenameLabel(from: String, to: String) {}
     override fun onUpdateLabels() {}
 
-    private fun onModifyFavoritesSuccess(addOrRemove: Boolean) {
+    private fun onModifyFavoritesSuccess() {
         if (composeBindingGD != null) {
-            composeBindingGD!!.isFavorited = !addOrRemove && composeBindingGD!!.favoriteName != null
+            composeBindingGD!!.isFavorited = composeBindingGD!!.favoriteName != null
             updateFavoriteDrawable()
         }
     }

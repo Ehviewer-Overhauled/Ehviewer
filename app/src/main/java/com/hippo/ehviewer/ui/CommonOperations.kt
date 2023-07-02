@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Text
@@ -51,13 +52,11 @@ import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchNow
 import eu.kanade.tachiyomi.util.lang.withUIContext
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.util.ContextUtils.requireActivity
 import splitties.init.appCtx
-import kotlin.coroutines.resume
 
 object CommonOperations {
     fun startDownload(activity: MainActivity?, galleryInfo: GalleryInfo, forceDefault: Boolean) {
@@ -191,64 +190,82 @@ suspend fun keepNoMediaFileStatus() {
     }
 }
 
-suspend fun Context.addToFavorites(galleryInfo: GalleryInfo, select: Boolean = false) {
-    val slot = Settings.defaultFavSlot
-    val localFav = getString(R.string.local_favorites)
-    val items = Settings.favCat.toMutableList().apply { add(0, localFav) }
-    suspend fun doAddToFavorites(slot: Int, newFavoriteName: String?) {
-        when (slot) {
-            -1 -> {
+suspend fun DialogState.addToFavorites(galleryInfo: GalleryInfo): Boolean {
+    val localFaved = EhDB.containLocalFavorites(galleryInfo.gid)
+    val localFav = if (localFaved) {
+        Icons.Default.Favorite
+    } else {
+        Icons.Default.FavoriteBorder
+    } to appCtx.getString(R.string.local_favorites)
+    val items = Settings.favCat.mapIndexed { index, name ->
+        if (galleryInfo.favoriteSlot == index) {
+            Icons.Default.Favorite
+        } else {
+            Icons.Default.FavoriteBorder
+        } to name
+    }.toTypedArray()
+    val slot = showSelectItemWithIcon(localFav, *items, title = R.string.add_favorites_dialog_title) - 1
+    val newFavoriteName = Settings.favCat.getOrNull(slot)
+    return doAddToFavorites(galleryInfo, slot, newFavoriteName)
+}
+
+private suspend fun doAddToFavorites(
+    galleryInfo: GalleryInfo,
+    slot: Int = -2,
+    newFavoriteName: String? = null,
+    note: String? = null,
+    localFaved: Boolean = false,
+): Boolean {
+    val add = when (slot) {
+        -2 -> {
+            EhDB.removeLocalFavorites(galleryInfo.gid)
+            if (galleryInfo.favoriteSlot >= 0) {
+                EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token)
+            }
+            false
+        }
+
+        -1 -> {
+            if (localFaved) {
+                EhDB.removeLocalFavorites(galleryInfo.gid)
+            } else {
                 EhDB.putLocalFavorites(galleryInfo)
             }
+            !localFaved
+        }
 
-            in 0..9 -> {
-                EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token, slot, "")
-            }
-
-            else -> {
-                throw EhException("Invalid favslot!")
+        in 0..9 -> {
+            if (galleryInfo.favoriteSlot == slot) {
+                EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token)
+                false
+            } else {
+                EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token, slot, note)
+                true
             }
         }
-        galleryInfo.favoriteName = newFavoriteName
-        galleryInfo.favoriteSlot = slot
+
+        else -> throw EhException("Invalid favorite slot!")
+    }
+    if (add) {
+        if (slot != -1 || galleryInfo.favoriteSlot == -2) { // Cloud favorites have priority
+            galleryInfo.favoriteSlot = slot
+            galleryInfo.favoriteName = newFavoriteName
+            withUIContext {
+                FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
+            }
+        }
+    } else if (slot != -1 || galleryInfo.favoriteSlot == -1) {
+        val newSlot = if (slot >= 0 && localFaved) -1 else -2
+        galleryInfo.favoriteSlot = newSlot
+        galleryInfo.favoriteName = null
         withUIContext {
-            FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
+            FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, newSlot)
         }
     }
-    if (!select && slot >= -1 && slot <= 9) {
-        val newFavoriteName = if (slot >= 0) items[slot + 1] else null
-        doAddToFavorites(slot, newFavoriteName)
-    } else {
-        val (slot1, checked) = withUIContext {
-            suspendCancellableCoroutine { cont ->
-                ListCheckBoxDialogBuilder(
-                    this@addToFavorites,
-                    items,
-                    { b, _, position -> cont.resume(position - 1 to b.isChecked) },
-                    getString(R.string.remember_favorite_collection),
-                    false,
-                ).setTitle(R.string.add_favorites_dialog_title).setOnCancelListener { cont.cancel() }.show()
-            }
-        }
-        val newFavoriteName = if (slot1 in 0..9) items[slot1 + 1] else null
-        doAddToFavorites(slot1, newFavoriteName)
-        if (checked) {
-            Settings.defaultFavSlot = slot1
-        } else {
-            Settings.defaultFavSlot = -2
-        }
-    }
+    return add
 }
 
-suspend fun removeFromFavorites(galleryInfo: GalleryInfo) {
-    EhDB.removeLocalFavorites(galleryInfo.gid)
-    EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token, -1, "")
-    galleryInfo.favoriteName = null
-    galleryInfo.favoriteSlot = -2
-    withUIContext {
-        FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, -2)
-    }
-}
+suspend fun removeFromFavorites(galleryInfo: GalleryInfo) = doAddToFavorites(galleryInfo)
 
 fun Context.navToReader(info: GalleryInfo, page: Int = -1) {
     val intent = Intent(this, ReaderActivity::class.java)
@@ -287,6 +304,7 @@ suspend fun DialogState.doGalleryInfoAction(info: GalleryInfo, context: Context)
                     CommonOperations.startDownload(this@with, info, false)
                 }
             }
+
             2 -> if (favourite) {
                 runSuspendCatching {
                     removeFromFavorites(info)
@@ -302,6 +320,7 @@ suspend fun DialogState.doGalleryInfoAction(info: GalleryInfo, context: Context)
                     showTip(R.string.add_to_favorite_failure, BaseScene.LENGTH_LONG)
                 }
             }
+
             3 -> showMoveDownloadLabel(info)
         }
         true
