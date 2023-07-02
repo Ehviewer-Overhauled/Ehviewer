@@ -17,14 +17,12 @@ package com.hippo.ehviewer.client.parser
 
 import android.util.Log
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.yorozuya.toIntOrDefault
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import splitties.init.appCtx
 import java.util.regex.Pattern
 
 object GalleryListParser {
@@ -96,7 +94,6 @@ object GalleryListParser {
                     runCatching { parseGalleryInfo(it.toString()) }.onFailure { it.printStackTrace() }.getOrNull()?.apply {
                         if (favoriteSlot == -2 && EhDB.containLocalFavorites(gid)) {
                             favoriteSlot = -1
-                            favoriteName = appCtx.getString(R.string.local_favorites)
                         }
                         generateSLang()
                     }

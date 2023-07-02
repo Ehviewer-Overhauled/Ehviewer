@@ -238,8 +238,8 @@ object EhEngine {
     suspend fun addFavorites(
         gid: Long,
         token: String?,
-        dstCat: Int,
-        note: String?,
+        dstCat: Int = -1,
+        note: String? = null,
     ) {
         val catStr: String = when (dstCat) {
             -1 -> "favdel"
@@ -450,6 +450,6 @@ object EhEngine {
     }
 
     suspend fun addFavoritesRange(gidTokenArray: Array<Pair<Long, String>>, dstCat: Int) {
-        gidTokenArray.forEach { (gid, token) -> addFavorites(gid, token, dstCat, null) }
+        gidTokenArray.forEach { (gid, token) -> addFavorites(gid, token, dstCat) }
     }
 }

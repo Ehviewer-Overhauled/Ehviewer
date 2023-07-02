@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Icon
@@ -164,13 +166,36 @@ class DialogState {
     ): Int = showNoButton {
         Column {
             Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
-            items.forEachIndexed { index, (icon, text) ->
-                Row(
-                    modifier = Modifier.clickable { dismissWith(index) }.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
-                    Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
+            LazyColumn {
+                itemsIndexed(items) { index, (icon, text) ->
+                    Row(
+                        modifier = Modifier.clickable { dismissWith(index) }.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
+                        Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.size(8.dp))
+        }
+    }
+
+    suspend fun showSelectItemWithIcon(
+        vararg items: Pair<ImageVector, String>,
+        @StringRes title: Int,
+    ): Int = showNoButton {
+        Column {
+            Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
+            LazyColumn {
+                itemsIndexed(items) { index, (icon, text) ->
+                    Row(
+                        modifier = Modifier.clickable { dismissWith(index) }.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
+                        Text(text = text, style = MaterialTheme.typography.titleMedium)
+                    }
                 }
             }
             Spacer(modifier = Modifier.size(8.dp))
