@@ -146,6 +146,7 @@ class EhApplication : Application(), ImageLoaderFactory {
         crossfade(300)
         error(R.drawable.image_failed)
         if (BuildConfig.DEBUG) logger(DebugLogger())
+        respectCacheHeaders(false)
     }
 
     companion object {
