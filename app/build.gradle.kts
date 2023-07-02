@@ -176,12 +176,12 @@ dependencies {
 
     // https://developer.android.com/jetpack/androidx/releases/compose-material3
     // api(platform("androidx.compose:compose-bom:2023.05.00"))
-    api(platform("dev.chrisbanes.compose:compose-bom:2023.04.00-SNAPSHOT"))
+    api(platform("dev.chrisbanes.compose:compose-bom:2023.07.00-alpha01"))
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material3:material3-window-size-class")
 
-    implementation("androidx.core:core-ktx:1.11.0-beta02")
+    implementation("androidx.core:core-ktx:1.12.0-alpha05")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha10")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
@@ -211,7 +211,7 @@ dependencies {
     implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") // Dead Dependency
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.6.3")
     // https://github.com/google/accompanist/releases
-    val accompanist_version = "0.31.3-SNAPSHOT"
+    val accompanist_version = "0.31.4-beta"
     implementation("com.google.accompanist:accompanist-themeadapter-material3:$accompanist_version")
     implementation("com.google.accompanist:accompanist-webview:$accompanist_version")
     implementation("com.google.android.material:material:1.10.0-alpha05")
