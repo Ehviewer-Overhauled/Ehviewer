@@ -737,7 +737,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
         } else {
             GalleryTags(
-                tags = tags,
+                tagGroups = tags,
                 onTagClick = {
                     val lub = ListUrlBuilder()
                     lub.mode = ListUrlBuilder.MODE_TAG

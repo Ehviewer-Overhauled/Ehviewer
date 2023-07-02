@@ -22,7 +22,7 @@ import com.hippo.ehviewer.ui.tools.includeFontPadding
 
 @Composable
 fun GalleryTags(
-    tags: Array<GalleryTagGroup>,
+    tagGroups: Array<GalleryTagGroup>,
     onTagClick: (String) -> Unit,
     onTagLongClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
@@ -30,10 +30,10 @@ fun GalleryTags(
     val context = LocalContext.current
     val canTranslate = Settings.showTagTranslations && EhTagDatabase.isTranslatable(context) && EhTagDatabase.initialized
     val ehTags = EhTagDatabase.takeIf { canTranslate }
-    fun String.translate() = ehTags?.takeIf { it.initialized }?.getTranslation(tag = this) ?: this
-    fun String.translate(prefix: String?) = ehTags?.takeIf { it.initialized }?.getTranslation(prefix = prefix, tag = this) ?: this
+    fun String.translate() = ehTags?.getTranslation(tag = this) ?: this
+    fun String.translate(prefix: String?) = ehTags?.getTranslation(prefix = prefix, tag = this) ?: this
     Column(modifier) {
-        tags.forEach { tagGroup ->
+        tagGroups.forEach { tagGroup ->
             Row {
                 BaseRoundText(
                     text = tagGroup.groupName.translate(),
