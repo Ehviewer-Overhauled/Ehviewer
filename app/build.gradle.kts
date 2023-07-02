@@ -211,7 +211,7 @@ dependencies {
     implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") // Dead Dependency
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.6.3")
     // https://github.com/google/accompanist/releases
-    val accompanist_version = "0.31.4-beta"
+    val accompanist_version = "0.31.4-SNAPSHOT"
     implementation("com.google.accompanist:accompanist-themeadapter-material3:$accompanist_version")
     implementation("com.google.accompanist:accompanist-webview:$accompanist_version")
     implementation("com.google.android.material:material:1.10.0-alpha05")
