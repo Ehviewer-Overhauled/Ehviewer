@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-rootProject.name = "EhViewer"
+rootProject.name = "Ehviewer"
 include(":app")
