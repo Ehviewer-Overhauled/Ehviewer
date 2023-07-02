@@ -16,6 +16,9 @@
 package com.hippo.ehviewer.client
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.R
@@ -58,9 +61,7 @@ object EhTagDatabase : CoroutineScope {
     private val dbLock = Mutex()
     override val coroutineContext = Dispatchers.IO + Job()
 
-    fun isInitialized(): Boolean {
-        return this::tagGroups.isInitialized
-    }
+    var initialized by mutableStateOf(false)
 
     private fun JSONObject.toTagGroups(): TagGroups =
         keys().asSequence().associateWith { getJSONObject(it).toTagGroup() }
@@ -220,6 +221,7 @@ object EhTagDatabase : CoroutineScope {
                     tagGroups = JSONObject(
                         dataFile.source().buffer().readString(StandardCharsets.UTF_8),
                     ).toTagGroups()
+                    initialized = true
                 }.onFailure {
                     it.printStackTrace()
                 }

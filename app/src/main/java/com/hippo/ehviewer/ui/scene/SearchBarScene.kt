@@ -329,7 +329,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         binding.searchview.editText.text?.toString()?.let { text ->
             mSuggestionProvider?.run { providerSuggestions(text)?.forEach { emit(it) } }
             mSearchDatabase.suggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
-            EhTagDatabase.takeIf { it.isInitialized() }?.run {
+            EhTagDatabase.takeIf { it.initialized }?.run {
                 if (text.isNotEmpty() && !text.endsWith(' ')) {
                     val keyword = text.substringAfterLast(' ')
                     val translate = Settings.showTagTranslations && isTranslatable(requireContext())

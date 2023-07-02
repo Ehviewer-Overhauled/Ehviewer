@@ -34,7 +34,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +52,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudDone
@@ -72,7 +70,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -90,11 +87,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LocalPinnableContainer
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -113,9 +108,6 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter.remember
-import com.hippo.ehviewer.client.EhTagDatabase
-import com.hippo.ehviewer.client.EhTagDatabase.isTranslatable
-import com.hippo.ehviewer.client.EhTagDatabase.namespaceToPrefix
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryComment
@@ -155,6 +147,7 @@ import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
 import com.hippo.ehviewer.ui.main.GalleryDetailErrorTip
 import com.hippo.ehviewer.ui.main.GalleryDetailHeaderCard
+import com.hippo.ehviewer.ui.main.GalleryTags
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.removeFromFavorites
@@ -164,7 +157,6 @@ import com.hippo.ehviewer.ui.tools.CrystalCard
 import com.hippo.ehviewer.ui.tools.FilledTertiaryIconButton
 import com.hippo.ehviewer.ui.tools.FilledTertiaryIconToggleButton
 import com.hippo.ehviewer.ui.tools.GalleryDetailRating
-import com.hippo.ehviewer.ui.tools.includeFontPadding
 import com.hippo.ehviewer.util.AppHelper
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.ReadableTime
@@ -744,7 +736,18 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 Text(text = stringResource(id = R.string.no_tags))
             }
         } else {
-            GalleryDetailTags(tags)
+            GalleryTags(
+                tags = tags,
+                onTagClick = {
+                    val lub = ListUrlBuilder()
+                    lub.mode = ListUrlBuilder.MODE_TAG
+                    lub.keyword = it
+                    navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
+                },
+                onTagLongClick = { translation, realTag ->
+                    showTagDialog(translation, realTag)
+                },
+            )
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         if (Settings.showComments) {
@@ -965,87 +968,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         updateFavoriteDrawable()
         ratingText = getAllRatingText(gd.rating, gd.ratingCount)
         torrentText = resources.getString(R.string.torrent_count, gd.torrentCount)
-    }
-
-    @Composable
-    private fun GalleryDetailTags(tagGroups: Array<GalleryTagGroup>) {
-        @Composable
-        fun baseRoundText(
-            text: String,
-            weak: Boolean = false,
-            isGroup: Boolean = false,
-            modifier: Modifier = Modifier,
-        ) {
-            val bgColor = if (isGroup) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.tertiaryContainer
-            }
-            Surface(
-                modifier = Modifier.padding(4.dp),
-                color = bgColor,
-                shape = RoundedCornerShape(64.dp),
-            ) {
-                Text(
-                    text = text,
-                    modifier = modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.onSurface.let { if (weak) it.copy(0.5F) else it },
-                    style = MaterialTheme.typography.labelLarge.includeFontPadding,
-                )
-            }
-        }
-
-        val canTranslate = Settings.showTagTranslations && isTranslatable(requireContext())
-        val ehTags = EhTagDatabase.takeIf { canTranslate }
-        fun String.translate(): String {
-            return ehTags?.takeIf { it.isInitialized() }?.getTranslation(tag = this) ?: this
-        }
-
-        fun String.translate(prefix: String?): String {
-            return ehTags?.takeIf { it.isInitialized() }
-                ?.getTranslation(prefix = prefix, tag = this) ?: this
-        }
-
-        tagGroups.forEach {
-            Row {
-                it.groupName?.run {
-                    baseRoundText(
-                        text = translate(),
-                        isGroup = true,
-                    )
-                    val prefix = namespaceToPrefix(this)
-                    FlowRow {
-                        it.forEach {
-                            val weak = it.startsWith('_')
-                            val real = it.removePrefix("_")
-                            val translated = real.translate(prefix)
-                            val tag = this@run + ":" + real
-                            fun onClick() {
-                                val lub = ListUrlBuilder()
-                                lub.mode = ListUrlBuilder.MODE_TAG
-                                lub.keyword = tag
-                                navAnimated(R.id.galleryListScene, lub.toStartArgs(), true)
-                            }
-
-                            val hapticFeedback = LocalHapticFeedback.current
-
-                            fun onLongClick() {
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                showTagDialog(translated, tag)
-                            }
-                            baseRoundText(
-                                text = translated,
-                                weak = weak,
-                                modifier = Modifier.combinedClickable(
-                                    onClick = ::onClick,
-                                    onLongClick = ::onLongClick,
-                                ),
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private fun onNavigateToCommentScene() {
