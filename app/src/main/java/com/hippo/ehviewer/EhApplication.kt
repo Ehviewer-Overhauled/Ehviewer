@@ -33,6 +33,7 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.coil.diskCache
 import com.hippo.ehviewer.coil.imageLoader
+import com.hippo.ehviewer.cronet.isCronetSupported
 import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
@@ -163,13 +164,11 @@ class EhApplication : Application(), ImageLoaderFactory {
                 if (Settings.bypassCloudflare) addInterceptor(CloudflareInterceptor(appCtx))
 
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
-                if (Settings.enableQuic) {
+                if (isCronetSupported) {
                     addInterceptor { chain ->
                         val request = chain.request()
                         val url = request.url
-                        val newRequest = request.newBuilder()
-                            .addHeader("Cookie", EhCookieStore.getCookieHeader(url))
-                            .build()
+                        val newRequest = request.newBuilder().addHeader("Cookie", EhCookieStore.getCookieHeader(url)).build()
                         val response = chain.proceed(newRequest)
                         EhCookieStore.saveFromResponse(url, Cookie.parseAll(url, response.headers))
                         response

@@ -16,11 +16,9 @@
 package com.hippo.ehviewer.spider
 
 import android.graphics.ImageDecoder
-import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehRequest
@@ -28,6 +26,7 @@ import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.coil.suspendEdit
+import com.hippo.ehviewer.cronet.isCronetSupported
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.ehviewer.image.Image.CloseableSource
@@ -130,7 +129,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         referer: String?,
         notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && Settings.enableQuic) {
+        return if (isCronetSupported) {
             cronetRequest(url, referer) {
                 disableCache()
             }.execute { info ->
