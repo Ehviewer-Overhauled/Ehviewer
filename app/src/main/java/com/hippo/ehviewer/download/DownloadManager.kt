@@ -18,8 +18,6 @@ package com.hippo.ehviewer.download
 import android.net.Uri
 import android.util.Log
 import android.util.SparseLongArray
-import androidx.collection.LongSparseArray
-import androidx.collection.keyIterator
 import com.google.android.material.math.MathUtils
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhDB
@@ -50,7 +48,7 @@ object DownloadManager : OnSpiderListener {
     private val mAllInfoList: LinkedList<DownloadInfo>
 
     // All download info map
-    private val mAllInfoMap: LongSparseArray<DownloadInfo>
+    private val mAllInfoMap: MutableMap<Long, DownloadInfo>
 
     // label and info list map, without default label info list
     private val mMap: MutableMap<String?, LinkedList<DownloadInfo>>
@@ -91,7 +89,7 @@ object DownloadManager : OnSpiderListener {
         mAllInfoList = LinkedList(allInfoList)
 
         // Create all info map
-        val allInfoMap = LongSparseArray<DownloadInfo>(allInfoList.size + 10)
+        val allInfoMap = HashMap<Long, DownloadInfo>(allInfoList.size + 10)
         mAllInfoMap = allInfoMap
         for (info in allInfoList) {
 
@@ -147,7 +145,7 @@ object DownloadManager : OnSpiderListener {
     }
 
     fun containDownloadInfo(gid: Long): Boolean {
-        return mAllInfoMap.indexOfKey(gid) >= 0
+        return mAllInfoMap.containsKey(gid)
     }
 
     val labelList: List<DownloadLabel>
@@ -581,7 +579,7 @@ object DownloadManager : OnSpiderListener {
     }
 
     suspend fun resetAllReadingProgress() = coroutineScope {
-        mAllInfoMap.keyIterator().forEach { gid ->
+        mAllInfoMap.keys.forEach { gid ->
             launch {
                 runCatching {
                     resetReadingProgress(gid)

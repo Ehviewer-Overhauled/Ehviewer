@@ -34,7 +34,6 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.tools.CrystalCard
-import com.hippo.ehviewer.ui.tools.Deferred
 import com.hippo.ehviewer.ui.tools.ElevatedCard
 import com.hippo.ehviewer.ui.tools.GalleryListCardRating
 
@@ -110,14 +109,12 @@ fun GalleryInfoListItem(
                             bottom.linkTo(if (showFav) favRef.top else postedRef.top)
                         },
                     ) {
-                        Deferred({ DownloadManager.containDownloadInfo(info.gid) }) {
-                            if (it) {
-                                Icon(
-                                    Icons.Default.Download,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                )
-                            }
+                        if (DownloadManager.containDownloadInfo(info.gid)) {
+                            Icon(
+                                Icons.Default.Download,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
                         }
                         Text(text = info.simpleLanguage.orEmpty())
                         if (info.pages != 0 && showPages) {
