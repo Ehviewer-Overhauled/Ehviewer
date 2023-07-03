@@ -102,7 +102,7 @@ object DownloadManager : OnSpiderListener {
             }
             list.add(info)
             info.gid
-        }.toMutableMap()
+        } as MutableMap<Long, DownloadInfo>
         mWaitList = LinkedList()
         mSpeedReminder = SpeedReminder()
         mDownloadInfoListeners = ArrayList()
