@@ -33,7 +33,7 @@ class ThumbKeyMigration : AutoMigrationSpec {
 
 @Database(
     entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 8,
+    version = 9,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -53,6 +53,10 @@ class ThumbKeyMigration : AutoMigrationSpec {
         AutoMigration(
             from = 7,
             to = 8,
+        ),
+        AutoMigration(
+            from = 8,
+            to = 9,
         ),
     ],
 )

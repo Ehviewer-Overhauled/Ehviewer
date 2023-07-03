@@ -109,9 +109,7 @@ object EhDB {
     @Synchronized
     fun addDownloadLabel(label: String): DownloadLabel {
         val dao = db.downloadLabelDao()
-        val raw = DownloadLabel()
-        raw.label = label
-        raw.time = System.currentTimeMillis()
+        val raw = DownloadLabel(label, System.currentTimeMillis())
         raw.id = dao.insert(raw)
         return raw
     }

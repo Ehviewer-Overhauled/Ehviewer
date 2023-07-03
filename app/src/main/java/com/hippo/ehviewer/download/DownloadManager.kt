@@ -78,7 +78,7 @@ object DownloadManager : OnSpiderListener {
             it.key to LinkedList(it.value)
         } as MutableMap<String?, LinkedList<DownloadInfo>>
         defaultInfoList = map.remove(null) ?: LinkedList()
-        labelList.forEach { (_, label) ->
+        labelList.forEach { (label) ->
             map[label] ?: LinkedList<DownloadInfo>().also { map[label] = it }
         }
     }
@@ -93,7 +93,7 @@ object DownloadManager : OnSpiderListener {
         if (label == null) {
             return false
         }
-        for ((_, label1) in labelList) {
+        for ((label1) in labelList) {
             if (label == label1) {
                 return true
             }
