@@ -36,10 +36,14 @@ import com.hippo.ehviewer.yorozuya.SimpleHandler
 import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import splitties.init.appCtx
 import splitties.preferences.edit
@@ -257,6 +261,8 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
+    private val callbackFlowScope = CoroutineScope(Dispatchers.IO)
+
     private val _stateFlow = callbackFlow {
         val listener = object : DownloadInfoListener {
             override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
@@ -296,7 +302,7 @@ object DownloadManager : OnSpiderListener {
         awaitClose {
             removeDownloadInfoListener(listener)
         }
-    }
+    }.shareIn(callbackFlowScope, SharingStarted.Eagerly)
 
     fun stateFlow(gid: Long) = _stateFlow.filter { it.gid == gid }
 
