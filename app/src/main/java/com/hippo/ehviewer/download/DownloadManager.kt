@@ -53,7 +53,7 @@ object DownloadManager : OnSpiderListener {
     private val map: MutableMap<String?, LinkedList<DownloadInfo>>
 
     // All labels without default label
-    val labelList: MutableList<DownloadLabel> = EhDB.allDownloadLabelList.toMutableList()
+    val labelList = EhDB.allDownloadLabelList as MutableList<DownloadLabel>
 
     // Store download info with default label
     val defaultInfoList: LinkedList<DownloadInfo>
