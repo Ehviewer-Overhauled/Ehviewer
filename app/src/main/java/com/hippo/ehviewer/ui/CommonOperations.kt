@@ -206,7 +206,7 @@ suspend fun DialogState.addToFavorites(galleryInfo: GalleryInfo): Boolean {
     }.toTypedArray()
     val slot = showSelectItemWithIcon(localFav, *items, title = R.string.add_favorites_dialog_title) - 1
     val newFavoriteName = Settings.favCat.getOrNull(slot)
-    return doAddToFavorites(galleryInfo, slot, newFavoriteName)
+    return doAddToFavorites(galleryInfo, slot, newFavoriteName, localFaved = localFaved)
 }
 
 private suspend fun doAddToFavorites(
@@ -214,7 +214,7 @@ private suspend fun doAddToFavorites(
     slot: Int = -2,
     newFavoriteName: String? = null,
     note: String? = null,
-    localFaved: Boolean = false,
+    localFaved: Boolean = true,
 ): Boolean {
     val add = when (slot) {
         -2 -> {
