@@ -111,7 +111,7 @@ fun GalleryInfoListItem(
                             bottom.linkTo(if (showFav) favRef.top else postedRef.top)
                         },
                     ) {
-                        val download by produceState(DownloadManager.containDownloadInfo(info.gid), info.gid) {
+                        val download by produceState(false, info.gid) {
                             // Workaround ComposeView in RecyclerView, since view is reused, remembered value will not update when setContent with similar @Composable lambda, since composer group key is the same
                             value = DownloadManager.containDownloadInfo(info.gid)
                             DownloadManager.stateFlow(info.gid).collect {
