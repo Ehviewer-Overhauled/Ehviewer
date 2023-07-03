@@ -10,7 +10,7 @@ import eu.kanade.tachiyomi.util.lang.withIOContext
 
 @Composable
 fun <T> Deferred(block: suspend () -> T, content: @Composable (T) -> Unit) {
-    var completed by remember { mutableStateOf<T?>(null) }
+    var completed by remember(block) { mutableStateOf<T?>(null) }
     LaunchedEffect(key1 = Unit) {
         completed = withIOContext { block() }
     }
