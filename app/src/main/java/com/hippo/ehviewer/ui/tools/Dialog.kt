@@ -3,7 +3,6 @@ package com.hippo.ehviewer.ui.tools
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -168,16 +167,17 @@ class DialogState {
             Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
             LazyColumn {
                 itemsIndexed(items) { index, (icon, text) ->
-                    Row(
-                        modifier = Modifier.clickable { dismissWith(index) }.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
-                        Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
-                    }
+                    ListItem(
+                        headlineContent = {
+                            Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
+                        },
+                        modifier = Modifier.clickable { dismissWith(index) },
+                        leadingContent = {
+                            Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
+                        },
+                    )
                 }
             }
-            Spacer(modifier = Modifier.size(8.dp))
         }
     }
 
@@ -189,16 +189,17 @@ class DialogState {
             Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
             LazyColumn {
                 itemsIndexed(items) { index, (icon, text) ->
-                    Row(
-                        modifier = Modifier.clickable { dismissWith(index) }.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
-                        Text(text = text, style = MaterialTheme.typography.titleMedium)
-                    }
+                    ListItem(
+                        headlineContent = {
+                            Text(text = text, style = MaterialTheme.typography.titleMedium)
+                        },
+                        modifier = Modifier.clickable { dismissWith(index) },
+                        leadingContent = {
+                            Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
+                        },
+                    )
                 }
             }
-            Spacer(modifier = Modifier.size(8.dp))
         }
     }
 }
