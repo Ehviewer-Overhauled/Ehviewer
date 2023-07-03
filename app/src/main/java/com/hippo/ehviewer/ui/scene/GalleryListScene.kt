@@ -71,13 +71,10 @@ import com.hippo.ehviewer.client.parser.GalleryListParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
-import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.ItemDrawerListBinding
 import com.hippo.ehviewer.databinding.SceneGalleryListBinding
-import com.hippo.ehviewer.download.DownloadManager
-import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.doGalleryInfoAction
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -106,7 +103,6 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener, OnExpandListener {
     private val mCallback = object : OnBackPressedCallback(false) {
@@ -156,31 +152,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             }
         }
     private var mHasFirstRefresh = false
-    private val mDownloadManager: DownloadManager = downloadManager
-
-    @SuppressLint("NotifyDataSetChanged")
-    private val mDownloadInfoListener: DownloadInfoListener = object : DownloadInfoListener {
-        override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-            mAdapter?.notifyDataSetChanged()
-        }
-
-        override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {}
-        override fun onUpdateAll() {}
-        override fun onReload() {
-            mAdapter?.notifyDataSetChanged()
-        }
-
-        override fun onChange() {
-            mAdapter?.notifyDataSetChanged()
-        }
-
-        override fun onRenameLabel(from: String, to: String) {}
-        override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-            mAdapter?.notifyDataSetChanged()
-        }
-
-        override fun onUpdateLabels() {}
-    }
 
     @SuppressLint("NotifyDataSetChanged")
     private val mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener =
@@ -217,7 +188,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mDownloadManager.addDownloadInfoListener(mDownloadInfoListener)
         FavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
         if (savedInstanceState == null) {
             onInit()
@@ -255,7 +225,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 
     override fun onDestroy() {
         super.onDestroy()
-        mDownloadManager.removeDownloadInfoListener(mDownloadInfoListener)
         FavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
     }
 

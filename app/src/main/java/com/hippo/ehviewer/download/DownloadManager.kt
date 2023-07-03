@@ -36,7 +36,9 @@ import com.hippo.ehviewer.yorozuya.SimpleHandler
 import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import splitties.init.appCtx
 import splitties.preferences.edit
@@ -251,6 +253,47 @@ object DownloadManager : OnSpiderListener {
             }
             // Ensure download
             ensureDownload()
+        }
+    }
+
+    val stateFlow = callbackFlow {
+        val listener = object : DownloadInfoListener {
+            override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
+                trySend(info)
+                list.forEach { trySend(it) }
+            }
+
+            override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {
+                trySend(info)
+            }
+
+            override fun onUpdateAll() {
+                // No-op
+            }
+
+            override fun onReload() {
+                // No-op
+            }
+
+            override fun onChange() {
+                // No-op
+            }
+
+            override fun onRenameLabel(from: String, to: String) {
+                // No-op
+            }
+
+            override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
+                trySend(info)
+            }
+
+            override fun onUpdateLabels() {
+                // No-op
+            }
+        }
+        addDownloadInfoListener(listener)
+        awaitClose {
+            removeDownloadInfoListener(listener)
         }
     }
 

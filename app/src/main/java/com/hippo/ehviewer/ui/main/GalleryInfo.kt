@@ -22,6 +22,11 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +41,7 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.tools.CrystalCard
 import com.hippo.ehviewer.ui.tools.ElevatedCard
 import com.hippo.ehviewer.ui.tools.GalleryListCardRating
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun GalleryInfoListItem(
@@ -109,7 +115,13 @@ fun GalleryInfoListItem(
                             bottom.linkTo(if (showFav) favRef.top else postedRef.top)
                         },
                     ) {
-                        if (DownloadManager.containDownloadInfo(info.gid)) {
+                        var download by remember(info.gid) { mutableStateOf(DownloadManager.containDownloadInfo(info.gid)) }
+                        LaunchedEffect(info.gid) {
+                            DownloadManager.stateFlow.collect {
+                                if (it.gid == info.gid) download = DownloadManager.containDownloadInfo(info.gid)
+                            }
+                        }
+                        if (download) {
                             Icon(
                                 Icons.Default.Download,
                                 contentDescription = null,

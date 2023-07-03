@@ -129,7 +129,6 @@ import com.hippo.ehviewer.databinding.DialogArchiveListBinding
 import com.hippo.ehviewer.databinding.DialogRateBinding
 import com.hippo.ehviewer.databinding.DialogTorrentListBinding
 import com.hippo.ehviewer.databinding.ItemGalleryCommentBinding
-import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
@@ -176,7 +175,7 @@ import splitties.systemservices.downloadManager
 import kotlin.math.roundToInt
 import com.hippo.ehviewer.download.DownloadManager as ehDownloadManager
 
-class GalleryDetailScene : BaseScene(), DownloadInfoListener {
+class GalleryDetailScene : BaseScene() {
     private var mDownloadState = 0
     private var mAction: String? = null
     private var mGid: Long = 0
@@ -396,7 +395,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         } else {
             getDetailError = getString(R.string.error_cannot_find_gallery)
         }
-        ehDownloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
         return ComposeView(requireContext()).apply {
             setMD3Content {
@@ -814,7 +812,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        ehDownloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
     }
 
@@ -1213,13 +1210,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private fun downloadLongClick() {
-        val galleryInfo = composeBindingGI
-        if (galleryInfo != null) {
-            CommonOperations.startDownload(activity as MainActivity, galleryInfo, true)
-        }
-    }
-
     private fun showFilterUploaderDialog() {
         if (uploader.isNullOrEmpty() || disowned) {
             return
@@ -1264,33 +1254,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         mDownloadState = downloadState
         updateDownloadText()
     }
-
-    override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-        updateDownloadState()
-    }
-
-    override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {
-        updateDownloadState()
-    }
-
-    override fun onUpdateAll() {
-        updateDownloadState()
-    }
-
-    override fun onReload() {
-        updateDownloadState()
-    }
-
-    override fun onChange() {
-        updateDownloadState()
-    }
-
-    override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-        updateDownloadState()
-    }
-
-    override fun onRenameLabel(from: String, to: String) {}
-    override fun onUpdateLabels() {}
 
     private fun onModifyFavoritesSuccess() {
         if (composeBindingGD != null) {
