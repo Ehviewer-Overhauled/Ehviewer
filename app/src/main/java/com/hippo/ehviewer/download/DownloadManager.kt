@@ -45,7 +45,7 @@ import kotlin.contracts.contract
 
 object DownloadManager : OnSpiderListener {
     // All download info list
-    private val mAllInfoList: LinkedList<DownloadInfo>
+    val allInfoList: LinkedList<DownloadInfo>
 
     // All download info map
     private val mAllInfoMap: MutableMap<Long, DownloadInfo>
@@ -54,10 +54,10 @@ object DownloadManager : OnSpiderListener {
     private val mMap: MutableMap<String?, LinkedList<DownloadInfo>>
 
     // All labels without default label
-    private val mLabelList: MutableList<DownloadLabel>
+    val labelList: MutableList<DownloadLabel>
 
     // Store download info with default label
-    private val mDefaultInfoList: LinkedList<DownloadInfo>
+    val defaultInfoList: LinkedList<DownloadInfo>
 
     // Store download info wait to start
     private val mWaitList: LinkedList<DownloadInfo>
@@ -72,7 +72,7 @@ object DownloadManager : OnSpiderListener {
 
         // Get all labels
         val labels = EhDB.allDownloadLabelList.toMutableList()
-        mLabelList = labels
+        labelList = labels
 
         // Create list for each label
         val map = HashMap<String?, LinkedList<DownloadInfo>>()
@@ -82,11 +82,10 @@ object DownloadManager : OnSpiderListener {
         }
 
         // Create default for non tag
-        mDefaultInfoList = LinkedList()
+        defaultInfoList = LinkedList()
 
         // Get all info
-        val allInfoList = EhDB.allDownloadInfo
-        mAllInfoList = LinkedList(allInfoList)
+        allInfoList = LinkedList(EhDB.allDownloadInfo)
 
         mAllInfoMap = allInfoList.associateBy { info ->
             // Add to each label list
@@ -113,7 +112,7 @@ object DownloadManager : OnSpiderListener {
             returns(null) implies (label != null)
         }
         return if (label == null) {
-            mDefaultInfoList
+            defaultInfoList
         } else {
             mMap[label]
         }
@@ -123,7 +122,7 @@ object DownloadManager : OnSpiderListener {
         if (label == null) {
             return false
         }
-        for ((_, label1) in mLabelList) {
+        for ((_, label1) in labelList) {
             if (label == label1) {
                 return true
             }
@@ -134,13 +133,6 @@ object DownloadManager : OnSpiderListener {
     fun containDownloadInfo(gid: Long): Boolean {
         return mAllInfoMap.containsKey(gid)
     }
-
-    val labelList: List<DownloadLabel>
-        get() = mLabelList
-    val allDownloadInfoList: List<DownloadInfo>
-        get() = mAllInfoList
-    val defaultDownloadInfoList: List<DownloadInfo>
-        get() = mDefaultInfoList
 
     fun getLabelDownloadInfoList(label: String?): List<DownloadInfo>? {
         return mMap[label]
@@ -247,8 +239,8 @@ object DownloadManager : OnSpiderListener {
             list.addFirst(info)
 
             // Add to all download list and map
-            mAllInfoList.addFirst(info)
-            mAllInfoMap.put(galleryInfo.gid, info)
+            allInfoList.addFirst(info)
+            mAllInfoMap[galleryInfo.gid] = info
 
             // Add to wait list
             mWaitList.add(info)
@@ -300,7 +292,7 @@ object DownloadManager : OnSpiderListener {
     fun startAllDownload() {
         var update = false
         // Start all STATE_NONE and STATE_FAILED item
-        for (info in mAllInfoList) {
+        for (info in allInfoList) {
             if (info.state == DownloadInfo.STATE_NONE || info.state == DownloadInfo.STATE_FAILED) {
                 update = true
                 // Set state DownloadInfo.STATE_WAIT
@@ -343,7 +335,7 @@ object DownloadManager : OnSpiderListener {
                 mMap[info.label] = list
                 if (!containLabel(info.label)) {
                     // Add label to DB and list
-                    mLabelList.add(EhDB.addDownloadLabel(info.label!!))
+                    labelList.add(EhDB.addDownloadLabel(info.label!!))
                 }
             }
             list.add(info)
@@ -351,15 +343,15 @@ object DownloadManager : OnSpiderListener {
             list.sortByDateDescending()
 
             // Add to all download list and map
-            mAllInfoList.add(info)
-            mAllInfoMap.put(info.gid, info)
+            allInfoList.add(info)
+            mAllInfoMap[info.gid] = info
 
             // Save to
             EhDB.putDownloadInfo(info)
         }
 
         // Sort all download list
-        mAllInfoList.sortByDateDescending()
+        allInfoList.sortByDateDescending()
 
         // Notify
         if (notify) {
@@ -374,7 +366,7 @@ object DownloadManager : OnSpiderListener {
             val labelString = label.label
             if (!containLabel(labelString)) {
                 mMap[labelString] = LinkedList()
-                mLabelList.add(EhDB.addDownloadLabel(label))
+                labelList.add(EhDB.addDownloadLabel(label))
             }
         }
     }
@@ -400,8 +392,8 @@ object DownloadManager : OnSpiderListener {
         list.addFirst(info)
 
         // Add to all download list and map
-        mAllInfoList.addFirst(info)
-        mAllInfoMap.put(galleryInfo.gid, info)
+        allInfoList.addFirst(info)
+        mAllInfoMap[galleryInfo.gid] = info
 
         // Save to
         EhDB.putDownloadInfo(info)
@@ -482,7 +474,7 @@ object DownloadManager : OnSpiderListener {
             EhDB.removeDownloadInfo(info)
 
             // Remove all list and map
-            mAllInfoList.remove(info)
+            allInfoList.remove(info)
             mAllInfoMap.remove(info.gid)
 
             // Remove label list
@@ -517,7 +509,7 @@ object DownloadManager : OnSpiderListener {
             EhDB.removeDownloadInfo(info)
 
             // Remove from all info map
-            mAllInfoList.remove(info)
+            allInfoList.remove(info)
             mAllInfoMap.remove(info.gid)
 
             // Remove from label list
@@ -536,22 +528,22 @@ object DownloadManager : OnSpiderListener {
 
     fun moveDownload(fromPosition: Int, toPosition: Int) {
         if (fromPosition > toPosition) {
-            val time = mAllInfoList[toPosition].time
+            val time = allInfoList[toPosition].time
             for (i in toPosition until fromPosition) {
-                mAllInfoList[i].time = mAllInfoList[i + 1].time
+                allInfoList[i].time = allInfoList[i + 1].time
             }
-            mAllInfoList[fromPosition].time = time
-            EhDB.updateDownloadInfo(mAllInfoList.slice(toPosition..fromPosition))
+            allInfoList[fromPosition].time = time
+            EhDB.updateDownloadInfo(allInfoList.slice(toPosition..fromPosition))
         } else {
-            val time = mAllInfoList[fromPosition].time
+            val time = allInfoList[fromPosition].time
             for (i in fromPosition until toPosition) {
-                mAllInfoList[i].time = mAllInfoList[i + 1].time
+                allInfoList[i].time = allInfoList[i + 1].time
             }
-            mAllInfoList[toPosition].time = time
-            EhDB.updateDownloadInfo(mAllInfoList.slice(fromPosition..toPosition))
+            allInfoList[toPosition].time = time
+            EhDB.updateDownloadInfo(allInfoList.slice(fromPosition..toPosition))
         }
-        val label = mAllInfoList[fromPosition].label
-        mAllInfoList.sortByDateDescending()
+        val label = allInfoList[fromPosition].label
+        allInfoList.sortByDateDescending()
         val list = getInfoListForLabel(label)!!
         list.sortByDateDescending()
     }
@@ -559,8 +551,8 @@ object DownloadManager : OnSpiderListener {
     fun moveDownload(label: String?, fromPosition: Int, toPosition: Int) {
         val list = getInfoListForLabel(label)
         list?.let {
-            val absFromPosition = mAllInfoList.indexOf(it[fromPosition])
-            val absToPosition = mAllInfoList.indexOf(it[toPosition])
+            val absFromPosition = allInfoList.indexOf(it[fromPosition])
+            val absToPosition = allInfoList.indexOf(it[toPosition])
             moveDownload(absFromPosition, absToPosition)
         }
     }
@@ -710,7 +702,7 @@ object DownloadManager : OnSpiderListener {
         if (label == null || containLabel(label)) {
             return
         }
-        mLabelList.add(EhDB.addDownloadLabel(label))
+        labelList.add(EhDB.addDownloadLabel(label))
         mMap[label] = LinkedList()
         for (l in mDownloadInfoListeners) {
             l!!.onUpdateLabels()
@@ -718,8 +710,8 @@ object DownloadManager : OnSpiderListener {
     }
 
     fun moveLabel(fromPosition: Int, toPosition: Int) {
-        val item = mLabelList.removeAt(fromPosition)
-        mLabelList.add(toPosition, item)
+        val item = labelList.removeAt(fromPosition)
+        labelList.add(toPosition, item)
         EhDB.moveDownloadLabel(fromPosition, toPosition)
         for (l in mDownloadInfoListeners) {
             l!!.onUpdateLabels()
@@ -729,7 +721,7 @@ object DownloadManager : OnSpiderListener {
     fun renameLabel(from: String, to: String) {
         // Find in label list
         var found = false
-        for (raw in mLabelList) {
+        for (raw in labelList) {
             if (from == raw.label) {
                 found = true
                 raw.label = to
@@ -761,7 +753,7 @@ object DownloadManager : OnSpiderListener {
     fun deleteLabel(label: String) {
         // Find in label list and remove
         var found = false
-        val iterator = mLabelList.iterator()
+        val iterator = labelList.iterator()
         while (iterator.hasNext()) {
             val raw = iterator.next()
             if (label == raw.label) {
@@ -781,11 +773,11 @@ object DownloadManager : OnSpiderListener {
             info.label = null
             // Update in DB
             EhDB.putDownloadInfo(info)
-            mDefaultInfoList.add(info)
+            defaultInfoList.add(info)
         }
 
         // Sort
-        mDefaultInfoList.sortByDateDescending()
+        defaultInfoList.sortByDateDescending()
 
         // Notify listener
         for (l in mDownloadInfoListeners) {

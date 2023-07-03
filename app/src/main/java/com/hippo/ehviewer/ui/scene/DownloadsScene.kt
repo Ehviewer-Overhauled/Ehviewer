@@ -195,18 +195,18 @@ class DownloadsScene :
         var list: List<DownloadInfo>?
         when (mLabel) {
             null -> {
-                list = DownloadManager.allDownloadInfoList
+                list = DownloadManager.allInfoList
             }
 
             getString(R.string.default_download_label_name) -> {
-                list = DownloadManager.defaultDownloadInfoList
+                list = DownloadManager.defaultInfoList
             }
 
             else -> {
                 list = DownloadManager.getLabelDownloadInfoList(mLabel)
                 if (list == null) {
                     mLabel = null
-                    list = DownloadManager.allDownloadInfoList
+                    list = DownloadManager.allInfoList
                 }
             }
         }
@@ -718,11 +718,11 @@ class DownloadsScene :
             val label = mLabels[position]
             val list: List<DownloadInfo?>? = when (position) {
                 0 -> {
-                    DownloadManager.allDownloadInfoList
+                    DownloadManager.allInfoList
                 }
 
                 1 -> {
-                    DownloadManager.defaultDownloadInfoList
+                    DownloadManager.defaultInfoList
                 }
 
                 else -> {
