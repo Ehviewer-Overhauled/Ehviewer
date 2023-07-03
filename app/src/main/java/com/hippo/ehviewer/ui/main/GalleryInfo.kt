@@ -41,7 +41,6 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.tools.CrystalCard
 import com.hippo.ehviewer.ui.tools.ElevatedCard
 import com.hippo.ehviewer.ui.tools.GalleryListCardRating
-import kotlinx.coroutines.flow.collect
 
 @Composable
 fun GalleryInfoListItem(
@@ -117,8 +116,8 @@ fun GalleryInfoListItem(
                     ) {
                         var download by remember(info.gid) { mutableStateOf(DownloadManager.containDownloadInfo(info.gid)) }
                         LaunchedEffect(info.gid) {
-                            DownloadManager.stateFlow.collect {
-                                if (it.gid == info.gid) download = DownloadManager.containDownloadInfo(info.gid)
+                            DownloadManager.stateFlow(info.gid).collect {
+                                download = DownloadManager.containDownloadInfo(info.gid)
                             }
                         }
                         if (download) {

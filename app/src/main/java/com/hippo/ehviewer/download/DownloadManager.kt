@@ -39,6 +39,7 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import splitties.init.appCtx
 import splitties.preferences.edit
@@ -256,7 +257,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    val stateFlow = callbackFlow {
+    private val _stateFlow = callbackFlow {
         val listener = object : DownloadInfoListener {
             override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
                 trySend(info)
@@ -296,6 +297,8 @@ object DownloadManager : OnSpiderListener {
             removeDownloadInfoListener(listener)
         }
     }
+
+    fun stateFlow(gid: Long) = _stateFlow.filter { it.gid == gid }
 
     fun startAllDownload() {
         var update = false
