@@ -267,7 +267,6 @@ object DownloadManager : OnSpiderListener {
         val listener = object : DownloadInfoListener {
             override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
                 trySend(info)
-                list.forEach { trySend(it) }
             }
 
             override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {
