@@ -19,6 +19,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.network.StatusCodeException
 import splitties.init.appCtx
+import java.io.IOException
 import java.net.MalformedURLException
 import java.net.ProtocolException
 import java.net.SocketException
@@ -29,6 +30,15 @@ import javax.net.ssl.SSLException
 object ExceptionUtils {
     fun getReadableString(e: Throwable): String {
         e.printStackTrace()
+        val cause = e.cause
+        return if (e is IOException && cause != null) {
+            getReadableStringInternal(cause)
+        } else {
+            getReadableStringInternal(e)
+        }
+    }
+
+    private fun getReadableStringInternal(e: Throwable): String {
         return when (e) {
             is MalformedURLException -> appCtx.getString(R.string.error_invalid_url)
             is SocketTimeoutException -> appCtx.getString(R.string.error_timeout)
