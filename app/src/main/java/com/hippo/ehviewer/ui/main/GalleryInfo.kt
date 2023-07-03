@@ -22,11 +22,8 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -114,10 +111,9 @@ fun GalleryInfoListItem(
                             bottom.linkTo(if (showFav) favRef.top else postedRef.top)
                         },
                     ) {
-                        var download by remember(info.gid) { mutableStateOf(DownloadManager.containDownloadInfo(info.gid)) }
-                        LaunchedEffect(info.gid) {
+                        val download by produceState(DownloadManager.containDownloadInfo(info.gid)) {
                             DownloadManager.stateFlow(info.gid).collect {
-                                download = DownloadManager.containDownloadInfo(info.gid)
+                                value = DownloadManager.containDownloadInfo(info.gid)
                             }
                         }
                         if (download) {
