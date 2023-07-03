@@ -48,7 +48,7 @@ object DownloadManager : OnSpiderListener {
     val allInfoList: LinkedList<DownloadInfo> = LinkedList(EhDB.allDownloadInfo)
 
     // All download info map
-    private val mAllInfoMap: MutableMap<Long, DownloadInfo>
+    private val mAllInfoMap = allInfoList.associateBy { it.gid } as MutableMap<Long, DownloadInfo>
 
     // label and info list map, without default label info list
     private val map: MutableMap<String?, LinkedList<DownloadInfo>>
@@ -60,9 +60,9 @@ object DownloadManager : OnSpiderListener {
     val defaultInfoList: LinkedList<DownloadInfo>
 
     // Store download info wait to start
-    private val mWaitList: LinkedList<DownloadInfo>
-    private val mSpeedReminder: SpeedReminder
-    private val mDownloadInfoListeners: MutableList<DownloadInfoListener?>
+    private val mWaitList = LinkedList<DownloadInfo>()
+    private val mSpeedReminder = SpeedReminder()
+    private val mDownloadInfoListeners = mutableListOf<DownloadInfoListener>()
     private val mNotifyTaskPool = ConcurrentPool<NotifyTask?>(5)
     private var mDownloadListener: DownloadListener? = null
     private var mCurrentTask: DownloadInfo? = null
@@ -82,10 +82,6 @@ object DownloadManager : OnSpiderListener {
         labelList.forEach { (_, label) ->
             map[label] ?: LinkedList<DownloadInfo>().also { map[label] = it }
         }
-        mAllInfoMap = allInfoList.associateBy { it.gid } as MutableMap<Long, DownloadInfo>
-        mWaitList = LinkedList()
-        mSpeedReminder = SpeedReminder()
-        mDownloadInfoListeners = ArrayList()
     }
 
     private fun getInfoListForLabel(label: String?): LinkedList<DownloadInfo>? {
@@ -128,11 +124,11 @@ object DownloadManager : OnSpiderListener {
         return info?.state ?: DownloadInfo.STATE_INVALID
     }
 
-    fun addDownloadInfoListener(downloadInfoListener: DownloadInfoListener?) {
+    fun addDownloadInfoListener(downloadInfoListener: DownloadInfoListener) {
         mDownloadInfoListeners.add(downloadInfoListener)
     }
 
-    fun removeDownloadInfoListener(downloadInfoListener: DownloadInfoListener?) {
+    fun removeDownloadInfoListener(downloadInfoListener: DownloadInfoListener) {
         mDownloadInfoListeners.remove(downloadInfoListener)
     }
 
