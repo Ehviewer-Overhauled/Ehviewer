@@ -131,6 +131,7 @@ class PagerPageHolder(
     private fun setQueued() {
         progressIndicator.show()
         errorLayout?.root?.isVisible = false
+        recycle()
     }
 
     /**

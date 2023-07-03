@@ -255,8 +255,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     val error: String?
         get() = null
 
-    fun forceRequest(index: Int) {
-        request(index, true)
+    fun forceRequest(index: Int, orgImg: Boolean) {
+        request(index, true, orgImg)
     }
 
     fun request(index: Int) {
@@ -281,7 +281,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         mWorkerScope.updateRAList(pages, pair)
     }
 
-    private fun request(index: Int, force: Boolean) {
+    private fun request(index: Int, force: Boolean, orgImg: Boolean = false) {
         // Get page state
         val state = getPageState(index)
 
@@ -290,7 +290,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             // Update state to none at once
             updatePageState(index, STATE_NONE)
         }
-        mWorkerScope.launch(index, force)
+        mWorkerScope.launch(index, force, orgImg)
     }
 
     fun save(index: Int, file: UniFile): Boolean {
@@ -558,7 +558,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             }
         }
 
-        private fun doLaunchDownloadJob(index: Int, force: Boolean) {
+        private fun doLaunchDownloadJob(index: Int, force: Boolean, orgImg: Boolean = false) {
             val state = mPageStateArray[index]
             if (!force && state == STATE_FINISHED) return
             val currentJob = mFetcherJobMap[index]
@@ -566,7 +566,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             if (currentJob?.isActive != true) {
                 mFetcherJobMap[index] = launch {
                     mSemaphore.withPermit {
-                        doInJob(index, force)
+                        doInJob(index, force, orgImg)
                     }
                 }.apply {
                     invokeOnCompletion {
@@ -579,14 +579,16 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             }
         }
 
-        fun launch(index: Int, force: Boolean = false) {
+        fun launch(index: Int, force: Boolean = false, orgImg: Boolean) {
             check(index in 0 until size)
-            if (!isDownloadMode) synchronized(mFetcherJobMap) { doLaunchDownloadJob(index, force) }
+            if (!isDownloadMode) {
+                synchronized(mFetcherJobMap) { doLaunchDownloadJob(index, force, orgImg) }
+            }
             if (force) decoder.cancel(index)
             decoder.launch(index)
         }
 
-        private suspend fun doInJob(index: Int, force: Boolean) {
+        private suspend fun doInJob(index: Int, force: Boolean, orgImg: Boolean) {
             suspend fun getPToken(index: Int): String? {
                 if (index !in 0 until size) return null
                 return mSpiderInfo.pTokenMap[index].takeIf { it != TOKEN_FAILED }
@@ -715,7 +717,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 val targetImageUrl: String?
                 val referer: String?
 
-                if (Settings.downloadOriginImage && !originImageUrl.isNullOrBlank()) {
+                if ((Settings.downloadOriginImage || orgImg) && !originImageUrl.isNullOrBlank()) {
                     targetImageUrl = originImageUrl
                     referer = EhUrl.getPageUrl(mSpiderInfo.gid, index, pToken)
                 } else {

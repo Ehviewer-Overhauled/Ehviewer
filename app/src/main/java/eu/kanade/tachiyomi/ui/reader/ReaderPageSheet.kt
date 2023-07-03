@@ -24,6 +24,7 @@ class ReaderPageSheet(
         binding.save.setOnClickListener { save() }
         binding.saveTo.setOnClickListener { saveTo() }
         binding.refresh.setOnClickListener { refresh() }
+        binding.refreshOrgImg.setOnClickListener { refreshOrgImg() }
 
         return binding.root
     }
@@ -62,6 +63,11 @@ class ReaderPageSheet(
 
     private fun refresh() {
         activity.mGalleryProvider?.retryPage(page.index)
+        dismiss()
+    }
+
+    private fun refreshOrgImg() {
+        activity.mGalleryProvider?.retryPage(page.index, true)
         dismiss()
     }
 }
