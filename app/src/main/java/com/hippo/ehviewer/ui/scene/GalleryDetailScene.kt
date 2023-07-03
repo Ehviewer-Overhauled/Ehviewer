@@ -79,6 +79,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -173,7 +174,7 @@ import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import splitties.systemservices.downloadManager
 import kotlin.math.roundToInt
-import com.hippo.ehviewer.download.DownloadManager as ehDownloadManager
+import com.hippo.ehviewer.download.DownloadManager as EhDownloadManager
 
 class GalleryDetailScene : BaseScene() {
     private var mDownloadState = 0
@@ -377,7 +378,7 @@ class GalleryDetailScene : BaseScene() {
         // Get download state
         val gid = gid
         mDownloadState = if (gid != -1L) {
-            ehDownloadManager.getDownloadState(gid)
+            EhDownloadManager.getDownloadState(gid)
         } else {
             DownloadInfo.STATE_INVALID
         }
@@ -398,6 +399,11 @@ class GalleryDetailScene : BaseScene() {
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
         return ComposeView(requireContext()).apply {
             setMD3Content {
+                LaunchedEffect(gid) {
+                    EhDownloadManager.stateFlow(gid).collect {
+                        updateDownloadState()
+                    }
+                }
                 dialogState.Handler()
                 val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                 Scaffold(
@@ -781,7 +787,7 @@ class GalleryDetailScene : BaseScene() {
 
     private fun onDownloadButtonClick() {
         val galleryDetail = composeBindingGD ?: return
-        if (ehDownloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
+        if (EhDownloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
             CommonOperations.startDownload(
                 activity as MainActivity,
                 galleryDetail,
@@ -798,7 +804,6 @@ class GalleryDetailScene : BaseScene() {
                 Settings.removeImageFiles,
             )
             val helper = DeleteDialogHelper(
-                ehDownloadManager,
                 galleryDetail,
                 builder,
             )
@@ -1247,7 +1252,7 @@ class GalleryDetailScene : BaseScene() {
         if (null == context || -1L == gid) {
             return
         }
-        val downloadState = com.hippo.ehviewer.download.DownloadManager.getDownloadState(gid)
+        val downloadState = EhDownloadManager.getDownloadState(gid)
         if (downloadState == mDownloadState) {
             return
         }
@@ -1263,7 +1268,6 @@ class GalleryDetailScene : BaseScene() {
     }
 
     private inner class DeleteDialogHelper(
-        private val mDownloadManager: com.hippo.ehviewer.download.DownloadManager?,
         private val mGalleryInfo: GalleryInfo,
         private val mBuilder: CheckBoxDialogBuilder,
     ) : DialogInterface.OnClickListener {
@@ -1273,7 +1277,7 @@ class GalleryDetailScene : BaseScene() {
             }
 
             // Delete
-            mDownloadManager?.deleteDownload(mGalleryInfo.gid)
+            EhDownloadManager.deleteDownload(mGalleryInfo.gid)
 
             // Delete image files
             val checked = mBuilder.isChecked
