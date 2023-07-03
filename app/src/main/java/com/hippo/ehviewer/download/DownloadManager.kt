@@ -41,7 +41,6 @@ import kotlinx.coroutines.launch
 import splitties.init.appCtx
 import splitties.preferences.edit
 import java.util.LinkedList
-import kotlin.contracts.contract
 
 object DownloadManager : OnSpiderListener {
     // All download info list
@@ -84,15 +83,10 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    private fun getInfoListForLabel(label: String?): LinkedList<DownloadInfo>? {
-        contract {
-            returns(null) implies (label != null)
-        }
-        return if (label == null) {
-            defaultInfoList
-        } else {
-            map[label]
-        }
+    private fun getInfoListForLabel(label: String?) = if (label == null) {
+        defaultInfoList
+    } else {
+        map[label]
     }
 
     fun containLabel(label: String?): Boolean {
@@ -107,17 +101,11 @@ object DownloadManager : OnSpiderListener {
         return false
     }
 
-    fun containDownloadInfo(gid: Long): Boolean {
-        return mAllInfoMap.containsKey(gid)
-    }
+    fun containDownloadInfo(gid: Long) = mAllInfoMap.containsKey(gid)
 
-    fun getLabelDownloadInfoList(label: String?): List<DownloadInfo>? {
-        return map[label]
-    }
+    fun getLabelDownloadInfoList(label: String?) = map[label]
 
-    fun getDownloadInfo(gid: Long): DownloadInfo? {
-        return mAllInfoMap[gid]
-    }
+    fun getDownloadInfo(gid: Long) = mAllInfoMap[gid]
 
     fun getDownloadState(gid: Long): Int {
         val info = mAllInfoMap[gid]
