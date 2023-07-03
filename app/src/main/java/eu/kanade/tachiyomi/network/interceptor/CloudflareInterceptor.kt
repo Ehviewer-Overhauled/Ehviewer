@@ -8,10 +8,12 @@ import android.webkit.WebViewClient
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.exception.EhException
+import eu.kanade.tachiyomi.util.system.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import java.io.IOException
 import java.util.concurrent.CountDownLatch
 
 class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
@@ -27,11 +29,18 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
         request: Request,
         response: Response,
     ): Response {
-        response.close()
-        EhCookieStore.deleteCookie(request.url, COOKIE_NAME)
-        resolveWithWebView(request)
+        // Because OkHttp's enqueue only handles IOExceptions, wrap the exception so that
+        // we don't crash the entire app
+        return runCatching {
+            // TODO: Remove logging when it's stable
+            logcat { "Response code: ${response.code}" }
+            logcat { "Response body: ${response.body.string()}" }
+            response.close()
+            EhCookieStore.deleteCookie(request.url, COOKIE_NAME)
+            resolveWithWebView(request)
 
-        return chain.proceed(request)
+            chain.proceed(request)
+        }.getOrElse { throw IOException(it) }
     }
 
     private fun resolveWithWebView(originalRequest: Request) {
