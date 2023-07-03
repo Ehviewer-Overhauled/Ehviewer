@@ -122,6 +122,6 @@ pub fn parseFav(env: JNIEnv, _class: JClass, input: JString, str: jobjectArray) 
 
 #[no_mangle]
 pub extern "system" fn JNI_OnLoad(_: JavaVM, _: *mut c_void) -> jint {
-    android_logger::init_once(Config::default().with_max_level(LevelFilter::Trace));
+    android_logger::init_once(Config::default().with_max_level(LevelFilter::Debug));
     JNI_VERSION_1_6
 }
