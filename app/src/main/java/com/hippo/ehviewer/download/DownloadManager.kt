@@ -88,25 +88,11 @@ object DownloadManager : OnSpiderListener {
         val allInfoList = EhDB.allDownloadInfo
         mAllInfoList = LinkedList(allInfoList)
 
-        // Create all info map
-        val allInfoMap = HashMap<Long, DownloadInfo>(allInfoList.size + 10)
-        mAllInfoMap = allInfoMap
-        for (info in allInfoList) {
-
-            // Add to all info map
-            allInfoMap.put(info.gid, info)
-
+        mAllInfoMap = allInfoList.associateBy { info ->
             // Add to each label list
             val label = info.label
 
             val list = getInfoListForLabel(label) ?: LinkedList<DownloadInfo>().also {
-                /* Contracts says if [getInfoListForLabel] return null, the param [label] is not null
-                 * [label] is local immutable
-                 * Why [label] is not smart casted to [String!] here ???
-                 *
-                 * TODO: Report it to kotlin compiler team
-                 *  https://youtrack.jetbrains.com/issue/KT-56869
-                 */
                 label!!
                 map[info.label] = it
                 if (!containLabel(label)) {
@@ -115,7 +101,8 @@ object DownloadManager : OnSpiderListener {
                 }
             }
             list.add(info)
-        }
+            info.gid
+        }.toMutableMap()
         mWaitList = LinkedList()
         mSpeedReminder = SpeedReminder()
         mDownloadInfoListeners = ArrayList()
