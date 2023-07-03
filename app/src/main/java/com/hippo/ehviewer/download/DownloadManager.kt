@@ -45,7 +45,7 @@ import kotlin.contracts.contract
 
 object DownloadManager : OnSpiderListener {
     // All download info list
-    val allInfoList: LinkedList<DownloadInfo>
+    val allInfoList: LinkedList<DownloadInfo> = LinkedList(EhDB.allDownloadInfo)
 
     // All download info map
     private val mAllInfoMap: MutableMap<Long, DownloadInfo>
@@ -69,33 +69,20 @@ object DownloadManager : OnSpiderListener {
     private var mCurrentSpider: SpiderQueen? = null
 
     init {
-        // Create list for each label
-        map = HashMap()
-        for ((_, label1) in labelList) {
-            map[label1] = LinkedList()
-        }
-
-        // Create default for non tag
-        defaultInfoList = LinkedList()
-
-        // Get all info
-        allInfoList = LinkedList(EhDB.allDownloadInfo)
-
-        mAllInfoMap = allInfoList.associateBy { info ->
-            // Add to each label list
-            val label = info.label
-
-            val list = getInfoListForLabel(label) ?: LinkedList<DownloadInfo>().also {
-                label!!
-                map[info.label] = it
+        map = allInfoList.groupBy { it.label }.entries.associate {
+            it.key?.let { label ->
                 if (!containLabel(label)) {
-                    // Add label to DB and list
+                    // Add non existing label to DB and list
                     labelList.add(EhDB.addDownloadLabel(label))
                 }
             }
-            list.add(info)
-            info.gid
-        } as MutableMap<Long, DownloadInfo>
+            it.key to LinkedList(it.value)
+        } as MutableMap<String?, LinkedList<DownloadInfo>>
+        defaultInfoList = map.remove(null) ?: LinkedList()
+        labelList.forEach { (_, label) ->
+            map[label] ?: LinkedList<DownloadInfo>().also { map[label] = it }
+        }
+        mAllInfoMap = allInfoList.associateBy { it.gid } as MutableMap<Long, DownloadInfo>
         mWaitList = LinkedList()
         mSpeedReminder = SpeedReminder()
         mDownloadInfoListeners = ArrayList()
@@ -1196,7 +1183,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    private val TAG = "DownloadManager"
+    private const val TAG = "DownloadManager"
     private const val TYPE_ON_GET_PAGES = 0
     private const val TYPE_ON_GET_509 = 1
     private const val TYPE_ON_PAGE_DOWNLOAD = 2
