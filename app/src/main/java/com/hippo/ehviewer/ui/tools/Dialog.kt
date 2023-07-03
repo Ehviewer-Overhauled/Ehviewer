@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -115,7 +118,7 @@ class DialogState {
         }
     }
 
-    private suspend fun <R> showNoButton(block: @Composable DismissDialogScope<R>.() -> Unit): R {
+    private suspend fun <R> showNoButton(respectDefaultWidth: Boolean = true, block: @Composable DismissDialogScope<R>.() -> Unit): R {
         return suspendCancellableCoroutine { cont ->
             cont.invokeOnCancellation { dismiss() }
             content = {
@@ -132,7 +135,7 @@ class DialogState {
                     },
                     content = {
                         Surface(
-                            modifier = Modifier.width(280.dp),
+                            modifier = with(Modifier) { if (!respectDefaultWidth) defaultMinSize(280.dp) else width(280.dp) },
                             shape = AlertDialogDefaults.shape,
                             color = AlertDialogDefaults.containerColor,
                             tonalElevation = AlertDialogDefaults.TonalElevation,
@@ -184,21 +187,22 @@ class DialogState {
     suspend fun showSelectItemWithIcon(
         vararg items: Pair<ImageVector, String>,
         @StringRes title: Int,
-    ): Int = showNoButton {
-        LazyColumn {
-            stickyHeader {
-                Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
-            }
-            itemsIndexed(items) { index, (icon, text) ->
-                ListItem(
-                    headlineContent = {
-                        Text(text = text, style = MaterialTheme.typography.titleMedium)
-                    },
-                    modifier = Modifier.clickable { dismissWith(index) },
-                    leadingContent = {
+    ): Int = showNoButton(false) {
+        Column {
+            Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
+            CircularLayout(
+                radius = 112.dp,
+                modifier = Modifier.fillMaxWidth().aspectRatio(1F),
+            ) {
+                items.forEachIndexed { index, (icon, text) ->
+                    Column(
+                        modifier = Modifier.clickable { dismissWith(index) },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
                         Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
-                    },
-                )
+                        Text(text = text, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
             }
         }
     }
