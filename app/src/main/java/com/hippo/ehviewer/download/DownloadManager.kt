@@ -51,10 +51,10 @@ object DownloadManager : OnSpiderListener {
     private val mAllInfoMap: MutableMap<Long, DownloadInfo>
 
     // label and info list map, without default label info list
-    private val mMap: MutableMap<String?, LinkedList<DownloadInfo>>
+    private val map: MutableMap<String?, LinkedList<DownloadInfo>>
 
     // All labels without default label
-    val labelList: MutableList<DownloadLabel>
+    val labelList: MutableList<DownloadLabel> = EhDB.allDownloadLabelList.toMutableList()
 
     // Store download info with default label
     val defaultInfoList: LinkedList<DownloadInfo>
@@ -69,15 +69,9 @@ object DownloadManager : OnSpiderListener {
     private var mCurrentSpider: SpiderQueen? = null
 
     init {
-
-        // Get all labels
-        val labels = EhDB.allDownloadLabelList.toMutableList()
-        labelList = labels
-
         // Create list for each label
-        val map = HashMap<String?, LinkedList<DownloadInfo>>()
-        mMap = map
-        for ((_, label1) in labels) {
+        map = HashMap()
+        for ((_, label1) in labelList) {
             map[label1] = LinkedList()
         }
 
@@ -96,7 +90,7 @@ object DownloadManager : OnSpiderListener {
                 map[info.label] = it
                 if (!containLabel(label)) {
                     // Add label to DB and list
-                    labels.add(EhDB.addDownloadLabel(label))
+                    labelList.add(EhDB.addDownloadLabel(label))
                 }
             }
             list.add(info)
@@ -114,7 +108,7 @@ object DownloadManager : OnSpiderListener {
         return if (label == null) {
             defaultInfoList
         } else {
-            mMap[label]
+            map[label]
         }
     }
 
@@ -135,7 +129,7 @@ object DownloadManager : OnSpiderListener {
     }
 
     fun getLabelDownloadInfoList(label: String?): List<DownloadInfo>? {
-        return mMap[label]
+        return map[label]
     }
 
     fun getDownloadInfo(gid: Long): DownloadInfo? {
@@ -332,7 +326,7 @@ object DownloadManager : OnSpiderListener {
             if (null == list) {
                 // Can't find the label in label list
                 list = LinkedList()
-                mMap[info.label] = list
+                map[info.label] = list
                 if (!containLabel(info.label)) {
                     // Add label to DB and list
                     labelList.add(EhDB.addDownloadLabel(info.label!!))
@@ -365,7 +359,7 @@ object DownloadManager : OnSpiderListener {
         for (label in downloadLabelList) {
             val labelString = label.label
             if (!containLabel(labelString)) {
-                mMap[labelString] = LinkedList()
+                map[labelString] = LinkedList()
                 labelList.add(EhDB.addDownloadLabel(label))
             }
         }
@@ -703,7 +697,7 @@ object DownloadManager : OnSpiderListener {
             return
         }
         labelList.add(EhDB.addDownloadLabel(label))
-        mMap[label] = LinkedList()
+        map[label] = LinkedList()
         for (l in mDownloadInfoListeners) {
             l!!.onUpdateLabels()
         }
@@ -733,7 +727,7 @@ object DownloadManager : OnSpiderListener {
         if (!found) {
             return
         }
-        val list = mMap.remove(from) ?: return
+        val list = map.remove(from) ?: return
 
         // Update info label
         for (info in list) {
@@ -742,7 +736,7 @@ object DownloadManager : OnSpiderListener {
             EhDB.putDownloadInfo(info)
         }
         // Put list back with new label
-        mMap[to] = list
+        map[to] = list
 
         // Notify listener
         for (l in mDownloadInfoListeners) {
@@ -766,7 +760,7 @@ object DownloadManager : OnSpiderListener {
         if (!found) {
             return
         }
-        val list = mMap.remove(label) ?: return
+        val list = map.remove(label) ?: return
 
         // Update info label
         for (info in list) {
@@ -1202,7 +1196,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    private val TAG = DownloadManager::class.java.simpleName
+    private val TAG = "DownloadManager"
     private const val TYPE_ON_GET_PAGES = 0
     private const val TYPE_ON_GET_509 = 1
     private const val TYPE_ON_PAGE_DOWNLOAD = 2
