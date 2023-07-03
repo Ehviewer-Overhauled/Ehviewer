@@ -142,7 +142,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                         awaitBodyFully { buffer ->
                             val read = chan.write(buffer)
                             notifyProgress(length, info.receivedByteCount, read)
-                        }
+                        }.also { size -> if (chan.size() != size) chan.truncate(size) }
                     }
                 }
             }
@@ -185,7 +185,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         val extension = contentType?.subtype ?: "jpg"
         val length = response.body.contentLength()
         return saveResponseMeta(index, extension, length) { outFile ->
-            object : ForwardingSink(outFile.openOutputStream().sink()) {
+            object : ForwardingSink(outFile.openOutputStream().also { it.channel.truncate(0) }.sink()) {
                 var totalBytesRead = 0L
                 override fun write(source: Buffer, byteCount: Long) {
                     super.write(source, byteCount)
