@@ -128,7 +128,7 @@ class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow
         notifyPageSucceed(index, image)
     }
 
-    override fun onForceRequest(index: Int) {
+    override fun onForceRequest(index: Int, orgImg: Boolean) {
         onRequest(index)
     }
 

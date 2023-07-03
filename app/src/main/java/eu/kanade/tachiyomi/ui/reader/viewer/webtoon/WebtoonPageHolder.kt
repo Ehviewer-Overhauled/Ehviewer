@@ -171,6 +171,7 @@ class WebtoonPageHolder(
         progressContainer.isVisible = true
         progressIndicator.show()
         removeErrorLayout()
+        frame.recycle()
     }
 
     /**
