@@ -163,20 +163,20 @@ class DialogState {
         vararg items: Pair<ImageVector, Int>,
         title: String,
     ): Int = showNoButton {
-        Column {
-            Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
-            LazyColumn {
-                itemsIndexed(items) { index, (icon, text) ->
-                    ListItem(
-                        headlineContent = {
-                            Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
-                        },
-                        modifier = Modifier.clickable { dismissWith(index) },
-                        leadingContent = {
-                            Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
-                        },
-                    )
-                }
+        LazyColumn {
+            stickyHeader {
+                Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
+            }
+            itemsIndexed(items) { index, (icon, text) ->
+                ListItem(
+                    headlineContent = {
+                        Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
+                    },
+                    modifier = Modifier.clickable { dismissWith(index) },
+                    leadingContent = {
+                        Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
+                    },
+                )
             }
         }
     }
@@ -185,20 +185,20 @@ class DialogState {
         vararg items: Pair<ImageVector, String>,
         @StringRes title: Int,
     ): Int = showNoButton {
-        Column {
-            Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
-            LazyColumn {
-                itemsIndexed(items) { index, (icon, text) ->
-                    ListItem(
-                        headlineContent = {
-                            Text(text = text, style = MaterialTheme.typography.titleMedium)
-                        },
-                        modifier = Modifier.clickable { dismissWith(index) },
-                        leadingContent = {
-                            Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
-                        },
-                    )
-                }
+        LazyColumn {
+            stickyHeader {
+                Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
+            }
+            itemsIndexed(items) { index, (icon, text) ->
+                ListItem(
+                    headlineContent = {
+                        Text(text = text, style = MaterialTheme.typography.titleMedium)
+                    },
+                    modifier = Modifier.clickable { dismissWith(index) },
+                    leadingContent = {
+                        Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
+                    },
+                )
             }
         }
     }
