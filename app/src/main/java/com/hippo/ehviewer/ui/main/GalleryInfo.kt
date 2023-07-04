@@ -22,8 +22,6 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
@@ -63,13 +61,12 @@ fun GalleryInfoListItem(
                     modifier = Modifier.aspectRatio(0.6666667F).fillMaxSize(),
                 )
             }
-            val scope = currentRecomposeScope
-            LaunchedEffect(info.gid) {
+            val showFav by produceState(false, info.gid) {
+                value = info.favoriteSlot != -2 && !isInFavScene
                 FavouriteStatusRouter.stateFlow(info.gid).collect {
-                    scope.invalidate()
+                    value = it != -2 && !isInFavScene
                 }
             }
-            val showFav = info.favoriteSlot != -2 && !isInFavScene
             ConstraintLayout(modifier = Modifier.padding(8.dp, 4.dp).fillMaxSize()) {
                 val (titleRef, uploaderRef, ratingRef, categoryRef, postedRef, favRef, iconsRef) = createRefs()
                 Text(
