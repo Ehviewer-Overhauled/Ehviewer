@@ -153,7 +153,6 @@
     <string name="no_torrents">ไม่มีไฟล์ torrents</string>
     <string name="torrents">Torrents</string>
     <string name="add_favorites_dialog_title">เพิ่มเข้ารายการโปรด</string>
-    <string name="remember_favorite_collection">จดจำรายการโปรดที่เลือก</string>
     <string name="add_to_favorite_success">เพิ่มเข้าในรายการโปรดแล้ว</string>
     <string name="remove_from_favorite_success">ลบออกจากรายการโปรดแล้ว</string>
     <string name="add_to_favorite_failure">เกิดความล้มเหลวในการเพิ่มเข้าในรายการโปรด</string>
@@ -383,7 +382,6 @@
     <string name="delete_favorites_dialog_title">ลบออกจากรายการโปรด</string>
     <string name="delete_favorites_dialog_message">ต้องการลบ %d รายการออกจากรายการโปรดหรือไม่?</string>
     <string name="move_favorites_dialog_title">ย้ายรายการโปรด</string>
-    <string name="default_favorites_collection">ค่าเริ่มต้นของที่เก็บรายการโปรด</string>
     <string name="let_me_select">ขอให้ฉันเลือกนะ</string>
     <string name="collections">คอลเลคชั่น</string>
     <string name="need_sign_in">จำเป็นต้องลงชื่อเข้าใช้ก่อน</string>

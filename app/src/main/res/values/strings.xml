@@ -193,7 +193,6 @@
     <string name="download_torrent_failure">Failed to download torrent</string>
     <string name="torrents">Torrents</string>
     <string name="add_favorites_dialog_title">Add to favorites</string>
-    <string name="remember_favorite_collection">Remember favorite collection</string>
     <string name="add_to_favorite_success">Added to favorites</string>
     <string name="remove_from_favorite_success">Removed from favorites</string>
     <string name="add_to_favorite_failure">Failed to add to favorites</string>
@@ -470,7 +469,6 @@
     <string name="delete_favorites_dialog_title">Delete from favorites</string>
     <string name="delete_favorites_dialog_message">Delete %d items from favorites?</string>
     <string name="move_favorites_dialog_title">Move favorites</string>
-    <string name="default_favorites_collection">Default favorites collection</string>
     <string name="let_me_select">Let me select</string>
     <string name="favorite_note">Note</string>
     <string name="collections">Collections</string>
