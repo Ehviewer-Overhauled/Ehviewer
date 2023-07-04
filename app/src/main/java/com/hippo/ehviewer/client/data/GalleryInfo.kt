@@ -127,5 +127,8 @@ interface GalleryInfo : AbstractGalleryInfo, Parcelable {
             "language:hungarian",
             "language:dutch",
         )
+
+        const val NOT_FAVORITED = -2
+        const val LOCAL_FAVORITED = -1
     }
 }

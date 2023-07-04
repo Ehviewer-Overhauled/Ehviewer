@@ -18,6 +18,7 @@ package com.hippo.ehviewer.client.data
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -72,7 +73,7 @@ open class BaseGalleryInfo(
     override var simpleLanguage: String? = null,
 
     @Ignore
-    override var favoriteSlot: Int = -2,
+    override var favoriteSlot: Int = NOT_FAVORITED,
 
     @Ignore
     override var favoriteName: String? = null,

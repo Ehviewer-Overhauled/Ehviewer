@@ -25,6 +25,8 @@ import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryCommentList
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.LargeGalleryPreview
@@ -207,8 +209,8 @@ object GalleryDetailParser {
                     }
                 }
             }
-            if (gd.favoriteSlot == -2 && EhDB.containLocalFavorites(gd.gid)) {
-                gd.favoriteSlot = -1
+            if (gd.favoriteSlot == NOT_FAVORITED && EhDB.containLocalFavorites(gd.gid)) {
+                gd.favoriteSlot = LOCAL_FAVORITED
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
