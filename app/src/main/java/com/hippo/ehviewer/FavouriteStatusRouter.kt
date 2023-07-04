@@ -19,11 +19,8 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.yorozuya.IntIdGenerator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.ProducerScope
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 
@@ -48,23 +45,20 @@ object FavouriteStatusRouter {
                 info.favoriteSlot = slot
             }
         }
-        collector.trySend(gid to slot)
+        _globalFlow.tryEmit(gid to slot)
     }
 
     private val listenerScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var collector: ProducerScope<Pair<Long, Int>>
-
-    val globalFlow = callbackFlow<Pair<Long, Int>> {
-        collector = this
-        awaitClose { error("Unreachable!!!") }
-    }.shareIn(listenerScope, SharingStarted.Eagerly).apply {
+    private val _globalFlow = MutableSharedFlow<Pair<Long, Int>>(extraBufferCapacity = 1).apply {
         listenerScope.launch {
             collect { (gid, slot) ->
                 EhDB.modifyHistoryInfoFavslotNonRefresh(gid, slot)
             }
         }
     }
+
+    val globalFlow = _globalFlow.asSharedFlow()
 
     fun stateFlow(targetGid: Long) = globalFlow.transform { (gid, slot) -> if (targetGid == gid) emit(slot) }
 }
