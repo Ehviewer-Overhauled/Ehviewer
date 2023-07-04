@@ -19,4 +19,5 @@ interface AbstractGalleryInfo {
     var simpleLanguage: String?
     var favoriteSlot: Int
     var favoriteName: String?
+    var favoriteNote: String?
 }

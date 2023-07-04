@@ -26,8 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -80,13 +82,13 @@ fun GalleryInfoListItem(
                     style = MaterialTheme.typography.titleSmall,
                 )
                 ProvideTextStyle(MaterialTheme.typography.labelLarge) {
-                    if (!isInFavScene) {
+                    info.uploader?.let {
                         Text(
-                            text = info.uploader ?: if (info.disowned) "(DISOWNED)" else "",
+                            text = it,
                             modifier = Modifier.constrainAs(uploaderRef) {
                                 start.linkTo(parent.start)
                                 bottom.linkTo(ratingRef.top)
-                            },
+                            }.alpha(if (info.disowned) 0.5f else 1f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -114,7 +116,7 @@ fun GalleryInfoListItem(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.constrainAs(iconsRef) {
                             end.linkTo(parent.end)
-                            bottom.linkTo(if (showFav) favRef.top else postedRef.top)
+                            bottom.linkTo(postedRef.top)
                         },
                     ) {
                         val download by produceState(false, info.gid) {
@@ -141,9 +143,15 @@ fun GalleryInfoListItem(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.constrainAs(favRef) {
                             end.linkTo(parent.end)
-                            bottom.linkTo(postedRef.top)
+                            bottom.linkTo(iconsRef.top)
                         },
                     ) {
+                        if (isInFavScene) {
+                            Text(
+                                text = info.favoriteNote.orEmpty(),
+                                fontStyle = FontStyle.Italic,
+                            )
+                        }
                         if (showFav) {
                             Icon(
                                 Icons.Default.Favorite,
