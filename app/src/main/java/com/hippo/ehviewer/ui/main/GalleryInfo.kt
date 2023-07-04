@@ -37,6 +37,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.tools.CrystalCard
 import com.hippo.ehviewer.ui.tools.ElevatedCard
@@ -64,9 +65,9 @@ fun GalleryInfoListItem(
                 )
             }
             val showFav by produceState(false, info.gid) {
-                value = info.favoriteSlot != -2 && !isInFavScene
+                value = info.favoriteSlot != NOT_FAVORITED && !isInFavScene
                 FavouriteStatusRouter.stateFlow(info.gid).collect {
-                    value = it != -2 && !isInFavScene
+                    value = it != NOT_FAVORITED && !isInFavScene
                 }
             }
             ConstraintLayout(modifier = Modifier.padding(8.dp, 4.dp).fillMaxSize()) {

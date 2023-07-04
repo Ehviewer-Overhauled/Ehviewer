@@ -18,6 +18,8 @@ package com.hippo.ehviewer.client.parser
 import android.util.Log
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.yorozuya.toIntOrDefault
@@ -92,8 +94,8 @@ object GalleryListParser {
             list.addAll(
                 es.mapNotNull {
                     runCatching { parseGalleryInfo(it.toString()) }.onFailure { it.printStackTrace() }.getOrNull()?.apply {
-                        if (favoriteSlot == -2 && EhDB.containLocalFavorites(gid)) {
-                            favoriteSlot = -1
+                        if (favoriteSlot == NOT_FAVORITED && EhDB.containLocalFavorites(gid)) {
+                            favoriteSlot = LOCAL_FAVORITED
                         }
                         generateSLang()
                     }

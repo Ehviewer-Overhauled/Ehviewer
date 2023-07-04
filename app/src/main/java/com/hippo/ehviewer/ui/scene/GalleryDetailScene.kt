@@ -116,6 +116,7 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
@@ -692,8 +693,8 @@ class GalleryDetailScene : BaseScene() {
             horizontalArrangement = Arrangement.Center,
         ) {
             val favored by produceState(initialValue = false) {
-                value = galleryDetail.favoriteSlot != -2
-                FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { value = it != -2 }
+                value = galleryDetail.favoriteSlot != NOT_FAVORITED
+                FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { value = it != NOT_FAVORITED }
             }
             FilledTertiaryIconToggleButton(
                 checked = favored,

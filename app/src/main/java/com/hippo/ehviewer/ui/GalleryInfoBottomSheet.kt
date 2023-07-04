@@ -42,6 +42,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
 import com.hippo.ehviewer.client.thumbUrl
 import com.hippo.ehviewer.ui.scene.navWithUrl
 import com.hippo.ehviewer.util.tellClipboardWithToast
@@ -96,7 +97,7 @@ fun GalleryInfoBottomSheet(
                 pages.toString(),
                 size,
                 favoriteCount.toString(),
-                (favoriteSlot >= 0).toString(),
+                (favoriteSlot > LOCAL_FAVORITED).toString(),
                 ratingCount.toString(),
                 rating.toString(),
                 torrentCount.toString(),

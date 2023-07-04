@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
 
 @Entity(tableName = "LOCAL_FAVORITES")
 class LocalFavoriteInfo() : BaseGalleryInfo() {
@@ -25,6 +26,6 @@ class LocalFavoriteInfo() : BaseGalleryInfo() {
     }
 
     init {
-        favoriteSlot = -1
+        favoriteSlot = LOCAL_FAVORITED
     }
 }

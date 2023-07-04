@@ -38,6 +38,8 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.download.DownloadManager
@@ -211,21 +213,21 @@ suspend fun DialogState.addToFavorites(galleryInfo: GalleryInfo): Boolean {
 
 private suspend fun doAddToFavorites(
     galleryInfo: GalleryInfo,
-    slot: Int = -2,
+    slot: Int = NOT_FAVORITED,
     newFavoriteName: String? = null,
     note: String? = null,
     localFaved: Boolean = true,
 ): Boolean {
     val add = when (slot) {
-        -2 -> {
+        NOT_FAVORITED -> {
             EhDB.removeLocalFavorites(galleryInfo.gid)
-            if (galleryInfo.favoriteSlot >= 0) {
+            if (galleryInfo.favoriteSlot > LOCAL_FAVORITED) {
                 EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token)
             }
             false
         }
 
-        -1 -> {
+        LOCAL_FAVORITED -> {
             if (localFaved) {
                 EhDB.removeLocalFavorites(galleryInfo.gid)
             } else {
@@ -247,15 +249,15 @@ private suspend fun doAddToFavorites(
         else -> throw EhException("Invalid favorite slot!")
     }
     if (add) {
-        if (slot != -1 || galleryInfo.favoriteSlot == -2) { // Cloud favorites have priority
+        if (slot != LOCAL_FAVORITED || galleryInfo.favoriteSlot == NOT_FAVORITED) { // Cloud favorites have priority
             galleryInfo.favoriteSlot = slot
             galleryInfo.favoriteName = newFavoriteName
             withUIContext {
                 FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
             }
         }
-    } else if (slot != -1 || galleryInfo.favoriteSlot == -1) {
-        val newSlot = if (slot >= 0 && localFaved) -1 else -2
+    } else if (slot != LOCAL_FAVORITED || galleryInfo.favoriteSlot == LOCAL_FAVORITED) {
+        val newSlot = if (slot > LOCAL_FAVORITED && localFaved) LOCAL_FAVORITED else NOT_FAVORITED
         galleryInfo.favoriteSlot = newSlot
         galleryInfo.favoriteName = null
         withUIContext {
@@ -277,7 +279,7 @@ fun Context.navToReader(info: GalleryInfo, page: Int = -1) {
 
 suspend fun DialogState.doGalleryInfoAction(info: GalleryInfo, context: Context) {
     val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
-    val favourite = info.favoriteSlot != -2
+    val favourite = info.favoriteSlot != NOT_FAVORITED
     val selected = if (!downloaded) {
         showSelectItemWithIcon(
             Icons.Default.MenuBook to R.string.read,
