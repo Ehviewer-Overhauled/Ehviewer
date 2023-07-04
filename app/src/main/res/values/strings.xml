@@ -560,6 +560,7 @@
     <string name="app_link_not_verified_message">For Android 12 and newer, you need to manually add link to verified links in order to open E-Hentai links in EhViewer.</string>
     <string name="app_link_not_verified_title">App links not verified</string>
     <string name="open_by_default">Open by default</string>
+    <string name="use_ci_update_channel">Use CI update channel</string>
     <string name="settings_privacy_require_unlock">Require Unlock</string>
     <string name="settings_privacy_require_unlock_delay">Lock Delay</string>
     <string name="settings_privacy_require_unlock_delay_summary">No unlock is required when leaving App and returning within %s minute(s)</string>

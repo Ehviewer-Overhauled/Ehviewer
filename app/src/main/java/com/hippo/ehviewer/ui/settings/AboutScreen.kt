@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.text.parseAsHtml
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
@@ -73,6 +74,10 @@ fun AboutScreen() {
             Preference(
                 title = stringResource(id = R.string.settings_about_version),
                 summary = versionCode(),
+            )
+            SwitchPreference(
+                title = stringResource(id = R.string.use_ci_update_channel),
+                value = Settings::useCIUpdateChannel,
             )
             Preference(title = stringResource(id = R.string.settings_about_check_for_updates))
         }

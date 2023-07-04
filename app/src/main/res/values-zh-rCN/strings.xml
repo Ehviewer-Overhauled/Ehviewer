@@ -464,6 +464,7 @@
     <string name="download_service">下载服务</string>
     <string name="favorite_name">收藏画廊</string>
     <string name="black_dark_theme">纯黑深色主题</string>
+    <string name="use_ci_update_channel">使用持续集成(CI)构建频道更新</string>
     <string name="download_filter">过滤</string>
     <string name="download_all">全部</string>
     <string name="download_start_all_reversed">全部开始（倒序）</string>

@@ -42,6 +42,7 @@ object Settings : DataStorePreferences(null) {
     var meteredNetworkWarning by boolPref("cellular_network_warning", false)
     var appLinkVerifyTip by boolPref("app_link_verify_tip", false)
     var enabledSecurity by boolPref("enable_secure", false)
+    var useCIUpdateChannel by boolPref("ci_update_channel", false)
     var mediaScan by boolPref("media_scan", false).observed { updateWhenKeepMediaStatusChanges() }
     var hasDefaultDownloadLabel by boolPref("has_default_download_label", false)
     var qSSaveProgress by boolPref("qs_save_progress", true)
