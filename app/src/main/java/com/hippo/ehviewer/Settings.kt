@@ -59,7 +59,6 @@ object Settings : DataStorePreferences(null) {
     var favLocalCount by intPref("fav_local", 0)
     var favCloudCount by intPref("fav_cloud", 0)
     var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_ALL)
-    var defaultFavSlot by intPref("default_favorite_2", -2) // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
     var securityDelay by intPref("require_unlock_delay", 0)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
     var listThumbSize by intPref("list_tile_size", 40)

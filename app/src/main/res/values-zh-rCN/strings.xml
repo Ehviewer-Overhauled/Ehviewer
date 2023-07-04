@@ -414,6 +414,7 @@
     <string name="move_favorites_dialog_title">移动收藏</string>
     <string name="default_favorites_collection">默认收藏夹</string>
     <string name="let_me_select">让我选择</string>
+    <string name="favorite_note">备注</string>
     <string name="collections">收藏夹</string>
     <string name="need_sign_in">需要登录</string>
     <!-- Progress Scene -->

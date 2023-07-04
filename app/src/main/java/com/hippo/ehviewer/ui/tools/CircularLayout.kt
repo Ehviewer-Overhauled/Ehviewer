@@ -16,6 +16,7 @@ private const val QuarterCircle = PI / 2
 fun CircularLayout(
     modifier: Modifier = Modifier,
     radius: Dp,
+    placeFirstItemInCenter: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     Layout(
@@ -25,13 +26,24 @@ fun CircularLayout(
         val radiusPx = radius.toPx()
         val itemConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         val placeables = measurables.map { measurable -> measurable.measure(itemConstraints) }
-        val theta = FullCircle / (placeables.count())
+        val outPlaceables = if (placeFirstItemInCenter) placeables.drop(1) else placeables
+        val theta = FullCircle / (outPlaceables.count())
 
         layout(
             width = constraints.minWidth,
             height = constraints.minHeight,
         ) {
-            placeables.forEachIndexed { i, it ->
+            if (placeFirstItemInCenter) {
+                placeables[0].let {
+                    val centerOffsetX = constraints.maxWidth / 2 - it.width / 2
+                    val centerOffsetY = constraints.maxHeight / 2 - it.height / 2
+                    it.place(
+                        x = centerOffsetX,
+                        y = centerOffsetY,
+                    )
+                }
+            }
+            outPlaceables.forEachIndexed { i, it ->
                 val centerOffsetX = constraints.maxWidth / 2 - it.width / 2
                 val centerOffsetY = constraints.maxHeight / 2 - it.height / 2
                 val offsetX = radiusPx * cos(theta * i - QuarterCircle) + centerOffsetX

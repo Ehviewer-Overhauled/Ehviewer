@@ -472,6 +472,7 @@
     <string name="move_favorites_dialog_title">Move favorites</string>
     <string name="default_favorites_collection">Default favorites collection</string>
     <string name="let_me_select">Let me select</string>
+    <string name="favorite_note">Note</string>
     <string name="collections">Collections</string>
     <string name="need_sign_in">Signing in is required</string>
     <!-- Progress Scene -->

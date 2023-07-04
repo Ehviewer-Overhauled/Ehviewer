@@ -239,7 +239,7 @@ object EhEngine {
         gid: Long,
         token: String?,
         dstCat: Int = -1,
-        note: String? = null,
+        note: String = "",
     ) {
         val catStr: String = when (dstCat) {
             -1 -> "favdel"
@@ -250,7 +250,7 @@ object EhEngine {
         return ehRequest(url, url, EhUrl.origin) {
             formBody {
                 add("favcat", catStr)
-                add("favnote", note ?: "")
+                add("favnote", note)
                 // apply=Add+to+Favorites is not necessary, just use apply=Apply+Changes all the time
                 add("apply", "Apply Changes")
                 add("update", "1")

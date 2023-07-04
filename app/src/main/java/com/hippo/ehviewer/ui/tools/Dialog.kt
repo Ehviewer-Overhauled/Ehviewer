@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.tools
 
+import android.graphics.Typeface
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,15 +14,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -31,8 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -186,19 +197,50 @@ class DialogState {
         }
     }
 
-    suspend fun showSelectItemWithIcon(
+    suspend fun showSelectItemWithIconAndTextField(
         vararg items: Pair<ImageVector, String>,
         @StringRes title: Int,
-    ): Int = showNoButton(false) {
+        @StringRes hint: Int,
+        maxChar: Int,
+    ): Pair<Int, String> = showNoButton(false) {
         Column {
             Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
             CircularLayout(
                 radius = 112.dp,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1F),
+                placeFirstItemInCenter = true,
             ) {
+                var note by remember { mutableStateOf("") }
+                TextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    modifier = Modifier.width(128.dp),
+                    textStyle = TextStyle(fontFamily = FontFamily(Typeface.MONOSPACE)),
+                    label = { Text(text = stringResource(id = hint)) },
+                    trailingIcon = {
+                        if (note.isNotEmpty()) {
+                            IconButton(onClick = { note = "" }) {
+                                Icon(imageVector = Icons.Default.Close, contentDescription = null)
+                            }
+                        }
+                    },
+                    supportingText = {
+                        Text(
+                            text = "${note.length} / $maxChar",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.End,
+                        )
+                    },
+                    maxLines = 6,
+                    shape = ShapeDefaults.ExtraSmall,
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                )
                 items.forEachIndexed { index, (icon, text) ->
                     Column(
-                        modifier = Modifier.clip(IconWithTextCorner).clickable { dismissWith(index) },
+                        modifier = Modifier.clip(IconWithTextCorner).clickable { dismissWith(index to note) },
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)

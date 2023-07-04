@@ -21,7 +21,6 @@ import android.content.DialogInterface
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.GravityCompat
@@ -322,25 +321,6 @@ class FavoritesScene :
     ): View {
         val drawerBinding = DrawerListRvBinding.inflate(inflater, container, false)
         drawerBinding.toolbar.setTitle(R.string.collections)
-        drawerBinding.toolbar.inflateMenu(R.menu.drawer_favorites)
-        drawerBinding.toolbar.setOnMenuItemClickListener { item: MenuItem ->
-            val id = item.itemId
-            if (id == R.id.action_default_favorites_slot) {
-                val items = arrayOfNulls<String>(12)
-                items[0] = getString(R.string.let_me_select)
-                items[1] = getString(R.string.local_favorites)
-                val favCat = Settings.favCat
-                System.arraycopy(favCat, 0, items, 2, 10)
-                BaseDialogBuilder(requireContext())
-                    .setTitle(R.string.default_favorites_collection)
-                    .setItems(items) { _, which ->
-                        Settings.defaultFavSlot = which - 2
-                    }
-                    .show()
-                return@setOnMenuItemClickListener true
-            }
-            false
-        }
         drawerBinding.recyclerViewDrawer.layoutManager = LinearLayoutManager(context)
         mDrawerAdapter = FavDrawerAdapter(inflater)
         drawerBinding.recyclerViewDrawer.adapter = mDrawerAdapter
