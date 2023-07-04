@@ -22,6 +22,8 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
@@ -32,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
@@ -59,6 +62,12 @@ fun GalleryInfoListItem(
                     key = info,
                     modifier = Modifier.aspectRatio(0.6666667F).fillMaxSize(),
                 )
+            }
+            val scope = currentRecomposeScope
+            LaunchedEffect(info.gid) {
+                FavouriteStatusRouter.stateFlow(info.gid).collect {
+                    scope.invalidate()
+                }
             }
             val showFav = info.favoriteSlot != -2 && !isInFavScene
             ConstraintLayout(modifier = Modifier.padding(8.dp, 4.dp).fillMaxSize()) {

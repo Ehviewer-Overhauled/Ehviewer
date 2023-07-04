@@ -53,7 +53,6 @@ import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
@@ -153,12 +152,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         }
     private var mHasFirstRefresh = false
 
-    @SuppressLint("NotifyDataSetChanged")
-    private val mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener =
-        FavouriteStatusRouter.Listener { _: Long, _: Int ->
-            mAdapter?.notifyDataSetChanged()
-        }
-
     private var mIsTopList = false
     override fun getMenuResId(): Int {
         return R.menu.scene_gallery_list_searchbar_menu
@@ -188,7 +181,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -221,11 +213,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh)
         outState.putParcelable(KEY_LIST_URL_BUILDER, mUrlBuilder)
         outState.putInt(KEY_STATE, mState)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        FavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
     }
 
     private fun setSearchBarHint() {

@@ -18,6 +18,13 @@ package com.hippo.ehviewer
 import android.annotation.SuppressLint
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.yorozuya.IntIdGenerator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.shareIn
 
 object FavouriteStatusRouter {
     private val idGenerator = IntIdGenerator(Settings.dataMapNextId)
@@ -59,4 +66,18 @@ object FavouriteStatusRouter {
     fun interface Listener {
         fun onModifyFavourites(gid: Long, slot: Int)
     }
+
+    private val listenerScope = CoroutineScope(Dispatchers.IO)
+
+    private val _stateFlow = callbackFlow {
+        val listener = Listener { gid, slot ->
+            trySend(gid to slot)
+        }
+        addListener(listener)
+        awaitClose {
+            removeListener(listener)
+        }
+    }.shareIn(listenerScope, SharingStarted.Eagerly)
+
+    fun stateFlow(gid: Long) = _stateFlow.filter { (gid1) -> gid1 == gid }
 }
