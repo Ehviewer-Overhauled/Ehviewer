@@ -54,6 +54,7 @@ import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchNow
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import moe.tarsin.coroutines.runSuspendCatching
@@ -65,6 +66,7 @@ object CommonOperations {
         startDownload(activity!!, listOf(galleryInfo), forceDefault)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun startDownload(
         activity: MainActivity,
         galleryInfos: List<GalleryInfo>,
@@ -130,7 +132,7 @@ object CommonOperations {
             val list = DownloadManager.labelList
             val items = mutableListOf<String>()
             items.add(activity.getString(R.string.default_download_label_name))
-            items.addAll(list.mapNotNull { it.label })
+            items.addAll(list.map { it.label })
             ListCheckBoxDialogBuilder(
                 activity,
                 items,
@@ -193,8 +195,8 @@ suspend fun keepNoMediaFileStatus() {
 }
 
 suspend fun DialogState.addToFavorites(galleryInfo: GalleryInfo): Boolean {
-    val localFaved = EhDB.containLocalFavorites(galleryInfo.gid)
-    val localFav = if (localFaved) {
+    val localFavorited = EhDB.containLocalFavorites(galleryInfo.gid)
+    val localFav = if (localFavorited) {
         Icons.Default.Favorite
     } else {
         Icons.Default.FavoriteBorder
@@ -206,58 +208,58 @@ suspend fun DialogState.addToFavorites(galleryInfo: GalleryInfo): Boolean {
             Icons.Default.FavoriteBorder
         } to name
     }.toTypedArray()
-    val slot = showSelectItemWithIcon(localFav, *items, title = R.string.add_favorites_dialog_title) - 1
-    val newFavoriteName = Settings.favCat.getOrNull(slot)
-    return doAddToFavorites(galleryInfo, slot, newFavoriteName, localFaved = localFaved)
+    val isFavorited = galleryInfo.favoriteSlot != NOT_FAVORITED
+    val (slot, note) = if (isFavorited) {
+        val remove = Icons.Default.HeartBroken to appCtx.getString(R.string.remove_from_favourites)
+        showSelectItemWithIconAndTextField(remove, localFav, *items, title = R.string.add_favorites_dialog_title, hint = R.string.favorite_note, maxChar = MAX_FAVNOTE_CHAR)
+    } else {
+        showSelectItemWithIconAndTextField(localFav, *items, title = R.string.add_favorites_dialog_title, hint = R.string.favorite_note, maxChar = MAX_FAVNOTE_CHAR)
+    }
+    return doAddToFavorites(galleryInfo, if (isFavorited) slot - 2 else slot - 1, note, localFavorited)
 }
 
 private suspend fun doAddToFavorites(
     galleryInfo: GalleryInfo,
     slot: Int = NOT_FAVORITED,
-    newFavoriteName: String? = null,
-    note: String? = null,
-    localFaved: Boolean = true,
+    note: String = "",
+    localFavorited: Boolean = true,
 ): Boolean {
     val add = when (slot) {
-        NOT_FAVORITED -> {
-            EhDB.removeLocalFavorites(galleryInfo.gid)
+        NOT_FAVORITED -> { // Remove from cloud favorites first
             if (galleryInfo.favoriteSlot > LOCAL_FAVORITED) {
                 EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token)
+            } else if (localFavorited) {
+                EhDB.removeLocalFavorites(galleryInfo.gid)
             }
             false
         }
 
         LOCAL_FAVORITED -> {
-            if (localFaved) {
+            if (localFavorited) {
                 EhDB.removeLocalFavorites(galleryInfo.gid)
             } else {
                 EhDB.putLocalFavorites(galleryInfo)
             }
-            !localFaved
+            !localFavorited
         }
 
         in 0..9 -> {
-            if (galleryInfo.favoriteSlot == slot) {
-                EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token)
-                false
-            } else {
-                EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token, slot, note)
-                true
-            }
+            EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token, slot, note)
+            true
         }
 
         else -> throw EhException("Invalid favorite slot!")
     }
-    if (add) {
-        if (slot != LOCAL_FAVORITED || galleryInfo.favoriteSlot == NOT_FAVORITED) { // Cloud favorites have priority
+    if (add) { // Cloud favorites have priority
+        if (slot != LOCAL_FAVORITED || galleryInfo.favoriteSlot == NOT_FAVORITED) {
             galleryInfo.favoriteSlot = slot
-            galleryInfo.favoriteName = newFavoriteName
+            galleryInfo.favoriteName = Settings.favCat.getOrNull(slot)
             withUIContext {
                 FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
             }
         }
     } else if (slot != LOCAL_FAVORITED || galleryInfo.favoriteSlot == LOCAL_FAVORITED) {
-        val newSlot = if (slot > LOCAL_FAVORITED && localFaved) LOCAL_FAVORITED else NOT_FAVORITED
+        val newSlot = if (galleryInfo.favoriteSlot > LOCAL_FAVORITED && localFavorited) LOCAL_FAVORITED else NOT_FAVORITED
         galleryInfo.favoriteSlot = newSlot
         galleryInfo.favoriteName = null
         withUIContext {
@@ -329,6 +331,8 @@ suspend fun DialogState.doGalleryInfoAction(info: GalleryInfo, context: Context)
     }
 }
 
+private const val MAX_FAVNOTE_CHAR = 200
+
 suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo): Boolean = show(
     confirmText = android.R.string.ok,
     dismissText = android.R.string.cancel,
@@ -338,7 +342,7 @@ suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo): Boolean = show
 
 suspend fun DialogState.showMoveDownloadLabel(info: GalleryInfo) {
     val defaultLabel = appCtx.getString(R.string.default_download_label_name)
-    val labels = DownloadManager.labelList.mapNotNull { it.label }.toTypedArray()
+    val labels = DownloadManager.labelList.map { it.label }.toTypedArray()
     val selected = showSelectItem(defaultLabel, *labels, title = R.string.download_move_dialog_title)
     val downloadInfo = DownloadManager.getDownloadInfo(info.gid) ?: return
     val label = if (selected == 0) null else labels[selected - 1]
