@@ -226,7 +226,7 @@ class DialogState {
                     },
                     supportingText = {
                         Text(
-                            text = "${note.length} / $maxChar",
+                            text = "${note.toByteArray().size} / $maxChar",
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.End,
                         )
