@@ -289,18 +289,11 @@ object EhDB {
     }
 
     @Synchronized
-    fun putHistoryInfoNonRefresh(info: GalleryInfo) {
+    fun modifyHistoryInfoFavslotNonRefresh(gid: Long, slot: Int) {
         val dao = db.historyDao()
-        val i = dao.load(info.gid)
-        if (null != i) {
-            val historyInfo: HistoryInfo
-            if (info is HistoryInfo) {
-                historyInfo = info
-            } else {
-                historyInfo = HistoryInfo(info)
-                historyInfo.time = i.time
-            }
-            dao.update(historyInfo)
+        dao.load(gid)?.let {
+            it.favoriteSlot = slot
+            dao.update(it)
         }
     }
 

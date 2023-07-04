@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.launch
 
 object FavouriteStatusRouter {
     private val idGenerator = IntIdGenerator(Settings.dataMapNextId)
@@ -57,7 +58,13 @@ object FavouriteStatusRouter {
     val globalFlow = callbackFlow<Pair<Long, Int>> {
         collector = this
         awaitClose { error("Unreachable!!!") }
-    }.shareIn(listenerScope, SharingStarted.Eagerly)
+    }.shareIn(listenerScope, SharingStarted.Eagerly).apply {
+        listenerScope.launch {
+            collect { (gid, slot) ->
+                EhDB.modifyHistoryInfoFavslotNonRefresh(gid, slot)
+            }
+        }
+    }
 
     fun stateFlow(targetGid: Long) = globalFlow.transform { (gid, slot) -> if (targetGid == gid) emit(slot) }
 }
