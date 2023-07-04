@@ -251,8 +251,8 @@ object EhEngine {
             formBody {
                 add("favcat", catStr)
                 add("favnote", note ?: "")
-                // submit=Add+to+Favorites is not necessary, just use submit=Apply+Changes all the time
-                add("submit", "Apply Changes")
+                // apply=Add+to+Favorites is not necessary, just use apply=Apply+Changes all the time
+                add("apply", "Apply Changes")
                 add("update", "1")
             }
         }.executeAndParsingWith { }

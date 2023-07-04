@@ -36,6 +36,7 @@ pub struct BaseGalleryInfo {
     simpleLanguage: Option<String>,
     favoriteSlot: i32,
     favoriteName: Option<String>,
+    favoriteNote: Option<String>,
 }
 
 fn to_category_i32(category: &str) -> i32 {
@@ -104,8 +105,7 @@ fn parse_uploader_and_pages(str: &str) -> (Option<String>, bool, i32) {
 fn parse_thumb_resolution(str: &str) -> (i32, i32) {
     let reg = regex!(r"height:(\d+)px;width:(\d+)px");
     match reg.captures(str) {
-        None => panic!("regex err{}", str),
-        //None => (0, 0),
+        None => (0, 0),
         Some(grp) => (grp[1].parse().unwrap(), grp[2].parse().unwrap()),
     }
 }
@@ -153,15 +153,15 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             },
             Some(cn) => cn.inner_text(parser),
         };
-        let (posted, favoriteName) = match dom
-            .get_element_by_id(format!("posted_{gid}").as_str())?
-            .get(parser)
-        {
+        let (posted, favoriteName) = match dom.get_element_by_id(format!("posted_{gid}").as_str()) {
             None => ("".to_string(), None),
-            Some(node) => (
-                node.inner_text(parser).trim().to_string(),
-                get_node_attr(node, "title").map(str::to_string),
-            ),
+            Some(e) => {
+                let node = e.get(parser)?;
+                (
+                    node.inner_text(parser).trim().to_string(),
+                    get_node_attr(node, "title").map(str::to_string),
+                )
+            }
         };
         let ir = dom
             .get_first_element_by_class_name("ir")?
@@ -174,6 +174,9 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             None => (None, false, 0),
             Some(node) => parse_uploader_and_pages(&node.get(parser)?.inner_html(parser)),
         };
+        let favoriteNote = dom
+            .get_element_by_id(format!("favnote_{gid}").as_str())
+            .map(|e| e.get(parser).unwrap().inner_text(parser).to_string());
         Some(BaseGalleryInfo {
             gid,
             token,
@@ -193,6 +196,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
             simpleLanguage: None,
             favoriteSlot: if favoriteName.is_some() { 0 } else { -2 },
             favoriteName,
+            favoriteNote,
         })
     })
     .unwrap()
