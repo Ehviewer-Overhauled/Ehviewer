@@ -15,11 +15,11 @@
  */
 package com.hippo.ehviewer
 
-import android.annotation.SuppressLint
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.yorozuya.IntIdGenerator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
@@ -28,10 +28,7 @@ import kotlinx.coroutines.flow.transform
 
 object FavouriteStatusRouter {
     private val idGenerator = IntIdGenerator(Settings.dataMapNextId)
-
-    @SuppressLint("UseSparseArrays")
     private val maps = HashMap<Int, MutableMap<Long, GalleryInfo>>()
-    private val listeners: MutableList<Listener> = ArrayList()
     fun saveDataMap(map: MutableMap<Long, GalleryInfo>): Int {
         val id = idGenerator.nextId()
         maps[id] = map
@@ -50,33 +47,16 @@ object FavouriteStatusRouter {
                 info.favoriteSlot = slot
             }
         }
-        for (listener in listeners) {
-            listener.onModifyFavourites(gid, slot)
-        }
-    }
-
-    private fun addListener(listener: Listener) {
-        listeners.add(listener)
-    }
-
-    private fun removeListener(listener: Listener) {
-        listeners.remove(listener)
-    }
-
-    fun interface Listener {
-        fun onModifyFavourites(gid: Long, slot: Int)
+        collector.trySend(gid to slot)
     }
 
     private val listenerScope = CoroutineScope(Dispatchers.IO)
 
-    val globalFlow = callbackFlow {
-        val listener = Listener { gid, slot ->
-            trySend(gid to slot)
-        }
-        addListener(listener)
-        awaitClose {
-            removeListener(listener)
-        }
+    private lateinit var collector: ProducerScope<Pair<Long, Int>>
+
+    val globalFlow = callbackFlow<Pair<Long, Int>> {
+        collector = this
+        awaitClose { error("Unreachable!!!") }
     }.shareIn(listenerScope, SharingStarted.Eagerly)
 
     fun stateFlow(targetGid: Long) = globalFlow.transform { (gid, slot) -> if (targetGid == gid) emit(slot) }
