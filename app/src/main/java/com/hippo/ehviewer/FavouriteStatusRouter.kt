@@ -55,11 +55,11 @@ object FavouriteStatusRouter {
         }
     }
 
-    fun addListener(listener: Listener) {
+    private fun addListener(listener: Listener) {
         listeners.add(listener)
     }
 
-    fun removeListener(listener: Listener) {
+    private fun removeListener(listener: Listener) {
         listeners.remove(listener)
     }
 
@@ -69,7 +69,7 @@ object FavouriteStatusRouter {
 
     private val listenerScope = CoroutineScope(Dispatchers.IO)
 
-    private val _stateFlow = callbackFlow {
+    val globalFlow = callbackFlow {
         val listener = Listener { gid, slot ->
             trySend(gid to slot)
         }
@@ -79,5 +79,5 @@ object FavouriteStatusRouter {
         }
     }.shareIn(listenerScope, SharingStarted.Eagerly)
 
-    fun stateFlow(gid: Long) = _stateFlow.filter { (gid1) -> gid1 == gid }
+    fun stateFlow(gid: Long) = globalFlow.filter { (gid1) -> gid1 == gid }
 }

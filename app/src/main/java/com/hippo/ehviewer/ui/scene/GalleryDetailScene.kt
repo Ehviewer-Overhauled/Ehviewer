@@ -82,6 +82,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -104,6 +105,7 @@ import coil.imageLoader
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
@@ -165,6 +167,7 @@ import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withIOContext
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -189,7 +192,6 @@ class GalleryDetailScene : BaseScene() {
     private var downloadButtonText by mutableStateOf("")
     private var ratingText by mutableStateOf("")
     private var torrentText by mutableStateOf("")
-    private var favourite by mutableStateOf(false)
     private var favButtonText by mutableStateOf("")
     private var getDetailError by mutableStateOf("")
 
@@ -690,12 +692,19 @@ class GalleryDetailScene : BaseScene() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
+            val favored by produceState(initialValue = false) {
+                val containLocalFav = withIOContext { EhDB.containLocalFavorites(galleryDetail.gid) }
+                value = containLocalFav || galleryDetail.favoriteSlot != -2
+                FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { (_, slot) ->
+                    value = slot != -2
+                }
+            }
             FilledTertiaryIconToggleButton(
-                checked = favourite,
+                checked = favored,
                 onCheckedChange = { modifyFavourite() },
             ) {
                 Icon(
-                    imageVector = if (favourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    imageVector = if (favored) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
                 )
             }
@@ -868,10 +877,7 @@ class GalleryDetailScene : BaseScene() {
         lifecycleScope.launchIO {
             val containLocalFav = EhDB.containLocalFavorites(gd.gid)
             if (gd.isFavorited || containLocalFav) {
-                favourite = true
                 favButtonText = gd.favoriteName ?: getString(R.string.local_favorites)
-            } else {
-                favourite = false
             }
         }
     }

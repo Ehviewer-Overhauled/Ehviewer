@@ -22,6 +22,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.coroutineScope
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
@@ -49,7 +50,7 @@ import com.hippo.ehviewer.yorozuya.FileUtils
 import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.launch
 import okhttp3.AsyncDns
 import okhttp3.Cookie
 import okhttp3.android.AndroidAsyncDns
@@ -57,10 +58,12 @@ import okio.Path.Companion.toOkioPath
 import splitties.arch.room.roomDb
 import splitties.init.appCtx
 
+private val lifecycle = ProcessLifecycleOwner.get().lifecycle
+private val lifecycleScope = lifecycle.coroutineScope
+
 class EhApplication : Application(), ImageLoaderFactory {
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(lockObserver)
+        lifecycle.addObserver(lockObserver)
         val handler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {
@@ -75,13 +78,13 @@ class EhApplication : Application(), ImageLoaderFactory {
         System.loadLibrary("ehviewer")
         System.loadLibrary("ehviewer_rust")
         ReadableTime.initialize(this)
-        launchIO {
+        lifecycleScope.launchIO {
             val theme = Settings.theme
             withUIContext {
                 AppCompatDelegate.setDefaultNightMode(theme)
             }
         }
-        launchIO {
+        lifecycleScope.launchIO {
             launchIO {
                 migrateCookies()
             }
@@ -190,8 +193,8 @@ class EhApplication : Application(), ImageLoaderFactory {
 
         val galleryDetailCache by lazy {
             LruCache<Long, GalleryDetail>(25).also {
-                FavouriteStatusRouter.addListener { gid, slot ->
-                    it[gid]?.favoriteSlot = slot
+                lifecycleScope.launch {
+                    FavouriteStatusRouter.globalFlow.collect { (gid, slot) -> it[gid]?.favoriteSlot = slot }
                 }
             }
         }

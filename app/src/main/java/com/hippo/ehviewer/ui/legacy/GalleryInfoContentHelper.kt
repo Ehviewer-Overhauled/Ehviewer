@@ -22,6 +22,10 @@ import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.legacy.ContentLayout.ContentHelper
 import com.hippo.ehviewer.yorozuya.IntIdGenerator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -29,24 +33,16 @@ import java.util.Locale
 
 abstract class GalleryInfoContentHelper : ContentHelper() {
     var jumpTo: String? = null
-    private val listener: FavouriteStatusRouter.Listener
+    val scope = CoroutineScope(Dispatchers.IO).apply {
+        launch {
+            FavouriteStatusRouter.globalFlow.collect { (gid, slot) -> map[gid]?.favoriteSlot = slot }
+        }
+    }
 
     @SuppressLint("UseSparseArrays")
     private var map: MutableMap<Long, GalleryInfo> = HashMap()
 
-    init {
-        listener = FavouriteStatusRouter.Listener { gid: Long, slot: Int ->
-            val info = map[gid]
-            if (info != null) {
-                info.favoriteSlot = slot
-            }
-        }
-        FavouriteStatusRouter.addListener(listener)
-    }
-
-    fun destroy() {
-        FavouriteStatusRouter.removeListener(listener)
-    }
+    fun destroy() = scope.cancel()
 
     override fun onAddData(data: List<GalleryInfo>) {
         data.forEach { map[it.gid] = it }
