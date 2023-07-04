@@ -96,7 +96,7 @@ fun GalleryInfoBottomSheet(
                 pages.toString(),
                 size,
                 favoriteCount.toString(),
-                isFavorited.toString(),
+                (favoriteSlot >= 0).toString(),
                 ratingCount.toString(),
                 rating.toString(),
                 torrentCount.toString(),

@@ -49,7 +49,6 @@ class GalleryDetail(
     var language: String? = null,
     var size: String? = null,
     var favoriteCount: Int = 0,
-    var isFavorited: Boolean = false,
     var ratingCount: Int = 0,
     val tags: Array<GalleryTagGroup>,
     var comments: GalleryCommentList,

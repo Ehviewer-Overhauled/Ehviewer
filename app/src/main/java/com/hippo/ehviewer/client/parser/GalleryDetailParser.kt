@@ -198,11 +198,9 @@ object GalleryDetailParser {
 
             // isFavorited
             val gdf = gm.getElementById("gdf")
-            gd.isFavorited = false
             if (gdf != null) {
                 val favoriteName = gdf.text().trim()
                 if (favoriteName != "Add to Favorites") {
-                    gd.isFavorited = true
                     gd.favoriteName = gdf.text().trim()
                     PATTERN_FAVORITE_SLOT.find(body)?.run {
                         gd.favoriteSlot = ((groupValues[1].toIntOrNull() ?: 2) - 2) / 19

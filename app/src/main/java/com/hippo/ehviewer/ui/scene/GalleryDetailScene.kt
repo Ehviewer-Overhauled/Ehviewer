@@ -875,10 +875,7 @@ class GalleryDetailScene : BaseScene() {
     private fun updateFavoriteDrawable() {
         val gd = composeBindingGD ?: return
         lifecycleScope.launchIO {
-            val containLocalFav = EhDB.containLocalFavorites(gd.gid)
-            if (gd.isFavorited || containLocalFav) {
-                favButtonText = gd.favoriteName ?: getString(R.string.local_favorites)
-            }
+            favButtonText = gd.favoriteName ?: getString(R.string.local_favorites)
         }
     }
 
@@ -1268,7 +1265,6 @@ class GalleryDetailScene : BaseScene() {
 
     private fun onModifyFavoritesSuccess() {
         if (composeBindingGD != null) {
-            composeBindingGD!!.isFavorited = composeBindingGD!!.favoriteName != null
             updateFavoriteDrawable()
         }
     }
