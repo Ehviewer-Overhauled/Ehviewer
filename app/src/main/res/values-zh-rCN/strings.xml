@@ -151,7 +151,6 @@
     <string name="download_torrent_failure">无法下载种子</string>
     <string name="torrents">种子</string>
     <string name="add_favorites_dialog_title">添加收藏</string>
-    <string name="remember_favorite_collection">记住收藏夹</string>
     <string name="add_to_favorite_success">已添加至收藏</string>
     <string name="remove_from_favorite_success">移除收藏</string>
     <string name="add_to_favorite_failure">添加收藏失败</string>
@@ -412,7 +411,6 @@
     <string name="delete_favorites_dialog_title">删除收藏</string>
     <string name="delete_favorites_dialog_message">删除 %d 项收藏？</string>
     <string name="move_favorites_dialog_title">移动收藏</string>
-    <string name="default_favorites_collection">默认收藏夹</string>
     <string name="let_me_select">让我选择</string>
     <string name="favorite_note">备注</string>
     <string name="collections">收藏夹</string>

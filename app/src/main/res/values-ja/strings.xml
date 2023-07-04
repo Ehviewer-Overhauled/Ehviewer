@@ -160,7 +160,6 @@
     <string name="no_torrents">トレントなし</string>
     <string name="torrents">トレント</string>
     <string name="add_favorites_dialog_title">お気に入りに追加</string>
-    <string name="remember_favorite_collection">お気に入りを記憶</string>
     <string name="add_to_favorite_success">お気に入りに追加しました。</string>
     <string name="remove_from_favorite_success">お気に入りから削除しました。</string>
     <string name="add_to_favorite_failure">お気に入りに追加失敗しました。</string>
@@ -394,7 +393,6 @@
     <string name="delete_favorites_dialog_title">お気に入りから削除</string>
     <string name="delete_favorites_dialog_message">%d件の項目をお気に入りリストから削除します？</string>
     <string name="move_favorites_dialog_title">お気に入りを移動</string>
-    <string name="default_favorites_collection">既定のお気に入りリスト</string>
     <string name="let_me_select">手動で選択</string>
     <string name="collections">お気に入りコレクション</string>
     <string name="need_sign_in">ログインが必要</string>
