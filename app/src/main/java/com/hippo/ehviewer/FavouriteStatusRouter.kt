@@ -23,8 +23,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.transform
 
 object FavouriteStatusRouter {
     private val idGenerator = IntIdGenerator(Settings.dataMapNextId)
@@ -79,5 +79,5 @@ object FavouriteStatusRouter {
         }
     }.shareIn(listenerScope, SharingStarted.Eagerly)
 
-    fun stateFlow(gid: Long) = globalFlow.filter { (gid1) -> gid1 == gid }
+    fun stateFlow(targetGid: Long) = globalFlow.transform { (gid, slot) -> if (targetGid == gid) emit(slot) }
 }

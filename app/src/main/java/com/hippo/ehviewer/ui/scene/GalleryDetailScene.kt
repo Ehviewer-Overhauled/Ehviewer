@@ -693,9 +693,7 @@ class GalleryDetailScene : BaseScene() {
         ) {
             val favored by produceState(initialValue = false) {
                 value = galleryDetail.favoriteSlot != -2
-                FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { (_, slot) ->
-                    value = slot != -2
-                }
+                FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { value = it != -2 }
             }
             FilledTertiaryIconToggleButton(
                 checked = favored,
