@@ -167,7 +167,6 @@ import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.withIOContext
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -693,8 +692,7 @@ class GalleryDetailScene : BaseScene() {
             horizontalArrangement = Arrangement.Center,
         ) {
             val favored by produceState(initialValue = false) {
-                val containLocalFav = withIOContext { EhDB.containLocalFavorites(galleryDetail.gid) }
-                value = containLocalFav || galleryDetail.favoriteSlot != -2
+                value = galleryDetail.favoriteSlot != -2
                 FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { (_, slot) ->
                     value = slot != -2
                 }
