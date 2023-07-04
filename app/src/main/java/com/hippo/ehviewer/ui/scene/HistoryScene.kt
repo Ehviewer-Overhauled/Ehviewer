@@ -61,11 +61,9 @@ import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import arrow.core.partially1
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings.listThumbSize
-import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.doGalleryInfoAction
 import com.hippo.ehviewer.ui.main.GalleryInfoListItem
 import com.hippo.ehviewer.ui.setMD3Content
@@ -91,7 +89,7 @@ class HistoryScene : BaseScene() {
                         TopAppBar(
                             title = { Text(text = stringResource(id = R.string.history)) },
                             navigationIcon = {
-                                IconButton(onClick = ::onNavigationClick) {
+                                IconButton(onClick = { toggleDrawer(GravityCompat.START) }) {
                                     Icon(imageVector = Icons.Default.Menu, contentDescription = null)
                                 }
                             },
@@ -115,6 +113,7 @@ class HistoryScene : BaseScene() {
                 ) { paddingValues ->
                     val state = rememberLazyListState()
                     Box {
+                        val cardHeight = remember { (3 * listThumbSize * 3).pxToDp.dp }
                         LazyColumn(
                             modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
                             state = state,
@@ -148,7 +147,15 @@ class HistoryScene : BaseScene() {
                                             // TODO: item delete & add animation
                                             // Bug tracker: https://issuetracker.google.com/issues/150812265
                                             GalleryInfoListItem(
-                                                onClick = ::onItemClick.partially1(it),
+                                                onClick = {
+                                                    navAnimated(
+                                                        R.id.galleryDetailScene,
+                                                        bundleOf(
+                                                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                                                            GalleryDetailScene.KEY_GALLERY_INFO to it,
+                                                        ),
+                                                    )
+                                                },
                                                 onLongClick = {
                                                     coroutineScope.launchIO {
                                                         dialogState.doGalleryInfoAction(info, context)
@@ -194,20 +201,4 @@ class HistoryScene : BaseScene() {
             }
         }
     }
-
-    private fun onNavigationClick() {
-        toggleDrawer(GravityCompat.START)
-    }
-
-    private fun onItemClick(gi: GalleryInfo) {
-        navAnimated(
-            R.id.galleryDetailScene,
-            bundleOf(
-                GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
-                GalleryDetailScene.KEY_GALLERY_INFO to gi,
-            ),
-        )
-    }
-
-    private val cardHeight = (3 * listThumbSize * 3).pxToDp.dp
 }
