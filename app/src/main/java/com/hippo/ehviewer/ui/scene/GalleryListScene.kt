@@ -17,6 +17,7 @@ package com.hippo.ehviewer.ui.scene
 
 import android.animation.Animator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.DialogInterface
 import android.content.res.Resources
 import android.os.Bundle
@@ -56,6 +57,7 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
+import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
@@ -278,7 +280,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         }
 
         // Update title
-        var title = getSuitableTitleForUrlBuilder(resources, mUrlBuilder, true)
+        var title = getSuitableTitleForUrlBuilder(requireContext(), mUrlBuilder, true)
         if (null == title) {
             title = resources.getString(R.string.search)
         }
@@ -425,7 +427,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         }
         val builder = EditTextDialogBuilder(
             context,
-            getSuitableTitleForUrlBuilder(context.resources, mUrlBuilder, false),
+            getSuitableTitleForUrlBuilder(context, mUrlBuilder, false),
             getString(R.string.quick_search),
         )
         builder.setTitle(R.string.add_quick_search_dialog_title)
@@ -1216,7 +1218,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 }
 
 private fun getSuitableTitleForUrlBuilder(
-    resources: Resources,
+    context: Context,
     urlBuilder: ListUrlBuilder,
     appName: Boolean,
 ): String? {
@@ -1224,26 +1226,29 @@ private fun getSuitableTitleForUrlBuilder(
     val category = urlBuilder.category
     val mode = urlBuilder.mode
     return if (mode == MODE_WHATS_HOT) {
-        resources.getString(R.string.whats_hot)
+        context.getString(R.string.whats_hot)
     } else if (!keyword.isNullOrEmpty()) {
         when (mode) {
             MODE_TOPLIST -> {
                 when (keyword) {
-                    "11" -> resources.getString(R.string.toplist_alltime)
-                    "12" -> resources.getString(R.string.toplist_pastyear)
-                    "13" -> resources.getString(R.string.toplist_pastmonth)
-                    "15" -> resources.getString(R.string.toplist_yesterday)
+                    "11" -> context.getString(R.string.toplist_alltime)
+                    "12" -> context.getString(R.string.toplist_pastyear)
+                    "13" -> context.getString(R.string.toplist_pastmonth)
+                    "15" -> context.getString(R.string.toplist_yesterday)
                     else -> null
                 }
             }
 
-            MODE_TAG -> wrapTagKeyword(keyword)
+            MODE_TAG -> {
+                val canTranslate = Settings.showTagTranslations && EhTagDatabase.isTranslatable(context) && EhTagDatabase.initialized
+                wrapTagKeyword(keyword, canTranslate)
+            }
             else -> keyword
         }
     } else if (category == EhUtils.NONE && urlBuilder.advanceSearch == -1) {
         when (mode) {
-            MODE_NORMAL -> resources.getString(if (appName) R.string.app_name else R.string.homepage)
-            MODE_SUBSCRIPTION -> resources.getString(R.string.subscription)
+            MODE_NORMAL -> context.getString(if (appName) R.string.app_name else R.string.homepage)
+            MODE_SUBSCRIPTION -> context.getString(R.string.subscription)
             else -> null
         }
     } else if (category.countOneBits() == 1) {
