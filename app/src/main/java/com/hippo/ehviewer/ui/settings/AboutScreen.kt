@@ -29,13 +29,14 @@ import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
 import com.hippo.ehviewer.util.iter
+import com.hippo.ehviewer.yorozuya.FileUtils
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Request
-import okio.sink
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.zip.ZipInputStream
 
 private const val REPO_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer"
 private const val API_URL = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer"
@@ -117,9 +118,12 @@ fun AboutScreen() {
                     }?.getString("archive_download_url")
                     if (archiveUrl != null) {
                         ghRequest(archiveUrl).execute {
-                            val file = AppConfig.createTempFile()!!
-                            file.sink().use {
-                                body.source().readAll(it)
+                            val file = FileUtils.createTempFile(AppConfig.tempDir, "apk")!!
+                            ZipInputStream(body.byteStream()).use { zip ->
+                                zip.nextEntry
+                                file.outputStream().use {
+                                    zip.copyTo(it)
+                                }
                             }
                         }
                     } else {
