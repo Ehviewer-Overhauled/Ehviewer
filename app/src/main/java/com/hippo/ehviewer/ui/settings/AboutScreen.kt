@@ -1,11 +1,14 @@
 package com.hippo.ehviewer.ui.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -20,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.text.parseAsHtml
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
@@ -28,6 +32,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
+import com.hippo.ehviewer.ui.tools.DialogState
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
 import com.hippo.ehviewer.util.ExceptionUtils
@@ -67,6 +72,31 @@ fun AboutScreen() {
     val dialogState = rememberDialogState()
     dialogState.Handler()
     fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
+    suspend fun DialogState.showNewVersion(
+        name: String,
+        changelog: String,
+        downloadTo: suspend (File) -> Unit,
+    ) {
+        val download = show(
+            confirmText = R.string.download,
+            dismissText = android.R.string.cancel,
+            title = R.string.new_version_available,
+        ) {
+            Column {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = changelog)
+            }
+        }
+        if (download) {
+            val file = File(AppConfig.tempDir, "tmp.apk").apply { delete() }
+            downloadTo(file)
+            withUIContext { context.installPackage(file) }
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -120,7 +150,8 @@ fun AboutScreen() {
                         val commitSha = ghRequest(branchUrl).execute {
                             JSONObject(body.string()).getJSONObject("commit").getString("sha")
                         }
-                        if (commitSha.take(7) != curSha) {
+                        val shortSha = commitSha.take(7)
+                        if (shortSha != curSha) {
                             val archiveUrl = ghRequest("$API_URL/actions/artifacts").execute {
                                 JSONObject(body.string()).getJSONArray("artifacts").iter<JSONObject>().find {
                                     val wf = it.getJSONObject("workflow_run")
@@ -128,16 +159,8 @@ fun AboutScreen() {
                                 }
                             }?.getString("archive_download_url")
                             if (archiveUrl != null) {
-                                val download = dialogState.show(
-                                    confirmText = R.string.download,
-                                    dismissText = android.R.string.cancel,
-                                    title = R.string.new_version_available,
-                                ) {
-                                    // TODO: Show changelog
-                                    Text(text = "Latest CI build: $commitSha")
-                                }
-                                if (download) {
-                                    val file = File(AppConfig.tempDir, "tmp.apk").apply { delete() }
+                                // TODO: Show changelog
+                                dialogState.showNewVersion(shortSha, "") { file ->
                                     ghRequest(archiveUrl).execute {
                                         ZipInputStream(body.byteStream()).use { zip ->
                                             zip.nextEntry
@@ -146,8 +169,7 @@ fun AboutScreen() {
                                             }
                                         }
                                     }
-                                    withUIContext { context.installPackage(file) }
-                                } else {}
+                                }
                             } else {
                                 launchSnackBar(context.getString(R.string.ci_is_running))
                             }
@@ -157,29 +179,20 @@ fun AboutScreen() {
                     } else {
                         val curVersion = BuildConfig.VERSION_NAME
                         val releaseUrl = "$API_URL/releases/latest"
-                        val (latestVersion, downloadUrl) = ghRequest(releaseUrl).execute {
+                        val release = ghRequest(releaseUrl).execute {
                             JSONObject(body.string())
-                        }.run {
-                            getString("name") to (getJSONArray("assets")[0] as JSONObject).getString("browser_download_url")
                         }
+                        val latestVersion = release.getString("name")
+                        val description = release.getString("body")
+                        val downloadUrl = (release.getJSONArray("assets")[0] as JSONObject).getString("browser_download_url")
                         if (latestVersion != curVersion) {
-                            val download = dialogState.show(
-                                confirmText = R.string.download,
-                                dismissText = android.R.string.cancel,
-                                title = R.string.new_version_available,
-                            ) {
-                                // TODO: Show changelog
-                                Text(text = "Latest version: $latestVersion")
-                            }
-                            if (download) {
-                                val file = File(AppConfig.tempDir, "tmp.apk").apply { delete() }
+                            dialogState.showNewVersion(latestVersion, description) { file ->
                                 ghRequest(downloadUrl).execute {
                                     file.sink().use {
                                         body.source().readAll(it)
                                     }
                                 }
-                                withUIContext { context.installPackage(file) }
-                            } else {}
+                            }
                         } else {
                             launchSnackBar(context.getString(R.string.already_latest_release, latestVersion))
                         }
