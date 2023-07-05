@@ -34,6 +34,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 private const val REPO_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer"
+private const val API_URL = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer"
 private const val RELEASE_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer/releases"
 
 @Composable
@@ -96,18 +97,17 @@ fun AboutScreen() {
             WorkPreference(title = stringResource(id = R.string.settings_about_check_for_updates)) {
                 if (Settings.useCIUpdateChannel) {
                     val curSha = BuildConfig.COMMIT_SHA
-                    val ciUrl = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer"
-                    val branch = ehRequest(ciUrl).execute {
+                    val branch = ehRequest(API_URL).execute {
                         JSONObject(body.string()).getString("default_branch")
                     }
-                    val branchUrl = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer/branches/$branch"
+                    val branchUrl = "$API_URL/branches/$branch"
                     val commitSha = ehRequest(branchUrl).execute {
                         JSONObject(body.string()).getJSONObject("commit").getString("sha")
                     }.take(7)
                     if (commitSha != curSha) launchSnackBar(commitSha)
                 } else {
                     val curVersion = BuildConfig.VERSION_NAME
-                    val releaseUrl = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer/releases"
+                    val releaseUrl = "$API_URL/releases"
                     val latestVersion = ehRequest(releaseUrl).execute {
                         JSONArray(body.string())[0] as JSONObject
                     }.getString("name")
