@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.text.parseAsHtml
 import com.hippo.ehviewer.AppConfig
@@ -28,8 +29,10 @@ import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
+import com.hippo.ehviewer.util.installPackage
 import com.hippo.ehviewer.util.iter
 import com.hippo.ehviewer.yorozuya.FileUtils
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,6 +55,7 @@ private fun author() = stringResource(R.string.settings_about_author_summary).re
 
 @Composable
 fun AboutScreen() {
+    val context = LocalContext.current
     val navController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -117,8 +121,8 @@ fun AboutScreen() {
                         }
                     }?.getString("archive_download_url")
                     if (archiveUrl != null) {
+                        val file = FileUtils.createTempFile(AppConfig.tempDir, "apk")!!
                         ghRequest(archiveUrl).execute {
-                            val file = FileUtils.createTempFile(AppConfig.tempDir, "apk")!!
                             ZipInputStream(body.byteStream()).use { zip ->
                                 zip.nextEntry
                                 file.outputStream().use {
@@ -126,6 +130,7 @@ fun AboutScreen() {
                                 }
                             }
                         }
+                        withUIContext { context.installPackage(file) }
                     } else {
                         launchSnackBar("CI is still running, please wait")
                     }

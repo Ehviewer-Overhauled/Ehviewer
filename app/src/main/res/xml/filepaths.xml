@@ -20,6 +20,10 @@
         name="temp"
         path="." />
 
+    <cache-path
+        name="temp"
+        path="." />
+
     <external-cache-path
         name="copy"
         path="." />
