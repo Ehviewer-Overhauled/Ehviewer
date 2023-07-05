@@ -28,6 +28,7 @@ import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
+import com.hippo.ehviewer.util.iter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -65,8 +66,8 @@ fun AboutScreen() {
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues).nestedScroll(scrollBehavior.nestedScrollConnection)) {
             Preference(
                 title = stringResource(id = R.string.settings_about_declaration),
                 summary = stringResource(id = R.string.settings_about_declaration_summary),
@@ -105,6 +106,13 @@ fun AboutScreen() {
                         JSONObject(body.string()).getJSONObject("commit").getString("sha")
                     }.take(7)
                     if (commitSha != curSha) launchSnackBar(commitSha)
+                    val workflowUrl = ehRequest("$API_URL/actions/workflows").execute {
+                        val r = JSONObject(body.string()).getJSONArray("workflows").iter<JSONObject>().find {
+                            it.getString("name") == "CI"
+                        }
+                        requireNotNull(r) { "No CI workflow found!!!" }
+                    }.getString("url")
+                    launchSnackBar(workflowUrl)
                 } else {
                     val curVersion = BuildConfig.VERSION_NAME
                     val releaseUrl = "$API_URL/releases"
