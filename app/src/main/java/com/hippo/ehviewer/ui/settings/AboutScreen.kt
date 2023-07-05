@@ -117,7 +117,7 @@ fun AboutScreen() {
                     val archiveUrl = ghRequest("$API_URL/actions/artifacts").execute {
                         JSONObject(body.string()).getJSONArray("artifacts").iter<JSONObject>().find {
                             val wf = it.getJSONObject("workflow_run")
-                            it.getString("name").startsWith("arm64-v8a") // && wf.getString("head_sha") == commitSha
+                            it.getString("name").startsWith("arm64-v8a") && wf.getString("head_sha") == commitSha
                         }
                     }?.getString("archive_download_url")
                     if (archiveUrl != null) {
