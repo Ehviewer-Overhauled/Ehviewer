@@ -30,6 +30,7 @@ import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONObject
 
 private const val REPO_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer"
@@ -104,6 +105,13 @@ fun AboutScreen() {
                         JSONObject(body.string()).getJSONObject("commit").getString("sha")
                     }.take(7)
                     if (commitSha != curSha) launchSnackBar(commitSha)
+                } else {
+                    val curVersion = BuildConfig.VERSION_NAME
+                    val releaseUrl = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer/releases"
+                    val latestVersion = ehRequest(releaseUrl).execute {
+                        JSONArray(body.string())[0] as JSONObject
+                    }.getString("name")
+                    if (latestVersion != curVersion) launchSnackBar(latestVersion)
                 }
             }
         }
