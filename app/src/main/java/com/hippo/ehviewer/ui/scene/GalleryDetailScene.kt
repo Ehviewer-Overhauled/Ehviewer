@@ -684,7 +684,7 @@ class GalleryDetailScene : BaseScene() {
                         .fillMaxWidth()
                         .height(32.dp),
                 ) {}
-                Text(text = stringResource(id = R.string.newer_version_avaliable))
+                Text(text = stringResource(id = R.string.newer_version_available))
             }
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         }

@@ -157,7 +157,7 @@
     <string name="filter_the_uploader">把上傳者“%s”加入過濾列表？</string>
     <string name="filter_the_tag">隱藏標籤“%s”？</string>
     <string name="filter_added">已經新增篩選條件</string>
-    <string name="newer_version_avaliable">此圖庫有新版本可以使用。</string>
+    <string name="newer_version_available">此圖庫有新版本可以使用。</string>
     <string name="newer_version_title">%1$s, 增加於 %2$s</string>
     <!-- Rating -->
     <string name="rating10">太神啦!</string>
