@@ -32,6 +32,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.okio.decodeFromBufferedSource
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -40,13 +42,9 @@ import okio.HashingSink.Companion.sha1
 import okio.blackholeSink
 import okio.buffer
 import okio.source
-import org.json.JSONObject
 import splitties.init.appCtx
 import java.io.File
 import java.nio.charset.StandardCharsets
-
-private typealias TagGroup = Map<String, String>
-private typealias TagGroups = Map<String, TagGroup>
 
 object EhTagDatabase : CoroutineScope {
     private const val NAMESPACE_PREFIX = "n"
@@ -56,18 +54,12 @@ object EhTagDatabase : CoroutineScope {
         "tag:",
         "weak:",
     )
-    private lateinit var tagGroups: TagGroups
+    private lateinit var tagGroups: Map<String, Map<String, String>>
     private val updateLock = Mutex()
     private val dbLock = Mutex()
     override val coroutineContext = Dispatchers.IO + Job()
 
     var initialized by mutableStateOf(false)
-
-    private fun JSONObject.toTagGroups(): TagGroups =
-        keys().asSequence().associateWith { getJSONObject(it).toTagGroup() }
-
-    private fun JSONObject.toTagGroup(): TagGroup =
-        keys().asSequence().associateWith { getString(it) }
 
     fun getTranslation(prefix: String? = NAMESPACE_PREFIX, tag: String?): String? {
         return tagGroups[prefix]?.get(tag)?.trim()?.takeIf { it.isNotEmpty() }
@@ -218,9 +210,7 @@ object EhTagDatabase : CoroutineScope {
                 val dir = AppConfig.getFilesDir("tag-translations")
                 val dataFile = File(dir, dataName).takeIf { it.exists() } ?: return
                 runSuspendCatching {
-                    tagGroups = JSONObject(
-                        dataFile.source().buffer().readString(StandardCharsets.UTF_8),
-                    ).toTagGroups()
+                    tagGroups = dataFile.source().buffer().use { Json.decodeFromBufferedSource(it) }
                     initialized = true
                 }.onFailure {
                     it.printStackTrace()

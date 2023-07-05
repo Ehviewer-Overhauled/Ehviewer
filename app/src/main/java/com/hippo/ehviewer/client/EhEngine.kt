@@ -49,6 +49,9 @@ import com.hippo.ehviewer.dailycheck.today
 import com.hippo.ehviewer.network.StatusCodeException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.addJsonArray
+import kotlinx.serialization.json.put
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Headers
 import okhttp3.MediaType
@@ -56,7 +59,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.json.JSONArray
 import org.jsoup.Jsoup
 import splitties.init.appCtx
 import java.io.File
@@ -360,7 +362,14 @@ object EhEngine {
         ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
             jsonBody {
                 put("method", "gdata")
-                array("gidlist") { it.forEach { put(jsonArrayOf(it.gid, it.token)) } }
+                array("gidlist") {
+                    it.forEach {
+                        addJsonArray {
+                            add(it.gid)
+                            add(it.token)
+                        }
+                    }
+                }
                 put("namespace", 1)
             }
         }.executeAndParsingWith { GalleryApiParser.parse(this, it) }
@@ -407,7 +416,13 @@ object EhEngine {
     suspend fun getGalleryToken(gid: Long, gtoken: String?, page: Int) = ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
         jsonBody {
             put("method", "gtoken")
-            put("pagelist", JSONArray().put(JSONArray().put(gid).put(gtoken).put(page + 1)))
+            array("pagelist") {
+                addJsonArray {
+                    add(gid)
+                    add(gtoken)
+                    add(page + 1)
+                }
+            }
         }
     }.executeAndParsingWith(GalleryTokenApiParser::parse)
 
