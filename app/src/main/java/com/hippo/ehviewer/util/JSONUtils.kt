@@ -8,6 +8,6 @@ fun <T> JSONArray.iter() = object : Iterable<T> {
         override fun hasNext() = index != length()
 
         @Suppress("UNCHECKED_CAST")
-        override fun next() = get(index) as T
+        override fun next() = get(index++) as T
     }
 }

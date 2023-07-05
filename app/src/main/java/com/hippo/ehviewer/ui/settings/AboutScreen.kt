@@ -104,15 +104,15 @@ fun AboutScreen() {
                     val branchUrl = "$API_URL/branches/$branch"
                     val commitSha = ehRequest(branchUrl).execute {
                         JSONObject(body.string()).getJSONObject("commit").getString("sha")
-                    }.take(7)
-                    if (commitSha != curSha) launchSnackBar(commitSha)
-                    val workflowUrl = ehRequest("$API_URL/actions/workflows").execute {
-                        val r = JSONObject(body.string()).getJSONArray("workflows").iter<JSONObject>().find {
-                            it.getString("name") == "CI"
+                    }
+                    if (commitSha.take(7) != curSha) launchSnackBar(commitSha)
+                    val archiveUrl = ehRequest("$API_URL/actions/artifacts").execute {
+                        JSONObject(body.string()).getJSONArray("artifacts").iter<JSONObject>().find {
+                            val wf = it.getJSONObject("workflow_run")
+                            it.getString("name").startsWith("arm64-v8a") && wf.getString("head_sha") == commitSha
                         }
-                        requireNotNull(r) { "No CI workflow found!!!" }
-                    }.getString("url")
-                    launchSnackBar(workflowUrl)
+                    }?.getString("archive_download_url")
+                    launchSnackBar(archiveUrl ?: "CI is still running, please wait")
                 } else {
                     val curVersion = BuildConfig.VERSION_NAME
                     val releaseUrl = "$API_URL/releases"
