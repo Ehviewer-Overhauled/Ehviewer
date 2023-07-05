@@ -158,7 +158,7 @@
     <string name="filter_the_uploader">屏蔽上传者“%s”？</string>
     <string name="filter_the_tag">屏蔽标签“%s”？</string>
     <string name="filter_added">已添加屏蔽项</string>
-    <string name="newer_version_avaliable">此画廊有新版本可用。</string>
+    <string name="newer_version_available">此画廊有新版本可用。</string>
     <string name="newer_version_title">%1$s, 添加于 %2$s</string>
     <!-- Rating -->
     <string name="rating10">根本把持不住</string>
@@ -510,6 +510,10 @@
     <string name="list_tile_thumb_size">详情模式下缩略图大小</string>
     <string name="account_name">账户</string>
     <string name="preload_thumb_aggressively">激进地预载缩略图</string>
+    <string name="new_version_available">有新版本！</string>
+    <string name="ci_is_running">CI 正在运行，请稍候</string>
+    <string name="already_latest_ci_build">已是最新 CI 构建</string>
+    <string name="already_latest_release">已是最新版本 %s</string>
     <!-- Tachiyomi Reader Start-->
     <string name="action_settings">设置</string>
     <string name="action_retry">重试</string>

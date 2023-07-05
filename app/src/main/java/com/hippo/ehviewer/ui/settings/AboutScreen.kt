@@ -28,19 +28,21 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
+import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.installPackage
 import com.hippo.ehviewer.util.iter
-import com.hippo.ehviewer.yorozuya.FileUtils
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import eu.kanade.tachiyomi.util.system.logcat
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Request
-import org.json.JSONArray
+import okio.sink
 import org.json.JSONObject
+import java.io.File
 import java.util.zip.ZipInputStream
 
 private const val REPO_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer"
@@ -62,6 +64,8 @@ fun AboutScreen() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    val dialogState = rememberDialogState()
+    dialogState.Handler()
     fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     Scaffold(
         topBar = {
@@ -124,32 +128,60 @@ fun AboutScreen() {
                                 }
                             }?.getString("archive_download_url")
                             if (archiveUrl != null) {
-                                val file = FileUtils.createTempFile(AppConfig.tempDir, "apk")!!
-                                ghRequest(archiveUrl).execute {
-                                    ZipInputStream(body.byteStream()).use { zip ->
-                                        zip.nextEntry
-                                        file.outputStream().use {
-                                            zip.copyTo(it)
+                                val download = dialogState.show(
+                                    confirmText = R.string.download,
+                                    dismissText = android.R.string.cancel,
+                                    title = R.string.new_version_available,
+                                ) {
+                                    // TODO: Show changelog
+                                    Text(text = "Latest CI build: $commitSha")
+                                }
+                                if (download) {
+                                    val file = File(AppConfig.tempDir, "tmp.apk").apply { delete() }
+                                    ghRequest(archiveUrl).execute {
+                                        ZipInputStream(body.byteStream()).use { zip ->
+                                            zip.nextEntry
+                                            file.outputStream().use {
+                                                zip.copyTo(it)
+                                            }
                                         }
                                     }
-                                }
-                                withUIContext { context.installPackage(file) }
+                                    withUIContext { context.installPackage(file) }
+                                } else {}
                             } else {
-                                launchSnackBar("CI is still running, please wait")
+                                launchSnackBar(context.getString(R.string.ci_is_running))
                             }
                         } else {
-                            launchSnackBar("Already latest CI build")
+                            launchSnackBar(context.getString(R.string.already_latest_ci_build))
                         }
                     } else {
                         val curVersion = BuildConfig.VERSION_NAME
-                        val releaseUrl = "$API_URL/releases"
-                        val latestVersion = ghRequest(releaseUrl).execute {
-                            JSONArray(body.string())[0] as JSONObject
-                        }.getString("name")
+                        val releaseUrl = "$API_URL/releases/latest"
+                        val (latestVersion, downloadUrl) = ghRequest(releaseUrl).execute {
+                            JSONObject(body.string())
+                        }.run {
+                            getString("name") to (getJSONArray("assets")[0] as JSONObject).getString("browser_download_url")
+                        }
                         if (latestVersion != curVersion) {
-                            launchSnackBar(latestVersion)
+                            val download = dialogState.show(
+                                confirmText = R.string.download,
+                                dismissText = android.R.string.cancel,
+                                title = R.string.new_version_available,
+                            ) {
+                                // TODO: Show changelog
+                                Text(text = "Latest version: $latestVersion")
+                            }
+                            if (download) {
+                                val file = File(AppConfig.tempDir, "tmp.apk").apply { delete() }
+                                ghRequest(downloadUrl).execute {
+                                    file.sink().use {
+                                        body.source().readAll(it)
+                                    }
+                                }
+                                withUIContext { context.installPackage(file) }
+                            } else {}
                         } else {
-                            launchSnackBar("Already latest Release $latestVersion")
+                            launchSnackBar(context.getString(R.string.already_latest_release, latestVersion))
                         }
                     }
                 }.onFailure {
@@ -161,6 +193,7 @@ fun AboutScreen() {
 }
 
 private inline fun ghRequest(url: String, builder: Request.Builder.() -> Unit = {}) = Request.Builder().url(url).apply {
+    logcat { url }
     val token = "github_" + "pat_11AXZS" + "T4A0k3TArCGakP3t_7DzUE5S" + "mr1zw8rmmzVtCeRq62" + "A4qkuDMw6YQm5ZUtHSLZ2MLI3J4VSifLXZ"
     val user = "nullArrayList"
     val base64 = "$user:$token".encodeBase64()
