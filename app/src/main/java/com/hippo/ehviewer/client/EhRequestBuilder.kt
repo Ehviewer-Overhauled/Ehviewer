@@ -21,10 +21,12 @@ import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArrayBuilder
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.okio.decodeFromBufferedSource
 import okhttp3.Call
 import okhttp3.FormBody
 import okhttp3.MediaType
@@ -102,6 +104,12 @@ suspend inline fun <R> Call.usingCancellable(crossinline block: suspend Response
 
 suspend inline fun <R> Request.execute(block: Response.() -> R) = okHttpClient.newCall(this).executeAsync().use(block)
 suspend inline fun <R> Request.executeNonCache(crossinline block: suspend Response.() -> R) = nonCacheOkHttpClient.newCall(this).usingCancellable(block)
+
+suspend inline fun <reified T> Request.executeAndParseAs() = execute { parseAs<T>() }
+
+inline fun <reified T> Response.parseAs(): T = json.decodeFromBufferedSource(body.source())
+
+val json = Json { ignoreUnknownKeys = true }
 
 const val CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
 const val CHROME_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"

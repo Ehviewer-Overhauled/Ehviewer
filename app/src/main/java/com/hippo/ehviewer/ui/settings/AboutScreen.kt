@@ -30,6 +30,7 @@ import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.execute
+import com.hippo.ehviewer.client.executeAndParseAs
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.DialogState
@@ -37,7 +38,6 @@ import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.installPackage
-import com.hippo.ehviewer.util.iter
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.logcat
 import io.ktor.util.encodeBase64
@@ -47,6 +47,9 @@ import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Request
 import okio.sink
 import org.json.JSONObject
+import tachiyomi.data.release.GithubArtifacts
+import tachiyomi.data.release.GithubRelease
+import tachiyomi.data.release.GithubWorkflowRuns
 import java.io.File
 import java.util.zip.ZipInputStream
 
@@ -146,21 +149,15 @@ fun AboutScreen() {
                         val branch = ghRequest(API_URL).execute {
                             JSONObject(body.string()).getString("default_branch")
                         }
-                        val branchUrl = "$API_URL/branches/$branch"
-                        val commitSha = ghRequest(branchUrl).execute {
-                            JSONObject(body.string()).getJSONObject("commit").getString("sha")
-                        }
-                        val shortSha = commitSha.take(7)
+                        val workflowRunsUrl = "$API_URL/actions/workflows/ci.yml/runs?branch=$branch&per_page=1"
+                        val workflowRun = ghRequest(workflowRunsUrl).executeAndParseAs<GithubWorkflowRuns>().workflowRuns[0]
+                        val shortSha = workflowRun.headSha.take(7)
                         if (shortSha != curSha) {
-                            val archiveUrl = ghRequest("$API_URL/actions/artifacts").execute {
-                                JSONObject(body.string()).getJSONArray("artifacts").iter<JSONObject>().find {
-                                    val wf = it.getJSONObject("workflow_run")
-                                    it.getString("name").startsWith("arm64-v8a") && wf.getString("head_sha") == commitSha
-                                }
-                            }?.getString("archive_download_url")
-                            if (archiveUrl != null) {
+                            val artifacts = ghRequest(workflowRun.artifactsUrl).executeAndParseAs<GithubArtifacts>()
+                            if (artifacts.artifacts.isNotEmpty()) {
+                                val archiveUrl = artifacts.getDownloadLink()
                                 // TODO: Show changelog
-                                dialogState.showNewVersion(shortSha, "") { file ->
+                                dialogState.showNewVersion(shortSha, workflowRun.title) { file ->
                                     ghRequest(archiveUrl).execute {
                                         ZipInputStream(body.byteStream()).use { zip ->
                                             zip.nextEntry
@@ -179,12 +176,10 @@ fun AboutScreen() {
                     } else {
                         val curVersion = BuildConfig.VERSION_NAME
                         val releaseUrl = "$API_URL/releases/latest"
-                        val release = ghRequest(releaseUrl).execute {
-                            JSONObject(body.string())
-                        }
-                        val latestVersion = release.getString("name")
-                        val description = release.getString("body")
-                        val downloadUrl = (release.getJSONArray("assets")[0] as JSONObject).getString("browser_download_url")
+                        val release = ghRequest(releaseUrl).executeAndParseAs<GithubRelease>()
+                        val latestVersion = release.version
+                        val description = release.info
+                        val downloadUrl = release.getDownloadLink()
                         if (latestVersion != curVersion) {
                             dialogState.showNewVersion(latestVersion, description) { file ->
                                 ghRequest(downloadUrl).execute {
