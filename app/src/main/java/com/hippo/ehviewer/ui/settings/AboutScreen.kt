@@ -7,11 +7,15 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -19,9 +23,14 @@ import androidx.core.text.parseAsHtml
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.ehRequest
+import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 private const val REPO_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer"
 private const val RELEASE_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer/releases"
@@ -38,6 +47,9 @@ private fun author() = stringResource(R.string.settings_about_author_summary).re
 fun AboutScreen() {
     val navController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,6 +62,7 @@ fun AboutScreen() {
                 scrollBehavior = scrollBehavior,
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
         Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
             Preference(
@@ -79,7 +92,20 @@ fun AboutScreen() {
                 title = stringResource(id = R.string.use_ci_update_channel),
                 value = Settings::useCIUpdateChannel,
             )
-            Preference(title = stringResource(id = R.string.settings_about_check_for_updates))
+            WorkPreference(title = stringResource(id = R.string.settings_about_check_for_updates)) {
+                if (Settings.useCIUpdateChannel) {
+                    val curSha = BuildConfig.COMMIT_SHA
+                    val ciUrl = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer"
+                    val branch = ehRequest(ciUrl).execute {
+                        JSONObject(body.string()).getString("default_branch")
+                    }
+                    val branchUrl = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer/branches/$branch"
+                    val commitSha = ehRequest(branchUrl).execute {
+                        JSONObject(body.string()).getJSONObject("commit").getString("sha")
+                    }.take(7)
+                    if (commitSha != curSha) launchSnackBar(commitSha)
+                }
+            }
         }
     }
 }
