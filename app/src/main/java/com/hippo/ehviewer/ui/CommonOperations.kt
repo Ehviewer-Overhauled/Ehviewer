@@ -254,17 +254,13 @@ private suspend fun doAddToFavorites(
         if (slot != LOCAL_FAVORITED || galleryInfo.favoriteSlot == NOT_FAVORITED) {
             galleryInfo.favoriteSlot = slot
             galleryInfo.favoriteName = Settings.favCat.getOrNull(slot)
-            withUIContext {
-                FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
-            }
+            FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
         }
     } else if (slot != LOCAL_FAVORITED || galleryInfo.favoriteSlot == LOCAL_FAVORITED) {
         val newSlot = if (galleryInfo.favoriteSlot > LOCAL_FAVORITED && localFavorited) LOCAL_FAVORITED else NOT_FAVORITED
         galleryInfo.favoriteSlot = newSlot
         galleryInfo.favoriteName = null
-        withUIContext {
-            FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, newSlot)
-        }
+        FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, newSlot)
     }
     return add
 }
