@@ -29,6 +29,7 @@ import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
+import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.installPackage
 import com.hippo.ehviewer.util.iter
 import com.hippo.ehviewer.yorozuya.FileUtils
@@ -36,6 +37,7 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
@@ -104,43 +106,54 @@ fun AboutScreen() {
                 value = Settings::useCIUpdateChannel,
             )
             WorkPreference(title = stringResource(id = R.string.settings_about_check_for_updates)) {
-                if (Settings.useCIUpdateChannel) {
-                    val curSha = BuildConfig.COMMIT_SHA
-                    val branch = ghRequest(API_URL).execute {
-                        JSONObject(body.string()).getString("default_branch")
-                    }
-                    val branchUrl = "$API_URL/branches/$branch"
-                    val commitSha = ghRequest(branchUrl).execute {
-                        JSONObject(body.string()).getJSONObject("commit").getString("sha")
-                    }
-                    if (commitSha.take(7) != curSha) launchSnackBar(commitSha)
-                    val archiveUrl = ghRequest("$API_URL/actions/artifacts").execute {
-                        JSONObject(body.string()).getJSONArray("artifacts").iter<JSONObject>().find {
-                            val wf = it.getJSONObject("workflow_run")
-                            it.getString("name").startsWith("arm64-v8a") && wf.getString("head_sha") == commitSha
+                runSuspendCatching {
+                    if (Settings.useCIUpdateChannel) {
+                        val curSha = BuildConfig.COMMIT_SHA
+                        val branch = ghRequest(API_URL).execute {
+                            JSONObject(body.string()).getString("default_branch")
                         }
-                    }?.getString("archive_download_url")
-                    if (archiveUrl != null) {
-                        val file = FileUtils.createTempFile(AppConfig.tempDir, "apk")!!
-                        ghRequest(archiveUrl).execute {
-                            ZipInputStream(body.byteStream()).use { zip ->
-                                zip.nextEntry
-                                file.outputStream().use {
-                                    zip.copyTo(it)
+                        val branchUrl = "$API_URL/branches/$branch"
+                        val commitSha = ghRequest(branchUrl).execute {
+                            JSONObject(body.string()).getJSONObject("commit").getString("sha")
+                        }
+                        if (commitSha.take(7) != curSha) {
+                            val archiveUrl = ghRequest("$API_URL/actions/artifacts").execute {
+                                JSONObject(body.string()).getJSONArray("artifacts").iter<JSONObject>().find {
+                                    val wf = it.getJSONObject("workflow_run")
+                                    it.getString("name").startsWith("arm64-v8a") && wf.getString("head_sha") == commitSha
                                 }
+                            }?.getString("archive_download_url")
+                            if (archiveUrl != null) {
+                                val file = FileUtils.createTempFile(AppConfig.tempDir, "apk")!!
+                                ghRequest(archiveUrl).execute {
+                                    ZipInputStream(body.byteStream()).use { zip ->
+                                        zip.nextEntry
+                                        file.outputStream().use {
+                                            zip.copyTo(it)
+                                        }
+                                    }
+                                }
+                                withUIContext { context.installPackage(file) }
+                            } else {
+                                launchSnackBar("CI is still running, please wait")
                             }
+                        } else {
+                            launchSnackBar("Already latest CI build")
                         }
-                        withUIContext { context.installPackage(file) }
                     } else {
-                        launchSnackBar("CI is still running, please wait")
+                        val curVersion = BuildConfig.VERSION_NAME
+                        val releaseUrl = "$API_URL/releases"
+                        val latestVersion = ghRequest(releaseUrl).execute {
+                            JSONArray(body.string())[0] as JSONObject
+                        }.getString("name")
+                        if (latestVersion != curVersion) {
+                            launchSnackBar(latestVersion)
+                        } else {
+                            launchSnackBar("Already latest Release $latestVersion")
+                        }
                     }
-                } else {
-                    val curVersion = BuildConfig.VERSION_NAME
-                    val releaseUrl = "$API_URL/releases"
-                    val latestVersion = ghRequest(releaseUrl).execute {
-                        JSONArray(body.string())[0] as JSONObject
-                    }.getString("name")
-                    if (latestVersion != curVersion) launchSnackBar(latestVersion)
+                }.onFailure {
+                    launchSnackBar(ExceptionUtils.getReadableString(it))
                 }
             }
         }
