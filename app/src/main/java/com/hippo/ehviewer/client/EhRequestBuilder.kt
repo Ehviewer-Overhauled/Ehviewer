@@ -21,6 +21,10 @@ import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.JsonArrayBuilder
+import kotlinx.serialization.json.JsonObjectBuilder
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
 import okhttp3.Call
 import okhttp3.FormBody
 import okhttp3.MediaType
@@ -30,8 +34,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.executeAsync
-import org.json.JSONArray
-import org.json.JSONObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -49,11 +51,9 @@ inline fun Request.Builder.multipartBody(builder: MultipartBody.Builder.() -> Un
 
 val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
 
-inline fun JSONObject.array(name: String, builder: JSONArray.() -> Unit): JSONObject = put(name, JSONArray().apply(builder))
+inline fun JsonObjectBuilder.array(name: String, builder: JsonArrayBuilder.() -> Unit) = put(name, buildJsonArray(builder))
 
-fun jsonArrayOf(vararg element: Any?) = JSONArray().apply { element.forEach { put(it) } } // Should ensure it is inlined
-
-inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
+inline fun Request.Builder.jsonBody(builder: JsonObjectBuilder.() -> Unit) = post(buildJsonObject(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
 
 const val TAG_CALL = "CancellableCallReadingScope"
 
