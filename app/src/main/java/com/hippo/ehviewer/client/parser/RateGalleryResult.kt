@@ -15,21 +15,13 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import com.hippo.ehviewer.client.exception.ParseException
-import org.json.JSONException
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-object RateGalleryParser {
-    fun parse(body: String): Result {
-        return try {
-            val jsonObject = JSONObject(body)
-            val rating = jsonObject.getDouble("rating_avg").toFloat()
-            val ratingCount = jsonObject.getInt("rating_cnt")
-            Result(rating, ratingCount)
-        } catch (e: JSONException) {
-            throw ParseException("Can't parse rate gallery", body, e)
-        }
-    }
-
-    class Result(val rating: Float, val ratingCount: Int)
-}
+@Serializable
+data class RateGalleryResult(
+    @SerialName("rating_avg")
+    val rating: Float,
+    @SerialName("rating_cnt")
+    val ratingCount: Int,
+)

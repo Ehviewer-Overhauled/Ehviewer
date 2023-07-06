@@ -19,32 +19,45 @@ import com.hippo.ehviewer.client.EhUtils.getCategory
 import com.hippo.ehviewer.client.EhUtils.handleThumbUrlResolution
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.getThumbKey
-import com.hippo.ehviewer.yorozuya.toFloatOrDefault
-import com.hippo.ehviewer.yorozuya.toIntOrDefault
-import org.json.JSONObject
+import com.hippo.ehviewer.client.parseAs
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 object GalleryApiParser {
     fun parse(body: String, galleryInfoList: List<GalleryInfo>) {
-        val jo = JSONObject(body)
-        val ja = jo.getJSONArray("gmetadata")
-        for (i in 0 until ja.length()) {
-            val g = ja.getJSONObject(i)
-            val gid = g.getLong("gid")
-            val gi = galleryInfoList.find { it.gid == gid } ?: continue
-            gi.title = ParserUtils.trim(g.getString("title"))
-            gi.titleJpn = ParserUtils.trim(g.getString("title_jpn"))
-            gi.category = getCategory(g.getString("category"))
-            gi.thumbKey = getThumbKey(handleThumbUrlResolution(g.getString("thumb"))!!)
-            gi.uploader = g.getString("uploader")
-            gi.posted =
-                ParserUtils.formatDate(ParserUtils.parseLong(g.getString("posted"), 0) * 1000)
-            gi.rating = g.getString("rating").toFloatOrDefault(0.0f)
-            // tags
-            val tagJa = g.getJSONArray("tags")
-            gi.simpleTags = (0 until tagJa.length()).map { tagJa.getString(it) }
-                .let { arrayListOf<String>().apply { addAll(it) } }
-            gi.pages = g.getString("filecount").toIntOrDefault(0)
-            gi.generateSLang()
+        body.parseAs<Result>().items.forEach { item ->
+            val gi = galleryInfoList.find { it.gid == item.gid } ?: return@forEach
+            gi.apply {
+                title = item.title
+                titleJpn = item.titleJpn
+                category = getCategory(item.category)
+                thumbKey = getThumbKey(handleThumbUrlResolution(item.thumb)!!)
+                uploader = item.uploader
+                posted = ParserUtils.formatDate(item.posted * 1000)
+                rating = item.rating
+                simpleTags = item.tags
+                pages = item.pages
+                generateSLang()
+            }
         }
     }
+
+    @Serializable
+    data class Result(@SerialName("gmetadata") val items: List<Item>)
+
+    @Serializable
+    data class Item(
+        val gid: Long,
+        val title: String,
+        @SerialName("title_jpn")
+        val titleJpn: String,
+        val category: String,
+        val thumb: String,
+        val uploader: String,
+        val posted: Long,
+        @SerialName("filecount")
+        val pages: Int,
+        val rating: Float,
+        val tags: ArrayList<String>,
+    )
 }

@@ -32,12 +32,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.okio.decodeFromBufferedSource
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.executeAsync
+import okio.BufferedSource
 import okio.HashingSink.Companion.sha1
 import okio.blackholeSink
 import okio.buffer
@@ -210,7 +209,7 @@ object EhTagDatabase : CoroutineScope {
                 val dir = AppConfig.getFilesDir("tag-translations")
                 val dataFile = File(dir, dataName).takeIf { it.exists() } ?: return
                 runSuspendCatching {
-                    tagGroups = dataFile.source().buffer().use { Json.decodeFromBufferedSource(it) }
+                    tagGroups = dataFile.source().buffer().use(BufferedSource::parseAs)
                     initialized = true
                 }.onFailure {
                     it.printStackTrace()
