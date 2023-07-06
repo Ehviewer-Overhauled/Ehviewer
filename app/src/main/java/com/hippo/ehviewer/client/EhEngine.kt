@@ -38,11 +38,11 @@ import com.hippo.ehviewer.client.parser.GalleryTokenApiParser
 import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.Limits
 import com.hippo.ehviewer.client.parser.ProfileParser
-import com.hippo.ehviewer.client.parser.RateGalleryParser
+import com.hippo.ehviewer.client.parser.RateGalleryResult
 import com.hippo.ehviewer.client.parser.SignInParser
 import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.client.parser.TorrentResult
-import com.hippo.ehviewer.client.parser.VoteCommentParser
+import com.hippo.ehviewer.client.parser.VoteCommentResult
 import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dailycheck.showEventNotification
 import com.hippo.ehviewer.dailycheck.today
@@ -347,7 +347,13 @@ object EhEngine {
         }.executeAndParsingWith(GalleryPageApiParser::parse)
     }
 
-    suspend fun rateGallery(apiUid: Long, apiKey: String?, gid: Long, token: String?, rating: Float) = ehRequest(EhUrl.apiUrl, EhUrl.getGalleryDetailUrl(gid, token), EhUrl.origin) {
+    suspend fun rateGallery(
+        apiUid: Long,
+        apiKey: String?,
+        gid: Long,
+        token: String?,
+        rating: Float,
+    ): RateGalleryResult = ehRequest(EhUrl.apiUrl, EhUrl.getGalleryDetailUrl(gid, token), EhUrl.origin) {
         jsonBody {
             put("method", "rategallery")
             put("apiuid", apiUid)
@@ -356,7 +362,7 @@ object EhEngine {
             put("token", token)
             put("rating", ceil((rating * 2).toDouble()).toInt())
         }
-    }.executeAndParsingWith(RateGalleryParser::parse)
+    }.executeAndParsingWith(String::parseAs)
 
     suspend fun fillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = galleryInfoList.chunked(MAX_REQUEST_SIZE).parMap {
         ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
@@ -382,7 +388,7 @@ object EhEngine {
         token: String?,
         commentId: Long,
         commentVote: Int,
-    ) = ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
+    ): VoteCommentResult = ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
         jsonBody {
             put("method", "votecomment")
             put("apiuid", apiUid)
@@ -392,7 +398,7 @@ object EhEngine {
             put("comment_id", commentId)
             put("comment_vote", commentVote)
         }
-    }.executeAndParsingWith { VoteCommentParser.parse(this, commentVote) }
+    }.executeAndParsingWith(String::parseAs)
 
     suspend fun voteTag(
         apiUid: Long,

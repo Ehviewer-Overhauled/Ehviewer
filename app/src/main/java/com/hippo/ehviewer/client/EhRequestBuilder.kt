@@ -36,6 +36,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.executeAsync
+import okio.BufferedSource
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -107,7 +108,9 @@ suspend inline fun <R> Request.executeNonCache(crossinline block: suspend Respon
 
 suspend inline fun <reified T> Request.executeAndParseAs() = execute { parseAs<T>() }
 
-inline fun <reified T> Response.parseAs(): T = json.decodeFromBufferedSource(body.source())
+inline fun <reified T> Response.parseAs(): T = body.source().parseAs()
+inline fun <reified T> BufferedSource.parseAs(): T = json.decodeFromBufferedSource(this)
+inline fun <reified T> String.parseAs(): T = json.decodeFromString(this)
 
 val json = Json { ignoreUnknownKeys = true }
 

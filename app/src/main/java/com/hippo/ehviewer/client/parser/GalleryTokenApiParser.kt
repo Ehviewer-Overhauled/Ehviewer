@@ -16,8 +16,10 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.client.parseAs
 import com.hippo.ehviewer.util.ExceptionUtils
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 object GalleryTokenApiParser {
     /**
@@ -31,12 +33,17 @@ object GalleryTokenApiParser {
      * }
      */
     fun parse(body: String): String {
-        val jo = JSONObject(body).getJSONArray("tokenlist").getJSONObject(0)
         return runCatching {
-            jo.getString("token")
+            body.parseAs<Result>().tokenList[0].token
         }.getOrElse {
             ExceptionUtils.throwIfFatal(it)
-            throw EhException(jo.getString("error"))
+            throw EhException(body.parseAs<Error>().error)
         }
     }
+
+    @Serializable
+    data class Result(@SerialName("tokenlist") val tokenList: List<Item>)
+
+    @Serializable
+    data class Item(val gid: Long, val token: String)
 }

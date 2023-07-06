@@ -63,7 +63,7 @@ import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryCommentList
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.ListUrlBuilder
-import com.hippo.ehviewer.client.parser.VoteCommentParser
+import com.hippo.ehviewer.client.parser.VoteCommentResult
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.dao.FilterMode
 import com.hippo.ehviewer.databinding.ItemDrawerFavoritesBinding
@@ -341,11 +341,12 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             runSuspendCatching {
                 EhEngine.voteComment(gd.apiUid, gd.apiKey, gd.gid, gd.token, id, vote)
             }.onSuccess { result ->
+                val voteUp = vote > 0
                 showTip(
-                    if (result.expectVote > 0) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully,
+                    if (voteUp) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully,
                     LENGTH_SHORT,
                 )
-                withUIContext { onVoteCommentSuccess(result) }
+                withUIContext { onVoteCommentSuccess(result, voteUp) }
             }.onFailure {
                 showTip(R.string.vote_failed, LENGTH_LONG)
             }
@@ -698,7 +699,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         updateView(true)
     }
 
-    private fun onVoteCommentSuccess(result: VoteCommentParser.Result) {
+    private fun onVoteCommentSuccess(result: VoteCommentResult, voteUp: Boolean) {
         if (mAdapter == null) {
             return
         }
@@ -721,7 +722,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         // Update comment
         val comment = mGalleryDetail!!.comments.comments[position]
         comment.score = result.score
-        if (result.expectVote > 0) {
+        if (voteUp) {
             comment.voteUpEd = 0 != result.vote
             comment.voteDownEd = false
         } else {

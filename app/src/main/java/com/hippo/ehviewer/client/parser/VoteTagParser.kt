@@ -17,11 +17,11 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import org.json.JSONObject
+import com.hippo.ehviewer.client.parseAs
 
 object VoteTagParser {
     // {"error":"The tag \"neko\" is not allowed. Use character:neko or artist:neko"}
-    fun parse(body: String): String {
-        return JSONObject(body).optString("error")
+    fun parse(body: String): String? {
+        return runCatching { body.parseAs<Error>().error }.getOrNull()
     }
 }

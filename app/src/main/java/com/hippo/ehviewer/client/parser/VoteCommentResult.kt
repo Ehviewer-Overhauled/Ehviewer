@@ -15,17 +15,15 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-object VoteCommentParser {
-    // {"comment_id":1253922,"comment_score":-19,"comment_vote":0}
-    fun parse(body: String, expectVote: Int): Result {
-        val jo = JSONObject(body)
-        val id = jo.getLong("comment_id")
-        val score = jo.getInt("comment_score")
-        val vote = jo.getInt("comment_vote")
-        return Result(id, score, vote, expectVote)
-    }
-
-    class Result(val id: Long, val score: Int, val vote: Int, val expectVote: Int)
-}
+@Serializable
+data class VoteCommentResult(
+    @SerialName("comment_id")
+    val id: Long,
+    @SerialName("comment_score")
+    val score: Int,
+    @SerialName("comment_vote")
+    val vote: Int,
+)

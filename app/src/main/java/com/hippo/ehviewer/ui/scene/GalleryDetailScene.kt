@@ -1193,11 +1193,9 @@ class GalleryDetailScene : BaseScene() {
                 runSuspendCatching {
                     EhEngine.voteTag(apiUid, apiKey, gid, token, tag, vote)
                 }.onSuccess { result ->
-                    if (result.isNotEmpty()) {
+                    result?.let {
                         showTip(result, LENGTH_SHORT)
-                    } else {
-                        showTip(R.string.tag_vote_successfully, LENGTH_SHORT)
-                    }
+                    } ?: showTip(R.string.tag_vote_successfully, LENGTH_SHORT)
                 }.onFailure {
                     showTip(R.string.vote_failed, LENGTH_LONG)
                 }
