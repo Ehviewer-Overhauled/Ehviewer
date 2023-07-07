@@ -73,7 +73,7 @@ object EhCookieStore : CookieJar {
     fun flush() = manager.flush()
 
     fun getCookieHeader(url: HttpUrl): String {
-        val cookies = get(url)
+        val cookies = loadForRequest(url)
         val cookieHeader = StringBuilder()
         var i = 0
         val size = cookies.size
