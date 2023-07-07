@@ -227,7 +227,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp-android")
     implementation("com.squareup.okhttp3:okhttp-coroutines")
 
-    implementation("com.squareup.okio:okio-jvm:3.3.0")
+    implementation("com.squareup.okio:okio-jvm:3.4.0")
 
     implementation("com.mikepenz:aboutlibraries-core:10.8.0")
 
