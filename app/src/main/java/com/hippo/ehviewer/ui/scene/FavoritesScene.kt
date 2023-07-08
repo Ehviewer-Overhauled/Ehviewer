@@ -30,6 +30,8 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
@@ -315,6 +317,12 @@ class FavoritesScene :
         return ComposeView(inflater.context).apply {
             setMD3Content {
                 ElevatedCard {
+                    val scope = currentRecomposeScope
+                    LaunchedEffect(Unit) {
+                        Settings.favChangesFlow.collect {
+                            scope.invalidate()
+                        }
+                    }
                     val faves = arrayOf(
                         stringResource(id = R.string.local_favorites) to Settings.favLocalCount,
                         stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,

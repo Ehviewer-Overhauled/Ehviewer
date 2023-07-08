@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import splitties.init.appCtx
 import splitties.preferences.PrefDelegate
@@ -20,6 +21,8 @@ import splitties.preferences.PrefDelegate
 private val collectScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 fun <T, R : PrefDelegate<T>> R.observed(func: (Unit) -> Unit) = apply { collectScope.launch { changesFlow().collect(func) } }
 fun <T, R : Settings.Delegate<T>> R.observed(func: (Unit) -> Unit) = apply { collectScope.launch { flowGetter().collect(func) } }
+fun <T, R : Settings.Delegate<T>> R.emitTo(flow: MutableSharedFlow<Unit>) = apply { collectScope.launch { flowGetter().collect { flow.emit(Unit) } } }
+fun <T, R : PrefDelegate<T>> R.emitTo(flow: MutableSharedFlow<Unit>) = apply { collectScope.launch { changesFlow().collect { flow.emit(Unit) } } }
 
 fun updateWhenLocaleChanges() {
     val newValue = Settings.language

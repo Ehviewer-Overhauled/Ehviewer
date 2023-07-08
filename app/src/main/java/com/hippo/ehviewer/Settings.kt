@@ -5,7 +5,11 @@ package com.hippo.ehviewer
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapMerge
 import splitties.preferences.DataStorePreferences
 import splitties.preferences.edit
 import java.util.Locale
@@ -14,13 +18,18 @@ import kotlin.reflect.KProperty
 object Settings : DataStorePreferences(null) {
     private const val KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations"
 
+    private val _favFlow = MutableSharedFlow<Unit>()
+    val favChangesFlow = _favFlow.debounce(1000)
+    var favCat by stringArrayPref("fav_cat", 10, "Favorites").emitTo(_favFlow)
+    var favCount by intArrayPref("fav_count", 10).emitTo(_favFlow)
+    var favLocalCount by intPref("fav_local", 0).emitTo(_favFlow)
+    var favCloudCount by intPref("fav_cloud", 0).emitTo(_favFlow)
+
     var downloadScheme by stringOrNullPref("image_scheme", null)
     var downloadAuthority by stringOrNullPref("image_authority", null)
     var downloadPath by stringOrNullPref("image_path", null)
     var downloadQuery by stringOrNullPref("image_query", null)
     var downloadFragment by stringOrNullPref("image_fragment", null)
-    var favCat by stringArrayPref("fav_cat", 10, "Favorites")
-    var favCount by intArrayPref("fav_count", 10)
     var archivePasswds by stringSetOrNullPref("archive_passwds")
     var downloadDelay by intFromStrPref("download_delay", 0)
     var gallerySite by intFromStrPref("gallery_site", 0).observed { updateWhenGallerySiteChanges() }
@@ -57,8 +66,6 @@ object Settings : DataStorePreferences(null) {
     var enableQuic by boolPref("enable_quic", true)
     var bypassCloudflare by boolPref("bypass_cloudflare", false)
     var thumbSizeDp by intPref("thumb_size_", 120)
-    var favLocalCount by intPref("fav_local", 0)
-    var favCloudCount by intPref("fav_cloud", 0)
     var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_ALL)
     var securityDelay by intPref("require_unlock_delay", 0)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
@@ -96,7 +103,7 @@ object Settings : DataStorePreferences(null) {
     }
 
     private fun intArrayPref(key: String, count: Int) = object : Delegate<IntArray> {
-        override val flowGetter: () -> Flow<Unit> = { flow { } }
+        override val flowGetter: () -> Flow<Unit> = { _value.asFlow().flatMapMerge { it.changesFlow() }.conflate() }
         private var _value = (0 until count).map { intPref("${key}_$it", 0) }.toTypedArray()
         override fun getValue(thisRef: Any?, prop: KProperty<*>?): IntArray = _value.map { it.value }.toIntArray()
         override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: IntArray) {
@@ -106,7 +113,7 @@ object Settings : DataStorePreferences(null) {
     }
 
     private fun stringArrayPref(key: String, count: Int, defMetaValue: String) = object : Delegate<Array<String>> {
-        override val flowGetter: () -> Flow<Unit> = { flow { } }
+        override val flowGetter: () -> Flow<Unit> = { _value.asFlow().flatMapMerge { it.changesFlow() }.conflate() }
         private var _value = (0 until count).map { stringPref("${key}_$it", "$defMetaValue $it") }.toTypedArray()
         override fun getValue(thisRef: Any?, prop: KProperty<*>?): Array<String> = _value.map { it.value }.toTypedArray()
         override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Array<String>) {
