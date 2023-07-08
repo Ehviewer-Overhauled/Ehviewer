@@ -37,7 +37,7 @@ class PagerPageHolder(
     /**
      * Loading progress bar to indicate the current progress.
      */
-    private val progressIndicator: ReaderProgressIndicator = ReaderProgressIndicator(readerThemedContext)
+    private val progressIndicator = ReaderProgressIndicator(readerThemedContext)
 
     /**
      * Error layout to show when the image fails to load.

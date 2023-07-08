@@ -19,9 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 
 @Composable
-fun CombinedCircularProgressIndicator(
-    progress: Float,
-) {
+fun CombinedCircularProgressIndicator(progress: Float) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
