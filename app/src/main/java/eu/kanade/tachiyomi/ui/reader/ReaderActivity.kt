@@ -63,7 +63,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.transition.MaterialContainerTransform
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
@@ -704,8 +703,7 @@ class ReaderActivity : EhActivity() {
         initBottomShortcuts()
 
         val toolbarBackground = MaterialShapeDrawable.createWithElevationOverlay(this).apply {
-            elevation =
-                resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
+            elevation = resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
             alpha = if (isNightMode()) 230 else 242 // 90% dark 95% light
         }
         binding.toolbarBottom.background = toolbarBackground.copy(this@ReaderActivity)
@@ -736,35 +734,9 @@ class ReaderActivity : EhActivity() {
 
                     ReaderPreferences.defaultReadingMode().set(newReadingMode.flagValue)
                     setGallery()
-
-                    // updateCropBordersShortcut()
                 }
             }
         }
-
-        // Crop borders
-        /*
-        with(binding.actionCropBorders) {
-            setTooltip(R.string.pref_crop_borders)
-
-            setOnClickListener {
-                val isPagerType =
-                    ReadingModeType.isPagerType(readerPreferences.defaultReadingMode().get())
-                if (isPagerType) {
-                    readerPreferences.cropBorders().toggle()
-                } else {
-                    readerPreferences.cropBordersWebtoon().toggle()
-                }
-            }
-        }
-        updateCropBordersShortcut()
-        listOf(readerPreferences.cropBorders(), readerPreferences.cropBordersWebtoon())
-            .forEach { pref ->
-                pref.changes()
-                    .onEach { updateCropBordersShortcut() }
-                    .launchIn(lifecycleScope)
-            }
-         */
 
         // Rotation
         with(binding.actionRotation) {
@@ -805,25 +777,6 @@ class ReaderActivity : EhActivity() {
         binding.actionRotation.setImageResource(orientation.iconRes)
     }
 
-    /*
-    private fun updateCropBordersShortcut() {
-        val isPagerType = ReadingModeType.isPagerType(readerPreferences.defaultReadingMode().get())
-        val enabled = if (isPagerType) {
-            readerPreferences.cropBorders().get()
-        } else {
-            readerPreferences.cropBordersWebtoon().get()
-        }
-
-        binding.actionCropBorders.setImageResource(
-            if (enabled) {
-                R.drawable.ic_crop_24dp
-            } else {
-                R.drawable.ic_crop_off_24dp
-            },
-        )
-    }
-     */
-
     /**
      * Dispatches a key event. If the viewer doesn't handle it, call the default implementation.
      */
@@ -839,13 +792,6 @@ class ReaderActivity : EhActivity() {
     override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
         val handled = viewer?.handleGenericMotionEvent(event) ?: false
         return handled || super.dispatchGenericMotionEvent(event)
-    }
-
-    private fun buildContainerTransform(entering: Boolean): MaterialContainerTransform {
-        return MaterialContainerTransform(this, entering).apply {
-            duration = 350 // ms
-            addTarget(android.R.id.content)
-        }
     }
 
     /**
