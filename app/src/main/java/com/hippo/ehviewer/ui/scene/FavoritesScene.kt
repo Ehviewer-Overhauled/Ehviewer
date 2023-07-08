@@ -231,10 +231,8 @@ class FavoritesScene :
     // keyword of mUrlBuilder, fav cat of mUrlBuilder, mFavCatArray.
     // They changed, call it
     private fun updateSearchBar() {
-        val context = context
-        if (null == context || null == mUrlBuilder) {
-            return
-        }
+        _binding ?: return
+        mUrlBuilder ?: return
 
         // Update title
         val favCatName: String = when (val favCat = mUrlBuilder!!.favCat) {
