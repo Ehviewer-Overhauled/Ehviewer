@@ -571,6 +571,7 @@ class FavoritesScene :
             Settings.favCat = result.catArray
             Settings.favCount = result.countArray
             Settings.favCloudCount = result.countArray.sum()
+            _binding ?: return
             updateSearchBar()
             mHelper.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList)
         }
