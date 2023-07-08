@@ -47,6 +47,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.ColorUtils
@@ -70,6 +73,7 @@ import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
+import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.util.getParcelableExtraCompat
@@ -655,6 +659,8 @@ class ReaderActivity : EhActivity() {
         }
     }
 
+    private var currentPage by mutableIntStateOf(-1)
+
     /**
      * Initializes the reader menu. It sets up click listeners and the initial visibility.
      */
@@ -664,6 +670,13 @@ class ReaderActivity : EhActivity() {
             type(navigationBars = true) {
                 margin(bottom = true, horizontal = true)
             }
+        }
+
+        binding.pageNumber.setMD3Content {
+            PageIndicatorText(
+                currentPage = currentPage,
+                totalPages = mGalleryProvider?.takeIf { it.isReady }?.size ?: -1,
+            )
         }
 
         // Init listeners on bottom menu
@@ -856,7 +869,7 @@ class ReaderActivity : EhActivity() {
         val pages = mGalleryProvider?.mPages ?: return
 
         // Set bottom page number
-        binding.pageNumber.text = "${page.number}/${pages.size}"
+        currentPage = page.number
 
         // Set page numbers
         if (viewer !is R2LPagerViewer) {
