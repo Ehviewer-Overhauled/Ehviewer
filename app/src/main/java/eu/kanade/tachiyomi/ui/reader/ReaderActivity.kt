@@ -349,8 +349,8 @@ class ReaderActivity : EhActivity() {
         if (mCurrentIndex == 0) {
             mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
         }
-        val viewerMode =
-            ReadingModeType.fromPreference(ReaderPreferences.defaultReadingMode().get())
+        totalPage = mGalleryProvider!!.size
+        val viewerMode = ReadingModeType.fromPreference(ReaderPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()
         viewer = ReadingModeType.toViewer(ReaderPreferences.defaultReadingMode().get(), this)
@@ -662,6 +662,7 @@ class ReaderActivity : EhActivity() {
     }
 
     private var currentPage by mutableIntStateOf(-1)
+    private var totalPage by mutableIntStateOf(-1)
     private var isRtl by mutableStateOf(false)
 
     /**
@@ -675,8 +676,6 @@ class ReaderActivity : EhActivity() {
             }
         }
 
-        val totalPages = mGalleryProvider?.takeIf { it.isReady }?.size ?: -1
-
         binding.pageNumber.setMD3Content {
             CompositionLocalProvider(
                 LocalTextStyle provides MaterialTheme.typography.bodySmall,
@@ -684,7 +683,7 @@ class ReaderActivity : EhActivity() {
             ) {
                 PageIndicatorText(
                     currentPage = currentPage,
-                    totalPages = totalPages,
+                    totalPages = totalPage,
                 )
             }
         }
@@ -694,7 +693,7 @@ class ReaderActivity : EhActivity() {
             ChapterNavigator(
                 isRtl = isRtl,
                 currentPage = currentPage,
-                totalPages = totalPages,
+                totalPages = totalPage,
                 onSliderValueChange = {
                     isScrollingThroughPages = true
                     moveToPageIndex(it)
