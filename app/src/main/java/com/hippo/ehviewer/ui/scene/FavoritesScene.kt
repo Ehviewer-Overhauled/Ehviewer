@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.LaunchedEffect
@@ -333,7 +334,7 @@ class FavoritesScene :
                         itemsIndexed(faves) { index, (name, count) ->
                             ListItem(
                                 headlineContent = { Text(text = name) },
-                                trailingContent = { Text(text = count.toString()) },
+                                trailingContent = { Text(text = count.toString(), style = MaterialTheme.typography.bodyLarge) },
                                 modifier = Modifier.clickable { onItemClick(index) },
                             )
                         }
