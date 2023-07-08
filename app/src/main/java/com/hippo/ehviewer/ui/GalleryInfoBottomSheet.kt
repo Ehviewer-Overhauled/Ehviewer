@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,10 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,14 +67,13 @@ class GalleryInfoBottomSheet(private val detail: GalleryDetail) : BottomSheetDia
             Column(modifier = Modifier.fillMaxWidth()) {
                 val context = LocalContext.current
                 val navController = remember { findNavController() }
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(text = stringResource(id = R.string.gallery_info), style = MaterialTheme.typography.titleLarge)
-                }
+                Text(
+                    text = stringResource(id = R.string.gallery_info),
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.titleLarge,
+                )
                 val data = remember(detail) { detail.generateContent() }
-                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
+                ProvideTextStyle(MaterialTheme.typography.labelLarge) {
                     LazyColumn {
                         itemsIndexed(data) { index, (key, content) ->
                             Row(
