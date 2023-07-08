@@ -73,7 +73,7 @@ import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
-import com.hippo.ehviewer.ui.setMD3Content
+import com.hippo.ehviewer.ui.setReaderMD3Content
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.util.getParcelableExtraCompat
@@ -672,7 +672,7 @@ class ReaderActivity : EhActivity() {
             }
         }
 
-        binding.pageNumber.setMD3Content {
+        binding.pageNumber.setReaderMD3Content {
             PageIndicatorText(
                 currentPage = currentPage,
                 totalPages = mGalleryProvider?.takeIf { it.isReady }?.size ?: -1,
