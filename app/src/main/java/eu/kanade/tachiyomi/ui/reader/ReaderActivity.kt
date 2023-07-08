@@ -46,6 +46,10 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -72,7 +76,7 @@ import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
-import com.hippo.ehviewer.ui.setReaderMD3Content
+import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.util.getParcelableExtraCompat
@@ -673,15 +677,20 @@ class ReaderActivity : EhActivity() {
 
         val totalPages = mGalleryProvider?.takeIf { it.isReady }?.size ?: -1
 
-        binding.pageNumber.setReaderMD3Content {
-            PageIndicatorText(
-                currentPage = currentPage,
-                totalPages = totalPages,
-            )
+        binding.pageNumber.setMD3Content {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodySmall,
+                LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+            ) {
+                PageIndicatorText(
+                    currentPage = currentPage,
+                    totalPages = totalPages,
+                )
+            }
         }
 
         // Init listeners on bottom menu
-        binding.readerNav.setReaderMD3Content {
+        binding.readerNav.setMD3Content {
             ChapterNavigator(
                 isRtl = isRtl,
                 currentPage = currentPage,
