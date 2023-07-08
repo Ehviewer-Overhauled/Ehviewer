@@ -78,13 +78,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -138,7 +136,6 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
-import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -491,6 +488,12 @@ class GalleryDetailScene : BaseScene() {
         }
     }
 
+    private fun onGalleryInfoCardClick() {
+        composeBindingGD?.let {
+            GalleryInfoBottomSheet(it).show(requireActivity().supportFragmentManager, "GalleryInfoBottomSheet")
+        }
+    }
+
     @Composable
     private fun GalleryDetailContent(
         galleryInfo: GalleryInfo,
@@ -498,19 +501,6 @@ class GalleryDetailScene : BaseScene() {
         contentPadding: PaddingValues,
         modifier: Modifier,
     ) {
-        var showSheet by rememberSaveable { mutableStateOf(false) }
-        fun onGalleryInfoCardClick() {
-            showSheet = true
-        }
-
-        val navController = remember { findNavController() }
-        CompositionLocalProvider(LocalNavController provides navController) {
-            composeBindingGD?.let {
-                if (showSheet) {
-                    GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false }
-                }
-            }
-        }
         val windowSizeClass = calculateWindowSizeClass(requireActivity())
         val columnCount = calculateSuitableSpanCount()
         when (windowSizeClass.widthSizeClass) {
