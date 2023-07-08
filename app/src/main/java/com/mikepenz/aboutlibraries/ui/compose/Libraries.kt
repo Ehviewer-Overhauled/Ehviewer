@@ -11,10 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.openBrowser
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.entity.Library
-import com.mikepenz.aboutlibraries.util.withContext
+import com.mikepenz.aboutlibraries.util.withJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -27,7 +28,7 @@ fun LibrariesContainer(
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     librariesBlock: (Context) -> Libs = { context ->
-        Libs.Builder().withContext(context).build()
+        Libs.Builder().withJson(context, R.raw.aboutlibraries).build()
     },
     showAuthor: Boolean = true,
     showVersion: Boolean = true,
