@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
-import android.view.Gravity
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import com.hippo.ehviewer.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
@@ -39,11 +37,7 @@ class PagerPageHolder(
     /**
      * Loading progress bar to indicate the current progress.
      */
-    private val progressIndicator: ReaderProgressIndicator = ReaderProgressIndicator(readerThemedContext).apply {
-        updateLayoutParams<LayoutParams> {
-            gravity = Gravity.CENTER
-        }
-    }
+    private val progressIndicator: ReaderProgressIndicator = ReaderProgressIndicator(readerThemedContext)
 
     /**
      * Error layout to show when the image fails to load.

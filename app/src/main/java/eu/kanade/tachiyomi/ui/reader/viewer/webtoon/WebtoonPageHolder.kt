@@ -2,14 +2,12 @@ package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.hippo.ehviewer.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
@@ -116,7 +114,7 @@ class WebtoonPageHolder(
 
         removeErrorLayout()
         frame.recycle()
-        progressIndicator.setProgress(0, animated = false)
+        progressIndicator.setProgress(0)
     }
 
     /**
@@ -238,11 +236,7 @@ class WebtoonPageHolder(
         progressContainer = FrameLayout(context)
         frame.addView(progressContainer, MATCH_PARENT, defaultHeight)
 
-        val progress = ReaderProgressIndicator(context).apply {
-            updateLayoutParams<FrameLayout.LayoutParams> {
-                gravity = Gravity.CENTER
-            }
-        }
+        val progress = ReaderProgressIndicator(context)
         progressContainer.addView(progress)
         return progress
     }
