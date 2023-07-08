@@ -23,12 +23,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
@@ -46,8 +55,6 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehUrl
 import com.hippo.ehviewer.client.parser.FavoritesParser
-import com.hippo.ehviewer.databinding.DrawerListRvBinding
-import com.hippo.ehviewer.databinding.ItemDrawerFavoritesBinding
 import com.hippo.ehviewer.databinding.SceneFavoritesBinding
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
@@ -60,6 +67,7 @@ import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
+import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -93,12 +101,6 @@ class FavoritesScene :
     private lateinit var mHelper: FavoritesHelper
     private lateinit var mActionFabDrawable: AddDeleteDrawable
 
-    private var mDrawerAdapter: FavDrawerAdapter? = null
-
-    private var mFavCatArray: Array<String>? = Settings.favCat
-
-    private var mFavCountArray: IntArray? = Settings.favCount
-
     private var mUrlBuilder: FavListUrlBuilder? = null
     private val showNormalFabsRunnable = Runnable {
         updateJumpFab() // index: 0, 2
@@ -107,8 +109,6 @@ class FavoritesScene :
             (3..6).forEach { setSecondaryFabVisibilityAt(it, false) }
         }
     }
-    private var mFavLocalCount = 0
-    private var mFavCountSum = 0
     private var mHasFirstRefresh = false
 
     // Avoid unnecessary search bar update
@@ -127,8 +127,6 @@ class FavoritesScene :
     private var mModifyAdd = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mFavLocalCount = Settings.favLocalCount
-        mFavCountSum = Settings.favCloudCount
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -152,7 +150,6 @@ class FavoritesScene :
             mUrlBuilder = FavListUrlBuilder()
         }
         mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
-        mFavCountArray = savedInstanceState.getIntArray(KEY_FAV_COUNT_ARRAY)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -164,14 +161,10 @@ class FavoritesScene :
         }
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh)
         outState.putParcelable(KEY_URL_BUILDER, mUrlBuilder)
-        outState.putIntArray(KEY_FAV_COUNT_ARRAY, mFavCountArray)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mFavCatArray = null
-        mFavCountArray = null
-        mFavCountSum = 0
         mUrlBuilder = null
     }
 
@@ -245,14 +238,14 @@ class FavoritesScene :
     // They changed, call it
     private fun updateSearchBar() {
         val context = context
-        if (null == context || null == mUrlBuilder || null == mFavCatArray) {
+        if (null == context || null == mUrlBuilder) {
             return
         }
 
         // Update title
         val favCatName: String = when (val favCat = mUrlBuilder!!.favCat) {
             in 0..9 -> {
-                mFavCatArray!![favCat]
+                Settings.favCat[favCat]
             }
 
             FavListUrlBuilder.FAV_CAT_LOCAL -> {
@@ -319,17 +312,27 @@ class FavoritesScene :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val drawerBinding = DrawerListRvBinding.inflate(inflater, container, false)
-        drawerBinding.toolbar.setTitle(R.string.collections)
-        drawerBinding.recyclerViewDrawer.layoutManager = LinearLayoutManager(context)
-        mDrawerAdapter = FavDrawerAdapter(inflater)
-        drawerBinding.recyclerViewDrawer.adapter = mDrawerAdapter
-        return drawerBinding.root
-    }
-
-    override fun onDestroyDrawerView() {
-        super.onDestroyDrawerView()
-        mDrawerAdapter = null
+        return ComposeView(inflater.context).apply {
+            setMD3Content {
+                ElevatedCard {
+                    val faves = arrayOf(
+                        stringResource(id = R.string.local_favorites) to Settings.favLocalCount,
+                        stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
+                        *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
+                    )
+                    TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
+                    LazyColumn {
+                        itemsIndexed(faves) { index, (name, count) ->
+                            ListItem(
+                                headlineContent = { Text(text = name) },
+                                trailingContent = { Text(text = count.toString()) },
+                                modifier = Modifier.clickable { onItemClick(index) },
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onStartDragHandler() {
@@ -567,20 +570,11 @@ class FavoritesScene :
 
     private fun onGetFavoritesSuccess(result: FavoritesParser.Result, taskId: Int) {
         if (mHelper.isCurrentTask(taskId)) {
-            if (mFavCatArray != null) {
-                System.arraycopy(result.catArray, 0, mFavCatArray!!, 0, 10)
-            }
-            mFavCountArray = result.countArray
-            mFavCountSum = 0
-            for (i in 0..9) {
-                mFavCountSum += mFavCountArray!![i]
-            }
-            Settings.favCloudCount = mFavCountSum
+            Settings.favCat = result.catArray
+            Settings.favCount = result.countArray
+            Settings.favCloudCount = result.countArray.sum()
             updateSearchBar()
             mHelper.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList)
-            if (mDrawerAdapter != null) {
-                mDrawerAdapter!!.notifyDataSetChanged()
-            }
         }
     }
 
@@ -603,60 +597,7 @@ class FavoritesScene :
                 mHelper.onGetPageData(taskId, 1, 0, null, null, list)
             }
             if (keyword.isNullOrEmpty()) {
-                mFavLocalCount = list.size
-                Settings.favLocalCount = mFavLocalCount
-                if (mDrawerAdapter != null) {
-                    mDrawerAdapter!!.notifyDataSetChanged()
-                }
-            }
-        }
-    }
-
-    private class FavDrawerHolder(val binding: ItemDrawerFavoritesBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    private inner class FavDrawerAdapter(private val mInflater: LayoutInflater) :
-        RecyclerView.Adapter<FavDrawerHolder>() {
-        override fun getItemViewType(position: Int): Int {
-            return position
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavDrawerHolder {
-            return FavDrawerHolder(ItemDrawerFavoritesBinding.inflate(mInflater, parent, false))
-        }
-
-        @SuppressLint("SetTextI18n")
-        override fun onBindViewHolder(holder: FavDrawerHolder, position: Int) {
-            holder.binding.run {
-                when (position) {
-                    0 -> {
-                        key.setText(R.string.local_favorites)
-                        value.text = mFavLocalCount.toString()
-                    }
-
-                    1 -> {
-                        key.setText(R.string.cloud_favorites)
-                        value.text = mFavCountSum.toString()
-                    }
-
-                    else -> {
-                        if (null == mFavCatArray || null == mFavCountArray || mFavCatArray!!.size < position - 1 || mFavCountArray!!.size < position - 1) {
-                            return
-                        }
-                        key.text = mFavCatArray!![position - 2]
-                        value.text = mFavCountArray!![position - 2].toString()
-                    }
-                }
-            }
-            holder.itemView.isEnabled = true
-            holder.itemView.setOnClickListener { onItemClick(position) }
-        }
-
-        override fun getItemCount(): Int {
-            return if (null == mFavCatArray) {
-                2
-            } else {
-                12
+                Settings.favLocalCount = list.size
             }
         }
     }
@@ -893,6 +834,5 @@ class FavoritesScene :
         private const val ANIMATE_TIME = 300L
         private const val KEY_URL_BUILDER = "url_builder"
         private const val KEY_HAS_FIRST_REFRESH = "has_first_refresh"
-        private const val KEY_FAV_COUNT_ARRAY = "fav_count_array"
     }
 }
