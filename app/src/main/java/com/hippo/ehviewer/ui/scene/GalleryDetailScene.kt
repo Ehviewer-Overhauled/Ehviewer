@@ -531,7 +531,7 @@ class GalleryDetailScene : BaseScene() {
                                     .padding(horizontal = 4.dp)
                                     .weight(1F),
                             ) {
-                                Text(text = downloadButtonText)
+                                Text(text = downloadButtonText, maxLines = 1)
                             }
                             Button(
                                 onClick = ::onReadButtonClick,
@@ -539,7 +539,7 @@ class GalleryDetailScene : BaseScene() {
                                     .padding(horizontal = 4.dp)
                                     .weight(1F),
                             ) {
-                                Text(text = readButtonText)
+                                Text(text = readButtonText, maxLines = 1)
                             }
                         }
                         if (getDetailError.isNotBlank()) {
@@ -596,7 +596,7 @@ class GalleryDetailScene : BaseScene() {
                                         .padding(horizontal = 16.dp)
                                         .width(192.dp),
                                 ) {
-                                    Text(text = readButtonText)
+                                    Text(text = readButtonText, maxLines = 1)
                                 }
                                 Spacer(modifier = modifier.height(24.dp))
                                 FilledTonalButton(
@@ -606,7 +606,7 @@ class GalleryDetailScene : BaseScene() {
                                         .padding(horizontal = 16.dp)
                                         .width(192.dp),
                                 ) {
-                                    Text(text = downloadButtonText)
+                                    Text(text = downloadButtonText, maxLines = 1)
                                 }
                             }
                         }
