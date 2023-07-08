@@ -35,7 +35,6 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import android.provider.MediaStore
-import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View.LAYER_TYPE_HARDWARE
@@ -49,6 +48,7 @@ import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -59,7 +59,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.slider.Slider
 import com.google.android.material.transition.MaterialContainerTransform
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
@@ -113,7 +112,6 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.math.abs
-import kotlin.math.max
 
 class ReaderActivity : EhActivity() {
     lateinit var binding: ReaderActivityBinding
@@ -352,7 +350,7 @@ class ReaderActivity : EhActivity() {
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()
         viewer = ReadingModeType.toViewer(ReaderPreferences.defaultReadingMode().get(), this)
-        binding.pageSlider.isRTL = viewer is R2LPagerViewer
+        isRtl = viewer is R2LPagerViewer
         updateViewerInset(ReaderPreferences.fullscreen().get())
         binding.viewerContainer.removeAllViews()
         setOrientation(ReaderPreferences.defaultOrientationType().get())
@@ -660,6 +658,7 @@ class ReaderActivity : EhActivity() {
     }
 
     private var currentPage by mutableIntStateOf(-1)
+    private var isRtl by mutableStateOf(false)
 
     /**
      * Initializes the reader menu. It sets up click listeners and the initial visibility.
@@ -672,31 +671,26 @@ class ReaderActivity : EhActivity() {
             }
         }
 
+        val totalPages = mGalleryProvider?.takeIf { it.isReady }?.size ?: -1
+
         binding.pageNumber.setReaderMD3Content {
             PageIndicatorText(
                 currentPage = currentPage,
-                totalPages = mGalleryProvider?.takeIf { it.isReady }?.size ?: -1,
+                totalPages = totalPages,
             )
         }
 
         // Init listeners on bottom menu
-        binding.pageSlider.addOnSliderTouchListener(
-            object : Slider.OnSliderTouchListener {
-                override fun onStartTrackingTouch(slider: Slider) {
+        binding.readerNav.setReaderMD3Content {
+            ChapterNavigator(
+                isRtl = isRtl,
+                currentPage = currentPage,
+                totalPages = totalPages,
+                onSliderValueChange = {
                     isScrollingThroughPages = true
-                }
-
-                override fun onStopTrackingTouch(slider: Slider) {
-                    isScrollingThroughPages = false
-                }
-            },
-        )
-        binding.pageSlider.addOnChangeListener { slider, value, fromUser ->
-            if (viewer != null && fromUser) {
-                isScrollingThroughPages = true
-                moveToPageIndex(value.toInt())
-                slider.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-            }
+                    moveToPageIndex(it)
+                },
+            )
         }
 
         initBottomShortcuts()
@@ -707,10 +701,6 @@ class ReaderActivity : EhActivity() {
             alpha = if (isNightMode()) 230 else 242 // 90% dark 95% light
         }
         binding.toolbarBottom.background = toolbarBackground.copy(this@ReaderActivity)
-
-        binding.readerSeekbar.background = toolbarBackground.copy(this@ReaderActivity)?.apply {
-            setCornerSize(999F)
-        }
 
         val toolbarColor = ColorUtils.setAlphaComponent(
             toolbarBackground.resolvedTintColor,
@@ -866,24 +856,8 @@ class ReaderActivity : EhActivity() {
      */
     @SuppressLint("SetTextI18n")
     fun onPageSelected(page: ReaderPage) {
-        val pages = mGalleryProvider?.mPages ?: return
-
         // Set bottom page number
         currentPage = page.number
-
-        // Set page numbers
-        if (viewer !is R2LPagerViewer) {
-            binding.leftPageText.text = "${page.number}"
-            binding.rightPageText.text = "${pages.size}"
-        } else {
-            binding.rightPageText.text = "${page.number}"
-            binding.leftPageText.text = "${pages.size}"
-        }
-
-        // Set slider progress
-        binding.pageSlider.isEnabled = pages.size > 1
-        binding.pageSlider.valueTo = max(pages.lastIndex.toFloat(), 1f)
-        binding.pageSlider.value = page.index.toFloat()
 
         mCurrentIndex = page.index
         mGalleryProvider?.putStartPage(mCurrentIndex)
@@ -1064,7 +1038,7 @@ class ReaderActivity : EhActivity() {
         }
 
         fun setReaderSeekbarVisibility(visible: Boolean) {
-            binding.readerSeekbar.isVisible = visible
+            binding.readerNav.isVisible = visible
         }
 
         /**
