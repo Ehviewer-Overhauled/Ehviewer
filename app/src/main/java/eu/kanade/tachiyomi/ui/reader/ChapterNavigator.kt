@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -20,10 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import eu.kanade.tachiyomi.util.system.isTabletUi
@@ -39,7 +39,7 @@ fun ChapterNavigator(
     val isTabletUi = LocalConfiguration.current.isTabletUi()
     val horizontalPadding = if (isTabletUi) 24.dp else 16.dp
     val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-    val haptic = LocalHapticFeedback.current
+    val view = LocalView.current
 
     // We explicitly handle direction based on the reader viewer rather than the system direction
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -61,7 +61,7 @@ fun ChapterNavigator(
                         val sliderDragged by interactionSource.collectIsDraggedAsState()
                         LaunchedEffect(currentPage) {
                             if (sliderDragged) {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                             }
                         }
                         Slider(
