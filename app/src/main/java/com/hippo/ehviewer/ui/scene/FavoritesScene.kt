@@ -91,19 +91,10 @@ class FavoritesScene :
     CustomChoiceListener {
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
-
-    // For modify action
     private val mModifyGiList: MutableList<GalleryInfo> = ArrayList()
-    var current = // -1 for error
-        0
-    var limit = // -1 for error
-        0
-
     private var mAdapter: FavoritesAdapter? = null
-
     private lateinit var mHelper: FavoritesHelper
     private lateinit var mActionFabDrawable: AddDeleteDrawable
-
     private var mUrlBuilder: FavListUrlBuilder? = null
     private val showNormalFabsRunnable = Runnable {
         updateJumpFab() // index: 0, 2
