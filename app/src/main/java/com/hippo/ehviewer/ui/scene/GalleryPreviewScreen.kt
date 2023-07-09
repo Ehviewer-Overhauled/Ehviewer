@@ -43,6 +43,9 @@ import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import androidx.room.paging.util.getClippedRefreshKey
+import androidx.room.paging.util.getLimit
+import androidx.room.paging.util.getOffset
 import arrow.fx.coroutines.parMap
 import coil.imageLoader
 import com.hippo.ehviewer.R
@@ -101,12 +104,13 @@ class GalleryPreviewScreen : Fragment() {
 
                 val previewPagesMap = rememberMemorized { galleryDetail.previewList.associateBy { it.position } as MutableMap }
                 val data = remember {
-                    Pager(PagingConfig(pageSize = pgSize, initialLoadSize = pgSize)) {
+                    Pager(PagingConfig(pageSize = pgSize, initialLoadSize = pgSize, jumpThreshold = 2 * pgSize)) {
                         object : PagingSource<Int, GalleryPreview>() {
-                            override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = ((state.anchorPosition ?: 0) - state.config.initialLoadSize / 2).coerceAtLeast(0)
+                            override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = state.getClippedRefreshKey()
                             override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
-                                val up = params.key ?: 0
-                                val end = (up + params.loadSize - 1).coerceAtMost(pages - 1)
+                                val key = params.key ?: 0
+                                val up = getOffset(params, key, pages)
+                                val end = (up + getLimit(params, key) - 1).coerceAtMost(pages - 1)
                                 runSuspendCatching {
                                     (up..end).filterNot { it in previewPagesMap }.map { it / pgSize }.toSet()
                                         .parMap(Dispatchers.IO) { getPreviewListByPage(it) }
@@ -119,7 +123,6 @@ class GalleryPreviewScreen : Fragment() {
                                 val nextK = if (end == pages - 1) null else end + 1
                                 return LoadResult.Page(r, prevK, nextK, up, pages - end - 1)
                             }
-                            override val keyReuseSupported = true
                             override val jumpingSupported = true
                         }
                     }.flow.cachedIn(lifecycleScope)
