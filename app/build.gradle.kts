@@ -209,7 +209,6 @@ dependencies {
     implementation("com.drakeet.drawer:drawer:1.0.3")
     implementation("com.github.chrisbanes:PhotoView:2.3.0") // Dead Dependency
     implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") // Dead Dependency
-    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.6.3")
     // https://github.com/google/accompanist/releases
     val accompanist_version = "0.31.4-beta"
     implementation("com.google.accompanist:accompanist-themeadapter-material3:$accompanist_version")

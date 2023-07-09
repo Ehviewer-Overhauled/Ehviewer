@@ -72,7 +72,7 @@ import com.hippo.ehviewer.ui.tools.rememberDialogState
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.delay
-import my.nanihadesuka.compose.InternalLazyColumnScrollbar
+import my.nanihadesuka.compose.LazyColumnScrollbar
 
 class HistoryScene : BaseScene() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -171,11 +171,7 @@ class HistoryScene : BaseScene() {
                             }
                         }
                         Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
-                            InternalLazyColumnScrollbar(
-                                listState = state,
-                                thumbColor = MaterialTheme.colorScheme.primary,
-                                thumbSelectedColor = MaterialTheme.colorScheme.primary,
-                            )
+                            LazyColumnScrollbar(listState = state)
                         }
                     }
                     Deferred({ delay(200) }) {
