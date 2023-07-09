@@ -49,10 +49,12 @@ import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
+import com.hippo.ehviewer.client.data.FavListUrlBuilder.Companion.FAV_CAT_LOCAL
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.main.GalleryInfoListItem
 import com.hippo.ehviewer.ui.setMD3Content
@@ -72,7 +74,7 @@ class ComposeFavScene : BaseScene() {
                     var active by remember { mutableStateOf(false) }
                     val favCatName: String = when (curFav) {
                         in 0..9 -> Settings.favCat[curFav]
-                        FavListUrlBuilder.FAV_CAT_LOCAL -> stringResource(id = R.string.local_favorites)
+                        FAV_CAT_LOCAL -> stringResource(id = R.string.local_favorites)
                         else -> stringResource(id = R.string.cloud_favorites)
                     }
                     SearchBar(
@@ -92,7 +94,12 @@ class ComposeFavScene : BaseScene() {
                 },
             ) {
                 val favBuilder = rememberSaveable(curFav) { FavListUrlBuilder(favCat = curFav) }
-                val data = remember(curFav) {
+                val localFavData = remember {
+                    Pager(PagingConfig(25)) {
+                        EhDB.localFavLazyList
+                    }.flow.cachedIn(lifecycleScope)
+                }.collectAsLazyPagingItems()
+                val cloudData = remember(curFav) {
                     Pager(PagingConfig(25)) {
                         object : PagingSource<String, GalleryInfo>() {
                             override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
@@ -116,6 +123,7 @@ class ComposeFavScene : BaseScene() {
                         }
                     }.flow.cachedIn(lifecycleScope)
                 }.collectAsLazyPagingItems()
+                val data = if (curFav == FAV_CAT_LOCAL) localFavData else cloudData
                 val height = remember { (3 * Settings.listThumbSize * 3).pxToDp.dp }
                 LazyColumn(
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),

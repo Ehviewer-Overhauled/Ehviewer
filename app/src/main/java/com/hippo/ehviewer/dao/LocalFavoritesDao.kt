@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -9,6 +10,9 @@ import androidx.room.Query
 interface LocalFavoritesDao : BasicDao<LocalFavoriteInfo> {
     @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
     override fun list(): List<LocalFavoriteInfo>
+
+    @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
+    fun listLazy(): PagingSource<Int, LocalFavoriteInfo>
 
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE TITLE LIKE :title ORDER BY TIME DESC")
     fun list(title: String): List<LocalFavoriteInfo>

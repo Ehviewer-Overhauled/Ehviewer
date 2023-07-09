@@ -268,9 +268,11 @@ object EhDB {
         dao.update(list)
     }
 
-    @get:Synchronized
     val historyLazyList: PagingSource<Int, HistoryInfo>
         get() = db.historyDao().listLazy()
+
+    val localFavLazyList: PagingSource<Int, LocalFavoriteInfo>
+        get() = db.localFavoritesDao().listLazy()
 
     @Synchronized
     fun putHistoryInfo(galleryInfo: GalleryInfo?) {
