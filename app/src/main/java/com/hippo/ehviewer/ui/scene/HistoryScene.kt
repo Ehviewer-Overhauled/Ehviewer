@@ -124,8 +124,6 @@ class HistoryScene : BaseScene() {
                             contentType = historyData.itemContentType(),
                         ) { index ->
                             val info = historyData[index]
-                            // TODO: item delete & add animation
-                            // Bug tracker: https://issuetracker.google.com/issues/150812265
                             info?.let {
                                 val dismissState = rememberDismissState(
                                     confirmValueChange = {
