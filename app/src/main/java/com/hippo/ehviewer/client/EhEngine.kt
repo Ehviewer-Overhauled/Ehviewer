@@ -102,6 +102,7 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
 
     // Check bad response code
     if (code >= 400) {
+        Log.d(TAG, "Code: $code\nHeaders: $headers\nBody: $body")
         throw StatusCodeException(code)
     }
 
