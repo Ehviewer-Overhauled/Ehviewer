@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ElevatedCard
@@ -14,20 +15,73 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.cachedIn
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhEngine
+import com.hippo.ehviewer.client.data.FavListUrlBuilder
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.ui.main.GalleryInfoListItem
 import com.hippo.ehviewer.ui.setMD3Content
+import eu.kanade.tachiyomi.util.system.pxToDp
 
 class ComposeFavScene : SearchBarScene() {
+    private var curFav by mutableIntStateOf(Settings.recentFavCat)
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(inflater.context).apply {
         setMD3Content {
+            val favBuilder = rememberSaveable(curFav) { FavListUrlBuilder(favCat = curFav) }
+            val data = remember(curFav) {
+                Pager(PagingConfig(25)) {
+                    object : PagingSource<Long, GalleryInfo>() {
+                        override fun getRefreshKey(state: PagingState<Long, GalleryInfo>) = null
+                        override suspend fun load(params: LoadParams<Long>): LoadResult<Long, GalleryInfo> {
+                            val r = EhEngine.getFavorites(favBuilder.build())
+                            return LoadResult.Page(r.galleryInfoList, null, null)
+                        }
+                    }
+                }.flow.cachedIn(lifecycleScope)
+            }.collectAsLazyPagingItems()
+            val height = remember { (3 * Settings.listThumbSize * 3).pxToDp.dp }
+            LazyColumn {
+                items(
+                    count = data.itemCount,
+                    key = data.itemKey(key = { item -> item.gid }),
+                    contentType = data.itemContentType(),
+                ) { index ->
+                    val item = data[index]
+                    if (item != null) {
+                        GalleryInfoListItem(
+                            onClick = {},
+                            onLongClick = {},
+                            info = item,
+                            modifier = Modifier.height(height),
+                            isInFavScene = true,
+                            showPages = Settings.showGalleryPages,
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -56,7 +110,7 @@ class ComposeFavScene : SearchBarScene() {
                             ListItem(
                                 headlineContent = { Text(text = name) },
                                 trailingContent = { Text(text = count.toString(), style = MaterialTheme.typography.bodyLarge) },
-                                modifier = Modifier.clickable { },
+                                modifier = Modifier.clickable { curFav = index - 2 },
                             )
                         }
                     }
