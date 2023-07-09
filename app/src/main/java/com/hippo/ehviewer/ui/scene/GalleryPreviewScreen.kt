@@ -5,20 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CallMissedOutgoing
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -29,11 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
@@ -65,11 +61,10 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.rememberMemorized
 import com.hippo.ehviewer.util.getParcelableCompat
-import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
-import kotlin.math.roundToInt
+import my.nanihadesuka.compose.LazyGridScrollbar
 
 class GalleryPreviewScreen : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -102,24 +97,6 @@ class GalleryPreviewScreen : Fragment() {
                         }
                     }
                     result.first.first
-                }
-
-                suspend fun showGoToDialog() {
-                    val toPage = dialogState.show(initial = 1F, title = R.string.go_to) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 18.dp)) {
-                            Text(text = "1", modifier = Modifier.padding(12.dp))
-                            Slider(
-                                value = expectedValue,
-                                onValueChange = { expectedValue = it },
-                                modifier = Modifier.height(48.dp).width(0.dp).weight(1F).align(Alignment.CenterVertically),
-                                valueRange = 1f..galleryDetail.previewPages.toFloat(),
-                                steps = galleryDetail.previewPages - 2,
-                            )
-                            Text(text = pages.toString(), modifier = Modifier.padding(12.dp))
-                        }
-                    }.roundToInt()
-                    val index = (toPage - 1) * pgSize
-                    withUIContext { state.scrollToItem(index) }
                 }
 
                 val previewPagesMap = rememberMemorized { galleryDetail.previewList.associateBy { it.position } as MutableMap }
@@ -157,41 +134,39 @@ class GalleryPreviewScreen : Fragment() {
                                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                                 }
                             },
-                            actions = {
-                                if (galleryDetail.previewPages > 1) {
-                                    IconButton(onClick = { coroutineScope.launch { showGoToDialog() } }) {
-                                        Icon(imageVector = Icons.Default.CallMissedOutgoing, contentDescription = null)
-                                    }
-                                }
-                            },
                             scrollBehavior = scrollBehaviour,
                         )
                     },
                 ) { paddingValues ->
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(columnCount),
-                        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
-                        state = state,
-                        contentPadding = paddingValues,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        items(
-                            count = data.itemCount,
-                            key = data.itemKey(key = { item -> item.position }),
-                            contentType = data.itemContentType(),
-                        ) { index ->
-                            val item = data[index]
-                            if (item != null) {
-                                EhPreviewItem(item) {
-                                    onPreviewCLick(item.position)
-                                }
-                            } else {
-                                EhPreviewItemPlaceholder(index) {
-                                    onPreviewCLick(index)
+                    Box {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(columnCount),
+                            modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection).padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
+                            state = state,
+                            contentPadding = paddingValues,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            items(
+                                count = data.itemCount,
+                                key = data.itemKey(key = { item -> item.position }),
+                                contentType = data.itemContentType(),
+                            ) { index ->
+                                val item = data[index]
+                                if (item != null) {
+                                    EhPreviewItem(item) {
+                                        onPreviewCLick(item.position)
+                                    }
+                                } else {
+                                    EhPreviewItemPlaceholder(index) {
+                                        onPreviewCLick(index)
+                                    }
                                 }
                             }
                         }
+                    }
+                    Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
+                        LazyGridScrollbar(listState = state)
                     }
                 }
             }
