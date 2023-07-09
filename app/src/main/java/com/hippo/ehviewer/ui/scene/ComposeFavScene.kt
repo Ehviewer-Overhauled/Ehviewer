@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.dimensionResource
@@ -90,11 +94,24 @@ class ComposeFavScene : BaseScene() {
                 val favBuilder = rememberSaveable(curFav) { FavListUrlBuilder(favCat = curFav) }
                 val data = remember(curFav) {
                     Pager(PagingConfig(25)) {
-                        object : PagingSource<Long, GalleryInfo>() {
-                            override fun getRefreshKey(state: PagingState<Long, GalleryInfo>) = null
-                            override suspend fun load(params: LoadParams<Long>): LoadResult<Long, GalleryInfo> {
+                        object : PagingSource<String, GalleryInfo>() {
+                            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
+                            override suspend fun load(params: LoadParams<String>): LoadResult<String, GalleryInfo> {
+                                when (params) {
+                                    is LoadParams.Prepend -> {
+                                        favBuilder.setIndex(params.key, isNext = false)
+                                    }
+                                    is LoadParams.Append -> {
+                                        favBuilder.setIndex(params.key, isNext = true)
+                                    }
+                                    is LoadParams.Refresh -> {
+                                    }
+                                }
                                 val r = EhEngine.getFavorites(favBuilder.build())
-                                return LoadResult.Page(r.galleryInfoList, null, null)
+                                Settings.favCat = r.catArray
+                                Settings.favCount = r.countArray
+                                Settings.favCloudCount = r.countArray.sum()
+                                return LoadResult.Page(r.galleryInfoList, r.prev, r.next)
                             }
                         }
                     }.flow.cachedIn(lifecycleScope)
@@ -105,6 +122,16 @@ class ComposeFavScene : BaseScene() {
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
                     contentPadding = it,
                 ) {
+                    if (data.itemCount == 0) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
                     items(
                         count = data.itemCount,
                         key = data.itemKey(key = { item -> item.gid }),
@@ -160,7 +187,10 @@ class ComposeFavScene : BaseScene() {
                             ListItem(
                                 headlineContent = { Text(text = name) },
                                 trailingContent = { Text(text = count.toString(), style = MaterialTheme.typography.bodyLarge) },
-                                modifier = Modifier.clickable { curFav = index - 2 },
+                                modifier = Modifier.clickable {
+                                    curFav = index - 2
+                                    toggleDrawer(GravityCompat.END)
+                                },
                             )
                         }
                     }
