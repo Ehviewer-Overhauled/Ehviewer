@@ -100,3 +100,18 @@ fun EhPreviewItem(
     }
     Text((galleryPreview.position + 1).toString())
 }
+
+@Composable
+fun EhPreviewItemPlaceholder(
+    position: Int,
+    onClick: () -> Unit,
+) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Box(contentAlignment = Alignment.Center) {
+        CrystalCard(
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth().aspectRatio(0.6666667F),
+        ) {
+        }
+    }
+    Text((position + 1).toString())
+}

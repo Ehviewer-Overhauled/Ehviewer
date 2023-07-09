@@ -22,8 +22,9 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,7 +45,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
-import arrow.core.partially1
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import arrow.fx.coroutines.parMap
 import coil.imageLoader
 import com.hippo.ehviewer.R
@@ -57,17 +59,17 @@ import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
+import com.hippo.ehviewer.ui.main.EhPreviewItemPlaceholder
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.rememberMemorized
 import com.hippo.ehviewer.util.getParcelableCompat
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import kotlin.math.roundToInt
-
-typealias PreviewPage = List<GalleryPreview>
 
 class GalleryPreviewScreen : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -76,7 +78,7 @@ class GalleryPreviewScreen : Fragment() {
                 val galleryDetail = remember { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
                 val context = LocalContext.current
                 fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail, index)
-                val toNextPage = rememberSaveable { requireArguments().getBoolean(KEY_NEXT_PAGE) }
+                var toNextPage by rememberSaveable { mutableStateOf(requireArguments().getBoolean(KEY_NEXT_PAGE)) }
                 val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
                 val columnCount = calculateSuitableSpanCount()
                 val state = rememberLazyGridState()
@@ -85,8 +87,12 @@ class GalleryPreviewScreen : Fragment() {
                 val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
                 val pages = galleryDetail.pages
                 val pgSize = galleryDetail.previewList.size
-                var initialKey by rememberSaveable { mutableIntStateOf(if (toNextPage) 2 else 1) }
-                val prefetchDistance = PREFETCH_THUMBS / pgSize
+
+                LaunchedEffect(Unit) {
+                    delay(500)
+                    if (toNextPage) state.animateScrollToItem(pgSize)
+                    toNextPage = false
+                }
 
                 suspend fun getPreviewListByPage(page: Int) = galleryDetail.run {
                     val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
@@ -100,7 +106,7 @@ class GalleryPreviewScreen : Fragment() {
                 }
 
                 suspend fun showGoToDialog() {
-                    initialKey = dialogState.show(initial = 1F, title = R.string.go_to) {
+                    val toPage = dialogState.show(initial = 1F, title = R.string.go_to) {
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 18.dp)) {
                             Text(text = "1", modifier = Modifier.padding(12.dp))
                             Slider(
@@ -113,28 +119,32 @@ class GalleryPreviewScreen : Fragment() {
                             Text(text = pages.toString(), modifier = Modifier.padding(12.dp))
                         }
                     }.roundToInt()
+                    val index = (toPage - 1) * pgSize
+                    state.animateScrollToItem(index)
                 }
 
-                val previewPagesMap = rememberMemorized { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
-                val data = remember(initialKey) {
-                    Pager(PagingConfig(1, prefetchDistance = prefetchDistance, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
-                        object : PagingSource<Int, PreviewPage>() {
-                            override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = null
-                            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
-                                val up = params.key ?: 1
-                                val end = (up + params.loadSize - 1).coerceAtMost(galleryDetail.previewPages)
+                val previewPagesMap = rememberMemorized { galleryDetail.previewList.associateBy { it.position } as MutableMap }
+                val data = remember {
+                    Pager(PagingConfig(pageSize = pgSize, initialLoadSize = pgSize)) {
+                        object : PagingSource<Int, GalleryPreview>() {
+                            override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = ((state.anchorPosition ?: 0) - state.config.initialLoadSize / 2).coerceAtLeast(0)
+                            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
+                                val up = params.key ?: 0
+                                val end = (up + params.loadSize - 1).coerceAtMost(pages - 1)
                                 runSuspendCatching {
-                                    (up..end).mapNotNull { it.takeUnless { previewPagesMap.contains(it) } }
-                                        .parMap(Dispatchers.IO) { getPreviewListByPage(it - 1).apply { previewPagesMap[it] = this } }
+                                    (up..end).filterNot { it in previewPagesMap }.map { it / pgSize }.toSet()
+                                        .parMap(Dispatchers.IO) { getPreviewListByPage(it) }
+                                        .forEach { previews -> previews.forEach { previewPagesMap[it.position] = it } }
                                 }.onFailure {
                                     return LoadResult.Error(it)
                                 }
-                                val r = (up..end).map { previewPagesMap[it]!! }
-                                val prevK = if (up == 1) null else up - 1
-                                val nextK = if (end == galleryDetail.previewPages) null else end + 1
-                                return LoadResult.Page(r, prevK, nextK)
+                                val r = (up..end).map { requireNotNull(previewPagesMap[it]) }
+                                val prevK = if (up == 0) null else up - 1
+                                val nextK = if (end == pages - 1) null else end + 1
+                                return LoadResult.Page(r, prevK, nextK, up, pages - end - 1)
                             }
                             override val keyReuseSupported = true
+                            override val jumpingSupported = true
                         }
                     }.flow.cachedIn(lifecycleScope)
                 }.collectAsLazyPagingItems()
@@ -150,9 +160,7 @@ class GalleryPreviewScreen : Fragment() {
                             },
                             actions = {
                                 if (galleryDetail.previewPages > 1) {
-                                    IconButton(onClick = {
-                                        coroutineScope.launch { showGoToDialog() }
-                                    }) {
+                                    IconButton(onClick = { coroutineScope.launch { showGoToDialog() } }) {
                                         Icon(imageVector = Icons.Default.CallMissedOutgoing, contentDescription = null)
                                     }
                                 }
@@ -169,14 +177,21 @@ class GalleryPreviewScreen : Fragment() {
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        val realList = data.itemSnapshotList.items.flatten()
                         items(
-                            count = realList.size,
-                            key = { realList[it].position },
+                            count = data.itemCount,
+                            key = data.itemKey(key = { item -> item.position }),
+                            contentType = data.itemContentType(),
                         ) { index ->
-                            data[index / pgSize] // Trigger item preload
-                            val item = realList[index]
-                            item.position.let { ::onPreviewCLick.partially1(it) }.let { EhPreviewItem(item, it) }
+                            val item = data[index]
+                            if (item != null) {
+                                EhPreviewItem(item) {
+                                    onPreviewCLick(item.position)
+                                }
+                            } else {
+                                EhPreviewItemPlaceholder(index) {
+                                    onPreviewCLick(index)
+                                }
+                            }
                         }
                     }
                 }
@@ -187,4 +202,3 @@ class GalleryPreviewScreen : Fragment() {
 
 const val KEY_GALLERY_DETAIL = "gallery_detail"
 const val KEY_NEXT_PAGE = "next_page"
-private const val PREFETCH_THUMBS = 200
