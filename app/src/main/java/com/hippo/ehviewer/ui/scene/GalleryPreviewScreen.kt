@@ -119,7 +119,7 @@ class GalleryPreviewScreen : Fragment() {
                                     return LoadResult.Error(it)
                                 }
                                 val r = (up..end).map { requireNotNull(previewPagesMap[it]) }
-                                val prevK = if (up == 0) null else up - 1
+                                val prevK = if (up <= 0 || r.isEmpty()) null else up
                                 val nextK = if (end == pages - 1) null else end + 1
                                 return LoadResult.Page(r, prevK, nextK, up, pages - end - 1)
                             }
