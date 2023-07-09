@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.LaunchedEffect
@@ -42,43 +44,57 @@ import com.hippo.ehviewer.ui.main.GalleryInfoListItem
 import com.hippo.ehviewer.ui.setMD3Content
 import eu.kanade.tachiyomi.util.system.pxToDp
 
-class ComposeFavScene : SearchBarScene() {
+class ComposeFavScene : BaseScene() {
     private var curFav by mutableIntStateOf(Settings.recentFavCat)
-    override fun onCreateViewWithToolbar(
+
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(inflater.context).apply {
         setMD3Content {
-            val favBuilder = rememberSaveable(curFav) { FavListUrlBuilder(favCat = curFav) }
-            val data = remember(curFav) {
-                Pager(PagingConfig(25)) {
-                    object : PagingSource<Long, GalleryInfo>() {
-                        override fun getRefreshKey(state: PagingState<Long, GalleryInfo>) = null
-                        override suspend fun load(params: LoadParams<Long>): LoadResult<Long, GalleryInfo> {
-                            val r = EhEngine.getFavorites(favBuilder.build())
-                            return LoadResult.Page(r.galleryInfoList, null, null)
-                        }
+            Scaffold(
+                topBar = {
+                    SearchBar(
+                        query = "",
+                        onQueryChange = { },
+                        onSearch = { },
+                        active = false,
+                        onActiveChange = {},
+                    ) {
                     }
-                }.flow.cachedIn(lifecycleScope)
-            }.collectAsLazyPagingItems()
-            val height = remember { (3 * Settings.listThumbSize * 3).pxToDp.dp }
-            LazyColumn {
-                items(
-                    count = data.itemCount,
-                    key = data.itemKey(key = { item -> item.gid }),
-                    contentType = data.itemContentType(),
-                ) { index ->
-                    val item = data[index]
-                    if (item != null) {
-                        GalleryInfoListItem(
-                            onClick = {},
-                            onLongClick = {},
-                            info = item,
-                            modifier = Modifier.height(height),
-                            isInFavScene = true,
-                            showPages = Settings.showGalleryPages,
-                        )
+                },
+            ) {
+                val favBuilder = rememberSaveable(curFav) { FavListUrlBuilder(favCat = curFav) }
+                val data = remember(curFav) {
+                    Pager(PagingConfig(25)) {
+                        object : PagingSource<Long, GalleryInfo>() {
+                            override fun getRefreshKey(state: PagingState<Long, GalleryInfo>) = null
+                            override suspend fun load(params: LoadParams<Long>): LoadResult<Long, GalleryInfo> {
+                                val r = EhEngine.getFavorites(favBuilder.build())
+                                return LoadResult.Page(r.galleryInfoList, null, null)
+                            }
+                        }
+                    }.flow.cachedIn(lifecycleScope)
+                }.collectAsLazyPagingItems()
+                val height = remember { (3 * Settings.listThumbSize * 3).pxToDp.dp }
+                LazyColumn(contentPadding = it) {
+                    items(
+                        count = data.itemCount,
+                        key = data.itemKey(key = { item -> item.gid }),
+                        contentType = data.itemContentType(),
+                    ) { index ->
+                        val item = data[index]
+                        if (item != null) {
+                            GalleryInfoListItem(
+                                onClick = {},
+                                onLongClick = {},
+                                info = item,
+                                modifier = Modifier.height(height),
+                                isInFavScene = true,
+                                showPages = Settings.showGalleryPages,
+                            )
+                        }
                     }
                 }
             }
