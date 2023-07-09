@@ -65,6 +65,7 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.rememberMemorized
 import com.hippo.ehviewer.util.getParcelableCompat
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
@@ -118,7 +119,7 @@ class GalleryPreviewScreen : Fragment() {
                         }
                     }.roundToInt()
                     val index = (toPage - 1) * pgSize
-                    state.scrollToItem(index)
+                    withUIContext { state.scrollToItem(index) }
                 }
 
                 val previewPagesMap = rememberMemorized { galleryDetail.previewList.associateBy { it.position } as MutableMap }
