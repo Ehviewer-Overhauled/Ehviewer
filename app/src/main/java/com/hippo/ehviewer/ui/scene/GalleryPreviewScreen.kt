@@ -2,7 +2,6 @@ package com.hippo.ehviewer.ui.scene
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,107 +69,105 @@ import moe.tarsin.coroutines.runSuspendCatching
 import my.nanihadesuka.compose.LazyGridScrollbar
 
 class GalleryPreviewScreen : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(inflater.context).apply {
-            setMD3Content {
-                val galleryDetail = remember { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
-                val context = LocalContext.current
-                fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail, index)
-                var toNextPage by rememberSaveable { mutableStateOf(requireArguments().getBoolean(KEY_NEXT_PAGE)) }
-                val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
-                val columnCount = calculateSuitableSpanCount()
-                val state = rememberLazyGridState()
-                val dialogState = rememberDialogState()
-                dialogState.Handler()
-                val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
-                val pages = galleryDetail.pages
-                val pgSize = galleryDetail.previewList.size
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = ComposeView(inflater.context).apply {
+        setMD3Content {
+            val galleryDetail = remember { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
+            val context = LocalContext.current
+            fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail, index)
+            var toNextPage by rememberSaveable { mutableStateOf(requireArguments().getBoolean(KEY_NEXT_PAGE)) }
+            val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
+            val columnCount = calculateSuitableSpanCount()
+            val state = rememberLazyGridState()
+            val dialogState = rememberDialogState()
+            dialogState.Handler()
+            val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+            val pages = galleryDetail.pages
+            val pgSize = galleryDetail.previewList.size
 
-                LaunchedEffect(Unit) {
-                    if (toNextPage) state.scrollToItem(pgSize)
-                    toNextPage = false
-                }
+            LaunchedEffect(Unit) {
+                if (toNextPage) state.scrollToItem(pgSize)
+                toNextPage = false
+            }
 
-                suspend fun getPreviewListByPage(page: Int) = galleryDetail.run {
-                    val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
-                    val result = EhEngine.getPreviewList(url)
-                    if (Settings.preloadThumbAggressively) {
-                        coroutineScope.launch {
-                            context.run { result.first.first.forEach { imageLoader.enqueue(imageRequest(it) { justDownload() }) } }
-                        }
+            suspend fun getPreviewListByPage(page: Int) = galleryDetail.run {
+                val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
+                val result = EhEngine.getPreviewList(url)
+                if (Settings.preloadThumbAggressively) {
+                    coroutineScope.launch {
+                        context.run { result.first.first.forEach { imageLoader.enqueue(imageRequest(it) { justDownload() }) } }
                     }
-                    result.first.first
                 }
+                result.first.first
+            }
 
-                val previewPagesMap = rememberMemorized { galleryDetail.previewList.associateBy { it.position } as MutableMap }
-                val data = remember {
-                    Pager(PagingConfig(pageSize = pgSize, initialLoadSize = pgSize, jumpThreshold = 2 * pgSize)) {
-                        object : PagingSource<Int, GalleryPreview>() {
-                            override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = state.getClippedRefreshKey()
-                            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
-                                val key = params.key ?: 0
-                                val up = getOffset(params, key, pages)
-                                val end = (up + getLimit(params, key) - 1).coerceAtMost(pages - 1)
-                                runSuspendCatching {
-                                    (up..end).filterNot { it in previewPagesMap }.map { it / pgSize }.toSet()
-                                        .parMap(Dispatchers.IO) { getPreviewListByPage(it) }
-                                        .forEach { previews -> previews.forEach { previewPagesMap[it.position] = it } }
-                                }.onFailure {
-                                    return LoadResult.Error(it)
-                                }
-                                val r = (up..end).map { requireNotNull(previewPagesMap[it]) }
-                                val prevK = if (up <= 0 || r.isEmpty()) null else up
-                                val nextK = if (end == pages - 1) null else end + 1
-                                return LoadResult.Page(r, prevK, nextK, up, pages - end - 1)
+            val previewPagesMap = rememberMemorized { galleryDetail.previewList.associateBy { it.position } as MutableMap }
+            val data = remember {
+                Pager(PagingConfig(pageSize = pgSize, initialLoadSize = pgSize, jumpThreshold = 2 * pgSize)) {
+                    object : PagingSource<Int, GalleryPreview>() {
+                        override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = state.getClippedRefreshKey()
+                        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
+                            val key = params.key ?: 0
+                            val up = getOffset(params, key, pages)
+                            val end = (up + getLimit(params, key) - 1).coerceAtMost(pages - 1)
+                            runSuspendCatching {
+                                (up..end).filterNot { it in previewPagesMap }.map { it / pgSize }.toSet()
+                                    .parMap(Dispatchers.IO) { getPreviewListByPage(it) }
+                                    .forEach { previews -> previews.forEach { previewPagesMap[it.position] = it } }
+                            }.onFailure {
+                                return LoadResult.Error(it)
                             }
-                            override val jumpingSupported = true
+                            val r = (up..end).map { requireNotNull(previewPagesMap[it]) }
+                            val prevK = if (up <= 0 || r.isEmpty()) null else up
+                            val nextK = if (end == pages - 1) null else end + 1
+                            return LoadResult.Page(r, prevK, nextK, up, pages - end - 1)
                         }
-                    }.flow.cachedIn(lifecycleScope)
-                }.collectAsLazyPagingItems()
+                        override val jumpingSupported = true
+                    }
+                }.flow.cachedIn(lifecycleScope)
+            }.collectAsLazyPagingItems()
 
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = { Text(stringResource(R.string.gallery_previews)) },
-                            navigationIcon = {
-                                IconButton(onClick = { findNavController().popBackStack() }) {
-                                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.gallery_previews)) },
+                        navigationIcon = {
+                            IconButton(onClick = { findNavController().popBackStack() }) {
+                                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                            }
+                        },
+                        scrollBehavior = scrollBehaviour,
+                    )
+                },
+            ) { paddingValues ->
+                Box {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(columnCount),
+                        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection).padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
+                        state = state,
+                        contentPadding = paddingValues,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        items(
+                            count = data.itemCount,
+                            key = data.itemKey(key = { item -> item.position }),
+                            contentType = data.itemContentType(),
+                        ) { index ->
+                            val item = data[index]
+                            if (item != null) {
+                                EhPreviewItem(item) {
+                                    onPreviewCLick(item.position)
                                 }
-                            },
-                            scrollBehavior = scrollBehaviour,
-                        )
-                    },
-                ) { paddingValues ->
-                    Box {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(columnCount),
-                            modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection).padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
-                            state = state,
-                            contentPadding = paddingValues,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            items(
-                                count = data.itemCount,
-                                key = data.itemKey(key = { item -> item.position }),
-                                contentType = data.itemContentType(),
-                            ) { index ->
-                                val item = data[index]
-                                if (item != null) {
-                                    EhPreviewItem(item) {
-                                        onPreviewCLick(item.position)
-                                    }
-                                } else {
-                                    EhPreviewItemPlaceholder(index) {
-                                        onPreviewCLick(index)
-                                    }
+                            } else {
+                                EhPreviewItemPlaceholder(index) {
+                                    onPreviewCLick(index)
                                 }
                             }
                         }
                     }
-                    Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
-                        LazyGridScrollbar(listState = state)
-                    }
+                }
+                Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
+                    LazyGridScrollbar(listState = state)
                 }
             }
         }

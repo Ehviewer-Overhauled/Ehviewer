@@ -17,7 +17,6 @@ package com.hippo.ehviewer.ui.scene
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -75,122 +74,120 @@ import kotlinx.coroutines.delay
 import my.nanihadesuka.compose.LazyColumnScrollbar
 
 class HistoryScene : BaseScene() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(inflater.context).apply {
-            setMD3Content {
-                val dialogState = rememberDialogState()
-                dialogState.Handler()
-                val coroutineScope = rememberCoroutineScope()
-                val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-                val historyData = remember { Pager(PagingConfig(20, jumpThreshold = 40)) { EhDB.historyLazyList }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
-                Scaffold(
-                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                    topBar = {
-                        TopAppBar(
-                            title = { Text(text = stringResource(id = R.string.history)) },
-                            navigationIcon = {
-                                IconButton(onClick = { toggleDrawer(GravityCompat.START) }) {
-                                    Icon(imageVector = Icons.Default.Menu, contentDescription = null)
-                                }
-                            },
-                            actions = {
-                                IconButton(onClick = {
-                                    coroutineScope.launchIO {
-                                        val clear = dialogState.show(
-                                            confirmText = R.string.clear_all,
-                                            dismissText = android.R.string.cancel,
-                                            text = { Text(text = stringResource(id = R.string.clear_all_history)) },
-                                        )
-                                        if (clear) EhDB.clearHistoryInfo()
-                                    }
-                                }) {
-                                    Icon(imageVector = Icons.Default.ClearAll, contentDescription = null)
-                                }
-                            },
-                            scrollBehavior = scrollBehavior,
-                        )
-                    },
-                ) { paddingValues ->
-                    val state = rememberLazyListState()
-                    Box {
-                        val cardHeight = remember { (3 * listThumbSize * 3).pxToDp.dp }
-                        LazyColumn(
-                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
-                            state = state,
-                            contentPadding = paddingValues,
-                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
-                        ) {
-                            items(
-                                count = historyData.itemCount,
-                                key = historyData.itemKey(key = { item -> item.gid }),
-                                contentType = historyData.itemContentType(),
-                            ) { index ->
-                                val info = historyData[index]
-                                // TODO: item delete & add animation
-                                // Bug tracker: https://issuetracker.google.com/issues/150812265
-                                info?.let {
-                                    val dismissState = rememberDismissState(
-                                        confirmValueChange = {
-                                            if (it == DismissValue.DismissedToStart) {
-                                                coroutineScope.launchIO {
-                                                    EhDB.deleteHistoryInfo(info)
-                                                }
-                                            }
-                                            true
-                                        },
-                                    )
-
-                                    SwipeToDismiss(
-                                        state = dismissState,
-                                        background = {},
-                                        dismissContent = {
-                                            // TODO: item delete & add animation
-                                            // Bug tracker: https://issuetracker.google.com/issues/150812265
-                                            GalleryInfoListItem(
-                                                onClick = {
-                                                    navAnimated(
-                                                        R.id.galleryDetailScene,
-                                                        bundleOf(
-                                                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
-                                                            GalleryDetailScene.KEY_GALLERY_INFO to it,
-                                                        ),
-                                                    )
-                                                },
-                                                onLongClick = {
-                                                    coroutineScope.launchIO {
-                                                        dialogState.doGalleryInfoAction(info, context)
-                                                    }
-                                                },
-                                                info = it,
-                                                modifier = Modifier.height(cardHeight),
-                                            )
-                                        },
-                                        directions = setOf(DismissDirection.EndToStart),
-                                    )
-                                }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = ComposeView(inflater.context).apply {
+        setMD3Content {
+            val dialogState = rememberDialogState()
+            dialogState.Handler()
+            val coroutineScope = rememberCoroutineScope()
+            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+            val historyData = remember { Pager(PagingConfig(20, jumpThreshold = 40)) { EhDB.historyLazyList }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
+            Scaffold(
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                topBar = {
+                    TopAppBar(
+                        title = { Text(text = stringResource(id = R.string.history)) },
+                        navigationIcon = {
+                            IconButton(onClick = { toggleDrawer(GravityCompat.START) }) {
+                                Icon(imageVector = Icons.Default.Menu, contentDescription = null)
                             }
-                        }
-                        Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
-                            LazyColumnScrollbar(listState = state)
+                        },
+                        actions = {
+                            IconButton(onClick = {
+                                coroutineScope.launchIO {
+                                    val clear = dialogState.show(
+                                        confirmText = R.string.clear_all,
+                                        dismissText = android.R.string.cancel,
+                                        text = { Text(text = stringResource(id = R.string.clear_all_history)) },
+                                    )
+                                    if (clear) EhDB.clearHistoryInfo()
+                                }
+                            }) {
+                                Icon(imageVector = Icons.Default.ClearAll, contentDescription = null)
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                    )
+                },
+            ) { paddingValues ->
+                val state = rememberLazyListState()
+                Box {
+                    val cardHeight = remember { (3 * listThumbSize * 3).pxToDp.dp }
+                    LazyColumn(
+                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
+                        state = state,
+                        contentPadding = paddingValues,
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
+                    ) {
+                        items(
+                            count = historyData.itemCount,
+                            key = historyData.itemKey(key = { item -> item.gid }),
+                            contentType = historyData.itemContentType(),
+                        ) { index ->
+                            val info = historyData[index]
+                            // TODO: item delete & add animation
+                            // Bug tracker: https://issuetracker.google.com/issues/150812265
+                            info?.let {
+                                val dismissState = rememberDismissState(
+                                    confirmValueChange = {
+                                        if (it == DismissValue.DismissedToStart) {
+                                            coroutineScope.launchIO {
+                                                EhDB.deleteHistoryInfo(info)
+                                            }
+                                        }
+                                        true
+                                    },
+                                )
+
+                                SwipeToDismiss(
+                                    state = dismissState,
+                                    background = {},
+                                    dismissContent = {
+                                        // TODO: item delete & add animation
+                                        // Bug tracker: https://issuetracker.google.com/issues/150812265
+                                        GalleryInfoListItem(
+                                            onClick = {
+                                                navAnimated(
+                                                    R.id.galleryDetailScene,
+                                                    bundleOf(
+                                                        GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                                                        GalleryDetailScene.KEY_GALLERY_INFO to it,
+                                                    ),
+                                                )
+                                            },
+                                            onLongClick = {
+                                                coroutineScope.launchIO {
+                                                    dialogState.doGalleryInfoAction(info, context)
+                                                }
+                                            },
+                                            info = it,
+                                            modifier = Modifier.height(cardHeight),
+                                        )
+                                    },
+                                    directions = setOf(DismissDirection.EndToStart),
+                                )
+                            }
                         }
                     }
-                    Deferred({ delay(200) }) {
-                        if (historyData.itemCount == 0) {
-                            Column(
-                                modifier = Modifier.padding(paddingValues).fillMaxSize(),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.big_history),
-                                    contentDescription = null,
-                                    Modifier.padding(16.dp),
-                                )
-                                Text(
-                                    text = stringResource(id = R.string.no_history),
-                                    style = MaterialTheme.typography.headlineMedium,
-                                )
-                            }
+                    Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
+                        LazyColumnScrollbar(listState = state)
+                    }
+                }
+                Deferred({ delay(200) }) {
+                    if (historyData.itemCount == 0) {
+                        Column(
+                            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.big_history),
+                                contentDescription = null,
+                                Modifier.padding(16.dp),
+                            )
+                            Text(
+                                text = stringResource(id = R.string.no_history),
+                                style = MaterialTheme.typography.headlineMedium,
+                            )
                         }
                     }
                 }
