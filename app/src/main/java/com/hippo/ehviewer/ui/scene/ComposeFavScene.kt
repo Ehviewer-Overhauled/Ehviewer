@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -59,12 +60,18 @@ class ComposeFavScene : BaseScene() {
         setMD3Content {
             Scaffold(
                 topBar = {
+                    var active by remember { mutableStateOf(false) }
+                    val favCatName: String = when (curFav) {
+                        in 0..9 -> Settings.favCat[curFav]
+                        FavListUrlBuilder.FAV_CAT_LOCAL -> stringResource(id = R.string.local_favorites)
+                        else -> stringResource(id = R.string.cloud_favorites)
+                    }
                     SearchBar(
-                        query = "",
+                        query = favCatName,
                         onQueryChange = { },
                         onSearch = { },
-                        active = false,
-                        onActiveChange = {},
+                        active = active,
+                        onActiveChange = { active = it },
                     ) {
                     }
                 },
