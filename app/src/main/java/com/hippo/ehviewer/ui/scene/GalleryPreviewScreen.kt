@@ -32,8 +32,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.Pager
@@ -70,10 +68,7 @@ import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import my.nanihadesuka.compose.LazyGridScrollbar
 
-class VMStorage1 : ViewModel()
-
 class GalleryPreviewScreen : Fragment() {
-    private val vm: VMStorage1 by viewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = ComposeView(inflater.context).apply {
         setMD3Content {
             val galleryDetail = remember { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
@@ -128,7 +123,7 @@ class GalleryPreviewScreen : Fragment() {
                         }
                         override val jumpingSupported = true
                     }
-                }.flow.cachedIn(vm.viewModelScope)
+                }.flow.cachedIn(viewModelScope)
             }.collectAsLazyPagingItems()
 
             Scaffold(
