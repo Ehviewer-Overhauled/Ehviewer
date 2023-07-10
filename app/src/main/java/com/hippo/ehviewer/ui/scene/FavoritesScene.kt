@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.app.Activity
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -71,18 +70,15 @@ import com.hippo.ehviewer.ui.legacy.EasyRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
-import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
-import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import java.time.Instant
 import java.time.LocalDateTime
@@ -98,9 +94,6 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
     private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
     private var mAdapterDelegate: GalleryAdapter? = null
     private var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
-    private var mEnableModify = false
-    private var mModifyFavCat = 0
-    private var mModifyAdd = false
     private val showNormalFabsRunnable = Runnable {
         updateJumpFab() // index: 0, 2
         binding.fabLayout.run {
@@ -461,36 +454,29 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
             }
         }
         when (position) {
-            3 -> // Check all
-                binding.recyclerView.checkAll()
+            // Check all
+            3 -> binding.recyclerView.checkAll()
 
-            4 -> { // Download
-                val activity: Activity? = mainActivity
-                if (activity != null) {
-                    CommonOperations.startDownload(mainActivity!!, modifyList, false)
-                }
+            // Download
+            4 -> {
+                CommonOperations.startDownload(mainActivity!!, modifyList, false)
                 modifyList.clear()
-                if (binding.recyclerView.isInCustomChoice) {
-                    binding.recyclerView.outOfCustomChoiceMode()
-                }
+                binding.recyclerView.outOfCustomChoiceMode()
             }
 
-            5 -> { // Delete
+            // Delete
+            5 -> {
                 val helper = DeleteDialogHelper()
                 BaseDialogBuilder(context)
                     .setTitle(R.string.delete_favorites_dialog_title)
-                    .setMessage(
-                        getString(
-                            R.string.delete_favorites_dialog_message,
-                            modifyList.size,
-                        ),
-                    )
+                    .setMessage(getString(R.string.delete_favorites_dialog_message, modifyList.size))
                     .setPositiveButton(android.R.string.ok, helper)
                     .setOnCancelListener(helper)
                     .show()
             }
 
-            6 -> { // Move
+            // Move
+            6 -> {
                 val helper = MoveDialogHelper()
                 // First is local favorite, the other 10 is cloud favorite
                 val array = arrayOfNulls<String>(11)
@@ -559,8 +545,8 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
                     val gidArray = modifyList.map { it.gid }.toLongArray()
                     EhDB.removeLocalFavorites(gidArray)
                 } else {
-                    mModifyFavCat = -1
-                    EhEngine.addFavoritesRange(modifyList.map { it.gid to it.token!! }.toTypedArray(), mModifyFavCat)
+                    val delArray = modifyList.map { it.gid to it.token!! }.toTypedArray()
+                    EhEngine.addFavoritesRange(delArray, -1)
                 }
                 modifyList.clear()
                 mAdapter?.refresh()
@@ -572,133 +558,34 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         }
     }
 
-    private inner class MoveDialogHelper :
-        DialogInterface.OnClickListener,
-        DialogInterface.OnCancelListener {
+    private inner class MoveDialogHelper : DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             val srcCat = urlBuilder.favCat
-            val dstCat: Int = if (which == 0) {
-                FavListUrlBuilder.FAV_CAT_LOCAL
-            } else {
-                which - 1
-            }
-            if (srcCat == dstCat) {
-                return
-            }
+            val dstCat = if (which == 0) { FavListUrlBuilder.FAV_CAT_LOCAL } else { which - 1 }
+            if (srcCat == dstCat) return
             binding.recyclerView.outOfCustomChoiceMode()
-            if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from local to cloud
-                val gidArray = modifyList.map { it.gid }.toLongArray()
-                EhDB.removeLocalFavorites(gidArray)
-                mEnableModify = true
-                mModifyFavCat = dstCat
-                mModifyAdd = true
-                mAdapter?.refresh()
-            } else if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from cloud to local
-                EhDB.putLocalFavorites(modifyList)
-                mEnableModify = true
-                mModifyFavCat = -1
-                mModifyAdd = false
-                mAdapter?.refresh()
-            } else {
-                mEnableModify = true
-                mModifyFavCat = dstCat
-                mModifyAdd = false
+            lifecycleScope.launchIO {
+                if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
+                    // Move from local to cloud
+                    val gidArray = modifyList.map { it.gid }.toLongArray()
+                    EhDB.removeLocalFavorites(gidArray)
+                }
+                if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
+                    // Move from cloud to local
+                    EhDB.putLocalFavorites(modifyList)
+                } else {
+                    // Move from cloud/local to cloud
+                    val gidArray = modifyList.map { it.gid }.toLongArray()
+                    val url = ehUrl { addPathSegments(EhUrl.FAV_PATH) }.toString()
+                    EhEngine.modifyFavorites(url, gidArray, dstCat)
+                }
+                modifyList.clear()
                 mAdapter?.refresh()
             }
         }
 
         override fun onCancel(dialog: DialogInterface) {
             modifyList.clear()
-        }
-    }
-
-    private inner class FavoritesHelper : GalleryInfoContentHelper() {
-        override fun getPageData(
-            taskId: Int,
-            type: Int,
-            page: Int,
-            index: String?,
-            isNext: Boolean,
-        ) {
-            mainActivity ?: return
-            if (mEnableModify) {
-                mEnableModify = false
-                val local = urlBuilder.favCat == FavListUrlBuilder.FAV_CAT_LOCAL
-                if (mModifyAdd) {
-                    val gidTokenArray = modifyList.map { Pair(it.gid, it.token!!) }.toTypedArray()
-                    val modifyGiListBackup: List<GalleryInfo> = ArrayList(modifyList)
-                    modifyList.clear()
-                    lifecycleScope.launchIO {
-                        runSuspendCatching {
-                            EhEngine.addFavoritesRange(gidTokenArray, mModifyFavCat)
-                        }.onSuccess {
-                            withUIContext {
-                                // onGetFavoritesLocal(urlBuilder.keyword, taskId)
-                            }
-                        }.onFailure {
-                            // TODO It's a failure, add all of backup back to db.
-                            // But how to known which one is failed?
-                            EhDB.putLocalFavorites(modifyGiListBackup)
-                            withUIContext {
-                                // onGetFavoritesLocal(urlBuilder.keyword, taskId)
-                            }
-                        }
-                    }
-                } else {
-                    val gidArray = modifyList.map { it.gid }.toLongArray()
-                    modifyList.clear()
-                    val url: String = if (local) {
-                        // Local fav is shown now, but operation need be done for cloud fav
-                        ehUrl { addPathSegments(EhUrl.FAV_PATH) }.toString()
-                    } else {
-                        urlBuilder.build()
-                    }
-                    urlBuilder.setIndex(index, true)
-                    lifecycleScope.launchIO {
-                        runSuspendCatching {
-                            EhEngine.modifyFavorites(url, gidArray, mModifyFavCat)
-                        }
-                    }
-                }
-            } else {
-                urlBuilder.setIndex(index, isNext)
-                urlBuilder.jumpTo = jumpTo
-                val url = urlBuilder.build()
-                lifecycleScope.launchIO {
-                    runSuspendCatching {
-                        EhEngine.getFavorites(url)
-                    }
-                }
-            }
-        }
-
-        override val context
-            get() = this@FavoritesScene.requireContext()
-
-        override fun notifyDataSetChanged() {
-            // Ensure outOfCustomChoiceMode to avoid error
-            binding.recyclerView.outOfCustomChoiceMode()
-            mAdapter?.notifyDataSetChanged()
-        }
-
-        override fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {
-            if (mAdapter != null) {
-                mAdapter!!.notifyItemRangeInserted(positionStart, itemCount)
-            }
-        }
-
-        override fun onShowView(hiddenView: View, shownView: View) {
-            showSearchBar()
-        }
-
-        override fun isDuplicate(d1: GalleryInfo, d2: GalleryInfo): Boolean {
-            return d1.gid == d2.gid
-        }
-
-        override fun onScrollToPosition(position: Int) {
-            if (0 == position) {
-                showSearchBar()
-            }
         }
     }
 
