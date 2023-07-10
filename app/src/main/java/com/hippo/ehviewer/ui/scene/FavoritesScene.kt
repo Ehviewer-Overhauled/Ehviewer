@@ -425,13 +425,13 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         }
     }
 
-    private fun peekCheckedInfo() = run {
+    private fun takeCheckedInfo() = run {
         val stateArray = binding.recyclerView.checkedItemPositions!!
         stateArray.valueIterator().asSequence().withIndex().filter { it.value }
             .mapNotNull { mAdapter?.peek(stateArray.keyAt(it.index)) }.toList()
-    }
+    }.also { binding.recyclerView.outOfCustomChoiceMode() }
 
-    private fun peekCheckedSize() = binding.recyclerView.checkedItemCount
+    private fun checkedSize() = binding.recyclerView.checkedItemCount
 
     override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
         val context = context ?: return
@@ -452,23 +452,17 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         when (position) {
             // Check all
             3 -> binding.recyclerView.checkAll()
-
             // Download
-            4 -> {
-                CommonOperations.startDownload(mainActivity!!, peekCheckedInfo(), false)
-                binding.recyclerView.outOfCustomChoiceMode()
-            }
-
+            4 -> CommonOperations.startDownload(mainActivity!!, takeCheckedInfo(), false)
             // Delete
             5 -> {
                 val helper = DeleteDialogHelper()
                 BaseDialogBuilder(context)
                     .setTitle(R.string.delete_favorites_dialog_title)
-                    .setMessage(getString(R.string.delete_favorites_dialog_message, peekCheckedSize()))
+                    .setMessage(getString(R.string.delete_favorites_dialog_message, checkedSize()))
                     .setPositiveButton(android.R.string.ok, helper)
                     .show()
             }
-
             // Move
             6 -> {
                 val helper = MoveDialogHelper()
@@ -532,8 +526,7 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
 
     private inner class DeleteDialogHelper : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
-            val info = peekCheckedInfo()
-            binding.recyclerView.outOfCustomChoiceMode()
+            val info = takeCheckedInfo()
             lifecycleScope.launchIO {
                 if (urlBuilder.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
                     val gidArray = info.map { it.gid }.toLongArray()
@@ -552,8 +545,7 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
             val srcCat = urlBuilder.favCat
             val dstCat = if (which == 0) { FavListUrlBuilder.FAV_CAT_LOCAL } else { which - 1 }
             if (srcCat == dstCat) return
-            val info = peekCheckedInfo()
-            binding.recyclerView.outOfCustomChoiceMode()
+            val info = takeCheckedInfo()
             lifecycleScope.launchIO {
                 if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                     // Move from local to cloud
