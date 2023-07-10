@@ -33,6 +33,8 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.core.os.bundleOf
+import androidx.core.util.valueIterator
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
@@ -76,9 +78,9 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
+import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import java.time.Instant
 import java.time.LocalDateTime
@@ -90,7 +92,6 @@ import java.util.Locale
 class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListener {
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
-    private val modifyList: MutableList<GalleryInfo> = ArrayList()
     private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
     private var mAdapterDelegate: GalleryAdapter? = null
     private var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
@@ -115,14 +116,8 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
             override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
             override suspend fun load(params: LoadParams<String>): LoadResult<String, GalleryInfo> {
                 when (params) {
-                    is LoadParams.Prepend -> {
-                        urlBuilder.setIndex(params.key, isNext = false)
-                    }
-
-                    is LoadParams.Append -> {
-                        urlBuilder.setIndex(params.key, isNext = true)
-                    }
-
+                    is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
+                    is LoadParams.Append -> urlBuilder.setIndex(params.key, isNext = true)
                     is LoadParams.Refresh -> {
                         val key = params.key
                         if (key.isNullOrBlank()) {
@@ -134,12 +129,16 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
                         }
                     }
                 }
-                val r = EhEngine.getFavorites(urlBuilder.build())
+                val r = runSuspendCatching {
+                    EhEngine.getFavorites(urlBuilder.build())
+                }.onFailure {
+                    return LoadResult.Error(it)
+                }.getOrThrow()
                 Settings.favCat = r.catArray
                 Settings.favCount = r.countArray
                 Settings.favCloudCount = r.countArray.sum()
                 urlBuilder.jumpTo = null
-                return LoadResult.Page(r.galleryInfoList, r.prev, r.next).also { logcat { it.toString() } }
+                return LoadResult.Page(r.galleryInfoList, r.prev, r.next)
             }
         }
     }.flow.cachedIn(lifecycleScope)
@@ -153,30 +152,29 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         }
     }.flow.cachedIn(lifecycleScope)
 
-    fun onItemClick(position: Int): Boolean {
+    fun onItemClick(position: Int) {
         if (isDrawerOpen(GravityCompat.END)) {
             // Skip if in search mode
-            if (binding.recyclerView.isInCustomChoice) {
-                return true
+            if (!binding.recyclerView.isInCustomChoice) {
+                switchFav(position - 2)
+                updateJumpFab()
+                closeDrawer(GravityCompat.END)
             }
-            switchFav(position - 2)
-            updateJumpFab()
-            closeDrawer(GravityCompat.END)
         } else {
             if (binding.recyclerView.isInCustomChoice) {
                 binding.recyclerView.toggleItemChecked(position)
             } else {
-                val gi = mAdapter?.peek(position) ?: return true
-                val args = Bundle()
-                args.putString(
-                    GalleryDetailScene.KEY_ACTION,
-                    GalleryDetailScene.ACTION_GALLERY_INFO,
-                )
-                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-                navAnimated(R.id.galleryDetailScene, args)
+                mAdapter?.peek(position)?.let {
+                    navAnimated(
+                        R.id.galleryDetailScene,
+                        bundleOf(
+                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                            GalleryDetailScene.KEY_GALLERY_INFO to it,
+                        ),
+                    )
+                }
             }
         }
-        return true
     }
 
     private var collectJob: Job? = null
@@ -427,6 +425,14 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         }
     }
 
+    private fun peekCheckedInfo() = run {
+        val stateArray = binding.recyclerView.checkedItemPositions!!
+        stateArray.valueIterator().asSequence().withIndex().filter { it.value }
+            .mapNotNull { mAdapter?.peek(stateArray.keyAt(it.index)) }.toList()
+    }
+
+    private fun peekCheckedSize() = binding.recyclerView.checkedItemCount
+
     override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
         val context = context ?: return
         if (!binding.recyclerView.isInCustomChoice) {
@@ -434,7 +440,7 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
                 0 -> {
                     showGoToDialog()
                 }
-                1 -> mAdapter?.refresh()
+                1 -> switchFav(urlBuilder.favCat)
                 2 -> {
                     initialKey = "1-0"
                     mAdapter?.refresh()
@@ -443,24 +449,13 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
             view.isExpanded = false
             return
         }
-        modifyList.clear()
-        val stateArray = binding.recyclerView.checkedItemPositions!!
-        for (i in 0 until stateArray.size()) {
-            if (stateArray.valueAt(i)) {
-                val gi = mAdapter?.peek(stateArray.keyAt(i))
-                if (gi != null) {
-                    modifyList.add(gi)
-                }
-            }
-        }
         when (position) {
             // Check all
             3 -> binding.recyclerView.checkAll()
 
             // Download
             4 -> {
-                CommonOperations.startDownload(mainActivity!!, modifyList, false)
-                modifyList.clear()
+                CommonOperations.startDownload(mainActivity!!, peekCheckedInfo(), false)
                 binding.recyclerView.outOfCustomChoiceMode()
             }
 
@@ -469,9 +464,8 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
                 val helper = DeleteDialogHelper()
                 BaseDialogBuilder(context)
                     .setTitle(R.string.delete_favorites_dialog_title)
-                    .setMessage(getString(R.string.delete_favorites_dialog_message, modifyList.size))
+                    .setMessage(getString(R.string.delete_favorites_dialog_message, peekCheckedSize()))
                     .setPositiveButton(android.R.string.ok, helper)
-                    .setOnCancelListener(helper)
                     .show()
             }
 
@@ -485,7 +479,6 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
                 BaseDialogBuilder(context)
                     .setTitle(R.string.move_favorites_dialog_title)
                     .setItems(array, helper)
-                    .setOnCancelListener(helper)
                     .show()
             }
         }
@@ -537,60 +530,50 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         }
     }
 
-    private inner class DeleteDialogHelper : DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
+    private inner class DeleteDialogHelper : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
+            val info = peekCheckedInfo()
             binding.recyclerView.outOfCustomChoiceMode()
             lifecycleScope.launchIO {
                 if (urlBuilder.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
-                    val gidArray = modifyList.map { it.gid }.toLongArray()
+                    val gidArray = info.map { it.gid }.toLongArray()
                     EhDB.removeLocalFavorites(gidArray)
                 } else {
-                    val delArray = modifyList.map { it.gid to it.token!! }.toTypedArray()
+                    val delArray = info.map { it.gid to it.token!! }.toTypedArray()
                     EhEngine.addFavoritesRange(delArray, -1)
                 }
-                modifyList.clear()
                 mAdapter?.refresh()
             }
         }
-
-        override fun onCancel(dialog: DialogInterface) {
-            modifyList.clear()
-        }
     }
 
-    private inner class MoveDialogHelper : DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
+    private inner class MoveDialogHelper : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             val srcCat = urlBuilder.favCat
             val dstCat = if (which == 0) { FavListUrlBuilder.FAV_CAT_LOCAL } else { which - 1 }
             if (srcCat == dstCat) return
+            val info = peekCheckedInfo()
             binding.recyclerView.outOfCustomChoiceMode()
             lifecycleScope.launchIO {
                 if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                     // Move from local to cloud
-                    val gidArray = modifyList.map { it.gid }.toLongArray()
+                    val gidArray = info.map { it.gid }.toLongArray()
                     EhDB.removeLocalFavorites(gidArray)
                 }
                 if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                     // Move from cloud to local
-                    EhDB.putLocalFavorites(modifyList)
+                    EhDB.putLocalFavorites(info)
                 } else {
                     // Move from cloud/local to cloud
-                    val gidArray = modifyList.map { it.gid }.toLongArray()
+                    val gidArray = info.map { it.gid }.toLongArray()
                     val url = ehUrl { addPathSegments(EhUrl.FAV_PATH) }.toString()
                     EhEngine.modifyFavorites(url, gidArray, dstCat)
                 }
-                modifyList.clear()
                 mAdapter?.refresh()
             }
         }
-
-        override fun onCancel(dialog: DialogInterface) {
-            modifyList.clear()
-        }
-    }
-
-    companion object {
-        private const val ANIMATE_TIME = 300L
-        private const val KEY_URL_BUILDER = "url_builder"
     }
 }
+
+private const val ANIMATE_TIME = 300L
+private const val KEY_URL_BUILDER = "url_builder"
