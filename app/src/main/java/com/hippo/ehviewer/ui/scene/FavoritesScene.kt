@@ -41,6 +41,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -80,8 +81,8 @@ import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import java.time.LocalDateTime
@@ -153,6 +154,59 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             }
         }
     }.flow.cachedIn(lifecycleScope)
+
+    fun onItemClick(position: Int): Boolean {
+        if (isDrawerOpen(GravityCompat.END)) {
+            // Skip if in search mode
+            if (binding.recyclerView.isInCustomChoice) {
+                return true
+            }
+            switchFav(position - 2)
+            updateSearchBar()
+            updateJumpFab()
+            closeDrawer(GravityCompat.END)
+        } else {
+            if (binding.recyclerView.isInCustomChoice) {
+                binding.recyclerView.toggleItemChecked(position)
+            } else {
+                val gi = mAdapter?.peek(position) ?: return true
+                val args = Bundle()
+                args.putString(
+                    GalleryDetailScene.KEY_ACTION,
+                    GalleryDetailScene.ACTION_GALLERY_INFO,
+                )
+                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
+                navAnimated(R.id.galleryDetailScene, args)
+            }
+        }
+        return true
+    }
+
+    private var collectJob: Job? = null
+
+    private fun switchFav(newCat: Int) {
+        urlBuilder.keyword = null
+        urlBuilder.favCat = newCat
+        collectJob?.cancel()
+        when (newCat) {
+            -2 -> {
+                collectJob = lifecycleScope.launchIO {
+                    localFavDataFlow.collectLatest {
+                        @Suppress("UNCHECKED_CAST")
+                        mAdapter?.submitData(it as PagingData<GalleryInfo>)
+                    }
+                }
+            }
+            else -> {
+                collectJob = lifecycleScope.launchIO {
+                    cloudDataFlow.collectLatest {
+                        mAdapter?.submitData(it)
+                    }
+                }
+            }
+        }
+        mAdapter?.refresh()
+    }
 
     private val localFavDataFlow = Pager(PagingConfig(25)) {
         EhDB.localFavLazyList
@@ -239,11 +293,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = delegateAdapter.onCreateViewHolder(parent, delegateAdapter.type)
             }.also { adapter ->
                 binding.recyclerView.adapter = adapter
-                lifecycleScope.launch {
-                    cloudDataFlow.collectLatest {
-                        adapter.submitData(it)
-                    }
-                }
+                switchFav(Settings.recentFavCat)
             }
             mAdapterDelegate = delegateAdapter
             clipToPadding = false
@@ -362,43 +412,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         }
         showSearchBar()
-    }
-
-    fun onItemClick(position: Int): Boolean {
-        if (isDrawerOpen(GravityCompat.END)) {
-            // Skip if in search mode
-            if (binding.recyclerView.isInCustomChoice) {
-                return true
-            }
-
-            // Local favorite position is 0, All favorite position is 1, so position - 2 is OK
-            val newFavCat = position - 2
-
-            // Check is the same
-            if (urlBuilder.favCat == newFavCat) {
-                return true
-            }
-            urlBuilder.keyword = null
-            urlBuilder.favCat = newFavCat
-            updateSearchBar()
-            updateJumpFab()
-            mAdapter?.refresh()
-            closeDrawer(GravityCompat.END)
-        } else {
-            if (binding.recyclerView.isInCustomChoice) {
-                binding.recyclerView.toggleItemChecked(position)
-            } else {
-                val gi = mAdapter?.peek(position) ?: return true
-                val args = Bundle()
-                args.putString(
-                    GalleryDetailScene.KEY_ACTION,
-                    GalleryDetailScene.ACTION_GALLERY_INFO,
-                )
-                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-                navAnimated(R.id.galleryDetailScene, args)
-            }
-        }
-        return true
     }
 
     fun onItemLongClick(position: Int): Boolean {
