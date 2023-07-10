@@ -1047,17 +1047,16 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         resources: Resources,
         recyclerView: RecyclerView,
         type: Int,
-    ) : GalleryAdapter(resources, recyclerView, type, true) {
+    ) : GalleryAdapter(
+        resources,
+        recyclerView,
+        type,
+        true,
+        { onItemClick(it) },
+        { onItemLongClick(it) },
+    ) {
         override fun getItemCount(): Int {
             return if (null != mHelper) mHelper!!.size() else 0
-        }
-
-        override fun onItemClick(position: Int) {
-            this@GalleryListScene.onItemClick(position)
-        }
-
-        override fun onItemLongClick(position: Int): Boolean {
-            return this@GalleryListScene.onItemLongClick(position)
         }
 
         override fun getDataAt(position: Int): GalleryInfo? {

@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.annotation.SuppressLint
 import android.content.res.Resources
 import android.graphics.Rect
 import android.view.View
@@ -36,14 +35,15 @@ import com.hippo.ehviewer.yorozuya.dp2px
 import splitties.init.appCtx
 
 abstract class GalleryAdapter(
-    private val mResources: Resources,
-    private val mRecyclerView: RecyclerView,
+    private val resources: Resources,
+    private val recyclerView: RecyclerView,
     type: Int,
-    showFavourited: Boolean,
+    private val showFavorite: Boolean,
+    private val onItemClick: (Int) -> Unit,
+    private val onItemLongClick: (Int) -> Unit,
 ) : RecyclerView.Adapter<GalleryHolder>() {
-    private val mLayoutManager: AutoStaggeredGridLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
-    private val mPaddingTopSB: Int = mResources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
-    private val mShowFavourited: Boolean
+    private val layoutManager: AutoStaggeredGridLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
+    private val mPaddingTopSB: Int = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
     private var mListDecoration: ItemDecoration? = null
     private var mGirdDecoration: MarginItemDecoration? = null
     private var mType = TYPE_INVALID
@@ -51,26 +51,23 @@ abstract class GalleryAdapter(
     var type: Int
         get() = mType
         set(type) {
-            if (type == mType) {
-                return
-            }
+            if (type == mType) return
             mType = type
-            val recyclerView = mRecyclerView
             when (type) {
                 TYPE_LIST -> {
-                    val columnWidth = mResources.getDimensionPixelOffset(
+                    val columnWidth = resources.getDimensionPixelOffset(
                         when (detailSize) {
                             0 -> R.dimen.gallery_list_column_width_long
                             1 -> R.dimen.gallery_list_column_width_short
-                            else -> throw IllegalStateException("Unexpected value: $detailSize")
+                            else -> error("Unexpected value: $detailSize")
                         },
                     )
-                    mLayoutManager.setColumnSize(columnWidth)
-                    mLayoutManager.setStrategy(STRATEGY_MIN_SIZE)
+                    layoutManager.setColumnSize(columnWidth)
+                    layoutManager.setStrategy(STRATEGY_MIN_SIZE)
                     if (null != mGirdDecoration) {
                         recyclerView.removeItemDecoration(mGirdDecoration!!)
-                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
-                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
+                        val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
+                        val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
                         recyclerView.setPadding(
                             recyclerView.paddingLeft - paddingH,
                             recyclerView.paddingTop - paddingV,
@@ -80,9 +77,9 @@ abstract class GalleryAdapter(
                         mGirdDecoration = null
                     }
                     if (null == mListDecoration) {
-                        val interval = mResources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
-                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
-                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
+                        val interval = resources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
+                        val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
+                        val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
                         mListDecoration = object : ItemDecoration() {
                             override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
                                 outRect.set(0, interval / 2, 0, interval / 2)
@@ -96,17 +93,16 @@ abstract class GalleryAdapter(
                         )
                         recyclerView.addItemDecoration(mListDecoration!!)
                     }
-                    notifyDataSetChanged()
                 }
 
                 TYPE_GRID -> {
                     val columnWidth = dp2px(appCtx, thumbSizeDp.toFloat())
-                    mLayoutManager.setColumnSize(columnWidth)
-                    mLayoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
+                    layoutManager.setColumnSize(columnWidth)
+                    layoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
                     if (null != mListDecoration) {
                         recyclerView.removeItemDecoration(mListDecoration!!)
-                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
-                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
+                        val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
+                        val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
                         recyclerView.setPadding(
                             recyclerView.paddingLeft - paddingH,
                             recyclerView.paddingTop - paddingV,
@@ -116,9 +112,9 @@ abstract class GalleryAdapter(
                         mListDecoration = null
                     }
                     if (null == mGirdDecoration) {
-                        val interval = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_interval)
-                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
-                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
+                        val interval = resources.getDimensionPixelOffset(R.dimen.gallery_grid_interval)
+                        val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
+                        val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
                         mGirdDecoration = MarginItemDecoration(interval, 0, 0, 0, 0)
                         recyclerView.setPadding(
                             recyclerView.paddingLeft + paddingH,
@@ -128,22 +124,19 @@ abstract class GalleryAdapter(
                         )
                         recyclerView.addItemDecoration(mGirdDecoration!!)
                     }
-                    notifyDataSetChanged()
                 }
             }
+            notifyDataSetChanged()
         }
 
     init {
-        mShowFavourited = showFavourited
-        mRecyclerView.adapter = this
-        mRecyclerView.layoutManager = mLayoutManager
-        @SuppressLint("InflateParams")
+        recyclerView.adapter = this
+        recyclerView.layoutManager = layoutManager
         this.type = type
         adjustPaddings()
     }
 
     private fun adjustPaddings() {
-        val recyclerView = mRecyclerView
         recyclerView.setPadding(
             recyclerView.paddingLeft,
             recyclerView.paddingTop + mPaddingTopSB,
@@ -152,17 +145,12 @@ abstract class GalleryAdapter(
         )
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryHolder {
-        val holder = when (viewType) {
-            TYPE_LIST -> ListGalleryHolder(CheckableComposeView(parent.context), mShowFavourited)
-            TYPE_GRID -> GridGalleryHolder(CheckableComposeView(parent.context))
-            else -> throw IllegalStateException("Unexpected value: $viewType")
-        }
-        return holder
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
+        TYPE_LIST -> ListGalleryHolder(CheckableComposeView(parent.context), showFavorite)
+        TYPE_GRID -> GridGalleryHolder(CheckableComposeView(parent.context))
+        else -> error("Unexpected value: $viewType")
     }
 
-    abstract fun onItemClick(position: Int)
-    abstract fun onItemLongClick(position: Int): Boolean
     override fun getItemViewType(position: Int): Int {
         return mType
     }

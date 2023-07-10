@@ -677,17 +677,16 @@ class FavoritesScene :
         resources: Resources,
         recyclerView: RecyclerView,
         type: Int,
-    ) : GalleryAdapter(resources, recyclerView, type, false) {
+    ) : GalleryAdapter(
+        resources,
+        recyclerView,
+        type,
+        false,
+        { onItemClick(it) },
+        { onItemLongClick(it) },
+    ) {
         override fun getItemCount(): Int {
             return mHelper.size()
-        }
-
-        override fun onItemClick(position: Int) {
-            this@FavoritesScene.onItemClick(position)
-        }
-
-        override fun onItemLongClick(position: Int): Boolean {
-            return this@FavoritesScene.onItemLongClick(position)
         }
 
         override fun getDataAt(position: Int): GalleryInfo? {
