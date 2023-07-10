@@ -83,6 +83,7 @@ import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withIOContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -120,7 +121,7 @@ class FavoritesScene : SearchBarScene() {
     private val cloudDataFlow = Pager(PagingConfig(25)) {
         object : PagingSource<String, GalleryInfo>() {
             override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
-            override suspend fun load(params: LoadParams<String>): LoadResult<String, GalleryInfo> {
+            override suspend fun load(params: LoadParams<String>) = withIOContext {
                 when (params) {
                     is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
                     is LoadParams.Append -> urlBuilder.setIndex(params.key, isNext = true)
@@ -138,13 +139,13 @@ class FavoritesScene : SearchBarScene() {
                 val r = runSuspendCatching {
                     EhEngine.getFavorites(urlBuilder.build())
                 }.onFailure {
-                    return LoadResult.Error(it)
+                    return@withIOContext LoadResult.Error(it)
                 }.getOrThrow()
                 Settings.favCat = r.catArray
                 Settings.favCount = r.countArray
                 Settings.favCloudCount = r.countArray.sum()
                 urlBuilder.jumpTo = null
-                return LoadResult.Page(r.galleryInfoList, r.prev, r.next)
+                LoadResult.Page(r.galleryInfoList, r.prev, r.next)
             }
         }
     }.flow.cachedIn(lifecycleScope)
