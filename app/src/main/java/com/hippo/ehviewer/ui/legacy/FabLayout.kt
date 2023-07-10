@@ -414,7 +414,7 @@ class FabLayout @JvmOverloads constructor(
         }
     }
 
-    interface OnExpandListener {
+    fun interface OnExpandListener {
         fun onExpand(expanded: Boolean)
     }
 

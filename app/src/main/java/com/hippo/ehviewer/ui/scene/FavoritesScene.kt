@@ -70,7 +70,6 @@ import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EasyRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
-import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
@@ -89,7 +88,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener, OnExpandListener, CustomChoiceListener {
+class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener, CustomChoiceListener {
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
     private val mModifyGiList: MutableList<GalleryInfo> = ArrayList()
@@ -194,6 +193,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         _binding ?: return
         urlBuilder.keyword = keyword
         urlBuilder.favCat = newCat
+        initialKey = null
         collectJob?.cancel()
         when (newCat) {
             -2 -> {
@@ -249,24 +249,14 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         savedInstanceState: Bundle?,
     ): View {
         _binding = SceneFavoritesBinding.inflate(inflater, container, false)
-        setOnApplySearch { query: String? ->
-            onApplySearch(query)
-        }
+        setOnApplySearch { onApplySearch(it) }
         binding.fastScroller.attachToRecyclerView(binding.recyclerView)
-        val drawable = HandlerDrawable()
-        drawable.setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary))
-        binding.fastScroller.setHandlerDrawable(drawable)
+        binding.fastScroller.setHandlerDrawable(HandlerDrawable().apply { setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary)) })
         binding.fabLayout.run {
-            addOnExpandListener(FabLayoutListener())
+            addOnExpandListener { if (!it && binding.recyclerView.isInCustomChoice) binding.recyclerView.outOfCustomChoiceMode() }
             (parent as ViewGroup).removeView(this)
             container!!.addView(this)
-            ViewCompat.setWindowInsetsAnimationCallback(
-                binding.root,
-                WindowInsetsAnimationHelper(
-                    WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
-                    this,
-                ),
-            )
+            ViewCompat.setWindowInsetsAnimationCallback(binding.root, WindowInsetsAnimationHelper(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP, this))
             updateJumpFab()
             val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
             mActionFabDrawable = AddDeleteDrawable(context, colorID)
@@ -275,7 +265,13 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             setAutoCancel(true)
             setHidePrimaryFab(false)
             setOnClickFabListener(this@FavoritesScene)
-            addOnExpandListener(this@FavoritesScene)
+            addOnExpandListener {
+                if (it) {
+                    mActionFabDrawable.setDelete(ANIMATE_TIME)
+                } else {
+                    mActionFabDrawable.setAdd(ANIMATE_TIME)
+                }
+            }
             addAboveSnackView(this)
         }
         binding.run {
@@ -406,14 +402,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             return
         }
         switchFav(urlBuilder.favCat, query)
-    }
-
-    override fun onExpand(expanded: Boolean) {
-        if (expanded) {
-            mActionFabDrawable.setDelete(ANIMATE_TIME)
-        } else {
-            mActionFabDrawable.setAdd(ANIMATE_TIME)
-        }
     }
 
     override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
@@ -631,12 +619,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         }
     }
 
-    private inner class FabLayoutListener : OnExpandListener {
-        override fun onExpand(expanded: Boolean) {
-            if (!expanded && binding.recyclerView.isInCustomChoice) binding.recyclerView.outOfCustomChoiceMode()
-        }
-    }
-
     private inner class FavoritesHelper : GalleryInfoContentHelper() {
         override fun getPageData(
             taskId: Int,
@@ -682,32 +664,9 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                     lifecycleScope.launchIO {
                         runSuspendCatching {
                             EhEngine.modifyFavorites(url, gidArray, mModifyFavCat)
-                        }.onSuccess { result ->
-                            // Put fav cat
-                            Settings.favCat = result.catArray
-                            Settings.favCount = result.countArray
-                            withUIContext {
-                                if (local) {
-                                    // onGetFavoritesLocal(urlBuilder.keyword, taskId)
-                                } else {
-                                    // onGetFavoritesSuccess(result, taskId)
-                                }
-                            }
-                        }.onFailure {
-                            it.printStackTrace()
-                            withUIContext {
-                                if (local) {
-                                    // onGetFavoritesLocal(urlBuilder.keyword, taskId)
-                                } else {
-                                    // onGetFavoritesFailure(it, taskId)
-                                }
-                            }
                         }
                     }
                 }
-            } else if (urlBuilder.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
-                val keyword = urlBuilder.keyword
-                // SimpleHandler.post { onGetFavoritesLocal(keyword, taskId) }
             } else {
                 urlBuilder.setIndex(index, isNext)
                 urlBuilder.jumpTo = jumpTo
@@ -715,16 +674,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 lifecycleScope.launchIO {
                     runSuspendCatching {
                         EhEngine.getFavorites(url)
-                    }.onSuccess { result ->
-                        Settings.favCat = result.catArray
-                        Settings.favCount = result.countArray
-                        withUIContext {
-                            // onGetFavoritesSuccess(result, taskId)
-                        }
-                    }.onFailure {
-                        withUIContext {
-                            // onGetFavoritesFailure(it, taskId)
-                        }
                     }
                 }
             }
