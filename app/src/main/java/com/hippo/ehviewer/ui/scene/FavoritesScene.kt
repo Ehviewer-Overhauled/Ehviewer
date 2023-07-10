@@ -83,6 +83,9 @@ import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
+import com.hippo.ehviewer.util.getValue
+import com.hippo.ehviewer.util.lazyMut
+import com.hippo.ehviewer.util.setValue
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
@@ -147,16 +150,10 @@ class VMStorage : ViewModel() {
 
 class FavoritesScene : SearchBarScene() {
     private val vm: VMStorage by viewModels()
-    private var urlBuilder
-        get() = vm.urlBuilder
-        set(value) { vm.urlBuilder = value }
-    private var initialKey
-        get() = vm.initialKey
-        set(value) { vm.initialKey = value }
-    private val cloudDataFlow
-        get() = vm.cloudDataFlow
-    private val localFavDataFlow
-        get() = vm.localFavDataFlow
+    private var urlBuilder by lazyMut { vm::urlBuilder }
+    private var initialKey by lazyMut { vm::initialKey }
+    private val cloudDataFlow by lazy { vm.cloudDataFlow }
+    private val localFavDataFlow by lazy { vm.localFavDataFlow }
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
     private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
