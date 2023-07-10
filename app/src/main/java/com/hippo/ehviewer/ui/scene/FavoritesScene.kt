@@ -105,7 +105,7 @@ import java.util.Locale
 class VMStorage : ViewModel() {
     var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
     var initialKey: String? = null
-    val cloudDataFlow = Pager(PagingConfig(25)) {
+    private val cloudDataFlow = Pager(PagingConfig(25)) {
         object : PagingSource<String, GalleryInfo>() {
             override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
             override suspend fun load(params: LoadParams<String>) = withIOContext {
@@ -137,7 +137,7 @@ class VMStorage : ViewModel() {
         }
     }.flow.cachedIn(viewModelScope)
 
-    val localFavDataFlow = Pager(PagingConfig(20, enablePlaceholders = false, jumpThreshold = 40)) {
+    private val localFavDataFlow = Pager(PagingConfig(20, enablePlaceholders = false, jumpThreshold = 40)) {
         val keyword = urlBuilder.keyword
         if (keyword.isNullOrBlank()) {
             EhDB.localFavLazyList
@@ -145,14 +145,13 @@ class VMStorage : ViewModel() {
             EhDB.searchLocalFav(keyword)
         }
     }.flow.cachedIn(viewModelScope)
+    fun dataflow() = if (urlBuilder.favCat == -2) localFavDataFlow else cloudDataFlow
 }
 
 class FavoritesScene : SearchBarScene() {
     private val vm: VMStorage by viewModels()
     private var urlBuilder by lazyMut { vm::urlBuilder }
     private var initialKey by lazyMut { vm::initialKey }
-    private val cloudDataFlow by lazy { vm.cloudDataFlow }
-    private val localFavDataFlow by lazy { vm.localFavDataFlow }
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
     private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
@@ -200,22 +199,10 @@ class FavoritesScene : SearchBarScene() {
         urlBuilder.setIndex(null, true)
         initialKey = null
         collectJob?.cancel()
-        when (newCat) {
-            -2 -> {
-                collectJob = lifecycleScope.launchIO {
-                    localFavDataFlow.collectLatest {
-                        @Suppress("UNCHECKED_CAST")
-                        mAdapter?.submitData(it as PagingData<GalleryInfo>)
-                    }
-                }
-            }
-
-            else -> {
-                collectJob = lifecycleScope.launchIO {
-                    cloudDataFlow.collectLatest {
-                        mAdapter?.submitData(it)
-                    }
-                }
+        collectJob = viewLifecycleOwner.lifecycleScope.launchIO {
+            vm.dataflow().collectLatest {
+                @Suppress("UNCHECKED_CAST")
+                mAdapter?.submitData(it as PagingData<GalleryInfo>)
             }
         }
         mAdapter?.refresh()
