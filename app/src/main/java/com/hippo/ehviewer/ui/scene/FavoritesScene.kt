@@ -82,7 +82,6 @@ import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.util.getValue
 import com.hippo.ehviewer.util.lazyMut
 import com.hippo.ehviewer.util.setValue
@@ -165,12 +164,6 @@ class FavoritesScene : SearchBarScene() {
             (3..6).forEach { setSecondaryFabVisibilityAt(it, false) }
         }
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            onRestore(savedInstanceState)
-        }
-    }
 
     fun onItemClick(position: Int) {
         if (isDrawerOpen(GravityCompat.END)) {
@@ -243,17 +236,6 @@ class FavoritesScene : SearchBarScene() {
     override fun onResume() {
         super.onResume()
         mAdapterDelegate?.type = Settings.listMode
-    }
-
-    private fun onRestore(savedInstanceState: Bundle) {
-        savedInstanceState.getParcelableCompat<FavListUrlBuilder>(KEY_URL_BUILDER)?.let {
-            urlBuilder = it
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelable(KEY_URL_BUILDER, urlBuilder)
     }
 
     override fun onCreateViewWithToolbar(
@@ -599,4 +581,3 @@ class FavoritesScene : SearchBarScene() {
 }
 
 private const val ANIMATE_TIME = 300L
-private const val KEY_URL_BUILDER = "url_builder"
