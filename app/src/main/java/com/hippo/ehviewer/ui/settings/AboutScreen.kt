@@ -29,34 +29,21 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.execute
-import com.hippo.ehviewer.client.executeAndParseAs
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.DialogState
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
+import com.hippo.ehviewer.updater.AppUpdater
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.installPackage
 import eu.kanade.tachiyomi.util.lang.withUIContext
-import eu.kanade.tachiyomi.util.system.logcat
-import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
-import okhttp3.Request
-import okio.sink
-import org.json.JSONObject
-import tachiyomi.data.release.GithubArtifacts
-import tachiyomi.data.release.GithubCommitComparison
-import tachiyomi.data.release.GithubRelease
-import tachiyomi.data.release.GithubWorkflowRuns
 import java.io.File
-import java.util.zip.ZipInputStream
 
-private const val REPO_NAME = BuildConfig.REPO_NAME
-private const val REPO_URL = "https://github.com/$REPO_NAME"
-private const val API_URL = "https://api.github.com/repos/$REPO_NAME"
+private const val REPO_URL = "https://github.com/${BuildConfig.REPO_NAME}"
 private const val RELEASE_URL = "$REPO_URL/releases"
 
 @Composable
@@ -97,7 +84,7 @@ fun AboutScreen() {
             }
         }
         if (download) {
-            val file = File(AppConfig.tempDir, "tmp.apk").apply { delete() }
+            val file = File(AppConfig.tempDir, "update.apk").apply { delete() }
             downloadTo(file)
             withUIContext { context.installPackage(file) }
         }
@@ -146,58 +133,11 @@ fun AboutScreen() {
             )
             WorkPreference(title = stringResource(id = R.string.settings_about_check_for_updates)) {
                 runSuspendCatching {
-                    if (Settings.useCIUpdateChannel) {
-                        val curSha = BuildConfig.COMMIT_SHA
-                        val branch = ghRequest(API_URL).execute {
-                            JSONObject(body.string()).getString("default_branch")
+                    AppUpdater.checkForUpdate(true)?.run {
+                        dialogState.showNewVersion(version, changelog) { file ->
+                            AppUpdater.downloadUpdate(downloadLink, file)
                         }
-                        val workflowRunsUrl = "$API_URL/actions/workflows/ci.yml/runs?branch=$branch&per_page=1"
-                        val workflowRun = ghRequest(workflowRunsUrl).executeAndParseAs<GithubWorkflowRuns>().workflowRuns[0]
-                        val shortSha = workflowRun.headSha.take(7)
-                        if (shortSha != curSha) {
-                            val artifacts = ghRequest(workflowRun.artifactsUrl).executeAndParseAs<GithubArtifacts>()
-                            if (artifacts.artifacts.isNotEmpty()) {
-                                val archiveUrl = artifacts.getDownloadLink()
-                                val changelog = runSuspendCatching {
-                                    val commitComparisonUrl = "$API_URL/compare/$curSha...$shortSha"
-                                    val result = ghRequest(commitComparisonUrl).executeAndParseAs<GithubCommitComparison>()
-                                    result.commits.joinToString("\n") { "${it.commit.message} (@${it.author.name})" }
-                                }.getOrDefault(workflowRun.title)
-                                dialogState.showNewVersion(shortSha, changelog) { file ->
-                                    ghRequest(archiveUrl).execute {
-                                        ZipInputStream(body.byteStream()).use { zip ->
-                                            zip.nextEntry
-                                            file.outputStream().use {
-                                                zip.copyTo(it)
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                launchSnackBar(context.getString(R.string.ci_is_running))
-                            }
-                        } else {
-                            launchSnackBar(context.getString(R.string.already_latest_ci_build))
-                        }
-                    } else {
-                        val curVersion = BuildConfig.VERSION_NAME
-                        val releaseUrl = "$API_URL/releases/latest"
-                        val release = ghRequest(releaseUrl).executeAndParseAs<GithubRelease>()
-                        val latestVersion = release.version
-                        val description = release.info
-                        val downloadUrl = release.getDownloadLink()
-                        if (latestVersion != curVersion) {
-                            dialogState.showNewVersion(latestVersion, description) { file ->
-                                ghRequest(downloadUrl).execute {
-                                    file.sink().use {
-                                        body.source().readAll(it)
-                                    }
-                                }
-                            }
-                        } else {
-                            launchSnackBar(context.getString(R.string.already_latest_release, latestVersion))
-                        }
-                    }
+                    } ?: launchSnackBar(context.getString(R.string.already_latest_version))
                 }.onFailure {
                     launchSnackBar(ExceptionUtils.getReadableString(it))
                 }
@@ -205,11 +145,3 @@ fun AboutScreen() {
         }
     }
 }
-
-private inline fun ghRequest(url: String, builder: Request.Builder.() -> Unit = {}) = Request.Builder().url(url).apply {
-    logcat { url }
-    val token = "github_" + "pat_11AXZS" + "T4A0k3TArCGakP3t_7DzUE5S" + "mr1zw8rmmzVtCeRq62" + "A4qkuDMw6YQm5ZUtHSLZ2MLI3J4VSifLXZ"
-    val user = "nullArrayList"
-    val base64 = "$user:$token".encodeBase64()
-    addHeader("Authorization", "Basic $base64")
-}.apply(builder).build()
