@@ -33,6 +33,7 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.util.valueIterator
 import androidx.core.view.GravityCompat
@@ -40,6 +41,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -73,12 +75,16 @@ import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
+import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
+import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchUI
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
@@ -358,6 +364,35 @@ class FavoritesScene : SearchBarScene() {
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = delegateAdapter.onCreateViewHolder(parent, delegateAdapter.type)
             }.also { adapter ->
                 binding.recyclerView.adapter = adapter
+                val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
+                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                binding.tip.setCompoundDrawables(null, drawable, null, null)
+                binding.tip.setOnClickListener { mAdapter?.refresh() }
+                val transition = ViewTransition(binding.recyclerView, binding.progress, binding.tip)
+                val empty = getString(R.string.gallery_list_empty_hit)
+                adapter.addLoadStateListener {
+                    lifecycleScope.launchUI {
+                        when (val state = it.refresh) {
+                            is LoadState.Loading -> {
+                                showSearchBar()
+                                transition.showView(1)
+                            }
+                            is LoadState.Error -> {
+                                binding.tip.text = ExceptionUtils.getReadableString(state.error)
+                                transition.showView(2)
+                            }
+                            is LoadState.NotLoading -> {
+                                delay(500)
+                                if (mAdapter?.itemCount == 0) {
+                                    binding.tip.text = empty
+                                    transition.showView(2)
+                                } else {
+                                    transition.showView(0)
+                                }
+                            }
+                        }
+                    }
+                }
             }
             switchFav(Settings.recentFavCat)
             mAdapterDelegate = delegateAdapter

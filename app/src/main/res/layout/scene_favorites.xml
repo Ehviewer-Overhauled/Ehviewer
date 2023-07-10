@@ -22,6 +22,22 @@
     android:paddingTop="16dp"
     app:layout_behavior="@string/searchbar_scrolling_view_behavior">
 
+    <TextView
+        android:id="@+id/tip"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="228dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawablePadding="8dp"
+        android:gravity="center_horizontal" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress"
+        style="@style/ProgressView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
     <androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
