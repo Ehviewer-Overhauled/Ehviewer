@@ -197,6 +197,7 @@ dependencies {
 
     // https://developer.android.com/jetpack/androidx/releases/paging
     implementation("androidx.paging:paging-compose:3.2.0-rc01")
+    implementation("androidx.paging:paging-runtime-ktx:3.2.0-rc01")
     implementation("androidx.recyclerview:recyclerview:1.3.0")
 
     // https://developer.android.com/jetpack/androidx/releases/room
