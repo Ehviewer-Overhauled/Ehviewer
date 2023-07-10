@@ -84,9 +84,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener, CustomChoiceListener {
     private var _binding: SceneFavoritesBinding? = null
@@ -137,7 +140,9 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                     is LoadParams.Refresh -> {
                         val key = params.key
                         if (key.isNullOrBlank()) {
-                            urlBuilder.setIndex(null, true)
+                            if (urlBuilder.jumpTo != null) {
+                                urlBuilder.mNext ?: urlBuilder.setIndex("2", true)
+                            }
                         } else {
                             urlBuilder.setIndex(key, false)
                         }
@@ -147,6 +152,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 Settings.favCat = r.catArray
                 Settings.favCount = r.countArray
                 Settings.favCloudCount = r.countArray.sum()
+                urlBuilder.jumpTo = null
                 return LoadResult.Page(r.galleryInfoList, r.prev, r.next).also { logcat { it.toString() } }
             }
         }
@@ -193,6 +199,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         _binding ?: return
         urlBuilder.keyword = keyword
         urlBuilder.favCat = newCat
+        urlBuilder.jumpTo = null
+        urlBuilder.setIndex(null, true)
         initialKey = null
         collectJob?.cancel()
         when (newCat) {
@@ -204,6 +212,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                     }
                 }
             }
+
             else -> {
                 collectJob = lifecycleScope.launchIO {
                     cloudDataFlow.collectLatest {
@@ -415,8 +424,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     private fun showGoToDialog() {
         context ?: return
         val local = LocalDateTime.of(2007, 3, 21, 0, 0)
-        val fromDate =
-            local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli()
+        val fromDate = local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli()
         val toDate = MaterialDatePicker.todayInUtcMilliseconds()
         val listValidators = ArrayList<DateValidator>()
         listValidators.add(DateValidatorPointForward.from(fromDate))
@@ -431,8 +439,11 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             .setSelection(toDate)
             .build()
         datePicker.show(requireActivity().supportFragmentManager, "date-picker")
-        datePicker.addOnPositiveButtonClickListener { v: Long? ->
-            // mHelper.goTo(v!!, true)
+        datePicker.addOnPositiveButtonClickListener { time: Long ->
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
+            val jumpTo = formatter.format(Instant.ofEpochMilli(time))
+            urlBuilder.jumpTo = jumpTo
+            mAdapter?.refresh()
         }
     }
 
@@ -441,7 +452,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         if (!binding.recyclerView.isInCustomChoice) {
             when (position) {
                 0 -> {
-                    // Goto by date
+                    showGoToDialog()
                 }
                 1 -> mAdapter?.refresh()
                 2 -> {
