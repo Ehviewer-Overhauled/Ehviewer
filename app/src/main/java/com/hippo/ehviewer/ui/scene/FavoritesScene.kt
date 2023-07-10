@@ -155,6 +155,10 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         }
     }.flow.cachedIn(lifecycleScope)
 
+    private val localFavDataFlow = Pager(PagingConfig(20, enablePlaceholders = false, jumpThreshold = 40)) {
+        EhDB.localFavLazyList
+    }.flow.cachedIn(lifecycleScope)
+
     fun onItemClick(position: Int): Boolean {
         if (isDrawerOpen(GravityCompat.END)) {
             // Skip if in search mode
@@ -207,10 +211,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         }
         mAdapter?.refresh()
     }
-
-    private val localFavDataFlow = Pager(PagingConfig(25)) {
-        EhDB.localFavLazyList
-    }.flow.cachedIn(lifecycleScope)
 
     override fun onResume() {
         super.onResume()
@@ -357,6 +357,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
         mAdapter = null
+        mAdapterDelegate = null
         mOldFavCat = null
         mOldKeyword = null
         _binding = null
