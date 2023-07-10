@@ -364,7 +364,7 @@ class FavoritesScene : SearchBarScene() {
             setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
             setCustomCheckedListener(object : CustomChoiceListener {
                 override fun onIntoCustomChoice(view: EasyRecyclerView) {
-                    showSelectionFabs()
+                    showSelectionFab()
                     binding.fabLayout.setAutoCancel(false)
                     // Delay expanding action to make layout work fine
                     SimpleHandler.post { binding.fabLayout.isExpanded = true }
@@ -375,7 +375,7 @@ class FavoritesScene : SearchBarScene() {
                 }
 
                 override fun onOutOfCustomChoice(view: EasyRecyclerView) {
-                    showNormalFabs()
+                    showNormalFab()
                     binding.fabLayout.setAutoCancel(true)
                     binding.fabLayout.isExpanded = false
                     binding.refreshLayout.isEnabled = true
@@ -421,35 +421,28 @@ class FavoritesScene : SearchBarScene() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        return ComposeView(inflater.context).apply {
-            setMD3Content {
-                ElevatedCard {
-                    val scope = currentRecomposeScope
-                    LaunchedEffect(Unit) {
-                        Settings.favChangesFlow.collect {
-                            scope.invalidate()
-                        }
+    ) = ComposeView(inflater.context).apply {
+        setMD3Content {
+            ElevatedCard {
+                val scope = currentRecomposeScope
+                LaunchedEffect(Unit) {
+                    Settings.favChangesFlow.collect {
+                        scope.invalidate()
                     }
-                    val faves = arrayOf(
-                        stringResource(id = R.string.local_favorites) to Settings.favLocalCount,
-                        stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
-                        *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
-                    )
-                    TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
-                    LazyColumn {
-                        itemsIndexed(faves) { index, (name, count) ->
-                            ListItem(
-                                headlineContent = { Text(text = name) },
-                                trailingContent = {
-                                    Text(
-                                        text = count.toString(),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                    )
-                                },
-                                modifier = Modifier.clickable { onItemClick(index) },
-                            )
-                        }
+                }
+                val faves = arrayOf(
+                    stringResource(id = R.string.local_favorites) to Settings.favLocalCount,
+                    stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
+                    *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
+                )
+                TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
+                LazyColumn {
+                    itemsIndexed(faves) { index, (name, count) ->
+                        ListItem(
+                            headlineContent = { Text(text = name) },
+                            trailingContent = { Text(text = count.toString(), style = MaterialTheme.typography.bodyLarge) },
+                            modifier = Modifier.clickable { onItemClick(index) },
+                        )
                     }
                 }
             }
@@ -499,13 +492,13 @@ class FavoritesScene : SearchBarScene() {
 
     private fun checkedSize() = binding.recyclerView.checkedItemCount
 
-    private fun showNormalFabs() {
-        // Delay showing normal fabs to avoid mutation
+    private fun showNormalFab() {
+        // Delay showing normal fab to avoid mutation
         SimpleHandler.removeCallbacks(showNormalFabsRunnable)
         SimpleHandler.postDelayed(showNormalFabsRunnable, 300)
     }
 
-    private fun showSelectionFabs() {
+    private fun showSelectionFab() {
         SimpleHandler.removeCallbacks(showNormalFabsRunnable)
         binding.fabLayout.run {
             (0..2).forEach { setSecondaryFabVisibilityAt(it, false) }
