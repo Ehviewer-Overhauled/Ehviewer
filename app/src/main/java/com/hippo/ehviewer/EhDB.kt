@@ -96,12 +96,6 @@ object EhDB {
         dao.deleteByKey(gid)
     }
 
-    @Synchronized
-    fun clearDownloadDirname() {
-        val dao = db.downloadDirnameDao()
-        dao.deleteAll()
-    }
-
     @get:Synchronized
     val allDownloadLabelList: List<DownloadLabel>
         get() = db.downloadLabelDao().list()
@@ -156,21 +150,6 @@ object EhDB {
     fun removeDownloadLabel(raw: DownloadLabel?) {
         val dao = db.downloadLabelDao()
         dao.delete(raw!!)
-    }
-
-    @get:Synchronized
-    val allLocalFavorites: List<GalleryInfo>
-        get() {
-            val dao = db.localFavoritesDao()
-            val list = dao.list()
-            return ArrayList<GalleryInfo>(list)
-        }
-
-    @Synchronized
-    fun searchLocalFavorites(query: String): List<GalleryInfo> {
-        val dao = db.localFavoritesDao()
-        val list = dao.list("%$query%")
-        return ArrayList<GalleryInfo>(list)
     }
 
     @Synchronized
@@ -273,6 +252,8 @@ object EhDB {
 
     val localFavLazyList: PagingSource<Int, LocalFavoriteInfo>
         get() = db.localFavoritesDao().listLazy()
+
+    fun searchLocalFav(keyword: String) = db.localFavoritesDao().listLazy("%$keyword%")
 
     @Synchronized
     fun putHistoryInfo(galleryInfo: GalleryInfo?) {

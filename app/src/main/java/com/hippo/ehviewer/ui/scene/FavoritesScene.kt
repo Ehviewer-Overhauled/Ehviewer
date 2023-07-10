@@ -156,7 +156,12 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     }.flow.cachedIn(lifecycleScope)
 
     private val localFavDataFlow = Pager(PagingConfig(20, enablePlaceholders = false, jumpThreshold = 40)) {
-        EhDB.localFavLazyList
+        val keyword = urlBuilder.keyword
+        if (keyword.isNullOrBlank()) {
+            EhDB.localFavLazyList
+        } else {
+            EhDB.searchLocalFav(keyword)
+        }
     }.flow.cachedIn(lifecycleScope)
 
     fun onItemClick(position: Int): Boolean {
@@ -188,8 +193,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
 
     private var collectJob: Job? = null
 
-    private fun switchFav(newCat: Int) {
-        urlBuilder.keyword = null
+    private fun switchFav(newCat: Int, keyword: String? = null) {
+        urlBuilder.keyword = keyword
         urlBuilder.favCat = newCat
         collectJob?.cancel()
         when (newCat) {
@@ -264,8 +269,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             addAboveSnackView(this)
         }
         binding.run {
-            val paddingTopSB =
-                resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
+            val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
             fastScroller.run {
                 setPadding(
                     paddingLeft,
@@ -296,8 +300,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 switchFav(Settings.recentFavCat)
             }
             mAdapterDelegate = delegateAdapter
-            clipToPadding = false
-            clipChildren = false
             setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
             setCustomCheckedListener(this@FavoritesScene)
         }
@@ -429,9 +431,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         if (binding.recyclerView.isInCustomChoice) {
             return
         }
-        urlBuilder.keyword = query
+        switchFav(urlBuilder.favCat, query)
         updateSearchBar()
-        mAdapter?.refresh()
     }
 
     override fun onExpand(expanded: Boolean) {
@@ -592,17 +593,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         }
     }
 
-    private fun onGetFavoritesLocal(keyword: String?, taskId: Int) {
-        val list: List<GalleryInfo> = if (keyword.isNullOrEmpty()) {
-            EhDB.allLocalFavorites
-        } else {
-            EhDB.searchLocalFavorites(keyword)
-        }
-        if (keyword.isNullOrEmpty()) {
-            Settings.favLocalCount = list.size
-        }
-    }
-
     private inner class DeleteDialogHelper :
         DialogInterface.OnClickListener,
         DialogInterface.OnCancelListener {
@@ -696,14 +686,14 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                             EhEngine.addFavoritesRange(gidTokenArray, mModifyFavCat)
                         }.onSuccess {
                             withUIContext {
-                                onGetFavoritesLocal(urlBuilder.keyword, taskId)
+                                // onGetFavoritesLocal(urlBuilder.keyword, taskId)
                             }
                         }.onFailure {
                             // TODO It's a failure, add all of backup back to db.
                             // But how to known which one is failed?
                             EhDB.putLocalFavorites(modifyGiListBackup)
                             withUIContext {
-                                onGetFavoritesLocal(urlBuilder.keyword, taskId)
+                                // onGetFavoritesLocal(urlBuilder.keyword, taskId)
                             }
                         }
                     }
@@ -726,7 +716,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                             Settings.favCount = result.countArray
                             withUIContext {
                                 if (local) {
-                                    onGetFavoritesLocal(urlBuilder.keyword, taskId)
+                                    // onGetFavoritesLocal(urlBuilder.keyword, taskId)
                                 } else {
                                     // onGetFavoritesSuccess(result, taskId)
                                 }
@@ -735,7 +725,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                             it.printStackTrace()
                             withUIContext {
                                 if (local) {
-                                    onGetFavoritesLocal(urlBuilder.keyword, taskId)
+                                    // onGetFavoritesLocal(urlBuilder.keyword, taskId)
                                 } else {
                                     // onGetFavoritesFailure(it, taskId)
                                 }
@@ -745,7 +735,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 }
             } else if (urlBuilder.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                 val keyword = urlBuilder.keyword
-                SimpleHandler.post { onGetFavoritesLocal(keyword, taskId) }
+                // SimpleHandler.post { onGetFavoritesLocal(keyword, taskId) }
             } else {
                 urlBuilder.setIndex(index, isNext)
                 urlBuilder.jumpTo = jumpTo
