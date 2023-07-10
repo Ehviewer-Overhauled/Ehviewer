@@ -324,6 +324,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             binding.contentLayout.recyclerView,
             Settings.listMode,
         )
+        binding.contentLayout.recyclerView.adapter = mAdapter
         binding.contentLayout.recyclerView.clipToPadding = false
         binding.contentLayout.recyclerView.clipChildren = false
         binding.contentLayout.recyclerView.addOnScrollListener(mOnScrollListener)

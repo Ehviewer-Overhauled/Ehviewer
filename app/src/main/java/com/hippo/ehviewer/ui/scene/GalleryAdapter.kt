@@ -130,7 +130,6 @@ abstract class GalleryAdapter(
         }
 
     init {
-        recyclerView.adapter = this
         recyclerView.layoutManager = layoutManager
         this.type = type
         adjustPaddings()

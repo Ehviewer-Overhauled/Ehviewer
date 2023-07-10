@@ -22,11 +22,56 @@
     android:paddingTop="16dp"
     app:layout_behavior="@string/searchbar_scrolling_view_behavior">
 
-    <com.hippo.ehviewer.ui.legacy.ContentLayout
-        android:id="@+id/content_layout"
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress"
+        style="@style/ProgressView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/tip"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="228dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawablePadding="8dp"
+        android:gravity="center_horizontal" />
+
+    <androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout
+        android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:fitsSystemWindowsInsets="top|bottom" />
+        android:clipChildren="false">
+
+        <com.hippo.ehviewer.ui.legacy.EasyRecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+    </androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/bottom_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:fitsSystemWindowsInsets="end"
+        app:hideAnimationBehavior="inward"
+        app:showAnimationBehavior="outward" />
+
+    <com.hippo.ehviewer.ui.legacy.FastScroller
+        android:id="@+id/fast_scroller"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:paddingStart="20dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="8dp" />
 
     <com.hippo.ehviewer.ui.legacy.FabLayout
         android:id="@+id/fab_layout"
