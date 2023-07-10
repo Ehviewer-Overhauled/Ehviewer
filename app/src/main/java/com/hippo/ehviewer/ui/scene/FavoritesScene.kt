@@ -79,7 +79,6 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -104,12 +103,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             (3..6).forEach { setSecondaryFabVisibilityAt(it, false) }
         }
     }
-
-    // Avoid unnecessary search bar update
-    private var mOldFavCat: String? = null
-
-    // Avoid unnecessary search bar update
-    private var mOldKeyword: String? = null
 
     // For modify action
     private var mEnableModify = false
@@ -147,9 +140,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 Settings.favCat = r.catArray
                 Settings.favCount = r.countArray
                 Settings.favCloudCount = r.countArray.sum()
-                lifecycleScope.launchUI {
-                    updateSearchBar()
-                }
                 return LoadResult.Page(r.galleryInfoList, r.prev, r.next)
             }
         }
@@ -171,7 +161,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 return true
             }
             switchFav(position - 2)
-            updateSearchBar()
             updateJumpFab()
             closeDrawer(GravityCompat.END)
         } else {
@@ -194,6 +183,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     private var collectJob: Job? = null
 
     private fun switchFav(newCat: Int, keyword: String? = null) {
+        _binding ?: return
         urlBuilder.keyword = keyword
         urlBuilder.favCat = newCat
         collectJob?.cancel()
@@ -215,6 +205,18 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             }
         }
         mAdapter?.refresh()
+        val favCatName: String = when (val favCat = urlBuilder.favCat) {
+            in 0..9 -> Settings.favCat[favCat]
+            FavListUrlBuilder.FAV_CAT_LOCAL -> getString(R.string.local_favorites)
+            else -> getString(R.string.cloud_favorites)
+        }
+        if (keyword.isNullOrEmpty()) {
+            setSearchBarHint(getString(R.string.favorites_title, favCatName))
+        } else {
+            setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword))
+        }
+        setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName))
+        Settings.recentFavCat = urlBuilder.favCat
     }
 
     override fun onResume() {
@@ -304,41 +306,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             setCustomCheckedListener(this@FavoritesScene)
         }
         setAllowEmptySearch(false)
-        updateSearchBar()
         return binding.root
-    }
-
-    // keyword of mUrlBuilder, fav cat of mUrlBuilder, mFavCatArray.
-    // They changed, call it
-    private fun updateSearchBar() {
-        _binding ?: return
-
-        // Update title
-        val favCatName: String = when (val favCat = urlBuilder.favCat) {
-            in 0..9 -> Settings.favCat[favCat]
-            FavListUrlBuilder.FAV_CAT_LOCAL -> getString(R.string.local_favorites)
-            else -> getString(R.string.cloud_favorites)
-        }
-        val keyword = urlBuilder.keyword
-        if (keyword.isNullOrEmpty()) {
-            if (favCatName != mOldFavCat) {
-                setSearchBarHint(getString(R.string.favorites_title, favCatName))
-            }
-        } else {
-            if (favCatName != mOldFavCat || keyword != mOldKeyword) {
-                setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword))
-            }
-        }
-
-        // Update hint
-        if (favCatName != mOldFavCat) {
-            setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName))
-        }
-        mOldFavCat = favCatName
-        mOldKeyword = keyword
-
-        // Save recent fav cat
-        Settings.recentFavCat = urlBuilder.favCat
     }
 
     // Hide jump fab on local fav cat
@@ -360,8 +328,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         removeAboveSnackView(binding.fabLayout)
         mAdapter = null
         mAdapterDelegate = null
-        mOldFavCat = null
-        mOldKeyword = null
         _binding = null
     }
 
@@ -432,7 +398,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             return
         }
         switchFav(urlBuilder.favCat, query)
-        updateSearchBar()
     }
 
     override fun onExpand(expanded: Boolean) {
