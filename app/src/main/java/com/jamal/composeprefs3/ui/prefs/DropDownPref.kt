@@ -77,3 +77,64 @@ fun DropDownPref(
         }
     }
 }
+
+@Composable
+fun DropDownPrefInt(
+    title: String,
+    modifier: Modifier = Modifier,
+    summary: String? = null,
+    defaultValue: Int? = null,
+    onValueChange: ((Int) -> Unit)? = null,
+    useSelectedAsSummary: Boolean = false,
+    dropdownBackgroundColor: Color? = null,
+    textColor: Color = MaterialTheme.colorScheme.onBackground,
+    enabled: Boolean = true,
+    entries: Map<Int, String> = mapOf(),
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    fun edit(item: Map.Entry<Int, String>) {
+        expanded = false
+        onValueChange?.invoke(item.key)
+    }
+
+    Column {
+        TextPref(
+            title = title,
+            modifier = modifier,
+            summary = when {
+                useSelectedAsSummary && defaultValue != null -> entries[defaultValue]
+                useSelectedAsSummary && defaultValue == null -> "Not Set"
+                else -> summary
+            },
+            textColor = textColor,
+            enabled = enabled,
+            onClick = {
+                expanded = true
+            },
+        )
+
+        Box(
+            modifier = Modifier.padding(start = 16.dp),
+        ) {
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = if (dropdownBackgroundColor != null) Modifier.background(dropdownBackgroundColor) else Modifier,
+            ) {
+                entries.forEach { item ->
+                    DropdownMenuItem(
+                        onClick = {
+                            edit(item)
+                        },
+                        text = {
+                            Text(
+                                text = item.value,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                    )
+                }
+            }
+        }
+    }
+}

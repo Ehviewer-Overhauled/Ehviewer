@@ -74,12 +74,14 @@ object Settings : DataStorePreferences(null) {
     var requestNewsTimerHour by intPref("request_news_timer_hour", -1)
     var requestNewsTimerMinute by intPref("request_news_timer_minute", -1)
     var dataMapNextId by intPref("data_map_next_id", 0)
+    var updateIntervalDays by intPref("update_interval_days", 0)
     var recentDownloadLabel by stringOrNullPref("recent_download_label", null)
     var defaultDownloadLabel by stringOrNullPref("default_download_label", null)
     var displayName by stringOrNullPref("display_name", null)
     var avatar by stringOrNullPref("avatar", null)
     var language by stringPref("app_language", "system").observed { updateWhenLocaleChanges() }
     var lastDawnDay by longPref("last_dawn_day", 0)
+    var lastUpdateDay by longPref("last_update_day", 0)
 
     init {
         if ("CN" == Locale.getDefault().country) {

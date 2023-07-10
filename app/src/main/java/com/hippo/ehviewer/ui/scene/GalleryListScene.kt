@@ -90,7 +90,9 @@ import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
+import com.hippo.ehviewer.ui.settings.showNewVersion
 import com.hippo.ehviewer.ui.tools.DialogState
+import com.hippo.ehviewer.updater.AppUpdater
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
@@ -289,6 +291,17 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 
     private val dialogState = DialogState()
 
+    // TODO: Move this out
+    private fun checkForUpdates() {
+        lifecycleScope.launchIO {
+            runSuspendCatching {
+                AppUpdater.checkForUpdate()?.let {
+                    dialogState.showNewVersion(requireContext(), it)
+                }
+            }
+        }
+    }
+
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -296,6 +309,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
     ): View {
         _binding = SceneGalleryListBinding.inflate(inflater, container, false)
         binding.root.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Handler() } })
+        checkForUpdates()
         requireActivity().onBackPressedDispatcher.addCallback(mCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
         mShowActionFab = true

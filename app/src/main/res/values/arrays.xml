@@ -320,4 +320,22 @@
         <item>20</item>
         <item>25</item>
     </string-array>
+
+    <string-array name="update_frequency">
+        <item>@string/update_frequency_never</item>
+        <item>@string/update_frequency_daily</item>
+        <item>@string/update_frequency_3days</item>
+        <item>@string/update_frequency_weekly</item>
+        <item>@string/update_frequency_biweekly</item>
+        <item>@string/update_frequency_monthly</item>
+    </string-array>
+    
+    <integer-array name="update_frequency_values">
+        <item>0</item>
+        <item>1</item>
+        <item>3</item>
+        <item>7</item>
+        <item>14</item>
+        <item>30</item>
+    </integer-array>
 </resources>
