@@ -13,7 +13,7 @@ class StateMapViewModel : ViewModel() {
 }
 
 @Composable
-fun <T : Any> rememberMemorized(
+fun <T : Any> rememberInVM(
     vararg inputs: Any?,
     init: ViewModel.() -> T,
 ): T {
