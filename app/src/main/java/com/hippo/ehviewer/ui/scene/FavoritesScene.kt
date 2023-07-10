@@ -311,8 +311,8 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = delegateAdapter.onCreateViewHolder(parent, delegateAdapter.type)
             }.also { adapter ->
                 binding.recyclerView.adapter = adapter
-                switchFav(Settings.recentFavCat)
             }
+            switchFav(Settings.recentFavCat)
             mAdapterDelegate = delegateAdapter
             setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
             setCustomCheckedListener(this@FavoritesScene)
