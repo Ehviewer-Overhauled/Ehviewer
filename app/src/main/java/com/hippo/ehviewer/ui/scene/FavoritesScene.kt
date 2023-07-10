@@ -40,7 +40,10 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -96,29 +99,11 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class FavoritesScene : SearchBarScene() {
-    private var _binding: SceneFavoritesBinding? = null
-    private val binding get() = _binding!!
-    private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
-    private var mAdapterDelegate: GalleryAdapter? = null
-    private var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
-    private val showNormalFabsRunnable = Runnable {
-        updateJumpFab() // index: 0, 2
-        binding.fabLayout.run {
-            setSecondaryFabVisibilityAt(1, true)
-            (3..6).forEach { setSecondaryFabVisibilityAt(it, false) }
-        }
-    }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            onRestore(savedInstanceState)
-        }
-    }
-
-    private var initialKey: String? = null
-
-    private val cloudDataFlow = Pager(PagingConfig(25)) {
+// Note that we do not really follow mvvm structure, just use it as ... storage
+class VMStorage : ViewModel() {
+    var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
+    var initialKey: String? = null
+    val cloudDataFlow = Pager(PagingConfig(25)) {
         object : PagingSource<String, GalleryInfo>() {
             override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
             override suspend fun load(params: LoadParams<String>) = withIOContext {
@@ -148,16 +133,47 @@ class FavoritesScene : SearchBarScene() {
                 LoadResult.Page(r.galleryInfoList, r.prev, r.next)
             }
         }
-    }.flow.cachedIn(lifecycleScope)
+    }.flow.cachedIn(viewModelScope)
 
-    private val localFavDataFlow = Pager(PagingConfig(20, enablePlaceholders = false, jumpThreshold = 40)) {
+    val localFavDataFlow = Pager(PagingConfig(20, enablePlaceholders = false, jumpThreshold = 40)) {
         val keyword = urlBuilder.keyword
         if (keyword.isNullOrBlank()) {
             EhDB.localFavLazyList
         } else {
             EhDB.searchLocalFav(keyword)
         }
-    }.flow.cachedIn(lifecycleScope)
+    }.flow.cachedIn(viewModelScope)
+}
+
+class FavoritesScene : SearchBarScene() {
+    private val vm: VMStorage by viewModels()
+    private var urlBuilder
+        get() = vm.urlBuilder
+        set(value) { vm.urlBuilder = value }
+    private var initialKey
+        get() = vm.initialKey
+        set(value) { vm.initialKey = value }
+    private val cloudDataFlow
+        get() = vm.cloudDataFlow
+    private val localFavDataFlow
+        get() = vm.localFavDataFlow
+    private var _binding: SceneFavoritesBinding? = null
+    private val binding get() = _binding!!
+    private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
+    private var mAdapterDelegate: GalleryAdapter? = null
+    private val showNormalFabsRunnable = Runnable {
+        updateJumpFab() // index: 0, 2
+        binding.fabLayout.run {
+            setSecondaryFabVisibilityAt(1, true)
+            (3..6).forEach { setSecondaryFabVisibilityAt(it, false) }
+        }
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            onRestore(savedInstanceState)
+        }
+    }
 
     fun onItemClick(position: Int) {
         if (isDrawerOpen(GravityCompat.END)) {
