@@ -48,6 +48,7 @@ import okhttp3.Request
 import okio.sink
 import org.json.JSONObject
 import tachiyomi.data.release.GithubArtifacts
+import tachiyomi.data.release.GithubCommitComparison
 import tachiyomi.data.release.GithubRelease
 import tachiyomi.data.release.GithubWorkflowRuns
 import java.io.File
@@ -156,8 +157,12 @@ fun AboutScreen() {
                             val artifacts = ghRequest(workflowRun.artifactsUrl).executeAndParseAs<GithubArtifacts>()
                             if (artifacts.artifacts.isNotEmpty()) {
                                 val archiveUrl = artifacts.getDownloadLink()
-                                // TODO: Show changelog
-                                dialogState.showNewVersion(shortSha, workflowRun.title) { file ->
+                                val changelog = runSuspendCatching {
+                                    val commitComparisonUrl = "$API_URL/compare/$curSha...$shortSha"
+                                    val result = ghRequest(commitComparisonUrl).executeAndParseAs<GithubCommitComparison>()
+                                    result.commits.joinToString("\n") { "${it.commit.message} (@${it.author.name})" }
+                                }.getOrDefault(workflowRun.title)
+                                dialogState.showNewVersion(shortSha, changelog) { file ->
                                     ghRequest(archiveUrl).execute {
                                         ZipInputStream(body.byteStream()).use { zip ->
                                             zip.nextEntry
