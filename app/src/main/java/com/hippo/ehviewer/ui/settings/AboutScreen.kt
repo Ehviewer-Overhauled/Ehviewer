@@ -54,9 +54,10 @@ import tachiyomi.data.release.GithubWorkflowRuns
 import java.io.File
 import java.util.zip.ZipInputStream
 
-private const val REPO_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer"
-private const val API_URL = "https://api.github.com/repos/Ehviewer-Overhauled/Ehviewer"
-private const val RELEASE_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer/releases"
+private const val REPO_NAME = BuildConfig.REPO_NAME
+private const val REPO_URL = "https://github.com/$REPO_NAME"
+private const val API_URL = "https://api.github.com/repos/$REPO_NAME"
+private const val RELEASE_URL = "$REPO_URL/releases"
 
 @Composable
 @Stable

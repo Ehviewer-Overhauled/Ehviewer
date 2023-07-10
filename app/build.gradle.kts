@@ -61,6 +61,16 @@ android {
         formatter.format(Instant.now())
     }
 
+    val repoName by lazy {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine = "git remote get-url origin".split(' ')
+            standardOutput = stdout
+        }
+        stdout.toString().trim().removePrefix("https://github.com/").removePrefix("git@github.com:")
+            .removeSuffix(".git")
+    }
+
     defaultConfig {
         applicationId = "moe.tarsin.ehviewer"
         minSdk = 28
@@ -85,6 +95,7 @@ android {
         )
         buildConfigField("String", "COMMIT_SHA", "\"$commitSha\"")
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
+        buildConfigField("String", "REPO_NAME", "\"$repoName\"")
     }
 
     externalNativeBuild {
