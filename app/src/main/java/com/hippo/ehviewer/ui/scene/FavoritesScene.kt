@@ -459,6 +459,7 @@ class FavoritesScene : SearchBarScene() {
     ) = ComposeView(inflater.context).apply {
         setMD3Content {
             ElevatedCard {
+                TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
                 val scope = currentRecomposeScope
                 LaunchedEffect(Unit) {
                     Settings.favChangesFlow.collect {
@@ -470,7 +471,6 @@ class FavoritesScene : SearchBarScene() {
                     stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
                     *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
                 )
-                TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
                 LazyColumn {
                     itemsIndexed(faves) { index, (name, count) ->
                         ListItem(
