@@ -75,8 +75,7 @@ abstract class GalleryInfoContentHelper : ContentHelper() {
     }
 
     fun goTo(time: Long, isNext: Boolean) {
-        val formatter = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
         jumpTo = formatter.format(Instant.ofEpochMilli(time))
         if (isNext) {
             goTo(mNext ?: "2", true)

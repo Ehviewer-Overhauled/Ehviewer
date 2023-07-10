@@ -23,8 +23,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class FavListUrlBuilder(
-    private var mPrev: String? = null,
-    private var mNext: String? = null,
+    var mPrev: String? = null,
+    var mNext: String? = null,
     var jumpTo: String? = null,
     var keyword: String? = null,
     var favCat: Int = FAV_CAT_ALL,

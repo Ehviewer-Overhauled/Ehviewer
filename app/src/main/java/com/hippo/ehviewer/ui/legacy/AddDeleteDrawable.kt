@@ -124,7 +124,7 @@ class AddDeleteDrawable(context: Context, color: Int) : Drawable() {
         setShape(true, duration)
     }
 
-    fun setShape(delete: Boolean, duration: Long) {
+    private fun setShape(delete: Boolean, duration: Long) {
         if (!(!delete && mProgress == 0f || delete && mProgress == 1f)) {
             val endProgress = if (delete) 1f else 0f
             if (duration <= 0) {

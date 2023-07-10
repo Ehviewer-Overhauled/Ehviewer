@@ -17,6 +17,9 @@ interface LocalFavoritesDao : BasicDao<LocalFavoriteInfo> {
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE TITLE LIKE :title ORDER BY TIME DESC")
     fun list(title: String): List<LocalFavoriteInfo>
 
+    @Query("SELECT * FROM LOCAL_FAVORITES WHERE TITLE LIKE :title ORDER BY TIME DESC")
+    fun listLazy(title: String): PagingSource<Int, LocalFavoriteInfo>
+
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE GID = :gid")
     fun load(gid: Long): LocalFavoriteInfo?
 

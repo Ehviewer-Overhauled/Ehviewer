@@ -15,10 +15,7 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.DialogInterface
-import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,12 +33,23 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.util.valueIterator
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
+import androidx.paging.LoadState
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingDataAdapter
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.cachedIn
+import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.CompositeDateValidator
@@ -57,7 +65,6 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehUrl
-import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.databinding.SceneFavoritesBinding
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
@@ -66,36 +73,35 @@ import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EasyRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
-import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
-import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
+import com.hippo.ehviewer.ui.legacy.HandlerDrawable
+import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
+import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.withUIContext
+import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withIOContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-// TODO Get favorite, modify favorite, add favorite, what a mess!
-@SuppressLint("NotifyDataSetChanged", "RtlHardcoded")
-class FavoritesScene :
-    SearchBarScene(),
-    OnDragHandlerListener,
-    OnClickFabListener,
-    OnExpandListener,
-    CustomChoiceListener {
+class FavoritesScene : SearchBarScene() {
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
-    private val mModifyGiList: MutableList<GalleryInfo> = ArrayList()
-    private var mAdapter: FavoritesAdapter? = null
-    private lateinit var mHelper: FavoritesHelper
-    private lateinit var mActionFabDrawable: AddDeleteDrawable
-    private var mUrlBuilder: FavListUrlBuilder? = null
+    private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
+    private var mAdapterDelegate: GalleryAdapter? = null
+    private var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
     private val showNormalFabsRunnable = Runnable {
         updateJumpFab() // index: 0, 2
         binding.fabLayout.run {
@@ -103,63 +109,138 @@ class FavoritesScene :
             (3..6).forEach { setSecondaryFabVisibilityAt(it, false) }
         }
     }
-    private var mHasFirstRefresh = false
-
-    // Avoid unnecessary search bar update
-    private var mOldFavCat: String? = null
-
-    // Avoid unnecessary search bar update
-    private var mOldKeyword: String? = null
-
-    // For modify action
-    private var mEnableModify = false
-
-    // For modify action
-    private var mModifyFavCat = 0
-
-    // For modify action
-    private var mModifyAdd = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            onInit()
-        } else {
+        if (savedInstanceState != null) {
             onRestore(savedInstanceState)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        mAdapter?.type = Settings.listMode
+    private var initialKey: String? = null
+
+    private val cloudDataFlow = Pager(PagingConfig(25)) {
+        object : PagingSource<String, GalleryInfo>() {
+            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
+            override suspend fun load(params: LoadParams<String>) = withIOContext {
+                when (params) {
+                    is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
+                    is LoadParams.Append -> urlBuilder.setIndex(params.key, isNext = true)
+                    is LoadParams.Refresh -> {
+                        val key = params.key
+                        if (key.isNullOrBlank()) {
+                            if (urlBuilder.jumpTo != null) {
+                                urlBuilder.mNext ?: urlBuilder.setIndex("2", true)
+                            }
+                        } else {
+                            urlBuilder.setIndex(key, false)
+                        }
+                    }
+                }
+                val r = runSuspendCatching {
+                    EhEngine.getFavorites(urlBuilder.build())
+                }.onFailure {
+                    return@withIOContext LoadResult.Error(it)
+                }.getOrThrow()
+                Settings.favCat = r.catArray
+                Settings.favCount = r.countArray
+                Settings.favCloudCount = r.countArray.sum()
+                urlBuilder.jumpTo = null
+                LoadResult.Page(r.galleryInfoList, r.prev, r.next)
+            }
+        }
+    }.flow.cachedIn(lifecycleScope)
+
+    private val localFavDataFlow = Pager(PagingConfig(20, enablePlaceholders = false, jumpThreshold = 40)) {
+        val keyword = urlBuilder.keyword
+        if (keyword.isNullOrBlank()) {
+            EhDB.localFavLazyList
+        } else {
+            EhDB.searchLocalFav(keyword)
+        }
+    }.flow.cachedIn(lifecycleScope)
+
+    fun onItemClick(position: Int) {
+        if (isDrawerOpen(GravityCompat.END)) {
+            // Skip if in search mode
+            if (!binding.recyclerView.isInCustomChoice) {
+                switchFav(position - 2)
+                updateJumpFab()
+                closeDrawer(GravityCompat.END)
+            }
+        } else {
+            if (binding.recyclerView.isInCustomChoice) {
+                binding.recyclerView.toggleItemChecked(position)
+            } else {
+                mAdapter?.peek(position)?.let {
+                    navAnimated(
+                        R.id.galleryDetailScene,
+                        bundleOf(
+                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                            GalleryDetailScene.KEY_GALLERY_INFO to it,
+                        ),
+                    )
+                }
+            }
+        }
     }
 
-    private fun onInit() {
-        mUrlBuilder = FavListUrlBuilder()
-        mUrlBuilder!!.favCat = Settings.recentFavCat
+    private var collectJob: Job? = null
+
+    private fun switchFav(newCat: Int, keyword: String? = null) {
+        _binding ?: return
+        urlBuilder.keyword = keyword
+        urlBuilder.favCat = newCat
+        urlBuilder.jumpTo = null
+        urlBuilder.setIndex(null, true)
+        initialKey = null
+        collectJob?.cancel()
+        when (newCat) {
+            -2 -> {
+                collectJob = lifecycleScope.launchIO {
+                    localFavDataFlow.collectLatest {
+                        @Suppress("UNCHECKED_CAST")
+                        mAdapter?.submitData(it as PagingData<GalleryInfo>)
+                    }
+                }
+            }
+
+            else -> {
+                collectJob = lifecycleScope.launchIO {
+                    cloudDataFlow.collectLatest {
+                        mAdapter?.submitData(it)
+                    }
+                }
+            }
+        }
+        mAdapter?.refresh()
+        val favCatName: String = when (val favCat = urlBuilder.favCat) {
+            in 0..9 -> Settings.favCat[favCat]
+            FavListUrlBuilder.FAV_CAT_LOCAL -> getString(R.string.local_favorites)
+            else -> getString(R.string.cloud_favorites)
+        }
+        if (keyword.isNullOrEmpty()) {
+            setSearchBarHint(getString(R.string.favorites_title, favCatName))
+        } else {
+            setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword))
+        }
+        setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName))
+        Settings.recentFavCat = urlBuilder.favCat
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mAdapterDelegate?.type = Settings.listMode
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
-        mUrlBuilder = savedInstanceState.getParcelableCompat(KEY_URL_BUILDER)
-        if (mUrlBuilder == null) {
-            mUrlBuilder = FavListUrlBuilder()
+        savedInstanceState.getParcelableCompat<FavListUrlBuilder>(KEY_URL_BUILDER)?.let {
+            urlBuilder = it
         }
-        mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val hasFirstRefresh: Boolean = if (1 == mHelper.shownViewIndex) {
-            false
-        } else {
-            mHasFirstRefresh
-        }
-        outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh)
-        outState.putParcelable(KEY_URL_BUILDER, mUrlBuilder)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mUrlBuilder = null
+        outState.putParcelable(KEY_URL_BUILDER, urlBuilder)
     }
 
     override fun onCreateViewWithToolbar(
@@ -168,38 +249,84 @@ class FavoritesScene :
         savedInstanceState: Bundle?,
     ): View {
         _binding = SceneFavoritesBinding.inflate(inflater, container, false)
-        setOnApplySearch { query: String? ->
-            onApplySearch(query)
+        setOnApplySearch {
+            if (!binding.recyclerView.isInCustomChoice) {
+                switchFav(urlBuilder.favCat, it)
+            }
         }
+        binding.fastScroller.attachToRecyclerView(binding.recyclerView)
+        binding.fastScroller.setHandlerDrawable(HandlerDrawable().apply { setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary)) })
         binding.fabLayout.run {
-            addOnExpandListener(FabLayoutListener())
+            addOnExpandListener { if (!it && binding.recyclerView.isInCustomChoice) binding.recyclerView.outOfCustomChoiceMode() }
             (parent as ViewGroup).removeView(this)
             container!!.addView(this)
-            ViewCompat.setWindowInsetsAnimationCallback(
-                binding.root,
-                WindowInsetsAnimationHelper(
-                    WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
-                    this,
-                ),
-            )
+            ViewCompat.setWindowInsetsAnimationCallback(binding.root, WindowInsetsAnimationHelper(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP, this))
             updateJumpFab()
             val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
-            mActionFabDrawable = AddDeleteDrawable(context, colorID)
-            primaryFab!!.setImageDrawable(mActionFabDrawable)
+            val addDelete = AddDeleteDrawable(context, colorID)
+            primaryFab!!.setImageDrawable(addDelete)
             setExpanded(expanded = false, animation = false)
             setAutoCancel(true)
             setHidePrimaryFab(false)
-            setOnClickFabListener(this@FavoritesScene)
-            addOnExpandListener(this@FavoritesScene)
+            setOnClickFabListener(object : OnClickFabListener {
+                override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
+                    if (binding.recyclerView.isInCustomChoice) {
+                        binding.recyclerView.outOfCustomChoiceMode()
+                    } else {
+                        binding.fabLayout.toggle()
+                    }
+                }
+
+                override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
+                    if (!binding.recyclerView.isInCustomChoice) {
+                        when (position) {
+                            0 -> showGoToDialog()
+                            1 -> switchFav(urlBuilder.favCat)
+                            2 -> {
+                                initialKey = "1-0"
+                                mAdapter?.refresh()
+                            }
+                        }
+                        view.isExpanded = false
+                        return
+                    }
+                    when (position) {
+                        // Check all
+                        3 -> binding.recyclerView.checkAll()
+                        // Download
+                        4 -> CommonOperations.startDownload(mainActivity!!, takeCheckedInfo(), false)
+                        // Delete
+                        5 -> {
+                            val helper = DeleteDialogHelper()
+                            BaseDialogBuilder(context)
+                                .setTitle(R.string.delete_favorites_dialog_title)
+                                .setMessage(getString(R.string.delete_favorites_dialog_message, checkedSize()))
+                                .setPositiveButton(android.R.string.ok, helper)
+                                .show()
+                        }
+                        // Move
+                        6 -> {
+                            val helper = MoveDialogHelper()
+                            // First is local favorite, the other 10 is cloud favorite
+                            val array = arrayOfNulls<String>(11)
+                            array[0] = getString(R.string.local_favorites)
+                            System.arraycopy(Settings.favCat, 0, array, 1, 10)
+                            BaseDialogBuilder(context).setTitle(R.string.move_favorites_dialog_title).setItems(array, helper).show()
+                        }
+                    }
+                }
+            })
+            addOnExpandListener {
+                if (it) {
+                    addDelete.setDelete(ANIMATE_TIME)
+                } else {
+                    addDelete.setAdd(ANIMATE_TIME)
+                }
+            }
             addAboveSnackView(this)
         }
-        binding.contentLayout.run {
-            mHelper = FavoritesHelper()
-            mHelper.setEmptyString(getString(R.string.gallery_list_empty_hit))
-            setHelper(mHelper)
-            val paddingTopSB =
-                resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
-            setFitPaddingTop(paddingTopSB)
+        binding.run {
+            val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
             fastScroller.run {
                 setPadding(
                     paddingLeft,
@@ -207,95 +334,122 @@ class FavoritesScene :
                     paddingRight,
                     paddingBottom,
                 )
-                setOnDragHandlerListener(this@FavoritesScene)
+                setOnDragHandlerListener(object : OnDragHandlerListener {
+                    override fun onStartDragHandler() {
+                        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                    }
+
+                    override fun onEndDragHandler() {
+                        if (!binding.recyclerView.isInCustomChoice) {
+                            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                        }
+                        showSearchBar()
+                    }
+                })
             }
         }
-        binding.contentLayout.recyclerView.run {
-            mAdapter = FavoritesAdapter(resources, this, Settings.listMode)
-            clipToPadding = false
-            clipChildren = false
+        binding.recyclerView.run {
+            val delegateAdapter = object : GalleryAdapter(resources, this@run, Settings.listMode, false, { onItemClick(it) }, { onItemLongClick(it) }) {
+                override fun getItemCount() = TODO()
+                override fun getDataAt(position: Int) = mAdapter?.peek(position)
+            }
+            val diffCallback = object : DiffUtil.ItemCallback<GalleryInfo>() {
+                override fun areItemsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
+                override fun areContentsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
+            }
+            mAdapter = object : PagingDataAdapter<GalleryInfo, GalleryHolder>(diffCallback) {
+                override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
+                    getItem(position)
+                    delegateAdapter.onBindViewHolder(holder, position)
+                }
+                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = delegateAdapter.onCreateViewHolder(parent, delegateAdapter.type)
+            }.also { adapter ->
+                binding.recyclerView.adapter = adapter
+                val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
+                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                binding.tip.setCompoundDrawables(null, drawable, null, null)
+                binding.tip.setOnClickListener { mAdapter?.refresh() }
+                val transition = ViewTransition(binding.recyclerView, binding.progress, binding.tip)
+                val empty = getString(R.string.gallery_list_empty_hit)
+                adapter.addLoadStateListener {
+                    lifecycleScope.launchUI {
+                        when (val state = it.refresh) {
+                            is LoadState.Loading -> {
+                                showSearchBar()
+                                transition.showView(1)
+                            }
+                            is LoadState.Error -> {
+                                binding.tip.text = ExceptionUtils.getReadableString(state.error)
+                                transition.showView(2)
+                            }
+                            is LoadState.NotLoading -> {
+                                delay(500)
+                                if (mAdapter?.itemCount == 0) {
+                                    binding.tip.text = empty
+                                    transition.showView(2)
+                                } else {
+                                    transition.showView(0)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            switchFav(Settings.recentFavCat)
+            mAdapterDelegate = delegateAdapter
             setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
-            setCustomCheckedListener(this@FavoritesScene)
+            setCustomCheckedListener(object : CustomChoiceListener {
+                override fun onIntoCustomChoice(view: EasyRecyclerView) {
+                    showSelectionFab()
+                    binding.fabLayout.setAutoCancel(false)
+                    // Delay expanding action to make layout work fine
+                    SimpleHandler.post { binding.fabLayout.isExpanded = true }
+                    binding.refreshLayout.isEnabled = false
+                    // Lock drawer
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                }
+
+                override fun onOutOfCustomChoice(view: EasyRecyclerView) {
+                    showNormalFab()
+                    binding.fabLayout.setAutoCancel(true)
+                    binding.fabLayout.isExpanded = false
+                    binding.refreshLayout.isEnabled = true
+                    // Unlock drawer
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                }
+
+                override fun onItemCheckedStateChanged(view: EasyRecyclerView, position: Int, id: Long, checked: Boolean) {
+                    if (view.checkedItemCount == 0) {
+                        view.outOfCustomChoiceMode()
+                    }
+                }
+            })
         }
         setAllowEmptySearch(false)
-        updateSearchBar()
-
-        // Only refresh for the first time
-        if (!mHasFirstRefresh) {
-            mHasFirstRefresh = true
-            mHelper.firstRefresh()
-        }
         return binding.root
-    }
-
-    // keyword of mUrlBuilder, fav cat of mUrlBuilder, mFavCatArray.
-    // They changed, call it
-    private fun updateSearchBar() {
-        _binding ?: return
-        mUrlBuilder ?: return
-
-        // Update title
-        val favCatName: String = when (val favCat = mUrlBuilder!!.favCat) {
-            in 0..9 -> {
-                Settings.favCat[favCat]
-            }
-
-            FavListUrlBuilder.FAV_CAT_LOCAL -> {
-                getString(R.string.local_favorites)
-            }
-
-            else -> {
-                getString(R.string.cloud_favorites)
-            }
-        }
-        val keyword = mUrlBuilder!!.keyword
-        if (keyword.isNullOrEmpty()) {
-            if (favCatName != mOldFavCat) {
-                setSearchBarHint(getString(R.string.favorites_title, favCatName))
-            }
-        } else {
-            if (favCatName != mOldFavCat || keyword != mOldKeyword) {
-                setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword))
-            }
-        }
-
-        // Update hint
-        if (favCatName != mOldFavCat) {
-            setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName))
-        }
-        mOldFavCat = favCatName
-        mOldKeyword = keyword
-
-        // Save recent fav cat
-        Settings.recentFavCat = mUrlBuilder!!.favCat
     }
 
     // Hide jump fab on local fav cat
     private fun updateJumpFab() {
-        if (mUrlBuilder != null) {
-            binding.fabLayout.setSecondaryFabVisibilityAt(
-                0,
-                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL,
-            )
-            binding.fabLayout.setSecondaryFabVisibilityAt(
-                2,
-                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL,
-            )
-        }
+        binding.fabLayout.setSecondaryFabVisibilityAt(
+            0,
+            urlBuilder.favCat != FavListUrlBuilder.FAV_CAT_LOCAL,
+        )
+        binding.fabLayout.setSecondaryFabVisibilityAt(
+            2,
+            urlBuilder.favCat != FavListUrlBuilder.FAV_CAT_LOCAL,
+        )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mHelper.destroy()
-        if (1 == mHelper.shownViewIndex) {
-            mHasFirstRefresh = false
-        }
-        binding.contentLayout.recyclerView.stopScroll()
+        binding.recyclerView.stopScroll()
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
         mAdapter = null
-        mOldFavCat = null
-        mOldKeyword = null
+        mAdapterDelegate = null
         _binding = null
     }
 
@@ -303,132 +457,47 @@ class FavoritesScene :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        return ComposeView(inflater.context).apply {
-            setMD3Content {
-                ElevatedCard {
-                    val scope = currentRecomposeScope
-                    LaunchedEffect(Unit) {
-                        Settings.favChangesFlow.collect {
-                            scope.invalidate()
-                        }
+    ) = ComposeView(inflater.context).apply {
+        setMD3Content {
+            ElevatedCard {
+                TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
+                val scope = currentRecomposeScope
+                LaunchedEffect(Unit) {
+                    Settings.favChangesFlow.collect {
+                        scope.invalidate()
                     }
-                    val faves = arrayOf(
-                        stringResource(id = R.string.local_favorites) to Settings.favLocalCount,
-                        stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
-                        *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
-                    )
-                    TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
-                    LazyColumn {
-                        itemsIndexed(faves) { index, (name, count) ->
-                            ListItem(
-                                headlineContent = { Text(text = name) },
-                                trailingContent = { Text(text = count.toString(), style = MaterialTheme.typography.bodyLarge) },
-                                modifier = Modifier.clickable { onItemClick(index) },
-                            )
-                        }
+                }
+                val faves = arrayOf(
+                    stringResource(id = R.string.local_favorites) to Settings.favLocalCount,
+                    stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
+                    *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
+                )
+                LazyColumn {
+                    itemsIndexed(faves) { index, (name, count) ->
+                        ListItem(
+                            headlineContent = { Text(text = name) },
+                            trailingContent = { Text(text = count.toString(), style = MaterialTheme.typography.bodyLarge) },
+                            modifier = Modifier.clickable { onItemClick(index) },
+                        )
                     }
                 }
             }
         }
     }
 
-    override fun onStartDragHandler() {
-        // Lock right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-    }
-
-    override fun onEndDragHandler() {
-        // Restore right drawer
-        if (!binding.contentLayout.recyclerView.isInCustomChoice) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-        }
-        showSearchBar()
-    }
-
-    fun onItemClick(position: Int): Boolean {
-        if (isDrawerOpen(GravityCompat.END)) {
-            // Skip if in search mode
-            if (binding.contentLayout.recyclerView.isInCustomChoice) {
-                return true
-            }
-            if (mUrlBuilder == null) {
-                return true
-            }
-
-            // Local favorite position is 0, All favorite position is 1, so position - 2 is OK
-            val newFavCat = position - 2
-
-            // Check is the same
-            if (mUrlBuilder!!.favCat == newFavCat) {
-                return true
-            }
-            mUrlBuilder!!.keyword = null
-            mUrlBuilder!!.favCat = newFavCat
-            updateSearchBar()
-            updateJumpFab()
-            mHelper.refresh()
-            closeDrawer(GravityCompat.END)
-        } else {
-            if (binding.contentLayout.recyclerView.isInCustomChoice) {
-                binding.contentLayout.recyclerView.toggleItemChecked(position)
-            } else {
-                val gi = mHelper.getDataAtEx(position) ?: return true
-                val args = Bundle()
-                args.putString(
-                    GalleryDetailScene.KEY_ACTION,
-                    GalleryDetailScene.ACTION_GALLERY_INFO,
-                )
-                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-                navAnimated(R.id.galleryDetailScene, args)
-            }
-        }
-        return true
-    }
-
     fun onItemLongClick(position: Int): Boolean {
         // Can not into
-        if (!binding.contentLayout.recyclerView.isInCustomChoice) {
-            binding.contentLayout.recyclerView.intoCustomChoiceMode()
+        if (!binding.recyclerView.isInCustomChoice) {
+            binding.recyclerView.intoCustomChoiceMode()
         }
-        binding.contentLayout.recyclerView.toggleItemChecked(position)
+        binding.recyclerView.toggleItemChecked(position)
         return true
-    }
-
-    private fun onApplySearch(query: String?) {
-        // Skip if in search mode
-        if (binding.contentLayout.recyclerView.isInCustomChoice) {
-            return
-        }
-        if (mUrlBuilder == null) {
-            return
-        }
-        mUrlBuilder!!.keyword = query
-        updateSearchBar()
-        mHelper.refresh()
-    }
-
-    override fun onExpand(expanded: Boolean) {
-        if (expanded) {
-            mActionFabDrawable.setDelete(ANIMATE_TIME)
-        } else {
-            mActionFabDrawable.setAdd(ANIMATE_TIME)
-        }
-    }
-
-    override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-        if (binding.contentLayout.recyclerView.isInCustomChoice) {
-            binding.contentLayout.recyclerView.outOfCustomChoiceMode()
-        } else {
-            binding.fabLayout.toggle()
-        }
     }
 
     private fun showGoToDialog() {
         context ?: return
         val local = LocalDateTime.of(2007, 3, 21, 0, 0)
-        val fromDate =
-            local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli()
+        val fromDate = local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli()
         val toDate = MaterialDatePicker.todayInUtcMilliseconds()
         val listValidators = ArrayList<DateValidator>()
         listValidators.add(DateValidatorPointForward.from(fromDate))
@@ -443,90 +512,29 @@ class FavoritesScene :
             .setSelection(toDate)
             .build()
         datePicker.show(requireActivity().supportFragmentManager, "date-picker")
-        datePicker.addOnPositiveButtonClickListener { v: Long? ->
-            mHelper.goTo(
-                v!!,
-                true,
-            )
+        datePicker.addOnPositiveButtonClickListener { time: Long ->
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
+            val jumpTo = formatter.format(Instant.ofEpochMilli(time))
+            urlBuilder.jumpTo = jumpTo
+            mAdapter?.refresh()
         }
     }
 
-    override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
-        val context = context ?: return
-        if (!binding.contentLayout.recyclerView.isInCustomChoice) {
-            when (position) {
-                0 -> {
-                    if (mHelper.canGoTo()) showGoToDialog()
-                }
+    private fun takeCheckedInfo() = run {
+        val stateArray = binding.recyclerView.checkedItemPositions!!
+        stateArray.valueIterator().asSequence().withIndex().filter { it.value }
+            .mapNotNull { mAdapter?.peek(stateArray.keyAt(it.index)) }.toList()
+    }.also { binding.recyclerView.outOfCustomChoiceMode() }
 
-                1 -> mHelper.refresh()
-                2 -> mHelper.goTo("1-0", false)
-            }
-            view.isExpanded = false
-            return
-        }
-        mModifyGiList.clear()
-        val stateArray = binding.contentLayout.recyclerView.checkedItemPositions!!
-        for (i in 0 until stateArray.size()) {
-            if (stateArray.valueAt(i)) {
-                val gi = mHelper.getDataAtEx(stateArray.keyAt(i))
-                if (gi != null) {
-                    mModifyGiList.add(gi)
-                }
-            }
-        }
-        when (position) {
-            3 -> // Check all
-                binding.contentLayout.recyclerView.checkAll()
+    private fun checkedSize() = binding.recyclerView.checkedItemCount
 
-            4 -> { // Download
-                val activity: Activity? = mainActivity
-                if (activity != null) {
-                    CommonOperations.startDownload(mainActivity!!, mModifyGiList, false)
-                }
-                mModifyGiList.clear()
-                if (binding.contentLayout.recyclerView.isInCustomChoice) {
-                    binding.contentLayout.recyclerView.outOfCustomChoiceMode()
-                }
-            }
-
-            5 -> { // Delete
-                val helper = DeleteDialogHelper()
-                BaseDialogBuilder(context)
-                    .setTitle(R.string.delete_favorites_dialog_title)
-                    .setMessage(
-                        getString(
-                            R.string.delete_favorites_dialog_message,
-                            mModifyGiList.size,
-                        ),
-                    )
-                    .setPositiveButton(android.R.string.ok, helper)
-                    .setOnCancelListener(helper)
-                    .show()
-            }
-
-            6 -> { // Move
-                val helper = MoveDialogHelper()
-                // First is local favorite, the other 10 is cloud favorite
-                val array = arrayOfNulls<String>(11)
-                array[0] = getString(R.string.local_favorites)
-                System.arraycopy(Settings.favCat, 0, array, 1, 10)
-                BaseDialogBuilder(context)
-                    .setTitle(R.string.move_favorites_dialog_title)
-                    .setItems(array, helper)
-                    .setOnCancelListener(helper)
-                    .show()
-            }
-        }
-    }
-
-    private fun showNormalFabs() {
-        // Delay showing normal fabs to avoid mutation
+    private fun showNormalFab() {
+        // Delay showing normal fab to avoid mutation
         SimpleHandler.removeCallbacks(showNormalFabsRunnable)
         SimpleHandler.postDelayed(showNormalFabsRunnable, 300)
     }
 
-    private fun showSelectionFabs() {
+    private fun showSelectionFab() {
         SimpleHandler.removeCallbacks(showNormalFabsRunnable)
         binding.fabLayout.run {
             (0..2).forEach { setSecondaryFabVisibilityAt(it, false) }
@@ -534,303 +542,48 @@ class FavoritesScene :
         }
     }
 
-    override fun onIntoCustomChoice(view: EasyRecyclerView) {
-        showSelectionFabs()
-        binding.fabLayout.setAutoCancel(false)
-        // Delay expanding action to make layout work fine
-        SimpleHandler.post { binding.fabLayout.isExpanded = true }
-        mHelper.setRefreshLayoutEnable(false)
-        // Lock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-    }
-
-    override fun onOutOfCustomChoice(view: EasyRecyclerView) {
-        showNormalFabs()
-        binding.fabLayout.setAutoCancel(true)
-        binding.fabLayout.isExpanded = false
-        mHelper.setRefreshLayoutEnable(true)
-        // Unlock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-    }
-
-    override fun onItemCheckedStateChanged(
-        view: EasyRecyclerView,
-        position: Int,
-        id: Long,
-        checked: Boolean,
-    ) {
-        if (view.checkedItemCount == 0) {
-            view.outOfCustomChoiceMode()
-        }
-    }
-
-    private fun onGetFavoritesSuccess(result: FavoritesParser.Result, taskId: Int) {
-        if (mHelper.isCurrentTask(taskId)) {
-            Settings.favCat = result.catArray
-            Settings.favCount = result.countArray
-            Settings.favCloudCount = result.countArray.sum()
-            _binding ?: return
-            updateSearchBar()
-            mHelper.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList)
-        }
-    }
-
-    private fun onGetFavoritesFailure(e: Throwable, taskId: Int) {
-        if (mHelper.isCurrentTask(taskId)) {
-            mHelper.onGetException(taskId, e)
-        }
-    }
-
-    private fun onGetFavoritesLocal(keyword: String?, taskId: Int) {
-        if (mHelper.isCurrentTask(taskId)) {
-            val list: List<GalleryInfo> = if (keyword.isNullOrEmpty()) {
-                EhDB.allLocalFavorites
-            } else {
-                EhDB.searchLocalFavorites(keyword)
-            }
-            if (list.isEmpty()) {
-                mHelper.onGetPageData(taskId, 0, 0, null, null, list)
-            } else {
-                mHelper.onGetPageData(taskId, 1, 0, null, null, list)
-            }
-            if (keyword.isNullOrEmpty()) {
-                Settings.favLocalCount = list.size
-            }
-        }
-    }
-
-    private inner class DeleteDialogHelper :
-        DialogInterface.OnClickListener,
-        DialogInterface.OnCancelListener {
+    private inner class DeleteDialogHelper : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
-            if (which != DialogInterface.BUTTON_POSITIVE) {
-                return
-            }
-            if (mUrlBuilder == null) {
-                return
-            }
-            binding.contentLayout.recyclerView.outOfCustomChoiceMode()
-            if (mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
-                val gidArray = mModifyGiList.map { it.gid }.toLongArray()
-                EhDB.removeLocalFavorites(gidArray)
-                mModifyGiList.clear()
-                mHelper.refresh()
-            } else { // Delete cloud fav
-                mEnableModify = true
-                mModifyFavCat = -1
-                mModifyAdd = false
-                mHelper.refresh()
-            }
-        }
-
-        override fun onCancel(dialog: DialogInterface) {
-            mModifyGiList.clear()
-        }
-    }
-
-    private inner class MoveDialogHelper :
-        DialogInterface.OnClickListener,
-        DialogInterface.OnCancelListener {
-        override fun onClick(dialog: DialogInterface, which: Int) {
-            if (mUrlBuilder == null) {
-                return
-            }
-            val srcCat = mUrlBuilder!!.favCat
-            val dstCat: Int = if (which == 0) {
-                FavListUrlBuilder.FAV_CAT_LOCAL
-            } else {
-                which - 1
-            }
-            if (srcCat == dstCat) {
-                return
-            }
-            binding.contentLayout.recyclerView.outOfCustomChoiceMode()
-            if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from local to cloud
-                val gidArray = mModifyGiList.map { it.gid }.toLongArray()
-                EhDB.removeLocalFavorites(gidArray)
-                mEnableModify = true
-                mModifyFavCat = dstCat
-                mModifyAdd = true
-                mHelper.refresh()
-            } else if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from cloud to local
-                EhDB.putLocalFavorites(mModifyGiList)
-                mEnableModify = true
-                mModifyFavCat = -1
-                mModifyAdd = false
-                mHelper.refresh()
-            } else {
-                mEnableModify = true
-                mModifyFavCat = dstCat
-                mModifyAdd = false
-                mHelper.refresh()
-            }
-        }
-
-        override fun onCancel(dialog: DialogInterface) {
-            mModifyGiList.clear()
-        }
-    }
-
-    private inner class FavoritesAdapter(
-        resources: Resources,
-        recyclerView: RecyclerView,
-        type: Int,
-    ) : GalleryAdapter(
-        resources,
-        recyclerView,
-        type,
-        false,
-        { onItemClick(it) },
-        { onItemLongClick(it) },
-    ) {
-        override fun getItemCount(): Int {
-            return mHelper.size()
-        }
-
-        override fun getDataAt(position: Int): GalleryInfo? {
-            return mHelper.getDataAtEx(position)
-        }
-    }
-
-    private inner class FabLayoutListener : OnExpandListener {
-        override fun onExpand(expanded: Boolean) {
-            if (!expanded && binding.contentLayout.recyclerView.isInCustomChoice) binding.contentLayout.recyclerView.outOfCustomChoiceMode()
-        }
-    }
-
-    private inner class FavoritesHelper : GalleryInfoContentHelper() {
-        override fun getPageData(
-            taskId: Int,
-            type: Int,
-            page: Int,
-            index: String?,
-            isNext: Boolean,
-        ) {
-            val activity = mainActivity
-            if (null == activity || null == mUrlBuilder) {
-                return
-            }
-            if (mEnableModify) {
-                mEnableModify = false
-                val local = mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL
-                if (mModifyAdd) {
-                    val gidTokenArray = mModifyGiList.map { Pair(it.gid, it.token!!) }.toTypedArray()
-                    val modifyGiListBackup: List<GalleryInfo> = ArrayList(mModifyGiList)
-                    mModifyGiList.clear()
-                    lifecycleScope.launchIO {
-                        runSuspendCatching {
-                            EhEngine.addFavoritesRange(gidTokenArray, mModifyFavCat)
-                        }.onSuccess {
-                            withUIContext {
-                                onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
-                            }
-                        }.onFailure {
-                            // TODO It's a failure, add all of backup back to db.
-                            // But how to known which one is failed?
-                            EhDB.putLocalFavorites(modifyGiListBackup)
-                            withUIContext {
-                                onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
-                            }
-                        }
-                    }
+            val info = takeCheckedInfo()
+            lifecycleScope.launchIO {
+                if (urlBuilder.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
+                    val gidArray = info.map { it.gid }.toLongArray()
+                    EhDB.removeLocalFavorites(gidArray)
                 } else {
-                    val gidArray = mModifyGiList.map { it.gid }.toLongArray()
-                    mModifyGiList.clear()
-                    val url: String = if (local) {
-                        // Local fav is shown now, but operation need be done for cloud fav
-                        ehUrl { addPathSegments(EhUrl.FAV_PATH) }.toString()
-                    } else {
-                        mUrlBuilder!!.build()
-                    }
-                    mUrlBuilder!!.setIndex(index, true)
-                    lifecycleScope.launchIO {
-                        runSuspendCatching {
-                            EhEngine.modifyFavorites(url, gidArray, mModifyFavCat)
-                        }.onSuccess { result ->
-                            // Put fav cat
-                            Settings.favCat = result.catArray
-                            Settings.favCount = result.countArray
-                            withUIContext {
-                                if (local) {
-                                    onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
-                                } else {
-                                    onGetFavoritesSuccess(result, taskId)
-                                }
-                            }
-                        }.onFailure {
-                            it.printStackTrace()
-                            withUIContext {
-                                if (local) {
-                                    onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
-                                } else {
-                                    onGetFavoritesFailure(it, taskId)
-                                }
-                            }
-                        }
-                    }
+                    val delArray = info.map { it.gid to it.token!! }.toTypedArray()
+                    EhEngine.addFavoritesRange(delArray, -1)
                 }
-            } else if (mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
-                val keyword = mUrlBuilder!!.keyword
-                SimpleHandler.post { onGetFavoritesLocal(keyword, taskId) }
-            } else {
-                mUrlBuilder!!.setIndex(index, isNext)
-                mUrlBuilder!!.jumpTo = jumpTo
-                val url = mUrlBuilder!!.build()
-                lifecycleScope.launchIO {
-                    runSuspendCatching {
-                        EhEngine.getFavorites(url)
-                    }.onSuccess { result ->
-                        Settings.favCat = result.catArray
-                        Settings.favCount = result.countArray
-                        withUIContext {
-                            onGetFavoritesSuccess(result, taskId)
-                        }
-                    }.onFailure {
-                        withUIContext {
-                            onGetFavoritesFailure(it, taskId)
-                        }
-                    }
-                }
-            }
-        }
-
-        override val context
-            get() = this@FavoritesScene.requireContext()
-
-        override fun notifyDataSetChanged() {
-            // Ensure outOfCustomChoiceMode to avoid error
-            binding.contentLayout.recyclerView.outOfCustomChoiceMode()
-            if (mAdapter != null) {
-                mAdapter!!.notifyDataSetChanged()
-            }
-        }
-
-        override fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {
-            if (mAdapter != null) {
-                mAdapter!!.notifyItemRangeInserted(positionStart, itemCount)
-            }
-        }
-
-        override fun onShowView(hiddenView: View, shownView: View) {
-            showSearchBar()
-        }
-
-        override fun isDuplicate(d1: GalleryInfo, d2: GalleryInfo): Boolean {
-            return d1.gid == d2.gid
-        }
-
-        override fun onScrollToPosition(position: Int) {
-            if (0 == position) {
-                showSearchBar()
+                mAdapter?.refresh()
             }
         }
     }
 
-    companion object {
-        private const val ANIMATE_TIME = 300L
-        private const val KEY_URL_BUILDER = "url_builder"
-        private const val KEY_HAS_FIRST_REFRESH = "has_first_refresh"
+    private inner class MoveDialogHelper : DialogInterface.OnClickListener {
+        override fun onClick(dialog: DialogInterface, which: Int) {
+            val srcCat = urlBuilder.favCat
+            val dstCat = if (which == 0) { FavListUrlBuilder.FAV_CAT_LOCAL } else { which - 1 }
+            if (srcCat == dstCat) return
+            val info = takeCheckedInfo()
+            lifecycleScope.launchIO {
+                if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
+                    // Move from local to cloud
+                    val gidArray = info.map { it.gid }.toLongArray()
+                    EhDB.removeLocalFavorites(gidArray)
+                }
+                if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
+                    // Move from cloud to local
+                    EhDB.putLocalFavorites(info)
+                } else {
+                    // Move from cloud/local to cloud
+                    val gidArray = info.map { it.gid }.toLongArray()
+                    val url = ehUrl { addPathSegments(EhUrl.FAV_PATH) }.toString()
+                    EhEngine.modifyFavorites(url, gidArray, dstCat)
+                }
+                mAdapter?.refresh()
+            }
+        }
     }
 }
+
+private const val ANIMATE_TIME = 300L
+private const val KEY_URL_BUILDER = "url_builder"
