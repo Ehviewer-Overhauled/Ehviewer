@@ -32,7 +32,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -68,7 +70,10 @@ import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import my.nanihadesuka.compose.LazyGridScrollbar
 
+class VMStorage1 : ViewModel()
+
 class GalleryPreviewScreen : Fragment() {
+    private val vm: VMStorage1 by viewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = ComposeView(inflater.context).apply {
         setMD3Content {
             val galleryDetail = remember { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
@@ -100,8 +105,8 @@ class GalleryPreviewScreen : Fragment() {
                 result.first.first
             }
 
-            val previewPagesMap = rememberMemorized { galleryDetail.previewList.associateBy { it.position } as MutableMap }
-            val data = remember {
+            val data = rememberMemorized {
+                val previewPagesMap = galleryDetail.previewList.associateBy { it.position } as MutableMap
                 Pager(PagingConfig(pageSize = pgSize, initialLoadSize = pgSize, jumpThreshold = 2 * pgSize)) {
                     object : PagingSource<Int, GalleryPreview>() {
                         override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = state.getClippedRefreshKey()
@@ -123,7 +128,7 @@ class GalleryPreviewScreen : Fragment() {
                         }
                         override val jumpingSupported = true
                     }
-                }.flow.cachedIn(lifecycleScope)
+                }.flow.cachedIn(vm.viewModelScope)
             }.collectAsLazyPagingItems()
 
             Scaffold(
