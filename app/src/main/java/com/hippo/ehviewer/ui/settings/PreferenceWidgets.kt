@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerArrayResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -40,6 +41,7 @@ import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
 import com.jamal.composeprefs3.ui.prefs.DropDownPref
+import com.jamal.composeprefs3.ui.prefs.DropDownPrefInt
 import com.jamal.composeprefs3.ui.prefs.SliderPref
 import com.jamal.composeprefs3.ui.prefs.SpannedTextPref
 import com.jamal.composeprefs3.ui.prefs.SwitchPref
@@ -119,6 +121,20 @@ fun SimpleMenuPreferenceInt(title: String, summary: String? = null, @ArrayRes en
     fun set(new: String) { v = new.toInt() }
     check(entryArray.size == valuesArray.size)
     DropDownPref(title = title, summary = summary, defaultValue = v.toString(), onValueChange = ::set, useSelectedAsSummary = summary.isNullOrBlank(), entries = map)
+}
+
+@Composable
+fun SimpleMenuPreferenceInt2(title: String, summary: String? = null, @ArrayRes entry: Int, @ArrayRes entryValueRes: Int, value: MutableState<Int>) {
+    val entryArray = stringArrayResource(id = entry)
+    val valuesArray = integerArrayResource(id = entryValueRes)
+    val map = remember {
+        val iter = entryArray.iterator()
+        valuesArray.associateWith { iter.next() }
+    }
+    var v by value
+    fun set(new: Int) { v = new }
+    check(entryArray.size == valuesArray.size)
+    DropDownPrefInt(title = title, summary = summary, defaultValue = v, onValueChange = ::set, useSelectedAsSummary = summary.isNullOrBlank(), entries = map)
 }
 
 @Composable

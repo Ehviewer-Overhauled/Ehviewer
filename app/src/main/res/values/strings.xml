@@ -573,6 +573,13 @@
     <string name="list_tile_thumb_size">Thumb size in thumb mode</string>
     <string name="account_name">Account</string>
     <string name="preload_thumb_aggressively">Preload thumbs aggressively</string>
+    <string name="auto_updates">Automatically check for updates</string>
+    <string name="update_frequency_never">Never</string>
+    <string name="update_frequency_daily">Daily</string>
+    <string name="update_frequency_3days">Every 3 days</string>
+    <string name="update_frequency_weekly">Weekly</string>
+    <string name="update_frequency_biweekly">Biweekly</string>
+    <string name="update_frequency_monthly">Monthly</string>
     <string name="new_version_available">New version available!</string>
     <string name="already_latest_version">Already the latest version</string>
     <!-- Tachiyomi Reader Start-->

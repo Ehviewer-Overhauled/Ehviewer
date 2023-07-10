@@ -15,6 +15,8 @@ import tachiyomi.data.release.GithubCommitComparison
 import tachiyomi.data.release.GithubRelease
 import tachiyomi.data.release.GithubWorkflowRuns
 import java.io.File
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.zip.ZipInputStream
 
 private const val API_URL = "https://api.github.com/repos/${BuildConfig.REPO_NAME}"
@@ -22,7 +24,11 @@ private const val LATEST_RELEASE_URL = "$API_URL/releases/latest"
 
 object AppUpdater {
     suspend fun checkForUpdate(forceCheck: Boolean = false): Release? {
-        if (forceCheck) {
+        val now = Instant.now()
+        val lastChecked = Instant.ofEpochSecond(Settings.lastUpdateDay)
+        val interval = Settings.updateIntervalDays
+        if (forceCheck || interval != 0 && now.isAfter(lastChecked.plus(interval.toLong(), ChronoUnit.DAYS))) {
+            Settings.lastUpdateDay = now.epochSecond
             if (Settings.useCIUpdateChannel) {
                 val curSha = BuildConfig.COMMIT_SHA
                 val branch = ghRequest(API_URL).execute {
@@ -37,6 +43,7 @@ object AppUpdater {
                     val changelog = runSuspendCatching {
                         val commitComparisonUrl = "$API_URL/compare/$curSha...$shortSha"
                         val result = ghRequest(commitComparisonUrl).executeAndParseAs<GithubCommitComparison>()
+                        // TODO: Prettier format, Markdown?
                         result.commits.joinToString("\n") { "${it.commit.message} (@${it.author.name})" }
                     }.getOrDefault(workflowRun.title)
                     return Release(shortSha, changelog, archiveUrl)

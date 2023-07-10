@@ -1,9 +1,12 @@
 package com.hippo.ehviewer.ui.settings
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -32,9 +35,11 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.tools.DialogState
+import com.hippo.ehviewer.ui.tools.observed
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.toAnnotatedString
 import com.hippo.ehviewer.updater.AppUpdater
+import com.hippo.ehviewer.updater.Release
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.installPackage
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -64,31 +69,6 @@ fun AboutScreen() {
     val dialogState = rememberDialogState()
     dialogState.Handler()
     fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
-    suspend fun DialogState.showNewVersion(
-        name: String,
-        changelog: String,
-        downloadTo: suspend (File) -> Unit,
-    ) {
-        val download = show(
-            confirmText = R.string.download,
-            dismissText = android.R.string.cancel,
-            title = R.string.new_version_available,
-        ) {
-            Column {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = changelog)
-            }
-        }
-        if (download) {
-            val file = File(AppConfig.tempDir, "update.apk").apply { delete() }
-            downloadTo(file)
-            withUIContext { context.installPackage(file) }
-        }
-    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -103,7 +83,7 @@ fun AboutScreen() {
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).nestedScroll(scrollBehavior.nestedScrollConnection)) {
+        Column(modifier = Modifier.padding(paddingValues).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             Preference(
                 title = stringResource(id = R.string.settings_about_declaration),
                 summary = stringResource(id = R.string.settings_about_declaration_summary),
@@ -131,17 +111,44 @@ fun AboutScreen() {
                 title = stringResource(id = R.string.use_ci_update_channel),
                 value = Settings::useCIUpdateChannel,
             )
+            SimpleMenuPreferenceInt2(
+                title = stringResource(id = R.string.auto_updates),
+                entry = R.array.update_frequency,
+                entryValueRes = R.array.update_frequency_values,
+                value = Settings::updateIntervalDays.observed,
+            )
             WorkPreference(title = stringResource(id = R.string.settings_about_check_for_updates)) {
                 runSuspendCatching {
-                    AppUpdater.checkForUpdate(true)?.run {
-                        dialogState.showNewVersion(version, changelog) { file ->
-                            AppUpdater.downloadUpdate(downloadLink, file)
-                        }
+                    AppUpdater.checkForUpdate(true)?.let {
+                        dialogState.showNewVersion(context, it)
                     } ?: launchSnackBar(context.getString(R.string.already_latest_version))
                 }.onFailure {
                     launchSnackBar(ExceptionUtils.getReadableString(it))
                 }
             }
         }
+    }
+}
+
+suspend fun DialogState.showNewVersion(context: Context, release: Release) {
+    val download = show(
+        confirmText = R.string.download,
+        dismissText = android.R.string.cancel,
+        title = R.string.new_version_available,
+    ) {
+        Column {
+            Text(
+                text = release.version,
+                style = MaterialTheme.typography.headlineSmall,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = release.changelog)
+        }
+    }
+    // TODO: Download in the background and show progress in notification
+    if (download) {
+        val file = File(AppConfig.tempDir, "update.apk").apply { delete() }
+        AppUpdater.downloadUpdate(release.downloadLink, file)
+        withUIContext { context.installPackage(file) }
     }
 }
