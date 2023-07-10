@@ -89,7 +89,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListener {
+class FavoritesScene : SearchBarScene() {
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
     private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
@@ -261,7 +261,54 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
             setExpanded(expanded = false, animation = false)
             setAutoCancel(true)
             setHidePrimaryFab(false)
-            setOnClickFabListener(this@FavoritesScene)
+            setOnClickFabListener(object : OnClickFabListener {
+                override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
+                    if (binding.recyclerView.isInCustomChoice) {
+                        binding.recyclerView.outOfCustomChoiceMode()
+                    } else {
+                        binding.fabLayout.toggle()
+                    }
+                }
+
+                override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
+                    if (!binding.recyclerView.isInCustomChoice) {
+                        when (position) {
+                            0 -> showGoToDialog()
+                            1 -> switchFav(urlBuilder.favCat)
+                            2 -> {
+                                initialKey = "1-0"
+                                mAdapter?.refresh()
+                            }
+                        }
+                        view.isExpanded = false
+                        return
+                    }
+                    when (position) {
+                        // Check all
+                        3 -> binding.recyclerView.checkAll()
+                        // Download
+                        4 -> CommonOperations.startDownload(mainActivity!!, takeCheckedInfo(), false)
+                        // Delete
+                        5 -> {
+                            val helper = DeleteDialogHelper()
+                            BaseDialogBuilder(context)
+                                .setTitle(R.string.delete_favorites_dialog_title)
+                                .setMessage(getString(R.string.delete_favorites_dialog_message, checkedSize()))
+                                .setPositiveButton(android.R.string.ok, helper)
+                                .show()
+                        }
+                        // Move
+                        6 -> {
+                            val helper = MoveDialogHelper()
+                            // First is local favorite, the other 10 is cloud favorite
+                            val array = arrayOfNulls<String>(11)
+                            array[0] = getString(R.string.local_favorites)
+                            System.arraycopy(Settings.favCat, 0, array, 1, 10)
+                            BaseDialogBuilder(context).setTitle(R.string.move_favorites_dialog_title).setItems(array, helper).show()
+                        }
+                    }
+                }
+            })
             addOnExpandListener {
                 if (it) {
                     addDelete.setDelete(ANIMATE_TIME)
@@ -315,7 +362,34 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
             switchFav(Settings.recentFavCat)
             mAdapterDelegate = delegateAdapter
             setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
-            setCustomCheckedListener(this@FavoritesScene)
+            setCustomCheckedListener(object : CustomChoiceListener {
+                override fun onIntoCustomChoice(view: EasyRecyclerView) {
+                    showSelectionFabs()
+                    binding.fabLayout.setAutoCancel(false)
+                    // Delay expanding action to make layout work fine
+                    SimpleHandler.post { binding.fabLayout.isExpanded = true }
+                    binding.refreshLayout.isEnabled = false
+                    // Lock drawer
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                }
+
+                override fun onOutOfCustomChoice(view: EasyRecyclerView) {
+                    showNormalFabs()
+                    binding.fabLayout.setAutoCancel(true)
+                    binding.fabLayout.isExpanded = false
+                    binding.refreshLayout.isEnabled = true
+                    // Unlock drawer
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                }
+
+                override fun onItemCheckedStateChanged(view: EasyRecyclerView, position: Int, id: Long, checked: Boolean) {
+                    if (view.checkedItemCount == 0) {
+                        view.outOfCustomChoiceMode()
+                    }
+                }
+            })
         }
         setAllowEmptySearch(false)
         return binding.root
@@ -391,14 +465,6 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         return true
     }
 
-    override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-        if (binding.recyclerView.isInCustomChoice) {
-            binding.recyclerView.outOfCustomChoiceMode()
-        } else {
-            binding.fabLayout.toggle()
-        }
-    }
-
     private fun showGoToDialog() {
         context ?: return
         val local = LocalDateTime.of(2007, 3, 21, 0, 0)
@@ -433,51 +499,6 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
 
     private fun checkedSize() = binding.recyclerView.checkedItemCount
 
-    override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
-        val context = context ?: return
-        if (!binding.recyclerView.isInCustomChoice) {
-            when (position) {
-                0 -> {
-                    showGoToDialog()
-                }
-                1 -> switchFav(urlBuilder.favCat)
-                2 -> {
-                    initialKey = "1-0"
-                    mAdapter?.refresh()
-                }
-            }
-            view.isExpanded = false
-            return
-        }
-        when (position) {
-            // Check all
-            3 -> binding.recyclerView.checkAll()
-            // Download
-            4 -> CommonOperations.startDownload(mainActivity!!, takeCheckedInfo(), false)
-            // Delete
-            5 -> {
-                val helper = DeleteDialogHelper()
-                BaseDialogBuilder(context)
-                    .setTitle(R.string.delete_favorites_dialog_title)
-                    .setMessage(getString(R.string.delete_favorites_dialog_message, checkedSize()))
-                    .setPositiveButton(android.R.string.ok, helper)
-                    .show()
-            }
-            // Move
-            6 -> {
-                val helper = MoveDialogHelper()
-                // First is local favorite, the other 10 is cloud favorite
-                val array = arrayOfNulls<String>(11)
-                array[0] = getString(R.string.local_favorites)
-                System.arraycopy(Settings.favCat, 0, array, 1, 10)
-                BaseDialogBuilder(context)
-                    .setTitle(R.string.move_favorites_dialog_title)
-                    .setItems(array, helper)
-                    .show()
-            }
-        }
-    }
-
     private fun showNormalFabs() {
         // Delay showing normal fabs to avoid mutation
         SimpleHandler.removeCallbacks(showNormalFabsRunnable)
@@ -489,38 +510,6 @@ class FavoritesScene : SearchBarScene(), OnClickFabListener, CustomChoiceListene
         binding.fabLayout.run {
             (0..2).forEach { setSecondaryFabVisibilityAt(it, false) }
             (3..6).forEach { setSecondaryFabVisibilityAt(it, true) }
-        }
-    }
-
-    override fun onIntoCustomChoice(view: EasyRecyclerView) {
-        showSelectionFabs()
-        binding.fabLayout.setAutoCancel(false)
-        // Delay expanding action to make layout work fine
-        SimpleHandler.post { binding.fabLayout.isExpanded = true }
-        binding.refreshLayout.isEnabled = false
-        // Lock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-    }
-
-    override fun onOutOfCustomChoice(view: EasyRecyclerView) {
-        showNormalFabs()
-        binding.fabLayout.setAutoCancel(true)
-        binding.fabLayout.isExpanded = false
-        binding.refreshLayout.isEnabled = true
-        // Unlock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-    }
-
-    override fun onItemCheckedStateChanged(
-        view: EasyRecyclerView,
-        position: Int,
-        id: Long,
-        checked: Boolean,
-    ) {
-        if (view.checkedItemCount == 0) {
-            view.outOfCustomChoiceMode()
         }
     }
 
