@@ -80,6 +80,7 @@ import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import moe.tarsin.coroutines.runSuspendCatching
@@ -119,9 +120,11 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         }
     }
 
+    private var initialKey: String? = null
+
     private val cloudDataFlow = Pager(PagingConfig(25)) {
         object : PagingSource<String, GalleryInfo>() {
-            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
+            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
             override suspend fun load(params: LoadParams<String>): LoadResult<String, GalleryInfo> {
                 when (params) {
                     is LoadParams.Prepend -> {
@@ -133,14 +136,19 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                     }
 
                     is LoadParams.Refresh -> {
-                        urlBuilder.setIndex(params.key, true)
+                        val key = params.key
+                        if (key.isNullOrBlank()) {
+                            urlBuilder.setIndex(null, true)
+                        } else {
+                            urlBuilder.setIndex(key, false)
+                        }
                     }
                 }
                 val r = EhEngine.getFavorites(urlBuilder.build())
                 Settings.favCat = r.catArray
                 Settings.favCount = r.countArray
                 Settings.favCloudCount = r.countArray.sum()
-                return LoadResult.Page(r.galleryInfoList, r.prev, r.next)
+                return LoadResult.Page(r.galleryInfoList, r.prev, r.next).also { logcat { it.toString() } }
             }
         }
     }.flow.cachedIn(lifecycleScope)
@@ -443,17 +451,16 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
         val context = context ?: return
         if (!binding.recyclerView.isInCustomChoice) {
-            /*
             when (position) {
                 0 -> {
-                    if (mHelper.canGoTo()) showGoToDialog()
+                    // Goto by date
                 }
-
-                1 -> mHelper.refresh()
-                2 -> mHelper.goTo("1-0", false)
+                1 -> mAdapter?.refresh()
+                2 -> {
+                    initialKey = "1-0"
+                    mAdapter?.refresh()
+                }
             }
-
-             */
             view.isExpanded = false
             return
         }
