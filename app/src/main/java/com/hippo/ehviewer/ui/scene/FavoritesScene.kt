@@ -102,10 +102,9 @@ import java.util.Locale
 // Note that we do not really follow mvvm structure, just use it as ... storage
 class VMStorage : ViewModel() {
     var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
-    var initialKey: String? = null
     private val cloudDataFlow = Pager(PagingConfig(25)) {
         object : PagingSource<String, GalleryInfo>() {
-            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
+            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
             override suspend fun load(params: LoadParams<String>) = withIOContext {
                 when (params) {
                     is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
@@ -149,7 +148,6 @@ class VMStorage : ViewModel() {
 class FavoritesScene : SearchBarScene() {
     private val vm: VMStorage by viewModels()
     private var urlBuilder by lazyMut { vm::urlBuilder }
-    private var initialKey by lazyMut { vm::initialKey }
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
     private var mAdapter: GalleryAdapter? = null
@@ -180,7 +178,6 @@ class FavoritesScene : SearchBarScene() {
         urlBuilder.favCat = newCat
         urlBuilder.jumpTo = null
         urlBuilder.setIndex(null, true)
-        initialKey = null
         collectJob?.cancel()
         collectJob = viewLifecycleOwner.lifecycleScope.launchIO {
             vm.dataflow().collectLatest {
@@ -248,7 +245,7 @@ class FavoritesScene : SearchBarScene() {
                             0 -> showGoToDialog()
                             1 -> switchFav(urlBuilder.favCat)
                             2 -> {
-                                initialKey = "1-0"
+                                urlBuilder.setIndex("1-0", false)
                                 mAdapter?.refresh()
                             }
                         }
