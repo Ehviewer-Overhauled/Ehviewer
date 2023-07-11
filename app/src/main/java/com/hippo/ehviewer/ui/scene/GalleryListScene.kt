@@ -319,7 +319,7 @@ class GalleryListScene : SearchBarScene() {
         }
 
         // Update title
-        var title = getSuitableTitleForUrlBuilder(requireContext(), mUrlBuilder, true)
+        var title = requireContext().getSuitableTitleForUrlBuilder(mUrlBuilder, true)
         if (null == title) {
             title = resources.getString(R.string.search)
         }
@@ -549,7 +549,7 @@ class GalleryListScene : SearchBarScene() {
         }
         val builder = EditTextDialogBuilder(
             context,
-            getSuitableTitleForUrlBuilder(context, mUrlBuilder, false),
+            context.getSuitableTitleForUrlBuilder(mUrlBuilder, false),
             getString(R.string.quick_search),
         )
         builder.setTitle(R.string.add_quick_search_dialog_title)
@@ -1027,13 +1027,11 @@ class GalleryListScene : SearchBarScene() {
             return R.id.galleryDetailScene
         }
 
-        override fun getArgs(): Bundle {
-            val args = Bundle()
-            args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-            args.putLong(GalleryDetailScene.KEY_GID, mGid)
-            args.putString(GalleryDetailScene.KEY_TOKEN, mToken)
-            return args
-        }
+        override fun getArgs() = bundleOf(
+            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GID_TOKEN,
+            GalleryDetailScene.KEY_GID to mGid,
+            GalleryDetailScene.KEY_TOKEN to mToken,
+        )
     }
 
     private inner class GalleryPageUrlSuggestion(
@@ -1129,8 +1127,7 @@ class GalleryListScene : SearchBarScene() {
     }
 }
 
-private fun getSuitableTitleForUrlBuilder(
-    context: Context,
+private fun Context.getSuitableTitleForUrlBuilder(
     urlBuilder: ListUrlBuilder,
     appName: Boolean,
 ): String? {
@@ -1138,29 +1135,29 @@ private fun getSuitableTitleForUrlBuilder(
     val category = urlBuilder.category
     val mode = urlBuilder.mode
     return if (mode == MODE_WHATS_HOT) {
-        context.getString(R.string.whats_hot)
+        getString(R.string.whats_hot)
     } else if (!keyword.isNullOrEmpty()) {
         when (mode) {
             MODE_TOPLIST -> {
                 when (keyword) {
-                    "11" -> context.getString(R.string.toplist_alltime)
-                    "12" -> context.getString(R.string.toplist_pastyear)
-                    "13" -> context.getString(R.string.toplist_pastmonth)
-                    "15" -> context.getString(R.string.toplist_yesterday)
+                    "11" -> getString(R.string.toplist_alltime)
+                    "12" -> getString(R.string.toplist_pastyear)
+                    "13" -> getString(R.string.toplist_pastmonth)
+                    "15" -> getString(R.string.toplist_yesterday)
                     else -> null
                 }
             }
 
             MODE_TAG -> {
-                val canTranslate = Settings.showTagTranslations && EhTagDatabase.isTranslatable(context) && EhTagDatabase.initialized
+                val canTranslate = Settings.showTagTranslations && EhTagDatabase.isTranslatable(this) && EhTagDatabase.initialized
                 wrapTagKeyword(keyword, canTranslate)
             }
             else -> keyword
         }
     } else if (category == EhUtils.NONE && urlBuilder.advanceSearch == -1) {
         when (mode) {
-            MODE_NORMAL -> context.getString(if (appName) R.string.app_name else R.string.homepage)
-            MODE_SUBSCRIPTION -> context.getString(R.string.subscription)
+            MODE_NORMAL -> getString(if (appName) R.string.app_name else R.string.homepage)
+            MODE_SUBSCRIPTION -> getString(R.string.subscription)
             else -> null
         }
     } else if (category.countOneBits() == 1) {
