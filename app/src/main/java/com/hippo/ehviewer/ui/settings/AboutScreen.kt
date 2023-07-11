@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -83,7 +84,7 @@ fun AboutScreen() {
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             Preference(
                 title = stringResource(id = R.string.settings_about_declaration),
                 summary = stringResource(id = R.string.settings_about_declaration_summary),
@@ -126,6 +127,7 @@ fun AboutScreen() {
                     launchSnackBar(ExceptionUtils.getReadableString(it))
                 }
             }
+            Spacer(modifier = Modifier.size(paddingValues.calculateBottomPadding()))
         }
     }
 }
