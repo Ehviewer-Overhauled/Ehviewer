@@ -186,7 +186,4 @@ class SearchLayout @JvmOverloads constructor(
             }
         }
     }
-
-    fun setHelper(helper: () -> Unit) {
-    }
 }

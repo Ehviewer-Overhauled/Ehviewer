@@ -354,8 +354,8 @@ class GalleryListScene : SearchBarScene() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = SceneGalleryListBinding.inflate(inflater, container, false)
-        binding.root.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Handler() } })
+        _binding = SceneGalleryListBinding.inflate(inflater, container!!)
+        container.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Handler() } })
         checkForUpdates()
         requireActivity().onBackPressedDispatcher.addCallback(stateBackPressedCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
@@ -368,14 +368,7 @@ class GalleryListScene : SearchBarScene() {
                 mSearchFab.parent as View,
             ),
         )
-        (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
-        container!!.addView(binding.fabLayout)
-        val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
-        val paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab)
-        mViewTransition = BringOutTransition(
-            binding.contentLayout,
-            binding.searchLayout,
-        )
+        mViewTransition = BringOutTransition(binding.contentLayout, binding.searchLayout)
         binding.fastScroller.setOnDragHandlerListener(object : OnDragHandlerListener {
             override fun onStartDragHandler() {
                 setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
@@ -446,23 +439,11 @@ class GalleryListScene : SearchBarScene() {
         binding.recyclerView.addOnScrollListener(mOnScrollListener)
         binding.fastScroller.attachToRecyclerView(binding.recyclerView)
         binding.fastScroller.setHandlerDrawable(HandlerDrawable().apply { setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary)) })
-        binding.fastScroller.apply {
-            setPadding(paddingLeft, paddingTopSB + paddingTop, paddingRight, paddingBottom)
-        }
         setOnApplySearch { query: String? ->
             onApplySearch(query)
         }
         setSearchBarHint()
         setSearchBarSuggestionProvider()
-        binding.searchLayout.setHelper { showSearchBar() }
-        binding.searchLayout.run {
-            setPadding(
-                paddingLeft,
-                paddingTop + paddingTopSB,
-                paddingRight,
-                paddingBottom + paddingBottomFab,
-            )
-        }
         binding.fabLayout.setAutoCancel(true)
         binding.fabLayout.isExpanded = false
         binding.fabLayout.setHidePrimaryFab(false)
@@ -522,7 +503,6 @@ class GalleryListScene : SearchBarScene() {
         super.onDestroyView()
         stateBackPressedCallback.remove()
         binding.recyclerView.stopScroll()
-        (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
         _binding = null
         mAdapter = null

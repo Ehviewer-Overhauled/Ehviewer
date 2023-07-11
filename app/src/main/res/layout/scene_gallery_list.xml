@@ -14,19 +14,16 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="16dp"
-    app:layout_behavior="@string/searchbar_scrolling_view_behavior">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipChildren="false">
+        android:clipChildren="false"
+        android:paddingTop="16dp"
+        app:layout_behavior="@string/searchbar_scrolling_view_behavior">
 
         <TextView
             android:id="@+id/tip"
@@ -59,17 +56,17 @@
                 android:clipToPadding="false" />
 
         </androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout>
-
-        <com.hippo.ehviewer.ui.legacy.FastScroller
-            android:id="@+id/fast_scroller"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:paddingStart="20dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="4dp"
-            android:paddingBottom="8dp" />
     </FrameLayout>
+
+    <com.hippo.ehviewer.ui.legacy.FastScroller
+        android:id="@+id/fast_scroller"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:paddingStart="20dp"
+        android:paddingTop="128dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="8dp" />
 
     <com.hippo.ehviewer.ui.legacy.SearchLayout
         android:id="@+id/search_layout"
@@ -77,6 +74,7 @@
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/gallery_search_bar_margin_v"
         android:layout_marginEnd="@dimen/gallery_search_bar_margin_v"
+        android:paddingTop="80dp"
         app:layout_fitsSystemWindowsInsets="top" />
 
     <com.hippo.ehviewer.ui.legacy.FabLayout
@@ -85,7 +83,7 @@
         android:layout_height="match_parent"
         android:paddingEnd="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin"
-        app:fitsSystemWindowsInsets="top|bottom">
+        app:layout_fitsSystemWindowsInsets="bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.Material3.FloatingActionButton.Small.Primary"
@@ -111,4 +109,4 @@
 
     </com.hippo.ehviewer.ui.legacy.FabLayout>
 
-</FrameLayout>
+</merge>

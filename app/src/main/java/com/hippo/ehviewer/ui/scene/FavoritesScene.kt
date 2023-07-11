@@ -210,7 +210,7 @@ class FavoritesScene : SearchBarScene() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = SceneFavoritesBinding.inflate(inflater, container, false)
+        _binding = SceneFavoritesBinding.inflate(inflater, container!!)
         setOnApplySearch {
             if (!binding.recyclerView.isInCustomChoice) {
                 switchFav(urlBuilder.favCat, it)
@@ -220,8 +220,6 @@ class FavoritesScene : SearchBarScene() {
         binding.fastScroller.setHandlerDrawable(HandlerDrawable().apply { setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary)) })
         binding.fabLayout.run {
             addOnExpandListener { if (!it && binding.recyclerView.isInCustomChoice) binding.recyclerView.outOfCustomChoiceMode() }
-            (parent as ViewGroup).removeView(this)
-            container!!.addView(this)
             ViewCompat.setWindowInsetsAnimationCallback(binding.root, WindowInsetsAnimationHelper(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP, this))
             updateJumpFab()
             val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
@@ -287,29 +285,18 @@ class FavoritesScene : SearchBarScene() {
             }
             addAboveSnackView(this)
         }
-        binding.run {
-            val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
-            fastScroller.run {
-                setPadding(
-                    paddingLeft,
-                    paddingTop + paddingTopSB,
-                    paddingRight,
-                    paddingBottom,
-                )
-                setOnDragHandlerListener(object : OnDragHandlerListener {
-                    override fun onStartDragHandler() {
-                        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-                    }
-
-                    override fun onEndDragHandler() {
-                        if (!binding.recyclerView.isInCustomChoice) {
-                            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-                        }
-                        showSearchBar()
-                    }
-                })
+        binding.fastScroller.setOnDragHandlerListener(object : OnDragHandlerListener {
+            override fun onStartDragHandler() {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
             }
-        }
+
+            override fun onEndDragHandler() {
+                if (!binding.recyclerView.isInCustomChoice) {
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                }
+                showSearchBar()
+            }
+        })
         binding.recyclerView.run {
             mAdapter = GalleryAdapter(
                 this@run,
@@ -414,7 +401,6 @@ class FavoritesScene : SearchBarScene() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding.recyclerView.stopScroll()
-        (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
         mAdapter = null
         _binding = null

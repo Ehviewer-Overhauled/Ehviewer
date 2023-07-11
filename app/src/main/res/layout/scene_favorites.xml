@@ -14,13 +14,8 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="16dp"
-    app:layout_behavior="@string/searchbar_scrolling_view_behavior">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/tip"
@@ -43,7 +38,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false"
-        app:fitsSystemWindowsInsets="top">
+        android:paddingTop="16dp"
+        app:fitsSystemWindowsInsets="top"
+        app:layout_behavior="@string/searchbar_scrolling_view_behavior">
 
         <com.hippo.ehviewer.ui.legacy.EasyRecyclerView
             android:id="@+id/recycler_view"
@@ -60,7 +57,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:paddingStart="20dp"
-        android:paddingTop="8dp"
+        android:paddingTop="128dp"
         android:paddingEnd="4dp"
         android:paddingBottom="8dp" />
 
@@ -70,7 +67,7 @@
         android:layout_height="match_parent"
         android:paddingEnd="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin"
-        app:fitsSystemWindowsInsets="top|bottom">
+        app:fitsSystemWindowsInsets="bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.Material3.FloatingActionButton.Small.Primary"
@@ -123,4 +120,4 @@
             android:layout_height="wrap_content" />
 
     </com.hippo.ehviewer.ui.legacy.FabLayout>
-</FrameLayout>
+</merge>
