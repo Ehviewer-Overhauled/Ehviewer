@@ -162,7 +162,7 @@ class VMStorage1 : ViewModel() {
     }.flow.cachedIn(viewModelScope)
 }
 
-class GalleryListScene : SearchBarScene(), OnDragHandlerListener {
+class GalleryListScene : SearchBarScene() {
     private val vm: VMStorage1 by viewModels()
     private var mUrlBuilder by lazyMut { vm::urlBuilder }
     private var mIsTopList by lazyMut { vm::isTopList }
@@ -366,7 +366,15 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener {
             binding.contentLayout,
             binding.searchLayout,
         )
-        binding.fastScroller.setOnDragHandlerListener(this)
+        binding.fastScroller.setOnDragHandlerListener(object : OnDragHandlerListener {
+            override fun onStartDragHandler() {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+            }
+            override fun onEndDragHandler() {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                showSearchBar()
+            }
+        })
         mAdapter = GalleryAdapter(
             binding.recyclerView,
             true,
@@ -904,17 +912,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener {
                 setState(STATE_NORMAL)
             }
         }
-    }
-
-    override fun onStartDragHandler() {
-        // Lock right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-    }
-
-    override fun onEndDragHandler() {
-        // Restore right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-        showSearchBar()
     }
 
     private fun onStateChange(newState: Int) {
