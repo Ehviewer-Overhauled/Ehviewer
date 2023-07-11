@@ -86,7 +86,6 @@ import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
-import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.LayoutManagerUtils
@@ -163,7 +162,7 @@ class VMStorage1 : ViewModel() {
     }.flow.cachedIn(viewModelScope)
 }
 
-class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener, OnExpandListener {
+class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener {
     private val vm: VMStorage1 by viewModels()
     private var mUrlBuilder by lazyMut { vm::urlBuilder }
     private var mIsTopList by lazyMut { vm::isTopList }
@@ -194,7 +193,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
     private var fabAnimator: ViewPropertyAnimator? = null
     private var mViewTransition: ViewTransition? = null
     private var mAdapter: GalleryAdapter? = null
-    private var mActionFabDrawable: AddDeleteDrawable? = null
     lateinit var mQuickSearchList: MutableList<QuickSearch>
     private var mHideActionFabSlop = 0
     private var mShowActionFab = true
@@ -446,11 +444,21 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         binding.fabLayout.isExpanded = false
         binding.fabLayout.setHidePrimaryFab(false)
         binding.fabLayout.setOnClickFabListener(this)
-        binding.fabLayout.addOnExpandListener(this)
-        addAboveSnackView(binding.fabLayout)
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
-        mActionFabDrawable = AddDeleteDrawable(requireContext(), colorID)
-        binding.fabLayout.primaryFab!!.setImageDrawable(mActionFabDrawable)
+        val actionFabDrawable = AddDeleteDrawable(requireContext(), colorID)
+        binding.fabLayout.addOnExpandListener {
+            if (it) {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                actionFabDrawable.setDelete(ANIMATE_TIME)
+            } else {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                actionFabDrawable.setAdd(ANIMATE_TIME)
+            }
+        }
+        binding.fabLayout.primaryFab!!.setImageDrawable(actionFabDrawable)
+        addAboveSnackView(binding.fabLayout)
         mSearchFab.setOnClickListener { onApplySearch() }
 
         // Update list url builder
@@ -472,7 +480,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         _binding = null
         mAdapter = null
         mViewTransition = null
-        mActionFabDrawable = null
     }
 
     private fun showQuickSearchTipDialog() {
@@ -705,21 +712,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             }
         }
         view.isExpanded = false
-    }
-
-    override fun onExpand(expanded: Boolean) {
-        if (null == mActionFabDrawable) {
-            return
-        }
-        if (expanded) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-            mActionFabDrawable!!.setDelete(ANIMATE_TIME)
-        } else {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-            mActionFabDrawable!!.setAdd(ANIMATE_TIME)
-        }
     }
 
     override fun onSearchViewExpanded() {
