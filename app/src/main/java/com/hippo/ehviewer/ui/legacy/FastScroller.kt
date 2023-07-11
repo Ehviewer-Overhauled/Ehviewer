@@ -167,7 +167,7 @@ class FastScroller : View {
         }
         check(mRecyclerView == null) {
             "The FastScroller is already attached to a RecyclerView, " +
-                "call detachedFromRecyclerView first"
+                    "call detachedFromRecyclerView first"
         }
         mRecyclerView = recyclerView
         mOnScrollChangeListener = object : RecyclerView.OnScrollListener() {

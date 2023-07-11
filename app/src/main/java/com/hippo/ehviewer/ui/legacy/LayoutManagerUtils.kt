@@ -43,7 +43,7 @@ object LayoutManagerUtils {
     }
 
     fun scrollToPositionWithOffset(
-        layoutManager: RecyclerView.LayoutManager,
+        layoutManager: LayoutManager,
         position: Int,
         offset: Int,
     ) {
@@ -58,7 +58,7 @@ object LayoutManagerUtils {
     }
 
     fun smoothScrollToPosition(
-        layoutManager: RecyclerView.LayoutManager,
+        layoutManager: LayoutManager,
         context: Context,
         position: Int,
         millisecondsPerInch: Int = -1,
@@ -105,7 +105,7 @@ object LayoutManagerUtils {
     }
 
     fun scrollToPositionProperly(
-        layoutManager: RecyclerView.LayoutManager,
+        layoutManager: LayoutManager,
         context: Context,
         position: Int,
         listener: OnScrollToPositionListener?,
@@ -136,7 +136,7 @@ object LayoutManagerUtils {
             else -> error("Can't do getFirstVisibleItemPosition for " + javaClass.name)
         }
 
-    fun getLastVisibleItemPosition(layoutManager: RecyclerView.LayoutManager): Int {
+    fun getLastVisibleItemPosition(layoutManager: LayoutManager): Int {
         return when (layoutManager) {
             is LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
             is StaggeredGridLayoutManager -> {

@@ -44,7 +44,7 @@ open class ViewTransition(vararg views: View) {
         if (shownView >= length || shownView < 0) {
             throw IndexOutOfBoundsException(
                 "Only " + length + " view(s) in " +
-                    "the ViewTransition, but attempt to show " + shownView,
+                        "the ViewTransition, but attempt to show " + shownView,
             )
         }
         return if (shownViewIndex != shownView) {

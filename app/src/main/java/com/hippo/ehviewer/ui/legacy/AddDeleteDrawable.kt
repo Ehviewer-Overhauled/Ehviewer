@@ -38,6 +38,7 @@ class AddDeleteDrawable(context: Context, color: Int) : Drawable() {
     private var mProgress = 0f
     private var mAutoUpdateMirror = false
     private var mVerticalMirror = false
+
     init {
         val resources = context.resources
         mSize = resources.getDimensionPixelSize(R.dimen.add_size)
@@ -78,7 +79,7 @@ class AddDeleteDrawable(context: Context, color: Int) : Drawable() {
     }
 
     override fun setColorFilter(cf: ColorFilter?) {
-        mPaint.setColorFilter(cf)
+        mPaint.colorFilter = cf
     }
 
     override fun getIntrinsicHeight(): Int {
@@ -131,7 +132,7 @@ class AddDeleteDrawable(context: Context, color: Int) : Drawable() {
                 progress = endProgress
             } else {
                 val oa = ObjectAnimator.ofFloat(this, "progress", endProgress)
-                oa.setDuration(duration)
+                oa.duration = duration
                 oa.setAutoCancel(true)
                 oa.start()
             }
