@@ -162,7 +162,7 @@ class VMStorage1 : ViewModel() {
     }.flow.cachedIn(viewModelScope)
 }
 
-class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener {
+class GalleryListScene : SearchBarScene(), OnDragHandlerListener {
     private val vm: VMStorage1 by viewModels()
     private var mUrlBuilder by lazyMut { vm::urlBuilder }
     private var mIsTopList by lazyMut { vm::isTopList }
@@ -443,7 +443,31 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         binding.fabLayout.setAutoCancel(true)
         binding.fabLayout.isExpanded = false
         binding.fabLayout.setHidePrimaryFab(false)
-        binding.fabLayout.setOnClickFabListener(this)
+        binding.fabLayout.setOnClickFabListener(object : OnClickFabListener {
+            override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
+                if (STATE_NORMAL == mState) {
+                    view.toggle()
+                }
+            }
+            override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
+                when (position) {
+                    0 -> showGoToDialog()
+                    1 -> {
+                        mUrlBuilder.setIndex(null, true)
+                        mAdapter?.refresh()
+                    }
+                    2 -> {
+                        if (mIsTopList) {
+                            mAdapter?.refresh()
+                        } else {
+                            mUrlBuilder.setIndex("1", false)
+                            mAdapter?.refresh()
+                        }
+                    }
+                }
+                view.isExpanded = false
+            }
+        })
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
         val actionFabDrawable = AddDeleteDrawable(requireContext(), colorID)
         binding.fabLayout.addOnExpandListener {
@@ -626,12 +650,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         return drawerBinding.root
     }
 
-    override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-        if (STATE_NORMAL == mState) {
-            view.toggle()
-        }
-    }
-
     private fun showGoToDialog() {
         val context = context ?: return
         mAdapter ?: return
@@ -693,25 +711,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
                 mAdapter?.refresh()
             }
         }
-    }
-
-    override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
-        when (position) {
-            0 -> showGoToDialog()
-            1 -> {
-                mUrlBuilder.setIndex(null, true)
-                mAdapter?.refresh()
-            }
-            2 -> {
-                if (mIsTopList) {
-                    mAdapter?.refresh()
-                } else {
-                    mUrlBuilder.setIndex("1", false)
-                    mAdapter?.refresh()
-                }
-            }
-        }
-        view.isExpanded = false
     }
 
     override fun onSearchViewExpanded() {
