@@ -169,20 +169,6 @@ class FavoritesScene : SearchBarScene() {
                 updateJumpFab()
                 closeDrawer(GravityCompat.END)
             }
-        } else {
-            if (binding.recyclerView.isInCustomChoice) {
-                binding.recyclerView.toggleItemChecked(position)
-            } else {
-                mAdapter?.peek(position)?.let {
-                    navAnimated(
-                        R.id.galleryDetailScene,
-                        bundleOf(
-                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
-                            GalleryDetailScene.KEY_GALLERY_INFO to it,
-                        ),
-                    )
-                }
-            }
         }
     }
 
@@ -331,8 +317,25 @@ class FavoritesScene : SearchBarScene() {
             mAdapter = GalleryAdapter(
                 this@run,
                 false,
-                { onItemClick(it) },
-                { onItemLongClick(it) },
+                { info, pos ->
+                    if (binding.recyclerView.isInCustomChoice) {
+                        binding.recyclerView.toggleItemChecked(pos)
+                    } else {
+                        navAnimated(
+                            R.id.galleryDetailScene,
+                            bundleOf(
+                                GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                                GalleryDetailScene.KEY_GALLERY_INFO to info,
+                            ),
+                        )
+                    }
+                },
+                { _, pos ->
+                    if (!binding.recyclerView.isInCustomChoice) {
+                        binding.recyclerView.intoCustomChoiceMode()
+                    }
+                    binding.recyclerView.toggleItemChecked(pos)
+                },
             ).also { adapter ->
                 val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
@@ -450,15 +453,6 @@ class FavoritesScene : SearchBarScene() {
                 }
             }
         }
-    }
-
-    private fun onItemLongClick(position: Int): Boolean {
-        // Can not into
-        if (!binding.recyclerView.isInCustomChoice) {
-            binding.recyclerView.intoCustomChoiceMode()
-        }
-        binding.recyclerView.toggleItemChecked(position)
-        return true
     }
 
     private fun showGoToDialog() {

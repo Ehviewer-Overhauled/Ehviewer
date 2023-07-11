@@ -372,8 +372,20 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         mAdapter = GalleryAdapter(
             binding.recyclerView,
             true,
-            { onItemClick(it) },
-            { onItemLongClick(it) },
+            { info, _ ->
+                navAnimated(
+                    R.id.galleryDetailScene,
+                    bundleOf(
+                        GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                        GalleryDetailScene.KEY_GALLERY_INFO to info,
+                    ),
+                )
+            },
+            { info, _ ->
+                lifecycleScope.launchIO {
+                    dialogState.doGalleryInfoAction(info, requireContext())
+                }
+            },
         ).also { adapter ->
             viewLifecycleOwner.lifecycleScope.launch {
                 val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_sad_pandroid)!!
@@ -607,16 +619,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         return drawerBinding.root
     }
 
-    private fun onItemClick(position: Int) {
-        _binding ?: return
-        mAdapter ?: return
-        val gi = mAdapter?.peek(position) ?: return
-        val args = Bundle()
-        args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
-        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        navAnimated(R.id.galleryDetailScene, args)
-    }
-
     override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
         if (STATE_NORMAL == mState) {
             view.toggle()
@@ -728,14 +730,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
     override fun onSearchViewHidden() {
         super.onSearchViewHidden()
         if (mState == STATE_NORMAL) selectActionFab(true)
-    }
-
-    private fun onItemLongClick(position: Int) {
-        val context = context ?: return
-        val info = mAdapter?.peek(position) ?: return
-        lifecycleScope.launchIO {
-            dialogState.doGalleryInfoAction(info, context)
-        }
     }
 
     private fun showActionFab() {
