@@ -87,22 +87,7 @@ fun EhAsyncPreview(
 
 @Composable
 fun EhPreviewItem(
-    galleryPreview: GalleryPreview,
-    onClick: () -> Unit,
-) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    Box(contentAlignment = Alignment.Center) {
-        CrystalCard(
-            onClick = onClick,
-            modifier = Modifier.fillMaxWidth().aspectRatio(0.6666667F),
-        ) {
-            EhAsyncPreview(model = galleryPreview, modifier = Modifier.fillMaxSize())
-        }
-    }
-    Text((galleryPreview.position + 1).toString())
-}
-
-@Composable
-fun EhPreviewItemPlaceholder(
+    galleryPreview: GalleryPreview?,
     position: Int,
     onClick: () -> Unit,
 ) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -111,6 +96,7 @@ fun EhPreviewItemPlaceholder(
             onClick = onClick,
             modifier = Modifier.fillMaxWidth().aspectRatio(0.6666667F),
         ) {
+            if (galleryPreview != null) EhAsyncPreview(model = galleryPreview, modifier = Modifier.fillMaxSize())
         }
     }
     Text((position + 1).toString())

@@ -57,7 +57,6 @@ import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
-import com.hippo.ehviewer.ui.main.EhPreviewItemPlaceholder
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.rememberDialogState
@@ -154,14 +153,8 @@ class GalleryPreviewScreen : Fragment() {
                             contentType = data.itemContentType(),
                         ) { index ->
                             val item = data[index]
-                            if (item != null) {
-                                EhPreviewItem(item) {
-                                    onPreviewCLick(item.position)
-                                }
-                            } else {
-                                EhPreviewItemPlaceholder(index) {
-                                    onPreviewCLick(index)
-                                }
+                            EhPreviewItem(item, index) {
+                                onPreviewCLick(index)
                             }
                         }
                     }

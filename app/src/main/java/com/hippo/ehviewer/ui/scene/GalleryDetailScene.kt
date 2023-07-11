@@ -636,6 +636,7 @@ class GalleryDetailScene : BaseScene() {
         items(previewList) {
             EhPreviewItem(
                 galleryPreview = it,
+                position = it.position,
                 onClick = { context?.navToReader(gd, it.position) },
             )
         }
