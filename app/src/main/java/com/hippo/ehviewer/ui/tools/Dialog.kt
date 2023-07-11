@@ -202,6 +202,7 @@ class DialogState {
         @StringRes title: Int,
         @StringRes hint: Int,
         maxChar: Int,
+        adjustTextPosition: Boolean = true,
     ): Pair<Int, String> = showNoButton(false) {
         Column {
             Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
@@ -243,8 +244,13 @@ class DialogState {
                         modifier = Modifier.clip(IconWithTextCorner).clickable { dismissWith(index to note) },
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
-                        Text(text = text, style = MaterialTheme.typography.bodySmall)
+                        if (index == 0 && adjustTextPosition) {
+                            Text(text = text, style = MaterialTheme.typography.bodySmall)
+                            Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
+                        } else {
+                            Icon(imageVector = icon, contentDescription = null, tint = AlertDialogDefaults.iconContentColor)
+                            Text(text = text, style = MaterialTheme.typography.bodySmall)
+                        }
                     }
                 }
             }
