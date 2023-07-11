@@ -18,7 +18,7 @@ package com.hippo.ehviewer.ui.legacy
 import android.content.Context
 import android.graphics.PointF
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.math.MathUtils
 import com.hippo.ehviewer.yorozuya.SimpleHandler
@@ -42,7 +42,7 @@ object LayoutManagerUtils {
     }
 
     fun scrollToPositionWithOffset(
-        layoutManager: RecyclerView.LayoutManager,
+        layoutManager: LayoutManager,
         position: Int,
         offset: Int,
     ) {
@@ -57,7 +57,7 @@ object LayoutManagerUtils {
     }
 
     fun smoothScrollToPosition(
-        layoutManager: RecyclerView.LayoutManager,
+        layoutManager: LayoutManager,
         context: Context,
         position: Int,
         millisecondsPerInch: Int = -1,
@@ -104,13 +104,13 @@ object LayoutManagerUtils {
     }
 
     fun scrollToPositionProperly(
-        layoutManager: RecyclerView.LayoutManager,
+        layoutManager: LayoutManager,
         context: Context,
         position: Int,
         listener: OnScrollToPositionListener?,
     ) {
         SimpleHandler.postDelayed({
-            val first = getFirstVisibleItemPosition(layoutManager)
+            val first = layoutManager.firstVisibleItemPosition
             val last = getLastVisibleItemPosition(layoutManager)
             val offset = abs(position - first)
             val max = last - first
@@ -128,19 +128,14 @@ object LayoutManagerUtils {
         }, 200)
     }
 
-    fun getFirstVisibleItemPosition(layoutManager: RecyclerView.LayoutManager): Int {
-        return when (layoutManager) {
-            is LinearLayoutManager -> layoutManager.findFirstVisibleItemPosition()
-            is StaggeredGridLayoutManager -> {
-                val positions = layoutManager.findFirstVisibleItemPositions(null)
-                positions.min()
-            }
-
-            else -> throw IllegalStateException("Can't do getFirstVisibleItemPosition for " + layoutManager.javaClass.name)
+    val LayoutManager.firstVisibleItemPosition: Int
+        get() = when (this) {
+            is LinearLayoutManager -> findFirstVisibleItemPosition()
+            is StaggeredGridLayoutManager -> findFirstVisibleItemPositions(null).min()
+            else -> error("Can't do getFirstVisibleItemPosition for " + javaClass.name)
         }
-    }
 
-    fun getLastVisibleItemPosition(layoutManager: RecyclerView.LayoutManager): Int {
+    fun getLastVisibleItemPosition(layoutManager: LayoutManager): Int {
         return when (layoutManager) {
             is LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
             is StaggeredGridLayoutManager -> {

@@ -18,8 +18,9 @@ package com.hippo.ehviewer.ui.legacy
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.view.View
+import android.widget.FrameLayout
 
-class BringOutTransition(contentLayout: ContentLayout, mSearchLayout: SearchLayout) :
+class BringOutTransition(contentLayout: FrameLayout, mSearchLayout: SearchLayout) :
     ViewTransition(contentLayout, mSearchLayout) {
     override fun startAnimations(hiddenView: View, shownView: View) {
         mAnimator1 = hiddenView.animate().alpha(0f).scaleY(0.7f).scaleX(0.7f).apply {

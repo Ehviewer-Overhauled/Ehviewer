@@ -48,11 +48,9 @@ import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingDataAdapter
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
-import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.CompositeDateValidator
@@ -104,10 +102,9 @@ import java.util.Locale
 // Note that we do not really follow mvvm structure, just use it as ... storage
 class VMStorage : ViewModel() {
     var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
-    var initialKey: String? = null
     private val cloudDataFlow = Pager(PagingConfig(25)) {
         object : PagingSource<String, GalleryInfo>() {
-            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = initialKey
+            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
             override suspend fun load(params: LoadParams<String>) = withIOContext {
                 when (params) {
                     is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
@@ -151,11 +148,9 @@ class VMStorage : ViewModel() {
 class FavoritesScene : SearchBarScene() {
     private val vm: VMStorage by viewModels()
     private var urlBuilder by lazyMut { vm::urlBuilder }
-    private var initialKey by lazyMut { vm::initialKey }
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
-    private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
-    private var mAdapterDelegate: GalleryAdapter? = null
+    private var mAdapter: GalleryAdapter? = null
     private val showNormalFabsRunnable = Runnable {
         updateJumpFab() // index: 0, 2
         binding.fabLayout.run {
@@ -164,27 +159,13 @@ class FavoritesScene : SearchBarScene() {
         }
     }
 
-    fun onItemClick(position: Int) {
+    private fun onItemClick(position: Int) {
         if (isDrawerOpen(GravityCompat.END)) {
             // Skip if in search mode
             if (!binding.recyclerView.isInCustomChoice) {
                 switchFav(position - 2)
                 updateJumpFab()
                 closeDrawer(GravityCompat.END)
-            }
-        } else {
-            if (binding.recyclerView.isInCustomChoice) {
-                binding.recyclerView.toggleItemChecked(position)
-            } else {
-                mAdapter?.peek(position)?.let {
-                    navAnimated(
-                        R.id.galleryDetailScene,
-                        bundleOf(
-                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
-                            GalleryDetailScene.KEY_GALLERY_INFO to it,
-                        ),
-                    )
-                }
             }
         }
     }
@@ -197,7 +178,6 @@ class FavoritesScene : SearchBarScene() {
         urlBuilder.favCat = newCat
         urlBuilder.jumpTo = null
         urlBuilder.setIndex(null, true)
-        initialKey = null
         collectJob?.cancel()
         collectJob = viewLifecycleOwner.lifecycleScope.launchIO {
             vm.dataflow().collectLatest {
@@ -222,7 +202,7 @@ class FavoritesScene : SearchBarScene() {
 
     override fun onResume() {
         super.onResume()
-        mAdapterDelegate?.type = Settings.listMode
+        mAdapter?.type = Settings.listMode
     }
 
     override fun onCreateViewWithToolbar(
@@ -265,7 +245,7 @@ class FavoritesScene : SearchBarScene() {
                             0 -> showGoToDialog()
                             1 -> switchFav(urlBuilder.favCat)
                             2 -> {
-                                initialKey = "1-0"
+                                urlBuilder.setIndex("1-0", false)
                                 mAdapter?.refresh()
                             }
                         }
@@ -331,22 +311,29 @@ class FavoritesScene : SearchBarScene() {
             }
         }
         binding.recyclerView.run {
-            val delegateAdapter = object : GalleryAdapter(resources, this@run, Settings.listMode, false, { onItemClick(it) }, { onItemLongClick(it) }) {
-                override fun getItemCount() = TODO()
-                override fun getDataAt(position: Int) = mAdapter?.peek(position)
-            }
-            val diffCallback = object : DiffUtil.ItemCallback<GalleryInfo>() {
-                override fun areItemsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
-                override fun areContentsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
-            }
-            mAdapter = object : PagingDataAdapter<GalleryInfo, GalleryHolder>(diffCallback) {
-                override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
-                    getItem(position)
-                    delegateAdapter.onBindViewHolder(holder, position)
-                }
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = delegateAdapter.onCreateViewHolder(parent, delegateAdapter.type)
-            }.also { adapter ->
-                binding.recyclerView.adapter = adapter
+            mAdapter = GalleryAdapter(
+                this@run,
+                false,
+                { info, pos ->
+                    if (binding.recyclerView.isInCustomChoice) {
+                        binding.recyclerView.toggleItemChecked(pos)
+                    } else {
+                        navAnimated(
+                            R.id.galleryDetailScene,
+                            bundleOf(
+                                GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                                GalleryDetailScene.KEY_GALLERY_INFO to info,
+                            ),
+                        )
+                    }
+                },
+                { _, pos ->
+                    if (!binding.recyclerView.isInCustomChoice) {
+                        binding.recyclerView.intoCustomChoiceMode()
+                    }
+                    binding.recyclerView.toggleItemChecked(pos)
+                },
+            ).also { adapter ->
                 val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
                 binding.tip.setCompoundDrawables(null, drawable, null, null)
@@ -378,7 +365,6 @@ class FavoritesScene : SearchBarScene() {
                 }
             }
             switchFav(Settings.recentFavCat)
-            mAdapterDelegate = delegateAdapter
             setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
             setCustomCheckedListener(object : CustomChoiceListener {
                 override fun onIntoCustomChoice(view: EasyRecyclerView) {
@@ -431,7 +417,6 @@ class FavoritesScene : SearchBarScene() {
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
         mAdapter = null
-        mAdapterDelegate = null
         _binding = null
     }
 
@@ -465,15 +450,6 @@ class FavoritesScene : SearchBarScene() {
                 }
             }
         }
-    }
-
-    fun onItemLongClick(position: Int): Boolean {
-        // Can not into
-        if (!binding.recyclerView.isInCustomChoice) {
-            binding.recyclerView.intoCustomChoiceMode()
-        }
-        binding.recyclerView.toggleItemChecked(position)
-        return true
     }
 
     private fun showGoToDialog() {

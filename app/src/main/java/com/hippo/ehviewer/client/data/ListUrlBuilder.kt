@@ -34,8 +34,8 @@ data class ListUrlBuilder(
     @get:Mode @Mode
     var mode: Int = MODE_NORMAL,
     private var mPrev: String? = null,
-    private var mNext: String? = null,
-    private var mJumpTo: String? = null,
+    var mNext: String? = null,
+    var mJumpTo: String? = null,
     var category: Int = EhUtils.NONE,
     private var mKeyword: String? = null,
     var hash: String? = null,

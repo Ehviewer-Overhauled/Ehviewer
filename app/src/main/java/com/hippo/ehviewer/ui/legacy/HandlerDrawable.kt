@@ -60,7 +60,7 @@ class HandlerDrawable : Drawable() {
     }
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
-        mPaint.setColorFilter(colorFilter)
+        mPaint.colorFilter = colorFilter
     }
 
     @Deprecated("Deprecated in Java")
@@ -69,9 +69,11 @@ class HandlerDrawable : Drawable() {
             0xff -> {
                 PixelFormat.OPAQUE
             }
+
             0x00 -> {
                 PixelFormat.TRANSPARENT
             }
+
             else -> {
                 PixelFormat.TRANSLUCENT
             }

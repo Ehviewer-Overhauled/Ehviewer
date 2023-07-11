@@ -16,11 +16,10 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.animation.Animator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
-import android.content.res.Resources
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -33,7 +32,6 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.IntDef
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -41,11 +39,19 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import androidx.paging.LoadState
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.cachedIn
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.imageLoader
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.CompositeDateValidator
@@ -68,10 +74,7 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_TOPLIST
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_WHATS_HOT
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
-import com.hippo.ehviewer.client.parser.GalleryListParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
-import com.hippo.ehviewer.coil.imageRequest
-import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.ItemDrawerListBinding
@@ -84,65 +87,128 @@ import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
-import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
-import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
+import com.hippo.ehviewer.ui.legacy.HandlerDrawable
+import com.hippo.ehviewer.ui.legacy.LayoutManagerUtils.firstVisibleItemPosition
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.settings.showNewVersion
 import com.hippo.ehviewer.ui.tools.DialogState
 import com.hippo.ehviewer.updater.AppUpdater
+import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
+import com.hippo.ehviewer.util.getValue
+import com.hippo.ehviewer.util.lazyMut
+import com.hippo.ehviewer.util.setValue
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withIOContext
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import java.io.File
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener, OnExpandListener {
-    private val mCallback = object : OnBackPressedCallback(false) {
+class VMStorage1 : ViewModel() {
+    var urlBuilder = ListUrlBuilder()
+    val dataFlow = Pager(PagingConfig(25)) {
+        object : PagingSource<String, GalleryInfo>() {
+            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
+            override suspend fun load(params: LoadParams<String>) = withIOContext {
+                if (urlBuilder.mode == MODE_TOPLIST) {
+                    // TODO: Since we know total pages, let pager support jump
+                    val key = (params.key ?: urlBuilder.mJumpTo ?: "0").toInt()
+                    val prev = if (key != 0) key - 1 else null
+                    val next = if (key != 199) key + 1 else null
+                    runSuspendCatching {
+                        urlBuilder.setJumpTo(key.toString())
+                        EhEngine.getGalleryList(urlBuilder.build())
+                    }.onFailure {
+                        return@withIOContext LoadResult.Error(it)
+                    }.onSuccess {
+                        return@withIOContext LoadResult.Page(it.galleryInfoList, prev?.toString(), next?.toString())
+                    }
+                }
+                when (params) {
+                    is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
+                    is LoadParams.Append -> urlBuilder.setIndex(params.key, isNext = true)
+                    is LoadParams.Refresh -> {
+                        val key = params.key
+                        if (key.isNullOrBlank()) {
+                            if (urlBuilder.mJumpTo != null) {
+                                urlBuilder.mNext ?: urlBuilder.setIndex("2", true)
+                            }
+                        } else {
+                            urlBuilder.setIndex(key, false)
+                        }
+                    }
+                }
+                val r = runSuspendCatching {
+                    if (ListUrlBuilder.MODE_IMAGE_SEARCH == urlBuilder.mode) {
+                        EhEngine.imageSearch(
+                            File(urlBuilder.imagePath!!),
+                            urlBuilder.isUseSimilarityScan,
+                            urlBuilder.isOnlySearchCovers,
+                        )
+                    } else {
+                        val url = urlBuilder.build()
+                        EhEngine.getGalleryList(url)
+                    }
+                }.onFailure {
+                    return@withIOContext LoadResult.Error(it)
+                }.getOrThrow()
+                urlBuilder.mJumpTo = null
+                LoadResult.Page(r.galleryInfoList, r.prev, r.next)
+            }
+        }
+    }.flow.cachedIn(viewModelScope)
+}
+
+class GalleryListScene : SearchBarScene() {
+    private val vm: VMStorage1 by viewModels()
+    private var mUrlBuilder by lazyMut { vm::urlBuilder }
+    private var mIsTopList = false
+
+    private val stateBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             when (mState) {
-                STATE_NORMAL -> throw IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL")
-                STATE_SIMPLE_SEARCH, STATE_SEARCH -> setState(STATE_NORMAL)
-                STATE_SEARCH_SHOW_LIST -> setState(STATE_SEARCH)
+                State.NORMAL -> error("SearchStateOnBackPressedCallback should not be enabled on $mState")
+                State.SIMPLE_SEARCH, State.SEARCH -> setState(State.NORMAL)
+                State.SEARCH_SHOW_LIST -> setState(State.SEARCH)
             }
         }
     }
-    private lateinit var mUrlBuilder: ListUrlBuilder
     private var _binding: SceneGalleryListBinding? = null
     private val binding get() = _binding!!
-    private val mSearchFabAnimatorListener: Animator.AnimatorListener =
-        object : SimpleAnimatorListener() {
-            override fun onAnimationEnd(animation: Animator) {
-                mSearchFab.visibility = View.INVISIBLE
-            }
+    private val mSearchFabAnimatorListener = object : SimpleAnimatorListener() {
+        override fun onAnimationEnd(animation: Animator) {
+            mSearchFab.visibility = View.INVISIBLE
         }
-    private val mActionFabAnimatorListener: Animator.AnimatorListener =
-        object : SimpleAnimatorListener() {
-            override fun onAnimationEnd(animation: Animator) {
-                binding.fabLayout.primaryFab?.visibility = View.INVISIBLE
-            }
+    }
+    private val mActionFabAnimatorListener = object : SimpleAnimatorListener() {
+        override fun onAnimationEnd(animation: Animator) {
+            binding.fabLayout.primaryFab?.visibility = View.INVISIBLE
         }
+    }
     private var fabAnimator: ViewPropertyAnimator? = null
     private var mViewTransition: ViewTransition? = null
-    private var mAdapter: GalleryListAdapter? = null
-    private var mHelper: GalleryListHelper? = null
-    private var mActionFabDrawable: AddDeleteDrawable? = null
+    private var mAdapter: GalleryAdapter? = null
     lateinit var mQuickSearchList: MutableList<QuickSearch>
     private var mHideActionFabSlop = 0
     private var mShowActionFab = true
-
-    @State
-    private var mState = STATE_NORMAL
+    private var mState = State.NORMAL
     private val mOnScrollListener: RecyclerView.OnScrollListener =
         object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {}
@@ -154,9 +220,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
                 }
             }
         }
-    private var mHasFirstRefresh = false
-
-    private var mIsTopList = false
     override fun getMenuResId(): Int {
         return R.menu.scene_gallery_list_searchbar_menu
     }
@@ -168,19 +231,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             ACTION_SUBSCRIPTION -> ListUrlBuilder(MODE_SUBSCRIPTION)
             ACTION_WHATS_HOT -> ListUrlBuilder(MODE_WHATS_HOT)
             ACTION_TOP_LIST -> ListUrlBuilder(MODE_TOPLIST, mKeyword = "11")
-            ACTION_LIST_URL_BUILDER ->
-                args?.getParcelableCompat<ListUrlBuilder>(KEY_LIST_URL_BUILDER)?.copy()
-                    ?: ListUrlBuilder()
-
+            ACTION_LIST_URL_BUILDER -> args?.getParcelableCompat<ListUrlBuilder>(KEY_LIST_URL_BUILDER)?.copy() ?: ListUrlBuilder()
             else -> throw IllegalStateException("Wrong KEY_ACTION:${args?.getString(KEY_ACTION)} when handle args!")
         }
-        val goto = args?.getString(KEY_GOTO)
-        goto?.let {
-            lifecycleScope.launchUI {
-                delay(100)
-                mHelper?.goTo(it, true)
-            }
-        }
+        args?.getString(KEY_GOTO)?.let { mUrlBuilder.mNext = it }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -202,21 +256,14 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
-        mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
         mUrlBuilder = savedInstanceState.getParcelableCompat(KEY_LIST_URL_BUILDER)!!
-        mState = savedInstanceState.getInt(KEY_STATE)
+        mState = savedInstanceState.getParcelableCompat(KEY_STATE)!!
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val hasFirstRefresh: Boolean = if (mHelper != null && 1 == mHelper!!.shownViewIndex) {
-            false
-        } else {
-            mHasFirstRefresh
-        }
-        outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh)
         outState.putParcelable(KEY_LIST_URL_BUILDER, mUrlBuilder)
-        outState.putInt(KEY_STATE, mState)
+        outState.putParcelable(KEY_STATE, mState)
     }
 
     private fun setSearchBarHint() {
@@ -282,7 +329,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         }
 
         // Update title
-        var title = getSuitableTitleForUrlBuilder(requireContext(), mUrlBuilder, true)
+        var title = requireContext().getSuitableTitleForUrlBuilder(mUrlBuilder, true)
         if (null == title) {
             title = resources.getString(R.string.search)
         }
@@ -310,7 +357,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         _binding = SceneGalleryListBinding.inflate(inflater, container, false)
         binding.root.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Handler() } })
         checkForUpdates()
-        requireActivity().onBackPressedDispatcher.addCallback(mCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(stateBackPressedCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
         mShowActionFab = true
         ViewCompat.setWindowInsetsAnimationCallback(
@@ -329,20 +376,77 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             binding.contentLayout,
             binding.searchLayout,
         )
-        mHelper = GalleryListHelper()
-        binding.contentLayout.setHelper(mHelper!!)
-        binding.contentLayout.fastScroller.setOnDragHandlerListener(this)
-        binding.contentLayout.setFitPaddingTop(paddingTopSB)
-        mAdapter = GalleryListAdapter(
-            resources,
-            binding.contentLayout.recyclerView,
-            Settings.listMode,
-        )
-        binding.contentLayout.recyclerView.adapter = mAdapter
-        binding.contentLayout.recyclerView.clipToPadding = false
-        binding.contentLayout.recyclerView.clipChildren = false
-        binding.contentLayout.recyclerView.addOnScrollListener(mOnScrollListener)
-        binding.contentLayout.fastScroller.run {
+        binding.fastScroller.setOnDragHandlerListener(object : OnDragHandlerListener {
+            override fun onStartDragHandler() {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+            }
+            override fun onEndDragHandler() {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                showSearchBar()
+            }
+        })
+        mAdapter = GalleryAdapter(
+            binding.recyclerView,
+            true,
+            { info, _ ->
+                navAnimated(
+                    R.id.galleryDetailScene,
+                    bundleOf(
+                        GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                        GalleryDetailScene.KEY_GALLERY_INFO to info,
+                    ),
+                )
+            },
+            { info, _ ->
+                lifecycleScope.launchIO {
+                    dialogState.doGalleryInfoAction(info, requireContext())
+                }
+            },
+        ).also { adapter ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_sad_pandroid)!!
+                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                binding.tip.setCompoundDrawables(null, drawable, null, null)
+                binding.tip.setOnClickListener { mAdapter?.refresh() }
+                val transition = ViewTransition(binding.recyclerView, binding.progress, binding.tip)
+                val empty = getString(R.string.gallery_list_empty_hit)
+                val noWatch = getString(R.string.gallery_list_empty_hit_subscription)
+                adapter.addLoadStateListener {
+                    lifecycleScope.launchUI {
+                        when (val state = it.refresh) {
+                            is LoadState.Loading -> {
+                                showSearchBar()
+                                transition.showView(1)
+                            }
+                            is LoadState.Error -> {
+                                binding.tip.text = ExceptionUtils.getReadableString(state.error)
+                                transition.showView(2)
+                            }
+                            is LoadState.NotLoading -> {
+                                delay(500)
+                                if (mAdapter?.itemCount == 0) {
+                                    if (mUrlBuilder.mode == MODE_SUBSCRIPTION) {
+                                        binding.tip.text = noWatch
+                                    } else {
+                                        binding.tip.text = empty
+                                    }
+                                    transition.showView(2)
+                                } else {
+                                    transition.showView(0)
+                                }
+                            }
+                        }
+                    }
+                }
+                vm.dataFlow.collectLatest {
+                    adapter.submitData(it)
+                }
+            }
+        }
+        binding.recyclerView.addOnScrollListener(mOnScrollListener)
+        binding.fastScroller.attachToRecyclerView(binding.recyclerView)
+        binding.fastScroller.setHandlerDrawable(HandlerDrawable().apply { setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary)) })
+        binding.fastScroller.apply {
             setPadding(paddingLeft, paddingTopSB + paddingTop, paddingRight, paddingBottom)
         }
         setOnApplySearch { query: String? ->
@@ -362,12 +466,46 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         binding.fabLayout.setAutoCancel(true)
         binding.fabLayout.isExpanded = false
         binding.fabLayout.setHidePrimaryFab(false)
-        binding.fabLayout.setOnClickFabListener(this)
-        binding.fabLayout.addOnExpandListener(this)
-        addAboveSnackView(binding.fabLayout)
+        binding.fabLayout.setOnClickFabListener(object : OnClickFabListener {
+            override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
+                if (State.NORMAL == mState) {
+                    view.toggle()
+                }
+            }
+            override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
+                when (position) {
+                    0 -> showGoToDialog()
+                    1 -> {
+                        mUrlBuilder.setIndex(null, true)
+                        mAdapter?.refresh()
+                    }
+                    2 -> {
+                        if (mIsTopList) {
+                            mAdapter?.refresh()
+                        } else {
+                            mUrlBuilder.setIndex("1", false)
+                            mAdapter?.refresh()
+                        }
+                    }
+                }
+                view.isExpanded = false
+            }
+        })
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
-        mActionFabDrawable = AddDeleteDrawable(requireContext(), colorID)
-        binding.fabLayout.primaryFab!!.setImageDrawable(mActionFabDrawable)
+        val actionFabDrawable = AddDeleteDrawable(requireContext(), colorID)
+        binding.fabLayout.addOnExpandListener {
+            if (it) {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                actionFabDrawable.setDelete(ANIMATE_TIME)
+            } else {
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                actionFabDrawable.setAdd(ANIMATE_TIME)
+            }
+        }
+        binding.fabLayout.primaryFab!!.setImageDrawable(actionFabDrawable)
+        addAboveSnackView(binding.fabLayout)
         mSearchFab.setOnClickListener { onApplySearch() }
 
         // Update list url builder
@@ -375,33 +513,20 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 
         // Restore state
         val newState = mState
-        mState = STATE_NORMAL
+        mState = State.NORMAL
         setState(newState, false)
-
-        // Only refresh for the first time
-        if (!mHasFirstRefresh) {
-            mHasFirstRefresh = true
-            mHelper!!.firstRefresh()
-        }
         return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mCallback.remove()
-        if (null != mHelper) {
-            mHelper!!.destroy()
-            if (1 == mHelper!!.shownViewIndex) {
-                mHasFirstRefresh = false
-            }
-        }
-        binding.contentLayout.recyclerView.stopScroll()
+        stateBackPressedCallback.remove()
+        binding.recyclerView.stopScroll()
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
         _binding = null
         mAdapter = null
         mViewTransition = null
-        mActionFabDrawable = null
     }
 
     private fun showQuickSearchTipDialog() {
@@ -417,17 +542,14 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         recyclerView: EasyRecyclerView,
         tip: TextView,
     ) {
-        val context = context
-        if (null == context || null == mHelper) {
-            return
-        }
+        val context = context ?: return
 
         // Can't add image search as quick search
         if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.mode) {
             showTip(R.string.image_search_not_quick_search, LENGTH_LONG)
             return
         }
-        val gi = mHelper!!.firstVisibleItem
+        val gi = mAdapter?.peek(binding.recyclerView.layoutManager!!.firstVisibleItemPosition)
         val next = if (gi != null) "@" + (gi.gid + 1) else null
 
         // Check duplicate
@@ -442,7 +564,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         }
         val builder = EditTextDialogBuilder(
             context,
-            getSuitableTitleForUrlBuilder(context, mUrlBuilder, false),
+            context.getSuitableTitleForUrlBuilder(mUrlBuilder, false),
             getString(R.string.quick_search),
         )
         builder.setTitle(R.string.add_quick_search_dialog_title)
@@ -450,10 +572,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         // TODO: It's ugly
         val checked = booleanArrayOf(Settings.qSSaveProgress)
         val hint = arrayOf(getString(R.string.save_progress))
-        builder.setMultiChoiceItems(
-            hint,
-            checked,
-        ) { _: DialogInterface?, which: Int, isChecked: Boolean -> checked[which] = isChecked }
+        builder.setMultiChoiceItems(hint, checked) { _, which, isChecked -> checked[which] = isChecked }
         val dialog = builder.show()
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             lifecycleScope.launchIO {
@@ -551,42 +670,17 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         return drawerBinding.root
     }
 
-    fun onItemClick(position: Int) {
-        _binding ?: return
-        mHelper ?: return
-        val gi = mHelper!!.getDataAtEx(position) ?: return
-        val args = Bundle()
-        args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
-        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        navAnimated(R.id.galleryDetailScene, args)
-    }
-
-    override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-        if (STATE_NORMAL == mState) {
-            view.toggle()
-        }
-    }
-
     private fun showGoToDialog() {
-        val context = context
-        if (null == context || null == mHelper) {
-            return
-        }
+        val context = context ?: return
+        mAdapter ?: return
         if (mIsTopList) {
-            val page = mHelper!!.pageForTop + 1
-            val pages = mHelper!!.pages
+            val page = 1
+            val pages = 200
             val hint = getString(R.string.go_to_hint, page, pages)
             val builder = EditTextDialogBuilder(context, null, hint)
-            builder.editText.inputType =
-                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-            val dialog = builder.setTitle(R.string.go_to)
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+            builder.editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            val dialog = builder.setTitle(R.string.go_to).setPositiveButton(android.R.string.ok, null).show()
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-                if (null == mHelper) {
-                    dialog.dismiss()
-                    return@setOnClickListener
-                }
                 val text = builder.text.trim { it <= ' ' }
                 val goTo: Int = try {
                     text.toInt() - 1
@@ -599,7 +693,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
                     return@setOnClickListener
                 }
                 builder.setError(null)
-                mHelper!!.goTo(goTo)
+                mUrlBuilder.setJumpTo(goTo.toString())
+                mAdapter?.refresh()
                 dialog.dismiss()
             }
         } else {
@@ -620,73 +715,28 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
                 .setSelection(toDate)
                 .build()
             datePicker.show(requireActivity().supportFragmentManager, "date-picker")
-            datePicker.addOnPositiveButtonClickListener { v: Long? ->
-                mHelper!!.goTo(
-                    v!!,
-                    true,
-                )
+            datePicker.addOnPositiveButtonClickListener { time ->
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
+                val jumpTo = formatter.format(Instant.ofEpochMilli(time))
+                mUrlBuilder.mJumpTo = jumpTo
+                mAdapter?.refresh()
             }
-        }
-    }
-
-    override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
-        if (null == mHelper) {
-            return
-        }
-        when (position) {
-            0 -> {
-                if (mHelper!!.canGoTo()) showGoToDialog()
-            }
-
-            1 -> mHelper!!.refresh()
-            2 -> {
-                if (mIsTopList) {
-                    mHelper!!.goTo(mHelper!!.pages - 1)
-                } else {
-                    mHelper!!.goTo("1", false)
-                }
-            }
-        }
-        view.isExpanded = false
-    }
-
-    override fun onExpand(expanded: Boolean) {
-        if (null == mActionFabDrawable) {
-            return
-        }
-        if (expanded) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-            mActionFabDrawable!!.setDelete(ANIMATE_TIME)
-        } else {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-            mActionFabDrawable!!.setAdd(ANIMATE_TIME)
         }
     }
 
     override fun onSearchViewExpanded() {
         super.onSearchViewExpanded()
-        if (mState == STATE_NORMAL) selectSearchFab(true)
+        if (mState == State.NORMAL) selectSearchFab(true)
     }
 
     override fun onSearchViewHidden() {
         super.onSearchViewHidden()
-        if (mState == STATE_NORMAL) selectActionFab(true)
-    }
-
-    fun onItemLongClick(position: Int): Boolean {
-        val context = context ?: return true
-        val info = mHelper?.getDataAtEx(position) ?: return true
-        lifecycleScope.launchIO {
-            dialogState.doGalleryInfoAction(info, context)
-        }
-        return true
+        if (mState == State.NORMAL) selectActionFab(true)
     }
 
     private fun showActionFab() {
         _binding ?: return
-        if (STATE_NORMAL == mState && !mShowActionFab) {
+        if (State.NORMAL == mState && !mShowActionFab) {
             mShowActionFab = true
             val fab: View? = binding.fabLayout.primaryFab
             if (fabAnimator != null) {
@@ -703,7 +753,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 
     private fun hideActionFab() {
         _binding ?: return
-        if (STATE_NORMAL == mState && mShowActionFab) {
+        if (State.NORMAL == mState && mShowActionFab) {
             mShowActionFab = false
             val fab: View? = binding.fabLayout.primaryFab
             if (fabAnimator != null) {
@@ -781,11 +831,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         }
     }
 
-    private fun setState(@State state: Int) {
+    private fun setState(state: State) {
         setState(state, true)
     }
 
-    private fun setState(@State state: Int, animation: Boolean) {
+    private fun setState(state: State, animation: Boolean) {
         _binding ?: return
         if (null == mViewTransition) {
             return
@@ -796,36 +846,30 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             showSearchBar()
             onStateChange(state)
             when (oldState) {
-                STATE_NORMAL -> when (state) {
-                    STATE_SIMPLE_SEARCH -> {
+                State.NORMAL -> when (state) {
+                    State.SIMPLE_SEARCH -> {
                         selectSearchFab(animation)
                     }
-
-                    STATE_SEARCH -> {
+                    State.SEARCH -> {
                         mViewTransition!!.showView(1, animation)
                         selectSearchFab(animation)
                     }
-
-                    STATE_SEARCH_SHOW_LIST -> {
+                    State.SEARCH_SHOW_LIST -> {
                         mViewTransition!!.showView(1, animation)
                         selectSearchFab(animation)
                     }
+                    else -> error("Unreachable!!!")
                 }
-
-                STATE_SIMPLE_SEARCH -> when (state) {
-                    STATE_NORMAL -> {
-                        selectActionFab(animation)
-                    }
-
-                    STATE_SEARCH -> mViewTransition!!.showView(1, animation)
-
-                    STATE_SEARCH_SHOW_LIST -> mViewTransition!!.showView(1, animation)
+                State.SIMPLE_SEARCH -> when (state) {
+                    State.NORMAL -> selectActionFab(animation)
+                    State.SEARCH -> mViewTransition!!.showView(1, animation)
+                    State.SEARCH_SHOW_LIST -> mViewTransition!!.showView(1, animation)
+                    else -> error("Unreachable!!!")
                 }
-
-                STATE_SEARCH, STATE_SEARCH_SHOW_LIST -> if (state == STATE_NORMAL) {
+                State.SEARCH, State.SEARCH_SHOW_LIST -> if (state == State.NORMAL) {
                     mViewTransition!!.showView(0, animation)
                     selectActionFab(animation)
-                } else if (state == STATE_SIMPLE_SEARCH) {
+                } else if (state == State.SIMPLE_SEARCH) {
                     mViewTransition!!.showView(0, animation)
                 }
             }
@@ -833,19 +877,18 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        if (mState == STATE_NORMAL) {
-            setState(STATE_SEARCH)
+        if (mState == State.NORMAL) {
+            setState(State.SEARCH)
         } else {
-            setState(STATE_NORMAL)
+            setState(State.NORMAL)
         }
         return true
     }
 
     private fun onApplySearch(query: String?) {
         _binding ?: return
-        mHelper ?: return
         lifecycleScope.launchIO {
-            if (mState == STATE_SEARCH || mState == STATE_SEARCH_SHOW_LIST) {
+            if (mState == State.SEARCH || mState == State.SEARCH_SHOW_LIST) {
                 try {
                     binding.searchLayout.formatListUrlBuilder(mUrlBuilder, query)
                 } catch (e: EhException) {
@@ -862,26 +905,15 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             }
             withUIContext {
                 onUpdateUrlBuilder()
-                mHelper!!.refresh()
-                setState(STATE_NORMAL)
+                mAdapter?.refresh()
+                setState(State.NORMAL)
             }
         }
     }
 
-    override fun onStartDragHandler() {
-        // Lock right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-    }
-
-    override fun onEndDragHandler() {
-        // Restore right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-        showSearchBar()
-    }
-
-    private fun onStateChange(newState: Int) {
-        mCallback.isEnabled = newState != STATE_NORMAL
-        if (newState == STATE_NORMAL || newState == STATE_SIMPLE_SEARCH) {
+    private fun onStateChange(newState: State) {
+        stateBackPressedCallback.isEnabled = newState != State.NORMAL
+        if (newState == State.NORMAL || newState == State.SIMPLE_SEARCH) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         } else {
@@ -889,42 +921,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
         }
     }
-
-    private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {
-        if (Settings.preloadThumbAggressively) {
-            lifecycleScope.launchIO {
-                result.galleryInfoList.forEach { context?.run { imageLoader.enqueue(imageRequest(it) { justDownload() }) } }
-            }
-        }
-        if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
-            val emptyString =
-                getString(if (mUrlBuilder.mode == MODE_SUBSCRIPTION && result.noWatchedTags) R.string.gallery_list_empty_hit_subscription else R.string.gallery_list_empty_hit)
-            mHelper!!.setEmptyString(emptyString)
-            if (mIsTopList) {
-                mHelper!!.onGetPageData(
-                    taskId,
-                    result.pages,
-                    result.nextPage,
-                    null,
-                    null,
-                    result.galleryInfoList,
-                )
-            } else {
-                mHelper!!.onGetPageData(
-                    taskId,
-                    0,
-                    0,
-                    result.prev,
-                    result.next,
-                    result.galleryInfoList,
-                )
-            }
-        }
-    }
-
-    @IntDef(STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST)
-    @Retention(AnnotationRetention.SOURCE)
-    private annotation class State
 
     private class QsDrawerHolder(val binding: ItemDrawerListBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -934,29 +930,21 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             val holder = QsDrawerHolder(ItemDrawerListBinding.inflate(mInflater, parent, false))
             if (!mIsTopList) {
                 holder.itemView.setOnClickListener {
-                    if (null == mHelper) {
-                        return@setOnClickListener
-                    }
                     val q = mQuickSearchList[holder.bindingAdapterPosition]
                     val i = q.name!!.lastIndexOf("@")
                     val goto = if (i != -1) q.name!!.substring(i + 1) else null
-                    val args = ListUrlBuilder().apply {
-                        set(q)
-                    }.toStartArgs().apply { putString(KEY_GOTO, goto) }
+                    val args = ListUrlBuilder().apply { set(q) }.toStartArgs().apply { putString(KEY_GOTO, goto) }
                     navAnimated(R.id.galleryListScene, args, true)
-                    setState(STATE_NORMAL)
+                    setState(State.NORMAL)
                     closeDrawer(GravityCompat.END)
                 }
             } else {
                 val keywords = intArrayOf(11, 12, 13, 15)
                 holder.itemView.setOnClickListener {
-                    if (null == mHelper) {
-                        return@setOnClickListener
-                    }
                     mUrlBuilder.keyword = keywords[holder.bindingAdapterPosition].toString()
                     onUpdateUrlBuilder()
-                    mHelper!!.refresh()
-                    setState(STATE_NORMAL)
+                    mAdapter?.refresh()
+                    setState(State.NORMAL)
                     closeDrawer(GravityCompat.END)
                 }
             }
@@ -1012,10 +1000,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
 
         override fun onClick() {
             navAnimated(getDestination(), getArgs())
-            if (mState == STATE_SIMPLE_SEARCH) {
-                setState(STATE_NORMAL)
-            } else if (mState == STATE_SEARCH_SHOW_LIST) {
-                setState(STATE_SEARCH)
+            if (mState == State.SIMPLE_SEARCH) {
+                setState(State.NORMAL)
+            } else if (mState == State.SEARCH_SHOW_LIST) {
+                setState(State.SEARCH)
             }
         }
 
@@ -1032,13 +1020,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
             return R.id.galleryDetailScene
         }
 
-        override fun getArgs(): Bundle {
-            val args = Bundle()
-            args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-            args.putLong(GalleryDetailScene.KEY_GID, mGid)
-            args.putString(GalleryDetailScene.KEY_TOKEN, mToken)
-            return args
-        }
+        override fun getArgs() = bundleOf(
+            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GID_TOKEN,
+            GalleryDetailScene.KEY_GID to mGid,
+            GalleryDetailScene.KEY_TOKEN to mToken,
+        )
     }
 
     private inner class GalleryPageUrlSuggestion(
@@ -1058,113 +1044,15 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         )
     }
 
-    private inner class GalleryListAdapter(
-        resources: Resources,
-        recyclerView: RecyclerView,
-        type: Int,
-    ) : GalleryAdapter(
-        resources,
-        recyclerView,
-        type,
-        true,
-        { onItemClick(it) },
-        { onItemLongClick(it) },
-    ) {
-        override fun getItemCount(): Int {
-            return if (null != mHelper) mHelper!!.size() else 0
-        }
-
-        override fun getDataAt(position: Int): GalleryInfo? {
-            return if (null != mHelper) mHelper!!.getDataAtEx(position) else null
-        }
-    }
-
-    private inner class GalleryListHelper : GalleryInfoContentHelper() {
-        override fun getPageData(
-            taskId: Int,
-            type: Int,
-            page: Int,
-            index: String?,
-            isNext: Boolean,
-        ) {
-            val activity = mainActivity
-            if (null == activity || null == mHelper) {
-                return
-            }
-            if (mIsTopList) {
-                mUrlBuilder.setJumpTo(page.toString())
-            } else {
-                mUrlBuilder.setIndex(index, isNext)
-                mUrlBuilder.setJumpTo(jumpTo)
-            }
-            lifecycleScope.launchIO {
-                runSuspendCatching {
-                    if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.mode) {
-                        EhEngine.imageSearch(
-                            File(mUrlBuilder.imagePath!!),
-                            mUrlBuilder.isUseSimilarityScan,
-                            mUrlBuilder.isOnlySearchCovers,
-                        )
-                    } else {
-                        val url = mUrlBuilder.build()
-                        EhEngine.getGalleryList(url)
-                    }
-                }.onSuccess {
-                    withUIContext {
-                        onGetGalleryListSuccess(it, taskId)
-                    }
-                }.onFailure { throwable ->
-                    withUIContext {
-                        mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetException(taskId, throwable)
-                    }
-                }
-            }
-        }
-
-        override val context
-            get() = requireContext()
-
-        @SuppressLint("NotifyDataSetChanged")
-        override fun notifyDataSetChanged() {
-            if (null != mAdapter) {
-                mAdapter!!.notifyDataSetChanged()
-            }
-        }
-
-        override fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {
-            if (null != mAdapter) {
-                mAdapter!!.notifyItemRangeInserted(positionStart, itemCount)
-            }
-        }
-
-        override fun onShowView(hiddenView: View, shownView: View) {
-            showSearchBar()
-            showActionFab()
-        }
-
-        override fun isDuplicate(d1: GalleryInfo, d2: GalleryInfo): Boolean {
-            return d1.gid == d2.gid
-        }
-
-        override fun onScrollToPosition(position: Int) {
-            if (0 == position) {
-                showSearchBar()
-                showActionFab()
-            }
-        }
-    }
-
     private inner class GalleryListQSItemTouchHelperCallback(private val mAdapter: QsDrawerAdapter) :
         ItemTouchHelper.Callback() {
         override fun getMovementFlags(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
-        ): Int {
-            return makeMovementFlags(
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                ItemTouchHelper.LEFT,
-            )
-        }
+        ) = makeMovementFlags(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT,
+        )
 
         override fun onMove(
             recyclerView: RecyclerView,
@@ -1217,12 +1105,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
         const val ACTION_TOP_LIST = "action_top_list"
         const val ACTION_LIST_URL_BUILDER = "action_list_url_builder"
         const val KEY_LIST_URL_BUILDER = "list_url_builder"
-        const val KEY_HAS_FIRST_REFRESH = "has_first_refresh"
         const val KEY_STATE = "state"
-        private const val STATE_NORMAL = 0
-        private const val STATE_SIMPLE_SEARCH = 1
-        private const val STATE_SEARCH = 2
-        private const val STATE_SEARCH_SHOW_LIST = 3
         private const val ANIMATE_TIME = 300L
         fun ListUrlBuilder.toStartArgs() = bundleOf(
             KEY_ACTION to ACTION_LIST_URL_BUILDER,
@@ -1231,8 +1114,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, OnClickFabList
     }
 }
 
-private fun getSuitableTitleForUrlBuilder(
-    context: Context,
+@Parcelize
+enum class State : Parcelable {
+    NORMAL, SIMPLE_SEARCH, SEARCH, SEARCH_SHOW_LIST
+}
+
+private fun Context.getSuitableTitleForUrlBuilder(
     urlBuilder: ListUrlBuilder,
     appName: Boolean,
 ): String? {
@@ -1240,29 +1127,29 @@ private fun getSuitableTitleForUrlBuilder(
     val category = urlBuilder.category
     val mode = urlBuilder.mode
     return if (mode == MODE_WHATS_HOT) {
-        context.getString(R.string.whats_hot)
+        getString(R.string.whats_hot)
     } else if (!keyword.isNullOrEmpty()) {
         when (mode) {
             MODE_TOPLIST -> {
                 when (keyword) {
-                    "11" -> context.getString(R.string.toplist_alltime)
-                    "12" -> context.getString(R.string.toplist_pastyear)
-                    "13" -> context.getString(R.string.toplist_pastmonth)
-                    "15" -> context.getString(R.string.toplist_yesterday)
+                    "11" -> getString(R.string.toplist_alltime)
+                    "12" -> getString(R.string.toplist_pastyear)
+                    "13" -> getString(R.string.toplist_pastmonth)
+                    "15" -> getString(R.string.toplist_yesterday)
                     else -> null
                 }
             }
 
             MODE_TAG -> {
-                val canTranslate = Settings.showTagTranslations && EhTagDatabase.isTranslatable(context) && EhTagDatabase.initialized
+                val canTranslate = Settings.showTagTranslations && EhTagDatabase.isTranslatable(this) && EhTagDatabase.initialized
                 wrapTagKeyword(keyword, canTranslate)
             }
             else -> keyword
         }
     } else if (category == EhUtils.NONE && urlBuilder.advanceSearch == -1) {
         when (mode) {
-            MODE_NORMAL -> context.getString(if (appName) R.string.app_name else R.string.homepage)
-            MODE_SUBSCRIPTION -> context.getString(R.string.subscription)
+            MODE_NORMAL -> getString(if (appName) R.string.app_name else R.string.homepage)
+            MODE_SUBSCRIPTION -> getString(R.string.subscription)
             else -> null
         }
     } else if (category.countOneBits() == 1) {

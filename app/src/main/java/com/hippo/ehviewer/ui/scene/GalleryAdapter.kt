@@ -15,15 +15,17 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.content.res.Resources
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.Settings.detailSize
 import com.hippo.ehviewer.Settings.thumbSizeDp
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -34,14 +36,18 @@ import com.hippo.ehviewer.ui.legacy.STRATEGY_SUITABLE_SIZE
 import com.hippo.ehviewer.yorozuya.dp2px
 import splitties.init.appCtx
 
-abstract class GalleryAdapter(
-    private val resources: Resources,
+private val diffCallback = object : DiffUtil.ItemCallback<GalleryInfo>() {
+    override fun areItemsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
+    override fun areContentsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
+}
+
+class GalleryAdapter(
     private val recyclerView: RecyclerView,
-    type: Int,
     private val showFavorite: Boolean,
-    private val onItemClick: (Int) -> Unit,
-    private val onItemLongClick: (Int) -> Unit,
-) : RecyclerView.Adapter<GalleryHolder>() {
+    private val onItemClick: (GalleryInfo, Int) -> Unit,
+    private val onItemLongClick: (GalleryInfo, Int) -> Unit,
+) : PagingDataAdapter<GalleryInfo, GalleryHolder>(diffCallback) {
+    private val resources = recyclerView.context.resources
     private val layoutManager: AutoStaggeredGridLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
     private val mPaddingTopSB: Int = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
     private var mListDecoration: ItemDecoration? = null
@@ -126,12 +132,13 @@ abstract class GalleryAdapter(
                     }
                 }
             }
-            notifyDataSetChanged()
+            refresh()
         }
 
     init {
+        recyclerView.adapter = this
         recyclerView.layoutManager = layoutManager
-        this.type = type
+        type = Settings.listMode
         adjustPaddings()
     }
 
@@ -150,18 +157,14 @@ abstract class GalleryAdapter(
         else -> error("Unexpected value: $viewType")
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return mType
-    }
-
-    abstract fun getDataAt(position: Int): GalleryInfo?
+    override fun getItemViewType(position: Int) = mType
 
     override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
-        val gi = getDataAt(position) ?: return
+        val gi = getItem(position) ?: return
         holder.bind(
             gi,
-            { onItemClick(position) },
-            { onItemLongClick(position) },
+            { onItemClick(gi, position) },
+            { onItemLongClick(gi, position) },
         )
     }
 
