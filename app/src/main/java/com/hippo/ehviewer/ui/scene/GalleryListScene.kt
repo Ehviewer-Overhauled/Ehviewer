@@ -397,6 +397,7 @@ class GalleryListScene : SearchBarScene() {
                 binding.tip.setOnClickListener { mAdapter?.refresh() }
                 val transition = ViewTransition(binding.recyclerView, binding.progress, binding.tip)
                 val empty = getString(R.string.gallery_list_empty_hit)
+                val noWatch = getString(R.string.gallery_list_empty_hit_subscription)
                 adapter.addLoadStateListener {
                     lifecycleScope.launchUI {
                         when (val state = it.refresh) {
@@ -411,7 +412,11 @@ class GalleryListScene : SearchBarScene() {
                             is LoadState.NotLoading -> {
                                 delay(500)
                                 if (mAdapter?.itemCount == 0) {
-                                    binding.tip.text = empty
+                                    if (mUrlBuilder.mode == MODE_SUBSCRIPTION) {
+                                        binding.tip.text = noWatch
+                                    } else {
+                                        binding.tip.text = empty
+                                    }
                                     transition.showView(2)
                                 } else {
                                     transition.showView(0)
