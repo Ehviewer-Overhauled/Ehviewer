@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
@@ -48,6 +47,7 @@ import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.ui.legacy.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.tools.DialogState
+import com.hippo.ehviewer.util.FavouriteStatusRouter
 import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.requestPermission
 import com.hippo.unifile.UniFile

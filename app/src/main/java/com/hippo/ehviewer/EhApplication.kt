@@ -45,6 +45,9 @@ import com.hippo.ehviewer.okhttp.httpClient
 import com.hippo.ehviewer.spider.cronetHttpClient
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.lockObserver
+import com.hippo.ehviewer.util.AppConfig
+import com.hippo.ehviewer.util.Crash
+import com.hippo.ehviewer.util.FavouriteStatusRouter
 import com.hippo.ehviewer.util.FileUtils
 import com.hippo.ehviewer.util.ReadableTime
 import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor

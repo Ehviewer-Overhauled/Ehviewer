@@ -18,7 +18,6 @@ package com.hippo.ehviewer.client
 import android.util.Log
 import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
-import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -47,6 +46,7 @@ import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dailycheck.showEventNotification
 import com.hippo.ehviewer.dailycheck.today
 import com.hippo.ehviewer.network.StatusCodeException
+import com.hippo.ehviewer.util.AppConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.add

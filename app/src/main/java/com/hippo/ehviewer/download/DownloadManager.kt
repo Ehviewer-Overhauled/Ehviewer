@@ -19,7 +19,6 @@ import android.net.Uri
 import android.util.Log
 import android.util.SparseLongArray
 import com.google.android.material.math.MathUtils
-import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -31,6 +30,7 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
 import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.spider.write
+import com.hippo.ehviewer.util.AppConfig
 import com.hippo.ehviewer.util.ConcurrentPool
 import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.SimpleHandler

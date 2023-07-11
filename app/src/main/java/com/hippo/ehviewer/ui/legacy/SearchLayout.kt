@@ -34,7 +34,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
-import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.ListUrlBuilder
@@ -44,6 +43,7 @@ import com.hippo.ehviewer.ui.main.AdvancedSearchOption
 import com.hippo.ehviewer.ui.main.ImageSearch
 import com.hippo.ehviewer.ui.main.NormalSearch
 import com.hippo.ehviewer.ui.main.SearchAdvanced
+import com.hippo.ehviewer.util.AppConfig
 import com.hippo.ehviewer.util.pickVisualMedia
 import com.hippo.unifile.UniFile
 import kotlinx.coroutines.launch

@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hippo.ehviewer
+package com.hippo.ehviewer.util
 
 import android.os.Environment
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.ehviewer.util.FileUtils
-import com.hippo.ehviewer.util.ReadableTime
 import splitties.init.appCtx
 import java.io.File
 
