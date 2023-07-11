@@ -19,6 +19,7 @@ import android.animation.Animator
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
@@ -30,7 +31,6 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.IntDef
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -109,6 +109,7 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import java.io.File
@@ -170,9 +171,9 @@ class GalleryListScene : SearchBarScene() {
     private val mCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             when (mState) {
-                STATE_NORMAL -> throw IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL")
-                STATE_SIMPLE_SEARCH, STATE_SEARCH -> setState(STATE_NORMAL)
-                STATE_SEARCH_SHOW_LIST -> setState(STATE_SEARCH)
+                State.STATE_NORMAL -> throw IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL")
+                State.STATE_SIMPLE_SEARCH, State.STATE_SEARCH -> setState(State.STATE_NORMAL)
+                State.STATE_SEARCH_SHOW_LIST -> setState(State.STATE_SEARCH)
             }
         }
     }
@@ -197,8 +198,7 @@ class GalleryListScene : SearchBarScene() {
     private var mHideActionFabSlop = 0
     private var mShowActionFab = true
 
-    @State
-    private var mState = STATE_NORMAL
+    private var mState = State.STATE_NORMAL
     private val mOnScrollListener: RecyclerView.OnScrollListener =
         object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {}
@@ -247,13 +247,13 @@ class GalleryListScene : SearchBarScene() {
 
     private fun onRestore(savedInstanceState: Bundle) {
         mUrlBuilder = savedInstanceState.getParcelableCompat(KEY_LIST_URL_BUILDER)!!
-        mState = savedInstanceState.getInt(KEY_STATE)
+        mState = savedInstanceState.getParcelableCompat(KEY_STATE)!!
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable(KEY_LIST_URL_BUILDER, mUrlBuilder)
-        outState.putInt(KEY_STATE, mState)
+        outState.putParcelable(KEY_STATE, mState)
     }
 
     private fun setSearchBarHint() {
@@ -453,7 +453,7 @@ class GalleryListScene : SearchBarScene() {
         binding.fabLayout.setHidePrimaryFab(false)
         binding.fabLayout.setOnClickFabListener(object : OnClickFabListener {
             override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-                if (STATE_NORMAL == mState) {
+                if (State.STATE_NORMAL == mState) {
                     view.toggle()
                 }
             }
@@ -498,7 +498,7 @@ class GalleryListScene : SearchBarScene() {
 
         // Restore state
         val newState = mState
-        mState = STATE_NORMAL
+        mState = State.STATE_NORMAL
         setState(newState, false)
         return binding.root
     }
@@ -723,17 +723,17 @@ class GalleryListScene : SearchBarScene() {
 
     override fun onSearchViewExpanded() {
         super.onSearchViewExpanded()
-        if (mState == STATE_NORMAL) selectSearchFab(true)
+        if (mState == State.STATE_NORMAL) selectSearchFab(true)
     }
 
     override fun onSearchViewHidden() {
         super.onSearchViewHidden()
-        if (mState == STATE_NORMAL) selectActionFab(true)
+        if (mState == State.STATE_NORMAL) selectActionFab(true)
     }
 
     private fun showActionFab() {
         _binding ?: return
-        if (STATE_NORMAL == mState && !mShowActionFab) {
+        if (State.STATE_NORMAL == mState && !mShowActionFab) {
             mShowActionFab = true
             val fab: View? = binding.fabLayout.primaryFab
             if (fabAnimator != null) {
@@ -750,7 +750,7 @@ class GalleryListScene : SearchBarScene() {
 
     private fun hideActionFab() {
         _binding ?: return
-        if (STATE_NORMAL == mState && mShowActionFab) {
+        if (State.STATE_NORMAL == mState && mShowActionFab) {
             mShowActionFab = false
             val fab: View? = binding.fabLayout.primaryFab
             if (fabAnimator != null) {
@@ -828,11 +828,11 @@ class GalleryListScene : SearchBarScene() {
         }
     }
 
-    private fun setState(@State state: Int) {
+    private fun setState(state: State) {
         setState(state, true)
     }
 
-    private fun setState(@State state: Int, animation: Boolean) {
+    private fun setState(state: State, animation: Boolean) {
         _binding ?: return
         if (null == mViewTransition) {
             return
@@ -843,36 +843,30 @@ class GalleryListScene : SearchBarScene() {
             showSearchBar()
             onStateChange(state)
             when (oldState) {
-                STATE_NORMAL -> when (state) {
-                    STATE_SIMPLE_SEARCH -> {
+                State.STATE_NORMAL -> when (state) {
+                    State.STATE_SIMPLE_SEARCH -> {
                         selectSearchFab(animation)
                     }
-
-                    STATE_SEARCH -> {
+                    State.STATE_SEARCH -> {
                         mViewTransition!!.showView(1, animation)
                         selectSearchFab(animation)
                     }
-
-                    STATE_SEARCH_SHOW_LIST -> {
+                    State.STATE_SEARCH_SHOW_LIST -> {
                         mViewTransition!!.showView(1, animation)
                         selectSearchFab(animation)
                     }
+                    else -> error("Unreachable!!!")
                 }
-
-                STATE_SIMPLE_SEARCH -> when (state) {
-                    STATE_NORMAL -> {
-                        selectActionFab(animation)
-                    }
-
-                    STATE_SEARCH -> mViewTransition!!.showView(1, animation)
-
-                    STATE_SEARCH_SHOW_LIST -> mViewTransition!!.showView(1, animation)
+                State.STATE_SIMPLE_SEARCH -> when (state) {
+                    State.STATE_NORMAL -> selectActionFab(animation)
+                    State.STATE_SEARCH -> mViewTransition!!.showView(1, animation)
+                    State.STATE_SEARCH_SHOW_LIST -> mViewTransition!!.showView(1, animation)
+                    else -> error("Unreachable!!!")
                 }
-
-                STATE_SEARCH, STATE_SEARCH_SHOW_LIST -> if (state == STATE_NORMAL) {
+                State.STATE_SEARCH, State.STATE_SEARCH_SHOW_LIST -> if (state == State.STATE_NORMAL) {
                     mViewTransition!!.showView(0, animation)
                     selectActionFab(animation)
-                } else if (state == STATE_SIMPLE_SEARCH) {
+                } else if (state == State.STATE_SIMPLE_SEARCH) {
                     mViewTransition!!.showView(0, animation)
                 }
             }
@@ -880,10 +874,10 @@ class GalleryListScene : SearchBarScene() {
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        if (mState == STATE_NORMAL) {
-            setState(STATE_SEARCH)
+        if (mState == State.STATE_NORMAL) {
+            setState(State.STATE_SEARCH)
         } else {
-            setState(STATE_NORMAL)
+            setState(State.STATE_NORMAL)
         }
         return true
     }
@@ -891,7 +885,7 @@ class GalleryListScene : SearchBarScene() {
     private fun onApplySearch(query: String?) {
         _binding ?: return
         lifecycleScope.launchIO {
-            if (mState == STATE_SEARCH || mState == STATE_SEARCH_SHOW_LIST) {
+            if (mState == State.STATE_SEARCH || mState == State.STATE_SEARCH_SHOW_LIST) {
                 try {
                     binding.searchLayout.formatListUrlBuilder(mUrlBuilder, query)
                 } catch (e: EhException) {
@@ -909,14 +903,14 @@ class GalleryListScene : SearchBarScene() {
             withUIContext {
                 onUpdateUrlBuilder()
                 mAdapter?.refresh()
-                setState(STATE_NORMAL)
+                setState(State.STATE_NORMAL)
             }
         }
     }
 
-    private fun onStateChange(newState: Int) {
-        mCallback.isEnabled = newState != STATE_NORMAL
-        if (newState == STATE_NORMAL || newState == STATE_SIMPLE_SEARCH) {
+    private fun onStateChange(newState: State) {
+        mCallback.isEnabled = newState != State.STATE_NORMAL
+        if (newState == State.STATE_NORMAL || newState == State.STATE_SIMPLE_SEARCH) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         } else {
@@ -924,10 +918,6 @@ class GalleryListScene : SearchBarScene() {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
         }
     }
-
-    @IntDef(STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST)
-    @Retention(AnnotationRetention.SOURCE)
-    private annotation class State
 
     private class QsDrawerHolder(val binding: ItemDrawerListBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -942,7 +932,7 @@ class GalleryListScene : SearchBarScene() {
                     val goto = if (i != -1) q.name!!.substring(i + 1) else null
                     val args = ListUrlBuilder().apply { set(q) }.toStartArgs().apply { putString(KEY_GOTO, goto) }
                     navAnimated(R.id.galleryListScene, args, true)
-                    setState(STATE_NORMAL)
+                    setState(State.STATE_NORMAL)
                     closeDrawer(GravityCompat.END)
                 }
             } else {
@@ -951,7 +941,7 @@ class GalleryListScene : SearchBarScene() {
                     mUrlBuilder.keyword = keywords[holder.bindingAdapterPosition].toString()
                     onUpdateUrlBuilder()
                     mAdapter?.refresh()
-                    setState(STATE_NORMAL)
+                    setState(State.STATE_NORMAL)
                     closeDrawer(GravityCompat.END)
                 }
             }
@@ -1007,10 +997,10 @@ class GalleryListScene : SearchBarScene() {
 
         override fun onClick() {
             navAnimated(getDestination(), getArgs())
-            if (mState == STATE_SIMPLE_SEARCH) {
-                setState(STATE_NORMAL)
-            } else if (mState == STATE_SEARCH_SHOW_LIST) {
-                setState(STATE_SEARCH)
+            if (mState == State.STATE_SIMPLE_SEARCH) {
+                setState(State.STATE_NORMAL)
+            } else if (mState == State.STATE_SEARCH_SHOW_LIST) {
+                setState(State.STATE_SEARCH)
             }
         }
 
@@ -1115,16 +1105,17 @@ class GalleryListScene : SearchBarScene() {
         const val ACTION_LIST_URL_BUILDER = "action_list_url_builder"
         const val KEY_LIST_URL_BUILDER = "list_url_builder"
         const val KEY_STATE = "state"
-        private const val STATE_NORMAL = 0
-        private const val STATE_SIMPLE_SEARCH = 1
-        private const val STATE_SEARCH = 2
-        private const val STATE_SEARCH_SHOW_LIST = 3
         private const val ANIMATE_TIME = 300L
         fun ListUrlBuilder.toStartArgs() = bundleOf(
             KEY_ACTION to ACTION_LIST_URL_BUILDER,
             KEY_LIST_URL_BUILDER to this,
         )
     }
+}
+
+@Parcelize
+enum class State : Parcelable {
+    STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST
 }
 
 private fun Context.getSuitableTitleForUrlBuilder(
