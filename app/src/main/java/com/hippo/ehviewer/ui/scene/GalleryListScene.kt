@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
@@ -88,7 +89,7 @@ import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
-import com.hippo.ehviewer.ui.legacy.LayoutManagerUtils
+import com.hippo.ehviewer.ui.legacy.LayoutManagerUtils.firstVisibleItemPosition
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
@@ -167,10 +168,10 @@ class GalleryListScene : SearchBarScene() {
     private var mUrlBuilder by lazyMut { vm::urlBuilder }
     private var mIsTopList by lazyMut { vm::isTopList }
 
-    private val mCallback = object : OnBackPressedCallback(false) {
+    private val stateBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             when (mState) {
-                State.NORMAL -> throw IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL")
+                State.NORMAL -> error("SearchStateOnBackPressedCallback should not be enabled on $mState")
                 State.SIMPLE_SEARCH, State.SEARCH -> setState(State.NORMAL)
                 State.SEARCH_SHOW_LIST -> setState(State.SEARCH)
             }
@@ -178,25 +179,22 @@ class GalleryListScene : SearchBarScene() {
     }
     private var _binding: SceneGalleryListBinding? = null
     private val binding get() = _binding!!
-    private val mSearchFabAnimatorListener: Animator.AnimatorListener =
-        object : SimpleAnimatorListener() {
-            override fun onAnimationEnd(animation: Animator) {
-                mSearchFab.visibility = View.INVISIBLE
-            }
+    private val mSearchFabAnimatorListener = object : SimpleAnimatorListener() {
+        override fun onAnimationEnd(animation: Animator) {
+            mSearchFab.visibility = View.INVISIBLE
         }
-    private val mActionFabAnimatorListener: Animator.AnimatorListener =
-        object : SimpleAnimatorListener() {
-            override fun onAnimationEnd(animation: Animator) {
-                binding.fabLayout.primaryFab?.visibility = View.INVISIBLE
-            }
+    }
+    private val mActionFabAnimatorListener = object : SimpleAnimatorListener() {
+        override fun onAnimationEnd(animation: Animator) {
+            binding.fabLayout.primaryFab?.visibility = View.INVISIBLE
         }
+    }
     private var fabAnimator: ViewPropertyAnimator? = null
     private var mViewTransition: ViewTransition? = null
     private var mAdapter: GalleryAdapter? = null
     lateinit var mQuickSearchList: MutableList<QuickSearch>
     private var mHideActionFabSlop = 0
     private var mShowActionFab = true
-
     private var mState = State.NORMAL
     private val mOnScrollListener: RecyclerView.OnScrollListener =
         object : RecyclerView.OnScrollListener() {
@@ -346,7 +344,7 @@ class GalleryListScene : SearchBarScene() {
         _binding = SceneGalleryListBinding.inflate(inflater, container, false)
         binding.root.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Handler() } })
         checkForUpdates()
-        requireActivity().onBackPressedDispatcher.addCallback(mCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(stateBackPressedCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
         mShowActionFab = true
         ViewCompat.setWindowInsetsAnimationCallback(
@@ -504,7 +502,7 @@ class GalleryListScene : SearchBarScene() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mCallback.remove()
+        stateBackPressedCallback.remove()
         binding.recyclerView.stopScroll()
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
@@ -533,7 +531,7 @@ class GalleryListScene : SearchBarScene() {
             showTip(R.string.image_search_not_quick_search, LENGTH_LONG)
             return
         }
-        val gi = mAdapter?.peek(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager!!))
+        val gi = mAdapter?.peek(binding.recyclerView.layoutManager!!.firstVisibleItemPosition)
         val next = if (gi != null) "@" + (gi.gid + 1) else null
 
         // Check duplicate
@@ -556,10 +554,7 @@ class GalleryListScene : SearchBarScene() {
         // TODO: It's ugly
         val checked = booleanArrayOf(Settings.qSSaveProgress)
         val hint = arrayOf(getString(R.string.save_progress))
-        builder.setMultiChoiceItems(
-            hint,
-            checked,
-        ) { _: DialogInterface?, which: Int, isChecked: Boolean -> checked[which] = isChecked }
+        builder.setMultiChoiceItems(hint, checked) { _, which, isChecked -> checked[which] = isChecked }
         val dialog = builder.show()
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             lifecycleScope.launchIO {
@@ -661,21 +656,15 @@ class GalleryListScene : SearchBarScene() {
         val context = context ?: return
         mAdapter ?: return
         if (mIsTopList) {
-            /*
-            val page = mHelper!!.pageForTop + 1
-            val pages = mHelper!!.pages
+            val page = binding.recyclerView.layoutManager!!.firstVisibleItemPosition / 25 + 1
+            val pages = 20
             val hint = getString(R.string.go_to_hint, page, pages)
             val builder = EditTextDialogBuilder(context, null, hint)
-            builder.editText.inputType =
-                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            builder.editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             val dialog = builder.setTitle(R.string.go_to)
                 .setPositiveButton(android.R.string.ok, null)
                 .show()
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-                if (null == mHelper) {
-                    dialog.dismiss()
-                    return@setOnClickListener
-                }
                 val text = builder.text.trim { it <= ' ' }
                 val goTo: Int = try {
                     text.toInt() - 1
@@ -688,11 +677,8 @@ class GalleryListScene : SearchBarScene() {
                     return@setOnClickListener
                 }
                 builder.setError(null)
-                mHelper!!.goTo(goTo)
                 dialog.dismiss()
             }
-
-             */
         } else {
             val local = LocalDateTime.of(2007, 3, 21, 0, 0)
             val fromDate =
@@ -908,7 +894,7 @@ class GalleryListScene : SearchBarScene() {
     }
 
     private fun onStateChange(newState: State) {
-        mCallback.isEnabled = newState != State.NORMAL
+        stateBackPressedCallback.isEnabled = newState != State.NORMAL
         if (newState == State.NORMAL || newState == State.SIMPLE_SEARCH) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
