@@ -48,11 +48,9 @@ import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingDataAdapter
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
-import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.CompositeDateValidator
@@ -154,8 +152,7 @@ class FavoritesScene : SearchBarScene() {
     private var initialKey by lazyMut { vm::initialKey }
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
-    private var mAdapter: PagingDataAdapter<GalleryInfo, GalleryHolder>? = null
-    private var mAdapterDelegate: GalleryAdapter? = null
+    private var mAdapter: GalleryAdapter? = null
     private val showNormalFabsRunnable = Runnable {
         updateJumpFab() // index: 0, 2
         binding.fabLayout.run {
@@ -164,7 +161,7 @@ class FavoritesScene : SearchBarScene() {
         }
     }
 
-    fun onItemClick(position: Int) {
+    private fun onItemClick(position: Int) {
         if (isDrawerOpen(GravityCompat.END)) {
             // Skip if in search mode
             if (!binding.recyclerView.isInCustomChoice) {
@@ -222,7 +219,7 @@ class FavoritesScene : SearchBarScene() {
 
     override fun onResume() {
         super.onResume()
-        mAdapterDelegate?.type = Settings.listMode
+        mAdapter?.type = Settings.listMode
     }
 
     override fun onCreateViewWithToolbar(
@@ -331,22 +328,12 @@ class FavoritesScene : SearchBarScene() {
             }
         }
         binding.recyclerView.run {
-            val delegateAdapter = object : GalleryAdapter(resources, this@run, Settings.listMode, false, { onItemClick(it) }, { onItemLongClick(it) }) {
-                override fun getItemCount() = TODO()
-                override fun getDataAt(position: Int) = mAdapter?.peek(position)
-            }
-            val diffCallback = object : DiffUtil.ItemCallback<GalleryInfo>() {
-                override fun areItemsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
-                override fun areContentsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
-            }
-            mAdapter = object : PagingDataAdapter<GalleryInfo, GalleryHolder>(diffCallback) {
-                override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
-                    getItem(position)
-                    delegateAdapter.onBindViewHolder(holder, position)
-                }
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = delegateAdapter.onCreateViewHolder(parent, delegateAdapter.type)
-            }.also { adapter ->
-                binding.recyclerView.adapter = adapter
+            mAdapter = GalleryAdapter(
+                this@run,
+                false,
+                { onItemClick(it) },
+                { onItemLongClick(it) },
+            ).also { adapter ->
                 val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
                 binding.tip.setCompoundDrawables(null, drawable, null, null)
@@ -378,7 +365,6 @@ class FavoritesScene : SearchBarScene() {
                 }
             }
             switchFav(Settings.recentFavCat)
-            mAdapterDelegate = delegateAdapter
             setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
             setCustomCheckedListener(object : CustomChoiceListener {
                 override fun onIntoCustomChoice(view: EasyRecyclerView) {
@@ -431,7 +417,6 @@ class FavoritesScene : SearchBarScene() {
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         removeAboveSnackView(binding.fabLayout)
         mAdapter = null
-        mAdapterDelegate = null
         _binding = null
     }
 
@@ -467,7 +452,7 @@ class FavoritesScene : SearchBarScene() {
         }
     }
 
-    fun onItemLongClick(position: Int): Boolean {
+    private fun onItemLongClick(position: Int): Boolean {
         // Can not into
         if (!binding.recyclerView.isInCustomChoice) {
             binding.recyclerView.intoCustomChoiceMode()
