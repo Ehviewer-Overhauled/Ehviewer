@@ -17,9 +17,9 @@ package com.hippo.ehviewer
 
 import android.os.Build
 import android.os.Debug
+import com.hippo.ehviewer.util.FileUtils
+import com.hippo.ehviewer.util.OSUtils
 import com.hippo.ehviewer.util.ReadableTime
-import com.hippo.ehviewer.yorozuya.FileUtils
-import com.hippo.ehviewer.yorozuya.OSUtils
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter

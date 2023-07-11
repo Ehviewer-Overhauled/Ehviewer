@@ -22,7 +22,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.yorozuya.toIntOrDefault
+import com.hippo.ehviewer.util.toIntOrDefault
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.regex.Pattern

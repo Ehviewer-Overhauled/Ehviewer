@@ -27,9 +27,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.util.AnimationUtils
+import com.hippo.ehviewer.util.SimpleAnimatorListener
 import com.hippo.ehviewer.util.getParcelableCompat
-import com.hippo.ehviewer.yorozuya.AnimationUtils
-import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
 
 class FabLayout @JvmOverloads constructor(
     context: Context,

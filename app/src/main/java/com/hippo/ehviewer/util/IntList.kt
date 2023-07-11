@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.yorozuya.collect
+package com.hippo.ehviewer.util
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

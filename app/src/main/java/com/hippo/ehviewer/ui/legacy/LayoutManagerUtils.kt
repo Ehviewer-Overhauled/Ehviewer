@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.math.MathUtils
-import com.hippo.ehviewer.yorozuya.SimpleHandler
+import com.hippo.ehviewer.util.SimpleHandler
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import kotlin.math.abs

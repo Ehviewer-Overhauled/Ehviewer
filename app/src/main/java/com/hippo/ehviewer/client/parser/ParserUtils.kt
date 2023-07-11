@@ -15,9 +15,9 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import com.hippo.ehviewer.yorozuya.toIntOrDefault
-import com.hippo.ehviewer.yorozuya.toLongOrDefault
-import com.hippo.ehviewer.yorozuya.unescapeXml
+import com.hippo.ehviewer.util.toIntOrDefault
+import com.hippo.ehviewer.util.toLongOrDefault
+import com.hippo.ehviewer.util.unescapeXml
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter

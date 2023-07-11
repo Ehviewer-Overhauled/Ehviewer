@@ -96,13 +96,13 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.settings.showNewVersion
 import com.hippo.ehviewer.ui.tools.DialogState
 import com.hippo.ehviewer.updater.AppUpdater
+import com.hippo.ehviewer.util.AnimationUtils
 import com.hippo.ehviewer.util.ExceptionUtils
+import com.hippo.ehviewer.util.SimpleAnimatorListener
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.util.getValue
 import com.hippo.ehviewer.util.lazyMut
 import com.hippo.ehviewer.util.setValue
-import com.hippo.ehviewer.yorozuya.AnimationUtils
-import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withIOContext

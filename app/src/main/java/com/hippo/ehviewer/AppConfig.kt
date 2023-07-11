@@ -17,8 +17,8 @@ package com.hippo.ehviewer
 
 import android.os.Environment
 import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.ehviewer.util.FileUtils
 import com.hippo.ehviewer.util.ReadableTime
-import com.hippo.ehviewer.yorozuya.FileUtils
 import splitties.init.appCtx
 import java.io.File
 

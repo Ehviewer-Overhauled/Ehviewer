@@ -37,10 +37,10 @@ import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.exception.PiningException
 import com.hippo.ehviewer.client.getThumbKey
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.yorozuya.toFloatOrDefault
-import com.hippo.ehviewer.yorozuya.toIntOrDefault
-import com.hippo.ehviewer.yorozuya.trimAnd
-import com.hippo.ehviewer.yorozuya.unescapeXml
+import com.hippo.ehviewer.util.toFloatOrDefault
+import com.hippo.ehviewer.util.toIntOrDefault
+import com.hippo.ehviewer.util.trimAnd
+import com.hippo.ehviewer.util.unescapeXml
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element

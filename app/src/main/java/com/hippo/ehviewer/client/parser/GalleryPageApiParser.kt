@@ -17,7 +17,7 @@ package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parseAs
-import com.hippo.ehviewer.yorozuya.unescapeXml
+import com.hippo.ehviewer.util.unescapeXml
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

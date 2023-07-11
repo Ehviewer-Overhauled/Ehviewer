@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.yorozuya.toLongOrDefault
+import com.hippo.ehviewer.util.toLongOrDefault
 import java.util.regex.Pattern
 
 /**

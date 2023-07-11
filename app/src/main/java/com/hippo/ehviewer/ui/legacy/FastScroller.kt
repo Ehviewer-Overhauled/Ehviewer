@@ -29,10 +29,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.google.android.material.math.MathUtils.dist
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.yorozuya.AnimationUtils
-import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
-import com.hippo.ehviewer.yorozuya.SimpleHandler
-import com.hippo.ehviewer.yorozuya.dp2px
+import com.hippo.ehviewer.util.AnimationUtils
+import com.hippo.ehviewer.util.SimpleAnimatorListener
+import com.hippo.ehviewer.util.SimpleHandler
+import com.hippo.ehviewer.util.dp2px
 import kotlin.math.abs
 
 class FastScroller : View {

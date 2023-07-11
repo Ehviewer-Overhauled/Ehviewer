@@ -36,11 +36,11 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.DownloadsScene
+import com.hippo.ehviewer.util.FileUtils
+import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.ReadableTime
+import com.hippo.ehviewer.util.SimpleHandler
 import com.hippo.ehviewer.util.getParcelableExtraCompat
-import com.hippo.ehviewer.yorozuya.FileUtils
-import com.hippo.ehviewer.yorozuya.SimpleHandler
-import com.hippo.ehviewer.yorozuya.collect.LongList
 
 class DownloadService : Service(), DownloadManager.DownloadListener {
     private var mNotifyManager: NotificationManagerCompat? = null

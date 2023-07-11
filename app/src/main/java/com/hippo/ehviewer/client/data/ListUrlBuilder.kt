@@ -24,7 +24,7 @@ import com.hippo.ehviewer.client.ehUrl
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.ui.main.AdvanceTable
 import com.hippo.ehviewer.util.encodeUTF8
-import com.hippo.ehviewer.yorozuya.toIntOrDefault
+import com.hippo.ehviewer.util.toIntOrDefault
 import kotlinx.parcelize.Parcelize
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder

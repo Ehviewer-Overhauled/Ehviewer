@@ -48,8 +48,8 @@ import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.ui.legacy.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.tools.DialogState
+import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.requestPermission
-import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchNow

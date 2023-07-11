@@ -159,11 +159,11 @@ import com.hippo.ehviewer.ui.tools.FilledTertiaryIconToggleButton
 import com.hippo.ehviewer.ui.tools.GalleryDetailRating
 import com.hippo.ehviewer.util.AppHelper
 import com.hippo.ehviewer.util.ExceptionUtils
+import com.hippo.ehviewer.util.FileUtils
+import com.hippo.ehviewer.util.IntList
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.util.addTextToClipboard
 import com.hippo.ehviewer.util.getParcelableCompat
-import com.hippo.ehviewer.yorozuya.FileUtils
-import com.hippo.ehviewer.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException

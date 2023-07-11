@@ -17,7 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.drakeet.drawer.FullDraggableHelper
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
-import com.hippo.ehviewer.yorozuya.dp2px
+import com.hippo.ehviewer.util.dp2px
 
 class AboveSnackerLayout : FrameLayout, AttachedBehavior, FullDraggableHelper.Callback {
     private val helper: FullDraggableHelper

@@ -31,8 +31,8 @@ import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.ehviewer.image.Image.CloseableSource
 import com.hippo.ehviewer.image.rewriteGifSource2
+import com.hippo.ehviewer.util.FileUtils
 import com.hippo.ehviewer.util.sendTo
-import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
 import okhttp3.MediaType.Companion.toMediaType

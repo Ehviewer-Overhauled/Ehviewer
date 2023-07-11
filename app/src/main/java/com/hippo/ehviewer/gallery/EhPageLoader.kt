@@ -21,7 +21,7 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.obtainSpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.releaseSpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
-import com.hippo.ehviewer.yorozuya.SimpleHandler
+import com.hippo.ehviewer.util.SimpleHandler
 import com.hippo.unifile.UniFile
 import java.util.Locale
 

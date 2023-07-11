@@ -23,7 +23,7 @@ import android.util.Log
 import com.hippo.ehviewer.Settings.archivePasswds
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.image.rewriteGifSource
-import com.hippo.ehviewer.yorozuya.FileUtils
+import com.hippo.ehviewer.util.FileUtils
 import com.hippo.unifile.UniFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart

@@ -33,7 +33,7 @@ import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.MarginItemDecoration
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.STRATEGY_SUITABLE_SIZE
-import com.hippo.ehviewer.yorozuya.dp2px
+import com.hippo.ehviewer.util.dp2px
 import splitties.init.appCtx
 
 private val diffCallback = object : DiffUtil.ItemCallback<GalleryInfo>() {

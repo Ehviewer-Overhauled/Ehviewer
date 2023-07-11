@@ -31,9 +31,9 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
 import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.spider.write
-import com.hippo.ehviewer.yorozuya.ConcurrentPool
-import com.hippo.ehviewer.yorozuya.SimpleHandler
-import com.hippo.ehviewer.yorozuya.collect.LongList
+import com.hippo.ehviewer.util.ConcurrentPool
+import com.hippo.ehviewer.util.LongList
+import com.hippo.ehviewer.util.SimpleHandler
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CoroutineScope

@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.yorozuya
+package com.hippo.ehviewer.util
 
 import okhttp3.ResponseBody
 import java.io.File

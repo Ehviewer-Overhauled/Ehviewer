@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.ehviewer.yorozuya.unescapeXml
+import com.hippo.ehviewer.util.unescapeXml
 import java.util.regex.Pattern
 
 object GalleryPageParser {
