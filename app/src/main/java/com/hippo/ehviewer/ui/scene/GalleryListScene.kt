@@ -122,12 +122,25 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class VMStorage1 : ViewModel() {
-    var isTopList = false
     var urlBuilder = ListUrlBuilder()
     val dataFlow = Pager(PagingConfig(25)) {
         object : PagingSource<String, GalleryInfo>() {
             override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
             override suspend fun load(params: LoadParams<String>) = withIOContext {
+                if (urlBuilder.mode == MODE_TOPLIST) {
+                    // TODO: Since we know total pages, let pager support jump
+                    val key = (params.key ?: urlBuilder.mJumpTo ?: "0").toInt()
+                    val prev = if (key != 0) key - 1 else null
+                    val next = if (key != 199) key + 1 else null
+                    runSuspendCatching {
+                        urlBuilder.setJumpTo(key.toString())
+                        EhEngine.getGalleryList(urlBuilder.build())
+                    }.onFailure {
+                        return@withIOContext LoadResult.Error(it)
+                    }.onSuccess {
+                        return@withIOContext LoadResult.Page(it.galleryInfoList, prev?.toString(), next?.toString())
+                    }
+                }
                 when (params) {
                     is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
                     is LoadParams.Append -> urlBuilder.setIndex(params.key, isNext = true)
@@ -166,7 +179,7 @@ class VMStorage1 : ViewModel() {
 class GalleryListScene : SearchBarScene() {
     private val vm: VMStorage1 by viewModels()
     private var mUrlBuilder by lazyMut { vm::urlBuilder }
-    private var mIsTopList by lazyMut { vm::isTopList }
+    private var mIsTopList = false
 
     private val stateBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -661,14 +674,12 @@ class GalleryListScene : SearchBarScene() {
         val context = context ?: return
         mAdapter ?: return
         if (mIsTopList) {
-            val page = binding.recyclerView.layoutManager!!.firstVisibleItemPosition / 25 + 1
-            val pages = 20
+            val page = 1
+            val pages = 200
             val hint = getString(R.string.go_to_hint, page, pages)
             val builder = EditTextDialogBuilder(context, null, hint)
             builder.editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-            val dialog = builder.setTitle(R.string.go_to)
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+            val dialog = builder.setTitle(R.string.go_to).setPositiveButton(android.R.string.ok, null).show()
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
                 val text = builder.text.trim { it <= ' ' }
                 val goTo: Int = try {
@@ -682,6 +693,8 @@ class GalleryListScene : SearchBarScene() {
                     return@setOnClickListener
                 }
                 builder.setError(null)
+                mUrlBuilder.setJumpTo(goTo.toString())
+                mAdapter?.refresh()
                 dialog.dismiss()
             }
         } else {
