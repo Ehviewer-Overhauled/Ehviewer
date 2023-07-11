@@ -223,8 +223,8 @@ open class EasyRecyclerView : RecyclerView {
         if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mChoiceActionMode == null) {
             check(mMultiChoiceModeCallback != null && mMultiChoiceModeCallback!!.hasWrappedCallback()) {
                 "EasyRecyclerView: attempted to start selection mode " +
-                        "for CHOICE_MODE_MULTIPLE_MODAL but no choice mode callback was " +
-                        "supplied. Call setMultiChoiceModeListener to set a callback."
+                    "for CHOICE_MODE_MULTIPLE_MODAL but no choice mode callback was " +
+                    "supplied. Call setMultiChoiceModeListener to set a callback."
             }
             mChoiceActionMode = startActionMode(mMultiChoiceModeCallback)
         }
@@ -280,8 +280,8 @@ open class EasyRecyclerView : RecyclerView {
         if (value && mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mChoiceActionMode == null) {
             check(mMultiChoiceModeCallback != null && mMultiChoiceModeCallback!!.hasWrappedCallback()) {
                 "EasyRecyclerView: attempted to start selection mode " +
-                        "for CHOICE_MODE_MULTIPLE_MODAL but no choice mode callback was " +
-                        "supplied. Call setMultiChoiceModeListener to set a callback."
+                    "for CHOICE_MODE_MULTIPLE_MODAL but no choice mode callback was " +
+                    "supplied. Call setMultiChoiceModeListener to set a callback."
             }
             mChoiceActionMode = startActionMode(mMultiChoiceModeCallback)
         }

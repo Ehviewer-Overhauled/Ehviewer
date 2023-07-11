@@ -18,7 +18,6 @@ package com.hippo.ehviewer.ui.legacy
 import android.content.Context
 import android.graphics.PointF
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.math.MathUtils
