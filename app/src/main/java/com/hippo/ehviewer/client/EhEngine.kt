@@ -121,7 +121,8 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     throw e
 }
 
-private suspend inline fun <T> Request.executeAndParsingWith(block: String.() -> T): T {
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+private suspend inline fun <T> Request.executeAndParsingWith(block: suspend String.() -> T): T {
     Log.d(TAG, url.toString())
     return execute {
         val body = body.string()

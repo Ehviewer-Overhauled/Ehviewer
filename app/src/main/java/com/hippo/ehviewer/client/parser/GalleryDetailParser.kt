@@ -83,7 +83,7 @@ object GalleryDetailParser {
         "<p>(And if you choose to ignore this warning, you lose all rights to complain about it in the future.)</p>"
     private const val PINING_STRING = "<p>This gallery is pining for the fjords.</p>"
 
-    fun parse(body: String): GalleryDetail {
+    suspend fun parse(body: String): GalleryDetail {
         if (body.contains(OFFENSIVE_STRING)) {
             throw OffensiveException()
         }
@@ -108,7 +108,7 @@ object GalleryDetailParser {
         return galleryDetail
     }
 
-    private fun parseDetail(gd: GalleryDetail, d: Document, body: String) {
+    private suspend fun parseDetail(gd: GalleryDetail, d: Document, body: String) {
         PATTERN_DETAIL.find(body)?.apply {
             gd.gid = groupValues[1].toLongOrNull() ?: -1L
             gd.token = groupValues[2]

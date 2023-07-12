@@ -21,7 +21,7 @@ import com.hippo.ehviewer.client.exception.ParseException
 import splitties.init.appCtx
 
 object FavoritesParser {
-    fun parse(body: String): Result {
+    suspend fun parse(body: String): Result {
         if (body.contains("This page requires you to log on.</p>")) {
             throw EhException(appCtx.getString(R.string.need_sign_in))
         }

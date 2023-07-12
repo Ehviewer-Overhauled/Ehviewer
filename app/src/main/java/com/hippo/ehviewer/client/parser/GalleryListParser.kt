@@ -35,13 +35,13 @@ object GalleryListParser {
     private val PATTERN_PREV = Pattern.compile("prev=(\\d+(-\\d+)?)")
     private val PATTERN_NEXT = Pattern.compile("next=(\\d+(-\\d+)?)")
 
-    fun parse(body: String): Result {
+    suspend fun parse(body: String): Result {
         val d = Jsoup.parse(body)
         d.outputSettings().prettyPrint(false)
         return parse(d, body)
     }
 
-    fun parse(d: Document, body: String): Result {
+    suspend fun parse(d: Document, body: String): Result {
         val result = Result()
         try {
             val prev = d.getElementById("uprev")

@@ -33,7 +33,6 @@ import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.util.sendTo
-import kotlinx.coroutines.runBlocking
 import splitties.arch.room.roomDb
 
 object EhDB {
@@ -162,11 +161,9 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun containLocalFavorites(gid: Long): Boolean {
+    suspend fun containLocalFavorites(gid: Long): Boolean {
         val dao = db.localFavoritesDao()
-        // TODO: remove runBlocking
-        return runBlocking { dao.contains(gid) }
+        return dao.contains(gid)
     }
 
     suspend fun putLocalFavorites(galleryInfo: GalleryInfo) {
