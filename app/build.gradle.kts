@@ -248,7 +248,7 @@ dependencies {
     implementation("dev.rikka.rikkax.insets:insets:1.3.0")
     implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.3.0")
 
-    implementation(platform("io.arrow-kt:arrow-stack:1.2.0-RC"))
+    implementation(platform("io.arrow-kt:arrow-stack:1.2.0"))
     implementation("io.arrow-kt:arrow-fx-coroutines")
 
     // https://coil-kt.github.io/coil/changelog/
