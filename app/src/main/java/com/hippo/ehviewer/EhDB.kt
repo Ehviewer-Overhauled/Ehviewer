@@ -22,7 +22,6 @@ import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import androidx.paging.PagingSource
 import arrow.fx.coroutines.release
 import arrow.fx.coroutines.resource
-import com.hippo.ehviewer.EhApplication.Companion.ehDatabase
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.BasicDao
 import com.hippo.ehviewer.dao.DownloadDirname
@@ -38,7 +37,7 @@ import com.hippo.ehviewer.util.sendTo
 import splitties.arch.room.roomDb
 
 object EhDB {
-    private val db = ehDatabase
+    private val db = roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() }
 
     // Fix state
     @get:Synchronized

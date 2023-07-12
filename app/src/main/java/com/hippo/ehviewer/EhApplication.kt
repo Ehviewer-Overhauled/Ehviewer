@@ -30,7 +30,6 @@ import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.dailycheck.checkDawn
-import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ktbuilder.cache
 import com.hippo.ehviewer.ktbuilder.chunker
@@ -57,7 +56,6 @@ import kotlinx.coroutines.launch
 import okhttp3.AsyncDns
 import okhttp3.android.AndroidAsyncDns
 import okio.Path.Companion.toOkioPath
-import splitties.arch.room.roomDb
 import splitties.init.appCtx
 
 private val lifecycle = ProcessLifecycleOwner.get().lifecycle
@@ -94,7 +92,7 @@ class EhApplication : Application(), ImageLoaderFactory {
                 EhTagDatabase.update()
             }
             launchIO {
-                ehDatabase
+                EhDB
             }
             launchIO {
                 DownloadManager.isIdle
@@ -191,8 +189,6 @@ class EhApplication : Application(), ImageLoaderFactory {
                 }
             }
         }
-
-        val ehDatabase by lazy { roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() } }
 
         val imageCache by lazy {
             diskCache {
