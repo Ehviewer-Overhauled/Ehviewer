@@ -99,6 +99,7 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
+import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.Dispatchers
@@ -635,10 +636,12 @@ class DownloadsScene :
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onReload() {
-        if (mAdapter != null) {
-            mAdapter!!.notifyDataSetChanged()
+        lifecycleScope.launchUI {
+            if (mAdapter != null) {
+                mAdapter!!.notifyDataSetChanged()
+            }
+            updateView()
         }
-        updateView()
     }
 
     override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
@@ -649,10 +652,6 @@ class DownloadsScene :
             mAdapter!!.notifyItemRemoved(position)
         }
         updateView()
-    }
-
-    override fun onUpdateLabels() {
-        // TODO
     }
 
     private class DownloadLabelHolder(val binding: ItemDrawerListBinding) :

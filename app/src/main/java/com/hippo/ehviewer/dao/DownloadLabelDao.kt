@@ -21,7 +21,7 @@ interface DownloadLabelDao {
     suspend fun update(downloadLabel: DownloadLabel)
 
     @Insert
-    fun insert(t: DownloadLabel): Long
+    suspend fun insert(t: DownloadLabel): Long
 
     @Delete
     suspend fun delete(downloadLabel: DownloadLabel)

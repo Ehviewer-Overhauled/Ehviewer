@@ -34,6 +34,7 @@ import com.hippo.ehviewer.util.AppConfig
 import com.hippo.ehviewer.util.ConcurrentPool
 import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.SimpleHandler
+import com.hippo.ehviewer.util.assertNotMainThread
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -46,6 +47,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import splitties.init.appCtx
 import splitties.preferences.edit
 import java.util.LinkedList
@@ -76,14 +78,17 @@ object DownloadManager : OnSpiderListener {
     private var mCurrentSpider: SpiderQueen? = null
 
     init {
-        map = allInfoList.groupBy { it.label }.entries.associate {
-            it.key?.let { label ->
-                if (!containLabel(label)) {
-                    // Add non existing label to DB and list
-                    labelList.add(EhDB.addDownloadLabel(label))
+        assertNotMainThread()
+        map = runBlocking {
+            allInfoList.groupBy { it.label }.entries.associate {
+                it.key?.let { label ->
+                    if (!containLabel(label)) {
+                        // Add non existing label to DB and list
+                        labelList.add(EhDB.addDownloadLabel(label))
+                    }
                 }
+                it.key to LinkedList(it.value)
             }
-            it.key to LinkedList(it.value)
         } as MutableMap<String?, LinkedList<DownloadInfo>>
         defaultInfoList = map.remove(null) ?: LinkedList()
         labelList.forEach { (label) ->
@@ -287,10 +292,6 @@ object DownloadManager : OnSpiderListener {
             override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
                 trySend(info)
             }
-
-            override fun onUpdateLabels() {
-                // No-op
-            }
         }
         addDownloadInfoListener(listener)
         awaitClose {
@@ -324,7 +325,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    fun addDownload(downloadInfoList: List<DownloadInfo>, notify: Boolean = true) {
+    suspend fun addDownload(downloadInfoList: List<DownloadInfo>, notify: Boolean = true) {
         for (info in downloadInfoList) {
             if (containDownloadInfo(info.gid)) {
                 // Contain
@@ -372,7 +373,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    fun addDownloadLabel(downloadLabelList: List<DownloadLabel>) {
+    suspend fun addDownloadLabel(downloadLabelList: List<DownloadLabel>) {
         for (label in downloadLabelList) {
             val labelString = label.label
             if (!containLabel(labelString)) {
@@ -709,24 +710,18 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    fun addLabel(label: String?) {
+    suspend fun addLabel(label: String?) {
         if (label == null || containLabel(label)) {
             return
         }
         labelList.add(EhDB.addDownloadLabel(label))
         map[label] = LinkedList()
-        for (l in mDownloadInfoListeners) {
-            l.onUpdateLabels()
-        }
     }
 
     fun moveLabel(fromPosition: Int, toPosition: Int) {
         val item = labelList.removeAt(fromPosition)
         labelList.add(toPosition, item)
         EhDB.moveDownloadLabel(fromPosition, toPosition)
-        for (l in mDownloadInfoListeners) {
-            l.onUpdateLabels()
-        }
     }
 
     suspend fun renameLabel(from: String, to: String) {
@@ -887,7 +882,6 @@ object DownloadManager : OnSpiderListener {
          * Remove the special info from the special position
          */
         fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int)
-        fun onUpdateLabels()
     }
 
     interface DownloadListener {

@@ -95,16 +95,14 @@ object EhDB {
     val allDownloadLabelList: List<DownloadLabel>
         get() = db.downloadLabelDao().list()
 
-    @Synchronized
-    fun addDownloadLabel(label: String): DownloadLabel {
+    suspend fun addDownloadLabel(label: String): DownloadLabel {
         val dao = db.downloadLabelDao()
         val raw = DownloadLabel(label, System.currentTimeMillis())
         raw.id = dao.insert(raw)
         return raw
     }
 
-    @Synchronized
-    fun addDownloadLabel(raw: DownloadLabel): DownloadLabel {
+    suspend fun addDownloadLabel(raw: DownloadLabel): DownloadLabel {
         // Reset id
         raw.id = null
         val dao = db.downloadLabelDao()

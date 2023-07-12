@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.util
 
+import android.os.Looper
 import java.io.BufferedReader
 import java.io.FileReader
 import java.util.regex.Pattern
@@ -64,4 +65,11 @@ object OSUtils {
             }
             return sTotalMem
         }
+}
+
+val isMainThread: Boolean
+    get() = Looper.getMainLooper().thread === Thread.currentThread()
+
+fun assertNotMainThread() {
+    check(!isMainThread) { "Cannot access database on the main thread since" + " it may potentially lock the UI for a long period of time." }
 }
