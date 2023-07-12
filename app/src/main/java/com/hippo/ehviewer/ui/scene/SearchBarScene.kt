@@ -99,6 +99,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         super.onDestroyView()
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) mSearchViewOnBackPressedCallback.remove()
         _binding = null
+        mSuggestionAdapter = null
     }
 
     private var privLockModeStart: Int? = null
