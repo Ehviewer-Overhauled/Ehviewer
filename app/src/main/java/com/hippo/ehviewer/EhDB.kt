@@ -23,7 +23,6 @@ import androidx.paging.PagingSource
 import arrow.fx.coroutines.release
 import arrow.fx.coroutines.resource
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.dao.BasicDao
 import com.hippo.ehviewer.dao.DownloadDirname
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.DownloadLabel
@@ -34,10 +33,11 @@ import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.util.sendTo
+import kotlinx.coroutines.runBlocking
 import splitties.arch.room.roomDb
 
 object EhDB {
-    private val db = roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() }
+    private val db = roomDb<EhDatabase>("eh.db")
 
     // Fix state
     @get:Synchronized
@@ -151,13 +151,11 @@ object EhDB {
         dao.delete(raw!!)
     }
 
-    @Synchronized
-    fun removeLocalFavorites(gid: Long) {
+    suspend fun removeLocalFavorites(gid: Long) {
         db.localFavoritesDao().deleteByKey(gid)
     }
 
-    @Synchronized
-    fun removeLocalFavorites(gidArray: LongArray) {
+    suspend fun removeLocalFavorites(gidArray: LongArray) {
         val dao = db.localFavoritesDao()
         for (gid in gidArray) {
             dao.deleteByKey(gid)
@@ -167,11 +165,11 @@ object EhDB {
     @Synchronized
     fun containLocalFavorites(gid: Long): Boolean {
         val dao = db.localFavoritesDao()
-        return dao.contains(gid)
+        // TODO: remove runBlocking
+        return runBlocking { dao.contains(gid) }
     }
 
-    @Synchronized
-    fun putLocalFavorites(galleryInfo: GalleryInfo) {
+    suspend fun putLocalFavorites(galleryInfo: GalleryInfo) {
         val dao = db.localFavoritesDao()
         if (null == dao.load(galleryInfo.gid)) {
             val info: LocalFavoriteInfo
@@ -185,46 +183,36 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun putLocalFavorites(galleryInfoList: List<GalleryInfo>) {
+    suspend fun putLocalFavorites(galleryInfoList: List<GalleryInfo>) {
         for (gi in galleryInfoList) {
             putLocalFavorites(gi)
         }
     }
 
-    @get:Synchronized
-    val allQuickSearch: List<QuickSearch>
-        get() {
-            val dao = db.quickSearchDao()
-            return dao.list()
-        }
+    suspend fun getAllQuickSearch() = db.quickSearchDao().list()
 
-    @Synchronized
-    fun insertQuickSearch(quickSearch: QuickSearch) {
+    suspend fun insertQuickSearch(quickSearch: QuickSearch) {
         val dao = db.quickSearchDao()
         quickSearch.id = null
         quickSearch.time = System.currentTimeMillis()
         quickSearch.id = dao.insert(quickSearch)
     }
 
-    @Synchronized
-    fun importQuickSearch(quickSearchList: List<QuickSearch?>) {
+    private suspend fun importQuickSearch(quickSearchList: List<QuickSearch?>) {
         val dao = db.quickSearchDao()
         for (quickSearch in quickSearchList) {
             dao.insert(quickSearch!!)
         }
     }
 
-    @Synchronized
-    fun deleteQuickSearch(quickSearch: QuickSearch?) {
+    suspend fun deleteQuickSearch(quickSearch: QuickSearch?) {
         val dao = db.quickSearchDao()
         if (quickSearch != null) {
             dao.delete(quickSearch)
         }
     }
 
-    @Synchronized
-    fun moveQuickSearch(fromPosition: Int, toPosition: Int) {
+    suspend fun moveQuickSearch(fromPosition: Int, toPosition: Int) {
         if (fromPosition == toPosition) {
             return
         }
@@ -254,8 +242,7 @@ object EhDB {
 
     fun searchLocalFav(keyword: String) = db.localFavoritesDao().listLazy("%$keyword%")
 
-    @Synchronized
-    fun putHistoryInfo(galleryInfo: GalleryInfo?) {
+    suspend fun putHistoryInfo(galleryInfo: GalleryInfo?) {
         val dao = db.historyDao()
         val info: HistoryInfo = if (galleryInfo is HistoryInfo) {
             galleryInfo
@@ -270,8 +257,7 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun modifyHistoryInfoFavslotNonRefresh(gid: Long, slot: Int) {
+    suspend fun modifyHistoryInfoFavslotNonRefresh(gid: Long, slot: Int) {
         val dao = db.historyDao()
         dao.load(gid)?.let {
             it.favoriteSlot = slot
@@ -279,8 +265,7 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun putHistoryInfo(historyInfoList: List<HistoryInfo>) {
+    private suspend fun putHistoryInfo(historyInfoList: List<HistoryInfo>) {
         val dao = db.historyDao()
         for (info in historyInfoList) {
             if (null == dao.load(info.gid)) {
@@ -289,29 +274,20 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun deleteHistoryInfo(info: HistoryInfo?) {
+    suspend fun deleteHistoryInfo(info: HistoryInfo?) {
         val dao = db.historyDao()
         dao.delete(info!!)
     }
 
-    @Synchronized
-    fun clearHistoryInfo() {
+    suspend fun clearHistoryInfo() {
         val dao = db.historyDao()
         dao.deleteAll()
     }
 
-    @get:Synchronized
-    val allFilter: List<Filter>
-        get() = db.filterDao().list()
+    suspend fun getAllFilter() = db.filterDao().list()
 
-    @Synchronized
-    fun addFilter(filter: Filter): Boolean {
-        val existFilter: Filter? = try {
-            db.filterDao().load(filter.text, filter.mode.field)
-        } catch (e: Exception) {
-            null
-        }
+    suspend fun addFilter(filter: Filter): Boolean {
+        val existFilter = runCatching { db.filterDao().load(filter.text, filter.mode.field) }.getOrNull()
         return if (existFilter == null) {
             filter.id = null
             filter.id = db.filterDao().insert(filter)
@@ -321,20 +297,13 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun deleteFilter(filter: Filter) {
+    suspend fun deleteFilter(filter: Filter) {
         db.filterDao().delete(filter)
     }
 
-    @Synchronized
-    fun triggerFilter(filter: Filter) {
+    suspend fun triggerFilter(filter: Filter) {
         filter.enable = !filter.enable
         db.filterDao().update(filter)
-    }
-
-    private fun <T> copyDao(from: BasicDao<T>, to: BasicDao<T>) {
-        val list = from.list()
-        for (item in list) to.insert(item)
     }
 
     suspend fun exportDB(context: Context, uri: Uri) {
@@ -346,13 +315,13 @@ object EhDB {
             it.close()
             context.deleteDatabase(ehExportName)
         } use { newDb ->
-            copyDao(db.downloadsDao(), newDb.downloadsDao())
-            copyDao(db.downloadLabelDao(), newDb.downloadLabelDao())
-            copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao())
-            copyDao(db.historyDao(), newDb.historyDao())
-            copyDao(db.quickSearchDao(), newDb.quickSearchDao())
-            copyDao(db.localFavoritesDao(), newDb.localFavoritesDao())
-            copyDao(db.filterDao(), newDb.filterDao())
+            db.downloadsDao().list().forEach { newDb.downloadsDao().insert(it) }
+            db.downloadLabelDao().list().forEach { newDb.downloadLabelDao().insert(it) }
+            db.downloadDirnameDao().list().forEach { newDb.downloadDirnameDao().insert(it) }
+            db.historyDao().list().forEach { newDb.historyDao().insert(it) }
+            db.quickSearchDao().list().forEach { newDb.quickSearchDao().insert(it) }
+            db.localFavoritesDao().list().forEach { newDb.localFavoritesDao().insert(it) }
+            db.filterDao().list().forEach { newDb.filterDao().insert(it) }
             newDb.close()
             val dbFile = context.getDatabasePath(ehExportName)
             context.contentResolver.openFileDescriptor(uri, "rw")!!.use { toFd ->

@@ -7,9 +7,9 @@ import androidx.room.Query
 import androidx.room.Update
 
 @Dao
-interface DownloadLabelDao : BasicDao<DownloadLabel> {
+interface DownloadLabelDao {
     @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC")
-    override fun list(): List<DownloadLabel>
+    fun list(): List<DownloadLabel>
 
     @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC LIMIT :limit OFFSET :offset")
     fun list(offset: Int, limit: Int): List<DownloadLabel>
@@ -21,7 +21,7 @@ interface DownloadLabelDao : BasicDao<DownloadLabel> {
     fun update(downloadLabel: DownloadLabel)
 
     @Insert
-    override fun insert(t: DownloadLabel): Long
+    fun insert(t: DownloadLabel): Long
 
     @Delete
     fun delete(downloadLabel: DownloadLabel)

@@ -7,22 +7,22 @@ import androidx.room.Query
 import androidx.room.Update
 
 @Dao
-interface QuickSearchDao : BasicDao<QuickSearch> {
+interface QuickSearchDao {
     @Query("SELECT * FROM QUICK_SEARCH ORDER BY TIME ASC")
-    override fun list(): List<QuickSearch>
+    suspend fun list(): List<QuickSearch>
 
     @Query("SELECT * FROM QUICK_SEARCH ORDER BY TIME ASC LIMIT :limit OFFSET :offset")
-    fun list(offset: Int, limit: Int): List<QuickSearch>
+    suspend fun list(offset: Int, limit: Int): List<QuickSearch>
 
     @Update
-    fun update(downloadLabels: List<QuickSearch>)
+    suspend fun update(downloadLabels: List<QuickSearch>)
 
     @Update
-    fun update(quickSearch: QuickSearch)
+    suspend fun update(quickSearch: QuickSearch)
 
     @Insert
-    override fun insert(t: QuickSearch): Long
+    suspend fun insert(t: QuickSearch): Long
 
     @Delete
-    fun delete(quickSearch: QuickSearch)
+    suspend fun delete(quickSearch: QuickSearch)
 }

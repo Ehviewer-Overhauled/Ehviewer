@@ -7,31 +7,28 @@ import androidx.room.Insert
 import androidx.room.Query
 
 @Dao
-interface LocalFavoritesDao : BasicDao<LocalFavoriteInfo> {
+interface LocalFavoritesDao {
     @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
-    override fun list(): List<LocalFavoriteInfo>
+    suspend fun list(): List<LocalFavoriteInfo>
 
     @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
     fun listLazy(): PagingSource<Int, LocalFavoriteInfo>
 
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE TITLE LIKE :title ORDER BY TIME DESC")
-    fun list(title: String): List<LocalFavoriteInfo>
-
-    @Query("SELECT * FROM LOCAL_FAVORITES WHERE TITLE LIKE :title ORDER BY TIME DESC")
     fun listLazy(title: String): PagingSource<Int, LocalFavoriteInfo>
 
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE GID = :gid")
-    fun load(gid: Long): LocalFavoriteInfo?
+    suspend fun load(gid: Long): LocalFavoriteInfo?
 
     @Query("SELECT EXISTS(SELECT * FROM LOCAL_FAVORITES WHERE GID = :gid)")
-    fun contains(gid: Long): Boolean
+    suspend fun contains(gid: Long): Boolean
 
     @Insert
-    override fun insert(t: LocalFavoriteInfo): Long
+    suspend fun insert(t: LocalFavoriteInfo): Long
 
     @Delete
-    fun delete(localFavoriteInfo: LocalFavoriteInfo)
+    suspend fun delete(localFavoriteInfo: LocalFavoriteInfo)
 
     @Query("DELETE FROM LOCAL_FAVORITES WHERE GID = :gid")
-    fun deleteByKey(gid: Long)
+    suspend fun deleteByKey(gid: Long)
 }

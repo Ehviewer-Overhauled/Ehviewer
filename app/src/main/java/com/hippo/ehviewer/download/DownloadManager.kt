@@ -35,6 +35,7 @@ import com.hippo.ehviewer.util.ConcurrentPool
 import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.SimpleHandler
 import com.hippo.unifile.UniFile
+import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -227,8 +228,10 @@ object DownloadManager : OnSpiderListener {
             // Make sure download is running
             ensureDownload()
 
-            // Add it to history
-            EhDB.putHistoryInfo(info)
+            launchIO {
+                // Add it to history
+                EhDB.putHistoryInfo(info)
+            }
         }
     }
 

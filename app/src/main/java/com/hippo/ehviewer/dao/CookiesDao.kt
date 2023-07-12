@@ -6,5 +6,5 @@ import androidx.room.Query
 @Dao
 interface CookiesDao {
     @Query("SELECT * FROM OK_HTTP_3_COOKIE")
-    fun list(): List<Cookie>
+    suspend fun list(): List<Cookie>
 }

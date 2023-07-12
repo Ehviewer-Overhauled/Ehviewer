@@ -7,19 +7,19 @@ import androidx.room.Query
 import androidx.room.Update
 
 @Dao
-interface FilterDao : BasicDao<Filter> {
+interface FilterDao {
     @Query("SELECT * FROM FILTER")
-    override fun list(): List<Filter>
+    suspend fun list(): List<Filter>
 
     @Update
-    fun update(filter: Filter)
+    suspend fun update(filter: Filter)
 
     @Insert
-    override fun insert(t: Filter): Long
+    suspend fun insert(t: Filter): Long
 
     @Delete
-    fun delete(filter: Filter)
+    suspend fun delete(filter: Filter)
 
     @Query("SELECT * FROM FILTER WHERE TEXT = :text AND MODE = :mode")
-    fun load(text: String, mode: Int): Filter?
+    suspend fun load(text: String, mode: Int): Filter?
 }

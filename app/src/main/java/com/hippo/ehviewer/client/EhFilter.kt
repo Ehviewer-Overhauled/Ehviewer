@@ -38,7 +38,7 @@ object EhFilter : CoroutineScope {
     override val coroutineContext = Dispatchers.IO.limitedParallelism(1)
     private fun <R> Filter.launchOps(
         callback: ((R) -> Unit)? = null,
-        ops: Filter.() -> R,
+        ops: suspend Filter.() -> R,
     ) = launch { ops().let { callback?.invoke(it) } }
     fun Filter.remember(callback: ((Boolean) -> Unit)? = null) = launchOps(callback) {
         EhDB.addFilter(this).also { if (it) memorizeFilter(this) }
@@ -56,9 +56,7 @@ object EhFilter : CoroutineScope {
         }
     }
 
-    init {
-        EhDB.allFilter.forEach(::memorizeFilter)
-    }
+    init { launch { EhDB.getAllFilter().forEach(::memorizeFilter) } }
 
     private fun memorizeFilter(filter: Filter) {
         when (filter.mode) {

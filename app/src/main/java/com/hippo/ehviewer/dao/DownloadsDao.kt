@@ -7,9 +7,9 @@ import androidx.room.Query
 import androidx.room.Update
 
 @Dao
-interface DownloadsDao : BasicDao<DownloadInfo> {
+interface DownloadsDao {
     @Query("SELECT * FROM DOWNLOADS ORDER BY TIME DESC")
-    override fun list(): List<DownloadInfo>
+    fun list(): List<DownloadInfo>
 
     @Query("SELECT * FROM DOWNLOADS ORDER BY TIME DESC LIMIT :limit OFFSET :offset")
     fun list(offset: Int, limit: Int): List<DownloadInfo>
@@ -24,7 +24,7 @@ interface DownloadsDao : BasicDao<DownloadInfo> {
     fun update(downloadInfo: DownloadInfo)
 
     @Insert
-    override fun insert(t: DownloadInfo): Long
+    fun insert(t: DownloadInfo): Long
 
     @Delete
     fun delete(downloadInfo: DownloadInfo)
