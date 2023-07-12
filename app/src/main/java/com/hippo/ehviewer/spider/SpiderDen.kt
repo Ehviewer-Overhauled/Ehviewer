@@ -51,13 +51,15 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     @Volatile
     @SpiderQueen.Mode
     var mode = SpiderQueen.MODE_READ
-        set(value) {
-            field = value
-            if (field == SpiderQueen.MODE_DOWNLOAD && downloadDir == null) {
-                mGalleryInfo.putToDownloadDir()
-                downloadDir = getGalleryDownloadDir(mGid)!!.apply { check(ensureDir()) { "Download directory $uri is not valid directory!" } }
-            }
+        private set
+
+    suspend fun setMode(value: Int) {
+        mode = value
+        if (mode == SpiderQueen.MODE_DOWNLOAD && downloadDir == null) {
+            mGalleryInfo.putToDownloadDir()
+            downloadDir = getGalleryDownloadDir(mGid)!!.apply { check(ensureDir()) { "Download directory $uri is not valid directory!" } }
         }
+    }
 
     private fun containInCache(index: Int): Boolean {
         val key = getImageKey(mGid, index)
@@ -288,7 +290,7 @@ private fun findImageFile(dir: UniFile, index: Int): UniFile? {
     return COMPAT_IMAGE_EXTENSIONS.firstNotNullOfOrNull { dir.findFile(perFilename(index, it)) }
 }
 
-fun GalleryInfo.putToDownloadDir() {
+suspend fun GalleryInfo.putToDownloadDir() {
     val title = getSuitableTitle(this)
     val dirname = FileUtils.sanitizeFilename("$gid-$title")
     EhDB.putDownloadDirname(gid, dirname)

@@ -155,7 +155,7 @@ fun DownloadScreen() {
                 summary = stringResource(id = R.string.settings_download_restore_download_items_summary),
             ) {
                 var restoreDirCount = 0
-                fun getRestoreItem(file: UniFile): RestoreItem? {
+                suspend fun getRestoreItem(file: UniFile): RestoreItem? {
                     if (!file.isDirectory) return null
                     val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
                     return runCatching {

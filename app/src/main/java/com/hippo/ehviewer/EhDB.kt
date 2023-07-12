@@ -76,8 +76,7 @@ object EhDB {
         return raw?.dirname
     }
 
-    @Synchronized
-    fun putDownloadDirname(gid: Long, dirname: String) {
+    suspend fun putDownloadDirname(gid: Long, dirname: String) {
         val dao = db.downloadDirnameDao()
         var raw = dao.load(gid)
         if (raw != null) {

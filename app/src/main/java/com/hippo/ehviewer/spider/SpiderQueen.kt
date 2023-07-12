@@ -167,39 +167,42 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     val isReady
         get() = this::mSpiderInfo.isInitialized && this::mPageStateArray.isInitialized
 
-    @Synchronized
-    private fun updateMode() {
-        if (!isReady) return
-        val mode: Int = if (mDownloadReference > 0) {
-            MODE_DOWNLOAD
-        } else {
-            MODE_READ
-        }
-        mSpiderDen.mode = mode
+    private val updateLock = Mutex()
 
-        // Update download page
-        val intoDownloadMode = mode == MODE_DOWNLOAD
-        if (intoDownloadMode && !downloadMode) {
-            // Clear download state
-            synchronized(mPageStateLock) {
-                val temp: IntArray = mPageStateArray
-                var i = 0
-                val n = temp.size
-                while (i < n) {
-                    val oldState = temp[i]
-                    if (STATE_DOWNLOADING != oldState) {
-                        temp[i] = STATE_NONE
-                    }
-                    i++
-                }
-                mDownloadedPages.lazySet(0)
-                mFinishedPages.lazySet(0)
-                mPageErrorMap.clear()
-                mPagePercentMap.clear()
+    private suspend fun updateMode() {
+        if (!awaitReady()) return
+        updateLock.withLock {
+            val mode: Int = if (mDownloadReference > 0) {
+                MODE_DOWNLOAD
+            } else {
+                MODE_READ
             }
-            mWorkerScope.enterDownloadMode()
+            mSpiderDen.setMode(mode)
+
+            // Update download page
+            val intoDownloadMode = mode == MODE_DOWNLOAD
+            if (intoDownloadMode && !downloadMode) {
+                // Clear download state
+                synchronized(mPageStateLock) {
+                    val temp: IntArray = mPageStateArray
+                    var i = 0
+                    val n = temp.size
+                    while (i < n) {
+                        val oldState = temp[i]
+                        if (STATE_DOWNLOADING != oldState) {
+                            temp[i] = STATE_NONE
+                        }
+                        i++
+                    }
+                    mDownloadedPages.lazySet(0)
+                    mFinishedPages.lazySet(0)
+                    mPageErrorMap.clear()
+                    mPagePercentMap.clear()
+                }
+                mWorkerScope.enterDownloadMode()
+            }
+            downloadMode = intoDownloadMode
         }
-        downloadMode = intoDownloadMode
     }
 
     private fun setMode(@Mode mode: Int) {
@@ -505,7 +508,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             val gid = galleryInfo.gid
             return (sQueenMap[gid] ?: SpiderQueen(galleryInfo).also { sQueenMap[gid] = it }).apply {
                 setMode(mode)
-                launchIO { if (awaitReady()) updateMode() }
+                launchIO { updateMode() }
             }
         }
 
@@ -516,7 +519,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     stop()
                     sQueenMap.remove(galleryInfo.gid)
                 } else {
-                    launchIO { if (awaitReady()) updateMode() }
+                    launchIO { updateMode() }
                 }
             }
         }

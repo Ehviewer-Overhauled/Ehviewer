@@ -11,10 +11,10 @@ interface DownloadDirnameDao {
     fun load(gid: Long): DownloadDirname?
 
     @Update
-    fun update(downloadDirname: DownloadDirname)
+    suspend fun update(downloadDirname: DownloadDirname)
 
     @Insert
-    fun insert(t: DownloadDirname): Long
+    suspend fun insert(t: DownloadDirname): Long
 
     @Query("DELETE FROM DOWNLOAD_DIRNAME WHERE GID = :gid")
     suspend fun deleteByKey(gid: Long)
