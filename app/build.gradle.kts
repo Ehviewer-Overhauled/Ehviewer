@@ -273,6 +273,8 @@ dependencies {
     val chunker = "4.0.0"
     debugImplementation("com.github.chuckerteam.chucker:library:$chunker")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:$chunker")
+
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
 }
 
 ksp {
