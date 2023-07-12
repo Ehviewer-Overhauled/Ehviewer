@@ -2,7 +2,6 @@ package com.hippo.ehviewer.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 
@@ -25,9 +24,6 @@ interface LocalFavoritesDao {
 
     @Insert
     suspend fun insert(t: LocalFavoriteInfo): Long
-
-    @Delete
-    suspend fun delete(localFavoriteInfo: LocalFavoriteInfo)
 
     @Query("DELETE FROM LOCAL_FAVORITES WHERE GID = :gid")
     suspend fun deleteByKey(gid: Long)

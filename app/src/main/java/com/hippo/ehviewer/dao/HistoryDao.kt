@@ -15,9 +15,6 @@ interface HistoryDao {
     @Query("SELECT * FROM HISTORY ORDER BY TIME DESC")
     suspend fun list(): List<HistoryInfo>
 
-    @Query("SELECT * FROM HISTORY ORDER BY TIME DESC LIMIT :limit OFFSET :offset")
-    suspend fun list(offset: Int, limit: Int): List<HistoryInfo>
-
     @Query("SELECT * FROM HISTORY ORDER BY TIME DESC")
     fun listLazy(): PagingSource<Int, HistoryInfo>
 
@@ -29,9 +26,6 @@ interface HistoryDao {
 
     @Delete
     suspend fun delete(historyInfo: HistoryInfo)
-
-    @Delete
-    suspend fun delete(historyInfo: List<HistoryInfo>)
 
     @Query("DELETE FROM HISTORY")
     suspend fun deleteAll()

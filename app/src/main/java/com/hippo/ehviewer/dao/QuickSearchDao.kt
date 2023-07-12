@@ -17,9 +17,6 @@ interface QuickSearchDao {
     @Update
     suspend fun update(downloadLabels: List<QuickSearch>)
 
-    @Update
-    suspend fun update(quickSearch: QuickSearch)
-
     @Insert
     suspend fun insert(t: QuickSearch): Long
 
