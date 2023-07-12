@@ -762,11 +762,11 @@ class DownloadsScene :
             // Cancel check mode
             binding.recyclerView.outOfCustomChoiceMode()
 
-            // Delete image files
-            val checked = mBuilder.isChecked
-            Settings.removeImageFiles = checked
-            if (checked) {
-                lifecycleScope.launchIO {
+            lifecycleScope.launchIO {
+                // Delete image files
+                val checked = mBuilder.isChecked
+                Settings.removeImageFiles = checked
+                if (checked) {
                     // Delete
                     DownloadManager.deleteRangeDownload(mGidList)
                     val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
