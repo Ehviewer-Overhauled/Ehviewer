@@ -99,7 +99,13 @@ import kotlin.math.hypot
 class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefreshListener {
     private var _binding: SceneGalleryCommentsBinding? = null
     private val binding get() = _binding!!
-    private val mCallback = EditPanelOnBackPressedCallback()
+    private val callback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            if (!mInAnimation && binding.editPanel.visibility == View.VISIBLE) {
+                hideEditPanel(true)
+            }
+        }
+    }
     private var mGalleryDetail: GalleryDetail? = null
     private var mAdapter: CommentAdapter? = null
     private var mViewTransition: ViewTransition? = null
@@ -111,7 +117,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     private var mRefreshingComments = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(mCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(callback)
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -283,12 +289,13 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mCallback.remove()
+        callback.remove()
         binding.recyclerView.stopScroll()
         removeAboveSnackView(binding.editPanel)
         removeAboveSnackView(binding.fabLayout)
         mAdapter = null
         mViewTransition = null
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -542,7 +549,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun showEditPanel(animation: Boolean) {
-        mCallback.isEnabled = true
+        callback.isEnabled = true
         if (animation) {
             showEditPanelWithAnimation()
         } else {
@@ -596,7 +603,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun hideEditPanel(animation: Boolean) {
-        mCallback.isEnabled = false
+        callback.isEnabled = false
         hideSoftInput()
         if (animation) {
             hideEditPanelWithAnimation()
@@ -868,14 +875,6 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 if (mRefreshingComments) TYPE_PROGRESS else TYPE_MORE
             } else {
                 TYPE_COMMENT
-            }
-        }
-    }
-
-    internal inner class EditPanelOnBackPressedCallback : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            if (!mInAnimation && binding.editPanel.visibility == View.VISIBLE) {
-                hideEditPanel(true)
             }
         }
     }
