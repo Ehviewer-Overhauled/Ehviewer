@@ -36,23 +36,20 @@ import com.hippo.ehviewer.util.sendTo
 import splitties.arch.room.roomDb
 
 object EhDB {
-    private val db = roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() }
+    private val db = roomDb<EhDatabase>("eh.db")
 
-    // Fix state
     suspend fun getAllDownloadInfo() = db.downloadsDao().list().onEach {
         if (it.state == DownloadInfo.STATE_WAIT || it.state == DownloadInfo.STATE_DOWNLOAD) {
             it.state = DownloadInfo.STATE_NONE
         }
     }
 
-    @Synchronized
-    fun updateDownloadInfo(downloadInfos: List<DownloadInfo>) {
+    suspend fun updateDownloadInfo(downloadInfo: List<DownloadInfo>) {
         val dao = db.downloadsDao()
-        dao.update(downloadInfos)
+        dao.update(downloadInfo)
     }
 
-    @Synchronized
-    fun putDownloadInfo(downloadInfo: DownloadInfo) {
+    suspend fun putDownloadInfo(downloadInfo: DownloadInfo) {
         db.downloadsDao().run {
             if (load(downloadInfo.gid) != null) {
                 update(downloadInfo)
@@ -62,8 +59,7 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun removeDownloadInfo(downloadInfo: DownloadInfo) {
+    suspend fun removeDownloadInfo(downloadInfo: DownloadInfo) {
         db.downloadsDao().delete(downloadInfo)
     }
 
@@ -111,11 +107,8 @@ object EhDB {
         dao.update(raw)
     }
 
-    @Synchronized
-    fun moveDownloadLabel(fromPosition: Int, toPosition: Int) {
-        if (fromPosition == toPosition) {
-            return
-        }
+    suspend fun moveDownloadLabel(fromPosition: Int, toPosition: Int) {
+        if (fromPosition == toPosition) return
         val reverse = fromPosition > toPosition
         val offset = if (reverse) toPosition else fromPosition
         val limit = if (reverse) fromPosition - toPosition + 1 else toPosition - fromPosition + 1
@@ -126,7 +119,7 @@ object EhDB {
         val end = if (reverse) 0 else limit - 1
         val toTime = list[end].time
         var i = end
-        while (if (reverse) i < start else i > start) {
+        while (if (reverse) i < start else i > 0) {
             list[i].time = list[i + step].time
             i += step
         }
@@ -197,9 +190,7 @@ object EhDB {
     }
 
     suspend fun moveQuickSearch(fromPosition: Int, toPosition: Int) {
-        if (fromPosition == toPosition) {
-            return
-        }
+        if (fromPosition == toPosition) return
         val reverse = fromPosition > toPosition
         val offset = if (reverse) toPosition else fromPosition
         val limit = if (reverse) fromPosition - toPosition + 1 else toPosition - fromPosition + 1
@@ -210,7 +201,7 @@ object EhDB {
         val end = if (reverse) 0 else limit - 1
         val toTime = list[end].time
         var i = end
-        while (if (reverse) i < start else i > start) {
+        while (if (reverse) i < start else i > 0) {
             list[i].time = list[i + step].time
             i += step
         }

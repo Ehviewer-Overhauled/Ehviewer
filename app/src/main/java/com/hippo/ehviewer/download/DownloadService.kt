@@ -21,7 +21,6 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.IBinder
 import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.IntDef
@@ -41,8 +40,13 @@ import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.util.SimpleHandler
 import com.hippo.ehviewer.util.getParcelableExtraCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
-class DownloadService : Service(), DownloadManager.DownloadListener {
+class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineScope {
+    override val coroutineContext = Dispatchers.IO + SupervisorJob()
     private var mNotifyManager: NotificationManagerCompat? = null
     private var mDownloadManager: DownloadManager? = null
     private var mDownloadingBuilder: NotificationCompat.Builder? = null
@@ -88,11 +92,11 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        handleIntent(intent)
+        launch { handleIntent(intent) }
         return START_STICKY
     }
 
-    private fun handleIntent(intent: Intent?) {
+    private suspend fun handleIntent(intent: Intent?) {
         when (intent?.action) {
             ACTION_START -> {
                 val gi = intent.getParcelableExtraCompat<GalleryInfo>(KEY_GALLERY_INFO)
@@ -162,9 +166,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
         checkStopSelf()
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        throw IllegalStateException("No bindService")
-    }
+    override fun onBind(intent: Intent) = error("No bindService")
 
     private fun ensureDownloadingBuilder() {
         if (mDownloadingBuilder != null) {
@@ -237,15 +239,17 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
     }
 
     override fun onGet509() {
-        if (mDownloadManager != null) {
-            mDownloadManager!!.stopAllDownload()
+        launch {
+            if (mDownloadManager != null) {
+                mDownloadManager!!.stopAllDownload()
+            }
+            if (mNotifyManager == null) {
+                return@launch
+            }
+            ensure509Builder()
+            m509dBuilder!!.setWhen(System.currentTimeMillis())
+            m509Delay!!.show()
         }
-        if (mNotifyManager == null) {
-            return
-        }
-        ensure509Builder()
-        m509dBuilder!!.setWhen(System.currentTimeMillis())
-        m509Delay!!.show()
     }
 
     override fun onStart(info: DownloadInfo) {

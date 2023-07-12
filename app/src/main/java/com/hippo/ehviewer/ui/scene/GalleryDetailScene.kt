@@ -1264,14 +1264,13 @@ class GalleryDetailScene : BaseScene() {
                 return
             }
 
-            // Delete
-            EhDownloadManager.deleteDownload(mGalleryInfo.gid)
-
-            // Delete image files
-            val checked = mBuilder.isChecked
-            Settings.removeImageFiles = checked
-            if (checked) {
-                lifecycleScope.launchIO {
+            lifecycleScope.launchIO {
+                // Delete
+                EhDownloadManager.deleteDownload(mGalleryInfo.gid)
+                // Delete image files
+                val checked = mBuilder.isChecked
+                Settings.removeImageFiles = checked
+                if (checked) {
                     runCatching {
                         val file = getGalleryDownloadDir(mGalleryInfo.gid)
                         EhDB.removeDownloadDirname(mGalleryInfo.gid)

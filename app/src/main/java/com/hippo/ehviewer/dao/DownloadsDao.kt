@@ -12,20 +12,20 @@ interface DownloadsDao {
     suspend fun list(): List<DownloadInfo>
 
     @Query("SELECT * FROM DOWNLOADS ORDER BY TIME DESC LIMIT :limit OFFSET :offset")
-    fun list(offset: Int, limit: Int): List<DownloadInfo>
+    suspend fun list(offset: Int, limit: Int): List<DownloadInfo>
 
     @Query("SELECT * FROM DOWNLOADS WHERE GID = :gid")
-    fun load(gid: Long): DownloadInfo?
+    suspend fun load(gid: Long): DownloadInfo?
 
     @Update
-    fun update(downloadInfos: List<DownloadInfo>)
+    suspend fun update(downloadInfo: List<DownloadInfo>)
 
     @Update
-    fun update(downloadInfo: DownloadInfo)
+    suspend fun update(downloadInfo: DownloadInfo)
 
     @Insert
-    fun insert(t: DownloadInfo): Long
+    suspend fun insert(t: DownloadInfo): Long
 
     @Delete
-    fun delete(downloadInfo: DownloadInfo)
+    suspend fun delete(downloadInfo: DownloadInfo)
 }

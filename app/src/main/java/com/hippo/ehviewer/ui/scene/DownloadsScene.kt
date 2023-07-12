@@ -370,7 +370,9 @@ class DownloadsScene :
             }
 
             R.id.action_stop_all -> {
-                DownloadManager.stopAllDownload()
+                lifecycleScope.launchIO {
+                    DownloadManager.stopAllDownload()
+                }
                 return true
             }
 
@@ -564,10 +566,14 @@ class DownloadsScene :
                 }
 
                 2 -> {
-                    // Stop
-                    DownloadManager.stopRangeDownload(gidList!!)
-                    // Cancel check mode
-                    binding.recyclerView.outOfCustomChoiceMode()
+                    lifecycleScope.launchIO {
+                        // Stop
+                        DownloadManager.stopRangeDownload(gidList!!)
+                        withUIContext {
+                            // Cancel check mode
+                            binding.recyclerView.outOfCustomChoiceMode()
+                        }
+                    }
                 }
 
                 3 -> {
@@ -611,10 +617,12 @@ class DownloadsScene :
         if (mList !== list) {
             return
         }
-        if (mAdapter != null) {
-            mAdapter!!.notifyItemInserted(position)
+        lifecycleScope.launchUI {
+            if (mAdapter != null) {
+                mAdapter!!.notifyItemInserted(position)
+            }
+            updateView()
         }
-        updateView()
     }
 
     override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {
@@ -622,15 +630,19 @@ class DownloadsScene :
             return
         }
         val index = mList!!.indexOf(info)
-        if (index >= 0 && mAdapter != null) {
-            mAdapter!!.notifyItemChanged(index, PAYLOAD_STATE)
+        lifecycleScope.launchUI {
+            if (index >= 0 && mAdapter != null) {
+                mAdapter!!.notifyItemChanged(index, PAYLOAD_STATE)
+            }
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onUpdateAll() {
-        if (mAdapter != null) {
-            mAdapter!!.notifyDataSetChanged()
+        lifecycleScope.launchUI {
+            if (mAdapter != null) {
+                mAdapter!!.notifyDataSetChanged()
+            }
         }
     }
 
@@ -648,10 +660,12 @@ class DownloadsScene :
         if (mList !== list) {
             return
         }
-        if (mAdapter != null) {
-            mAdapter!!.notifyItemRemoved(position)
+        lifecycleScope.launchUI {
+            if (mAdapter != null) {
+                mAdapter!!.notifyItemRemoved(position)
+            }
+            updateView()
         }
-        updateView()
     }
 
     private class DownloadLabelHolder(val binding: ItemDrawerListBinding) :
@@ -748,14 +762,13 @@ class DownloadsScene :
             // Cancel check mode
             binding.recyclerView.outOfCustomChoiceMode()
 
-            // Delete
-            DownloadManager.deleteRangeDownload(mGidList)
-
             // Delete image files
             val checked = mBuilder.isChecked
             Settings.removeImageFiles = checked
             if (checked) {
                 lifecycleScope.launchIO {
+                    // Delete
+                    DownloadManager.deleteRangeDownload(mGidList)
                     val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
                     for ((i, info) in mDownloadInfoList.withIndex()) {
                         // Put file
@@ -784,9 +797,13 @@ class DownloadsScene :
             } else {
                 mLabels[which]
             }
-            downloadManager.changeLabel(mDownloadInfoList, label)
-            if (mLabelAdapter != null) {
-                mLabelAdapter!!.notifyDataSetChanged()
+            lifecycleScope.launchIO {
+                downloadManager.changeLabel(mDownloadInfoList, label)
+                withUIContext {
+                    if (mLabelAdapter != null) {
+                        mLabelAdapter!!.notifyDataSetChanged()
+                    }
+                }
             }
         }
     }
@@ -833,7 +850,9 @@ class DownloadsScene :
                 }
 
                 binding.stop -> {
-                    DownloadManager.stopDownload(list[index].gid)
+                    lifecycleScope.launchIO {
+                        DownloadManager.stopDownload(list[index].gid)
+                    }
                 }
             }
         }
@@ -1133,7 +1152,9 @@ class DownloadsScene :
             if (null == context || fromPosition == toPosition || toPosition < LABEL_OFFSET) {
                 return false
             }
-            downloadManager.moveLabel(fromPosition - LABEL_OFFSET, toPosition - LABEL_OFFSET)
+            lifecycleScope.launchIO {
+                downloadManager.moveLabel(fromPosition - LABEL_OFFSET, toPosition - LABEL_OFFSET)
+            }
             val item = mLabels.removeAt(fromPosition)
             mLabels.add(toPosition, item)
             mLabelAdapter!!.notifyItemMoved(fromPosition, toPosition)

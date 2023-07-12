@@ -12,10 +12,10 @@ interface DownloadLabelDao {
     suspend fun list(): List<DownloadLabel>
 
     @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC LIMIT :limit OFFSET :offset")
-    fun list(offset: Int, limit: Int): List<DownloadLabel>
+    suspend fun list(offset: Int, limit: Int): List<DownloadLabel>
 
     @Update
-    fun update(downloadLabels: List<DownloadLabel>)
+    suspend fun update(downloadLabels: List<DownloadLabel>)
 
     @Update
     suspend fun update(downloadLabel: DownloadLabel)
