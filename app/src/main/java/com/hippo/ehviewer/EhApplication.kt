@@ -26,8 +26,6 @@ import androidx.lifecycle.coroutineScope
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
-import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.google.net.cronet.okhttptransport.CronetInterceptor
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
@@ -37,6 +35,8 @@ import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ktbuilder.cache
+import com.hippo.ehviewer.ktbuilder.chunker
+import com.hippo.ehviewer.ktbuilder.cronet
 import com.hippo.ehviewer.ktbuilder.diskCache
 import com.hippo.ehviewer.ktbuilder.httpClient
 import com.hippo.ehviewer.ktbuilder.imageLoader
@@ -161,12 +161,7 @@ class EhApplication : Application(), ImageLoaderFactory {
             httpClient {
                 cookieJar(EhCookieStore)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) dns(AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6))
-                addInterceptor(
-                    ChuckerInterceptor.Builder(appCtx).apply {
-                        alwaysReadResponseBody(false)
-                    }.build(),
-                )
-
+                chunker { alwaysReadResponseBody(false) }
                 if (Settings.bypassCloudflare) addInterceptor(CloudflareInterceptor(appCtx))
 
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
@@ -179,7 +174,7 @@ class EhApplication : Application(), ImageLoaderFactory {
                         EhCookieStore.saveFromResponse(url, Cookie.parseAll(url, response.headers))
                         response
                     }
-                    addInterceptor(CronetInterceptor.newBuilder(cronetHttpClient).build())
+                    cronet(cronetHttpClient)
                 }
             }
         }
