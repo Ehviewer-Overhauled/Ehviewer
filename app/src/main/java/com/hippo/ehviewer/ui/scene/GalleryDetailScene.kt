@@ -1271,10 +1271,10 @@ class GalleryDetailScene : BaseScene() {
             val checked = mBuilder.isChecked
             Settings.removeImageFiles = checked
             if (checked) {
-                val file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid)
-                EhDB.removeDownloadDirname(mGalleryInfo.gid)
                 lifecycleScope.launchIO {
                     runCatching {
+                        val file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid)
+                        EhDB.removeDownloadDirname(mGalleryInfo.gid)
                         file?.delete()
                     }
                 }

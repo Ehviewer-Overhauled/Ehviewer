@@ -88,8 +88,7 @@ object EhDB {
         }
     }
 
-    @Synchronized
-    fun removeDownloadDirname(gid: Long) {
+    suspend fun removeDownloadDirname(gid: Long) {
         val dao = db.downloadDirnameDao()
         dao.deleteByKey(gid)
     }

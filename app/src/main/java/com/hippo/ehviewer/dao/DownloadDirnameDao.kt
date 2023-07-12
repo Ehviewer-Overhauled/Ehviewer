@@ -17,7 +17,7 @@ interface DownloadDirnameDao {
     fun insert(t: DownloadDirname): Long
 
     @Query("DELETE FROM DOWNLOAD_DIRNAME WHERE GID = :gid")
-    fun deleteByKey(gid: Long)
+    suspend fun deleteByKey(gid: Long)
 
     @Query("SELECT * FROM DOWNLOAD_DIRNAME")
     fun list(): List<DownloadDirname>

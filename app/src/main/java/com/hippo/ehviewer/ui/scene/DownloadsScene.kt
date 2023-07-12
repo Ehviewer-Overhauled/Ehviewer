@@ -774,15 +774,15 @@ class DownloadsScene :
             val checked = mBuilder.isChecked
             Settings.removeImageFiles = checked
             if (checked) {
-                val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
-                for ((i, info) in mDownloadInfoList.withIndex()) {
-                    // Put file
-                    files[i] = SpiderDen.getGalleryDownloadDir(info.gid)
-                    // Remove download path
-                    EhDB.removeDownloadDirname(info.gid)
-                }
-                // Delete file
                 lifecycleScope.launchIO {
+                    val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
+                    for ((i, info) in mDownloadInfoList.withIndex()) {
+                        // Put file
+                        files[i] = SpiderDen.getGalleryDownloadDir(info.gid)
+                        // Remove download path
+                        EhDB.removeDownloadDirname(info.gid)
+                    }
+                    // Delete file
                     files.forEach { it?.delete() }
                 }
             }
