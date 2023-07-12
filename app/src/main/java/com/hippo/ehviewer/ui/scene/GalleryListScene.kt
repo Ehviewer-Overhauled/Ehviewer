@@ -209,17 +209,6 @@ class GalleryListScene : SearchBarScene() {
     private var mHideActionFabSlop = 0
     private var mShowActionFab = true
     private var mState = State.NORMAL
-    private val mOnScrollListener: RecyclerView.OnScrollListener =
-        object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {}
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy >= mHideActionFabSlop) {
-                    hideActionFab()
-                } else if (dy <= -mHideActionFabSlop / 2) {
-                    showActionFab()
-                }
-            }
-        }
     override fun getMenuResId(): Int {
         return R.menu.scene_gallery_list_searchbar_menu
     }
@@ -436,7 +425,18 @@ class GalleryListScene : SearchBarScene() {
                 }
             }
         }
-        binding.recyclerView.addOnScrollListener(mOnScrollListener)
+        binding.recyclerView.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {}
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (dy >= mHideActionFabSlop) {
+                        hideActionFab()
+                    } else if (dy <= -mHideActionFabSlop / 2) {
+                        showActionFab()
+                    }
+                }
+            },
+        )
         binding.fastScroller.attachToRecyclerView(binding.recyclerView)
         binding.fastScroller.setHandlerDrawable(HandlerDrawable().apply { setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary)) })
         setOnApplySearch { query: String? ->
@@ -505,6 +505,7 @@ class GalleryListScene : SearchBarScene() {
         binding.recyclerView.stopScroll()
         removeAboveSnackView(binding.fabLayout)
         _binding = null
+        fabAnimator = null
         mAdapter = null
         mViewTransition = null
     }
