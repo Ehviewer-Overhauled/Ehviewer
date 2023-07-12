@@ -39,13 +39,11 @@ object EhDB {
     private val db = roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() }
 
     // Fix state
-    @get:Synchronized
-    val allDownloadInfo: List<DownloadInfo>
-        get() = db.downloadsDao().list().onEach {
-            if (it.state == DownloadInfo.STATE_WAIT || it.state == DownloadInfo.STATE_DOWNLOAD) {
-                it.state = DownloadInfo.STATE_NONE
-            }
+    suspend fun getAllDownloadInfo() = db.downloadsDao().list().onEach {
+        if (it.state == DownloadInfo.STATE_WAIT || it.state == DownloadInfo.STATE_DOWNLOAD) {
+            it.state = DownloadInfo.STATE_NONE
         }
+    }
 
     @Synchronized
     fun updateDownloadInfo(downloadInfos: List<DownloadInfo>) {

@@ -54,7 +54,7 @@ import java.util.LinkedList
 
 object DownloadManager : OnSpiderListener {
     // All download info list
-    val allInfoList: LinkedList<DownloadInfo> = LinkedList(EhDB.allDownloadInfo)
+    val allInfoList: LinkedList<DownloadInfo> = runAssertingNotMainThread { LinkedList(EhDB.getAllDownloadInfo()) }
 
     // All download info map
     private val mAllInfoMap = allInfoList.associateBy { it.gid } as MutableMap<Long, DownloadInfo>
