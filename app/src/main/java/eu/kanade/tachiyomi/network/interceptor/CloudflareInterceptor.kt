@@ -21,7 +21,8 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
 
     override fun shouldIntercept(response: Response): Boolean {
         // Check if Cloudflare anti-bot is on
-        return response.code in ERROR_CODES && response.header("Server") in SERVER_CHECK
+        return response.code in ERROR_CODES && response.header("Server") in SERVER_CHECK &&
+            response.header("X-Varnish") == null
     }
 
     override fun intercept(
