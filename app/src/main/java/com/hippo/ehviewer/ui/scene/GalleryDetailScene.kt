@@ -130,9 +130,9 @@ import com.hippo.ehviewer.databinding.DialogRateBinding
 import com.hippo.ehviewer.databinding.DialogTorrentListBinding
 import com.hippo.ehviewer.databinding.ItemGalleryCommentBinding
 import com.hippo.ehviewer.ktbuilder.imageRequest
-import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
+import com.hippo.ehviewer.spider.getGalleryDownloadDir
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
@@ -1273,7 +1273,7 @@ class GalleryDetailScene : BaseScene() {
             if (checked) {
                 lifecycleScope.launchIO {
                     runCatching {
-                        val file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid)
+                        val file = getGalleryDownloadDir(mGalleryInfo.gid)
                         EhDB.removeDownloadDirname(mGalleryInfo.gid)
                         file?.delete()
                     }

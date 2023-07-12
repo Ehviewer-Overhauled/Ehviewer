@@ -46,7 +46,7 @@ import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid = mGalleryInfo.gid
-    var downloadDir: UniFile? = getGalleryDownloadDir(mGid)?.takeIf { it.isDirectory }
+    var downloadDir: UniFile? = null
 
     @Volatile
     @SpiderQueen.Mode
@@ -261,13 +261,6 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             override fun close() {}
         }
     }
-
-    companion object {
-        fun getGalleryDownloadDir(gid: Long): UniFile? {
-            val dirname = EhDB.getDownloadDirname(gid) ?: return null
-            return downloadLocation.subFile(dirname)
-        }
-    }
 }
 
 private val COMPAT_IMAGE_EXTENSIONS = SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
@@ -294,4 +287,9 @@ suspend fun GalleryInfo.putToDownloadDir() {
     val title = getSuitableTitle(this)
     val dirname = FileUtils.sanitizeFilename("$gid-$title")
     EhDB.putDownloadDirname(gid, dirname)
+}
+
+suspend fun getGalleryDownloadDir(gid: Long): UniFile? {
+    val dirname = EhDB.getDownloadDirname(gid) ?: return null
+    return downloadLocation.subFile(dirname)
 }

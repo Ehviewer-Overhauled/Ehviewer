@@ -74,7 +74,7 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.ktbuilder.imageRequest
-import com.hippo.ehviewer.spider.SpiderDen
+import com.hippo.ehviewer.spider.getGalleryDownloadDir
 import com.hippo.ehviewer.spider.putToDownloadDir
 import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -778,7 +778,7 @@ class DownloadsScene :
                     val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
                     for ((i, info) in mDownloadInfoList.withIndex()) {
                         // Put file
-                        files[i] = SpiderDen.getGalleryDownloadDir(info.gid)
+                        files[i] = getGalleryDownloadDir(info.gid)
                         // Remove download path
                         EhDB.removeDownloadDirname(info.gid)
                     }
@@ -864,9 +864,9 @@ class DownloadsScene :
                 Spacer(modifier = Modifier.height(height).fillMaxWidth())
             }
             lifecycleScope.launchIO {
-                val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid) ?: run {
+                val downloadDir = getGalleryDownloadDir(info.gid) ?: run {
                     info.putToDownloadDir()
-                    SpiderDen.getGalleryDownloadDir(info.gid)!!
+                    getGalleryDownloadDir(info.gid)!!
                 }
                 downloadDir.ensureDir()
                 val thumbLocation = downloadDir.subFile(".thumb")!!

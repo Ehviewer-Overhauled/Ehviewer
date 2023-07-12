@@ -69,8 +69,7 @@ object EhDB {
         db.downloadsDao().delete(downloadInfo)
     }
 
-    @Synchronized
-    fun getDownloadDirname(gid: Long): String? {
+    suspend fun getDownloadDirname(gid: Long): String? {
         val dao = db.downloadDirnameDao()
         val raw = dao.load(gid)
         return raw?.dirname
