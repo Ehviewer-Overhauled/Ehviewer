@@ -191,18 +191,16 @@ object EhDB {
         quickSearch.id = dao.insert(quickSearch)
     }
 
-    private suspend fun importQuickSearch(quickSearchList: List<QuickSearch?>) {
+    private suspend fun importQuickSearch(quickSearchList: List<QuickSearch>) {
         val dao = db.quickSearchDao()
         for (quickSearch in quickSearchList) {
-            dao.insert(quickSearch!!)
+            dao.insert(quickSearch)
         }
     }
 
-    suspend fun deleteQuickSearch(quickSearch: QuickSearch?) {
+    suspend fun deleteQuickSearch(quickSearch: QuickSearch) {
         val dao = db.quickSearchDao()
-        if (quickSearch != null) {
-            dao.delete(quickSearch)
-        }
+        dao.delete(quickSearch)
     }
 
     suspend fun moveQuickSearch(fromPosition: Int, toPosition: Int) {
@@ -235,12 +233,12 @@ object EhDB {
 
     fun searchLocalFav(keyword: String) = db.localFavoritesDao().listLazy("%$keyword%")
 
-    suspend fun putHistoryInfo(galleryInfo: GalleryInfo?) {
+    suspend fun putHistoryInfo(galleryInfo: GalleryInfo) {
         val dao = db.historyDao()
         val info: HistoryInfo = if (galleryInfo is HistoryInfo) {
             galleryInfo
         } else {
-            HistoryInfo(galleryInfo!!)
+            HistoryInfo(galleryInfo)
         }
         info.time = System.currentTimeMillis()
         if (null != dao.load(info.gid)) {
@@ -267,9 +265,9 @@ object EhDB {
         }
     }
 
-    suspend fun deleteHistoryInfo(info: HistoryInfo?) {
+    suspend fun deleteHistoryInfo(info: HistoryInfo) {
         val dao = db.historyDao()
-        dao.delete(info!!)
+        dao.delete(info)
     }
 
     suspend fun clearHistoryInfo() {
