@@ -43,12 +43,14 @@ import com.hippo.ehviewer.util.getParcelableExtraCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineScope {
     override val coroutineContext = Dispatchers.IO + SupervisorJob()
+    private val deferredMgr = async { DownloadManager.apply { setDownloadListener(this@DownloadService) } }
     private var mNotifyManager: NotificationManagerCompat? = null
-    private var mDownloadManager: DownloadManager? = null
     private var mDownloadingBuilder: NotificationCompat.Builder? = null
     private var mDownloadedBuilder: NotificationCompat.Builder? = null
     private var m509dBuilder: NotificationCompat.Builder? = null
@@ -62,15 +64,9 @@ class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineSc
         mChannelID = "$packageName.download"
         mNotifyManager = NotificationManagerCompat.from(this)
         mNotifyManager!!.createNotificationChannel(
-            NotificationChannelCompat.Builder(
-                mChannelID!!,
-                NotificationManagerCompat.IMPORTANCE_LOW,
-            )
-                .setName(getString(R.string.download_service))
-                .build(),
+            NotificationChannelCompat.Builder(mChannelID!!, NotificationManagerCompat.IMPORTANCE_LOW)
+                .setName(getString(R.string.download_service)).build(),
         )
-        mDownloadManager = DownloadManager
-        mDownloadManager!!.setDownloadListener(this)
         ensureDownloadingBuilder()
         mDownloadingBuilder!!.setContentTitle(getString(R.string.download_service))
             .setContentText(null)
@@ -81,11 +77,12 @@ class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineSc
 
     override fun onDestroy() {
         super.onDestroy()
-        mNotifyManager = null
-        if (mDownloadManager != null) {
-            mDownloadManager!!.setDownloadListener(null)
-            mDownloadManager = null
+        val scope = this
+        launch {
+            deferredMgr.await().setDownloadListener(null)
+            scope.cancel()
         }
+        mNotifyManager = null
         mDownloadingBuilder = null
         mDownloadedBuilder = null
         m509dBuilder = null
@@ -101,61 +98,51 @@ class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineSc
             ACTION_START -> {
                 val gi = intent.getParcelableExtraCompat<GalleryInfo>(KEY_GALLERY_INFO)
                 val label = intent.getStringExtra(KEY_LABEL)
-                if (gi != null && mDownloadManager != null) {
-                    mDownloadManager!!.startDownload(gi, label)
+                if (gi != null) {
+                    deferredMgr.await().startDownload(gi, label)
                 }
             }
 
             ACTION_START_RANGE -> {
                 val gidList = intent.getParcelableExtraCompat<LongList>(KEY_GID_LIST)
-                if (gidList != null && mDownloadManager != null) {
-                    mDownloadManager!!.startRangeDownload(gidList)
+                if (gidList != null) {
+                    deferredMgr.await().startRangeDownload(gidList)
                 }
             }
 
             ACTION_START_ALL -> {
-                if (mDownloadManager != null) {
-                    mDownloadManager!!.startAllDownload()
-                }
+                deferredMgr.await().startAllDownload()
             }
 
             ACTION_STOP -> {
                 val gid = intent.getLongExtra(KEY_GID, -1)
-                if (gid != -1L && mDownloadManager != null) {
-                    mDownloadManager!!.stopDownload(gid)
+                if (gid != -1L) {
+                    deferredMgr.await().stopDownload(gid)
                 }
             }
 
-            ACTION_STOP_CURRENT -> {
-                if (mDownloadManager != null) {
-                    mDownloadManager!!.stopCurrentDownload()
-                }
-            }
+            ACTION_STOP_CURRENT -> deferredMgr.await().stopCurrentDownload()
 
             ACTION_STOP_RANGE -> {
                 val gidList = intent.getParcelableExtraCompat<LongList>(KEY_GID_LIST)
-                if (gidList != null && mDownloadManager != null) {
-                    mDownloadManager!!.stopRangeDownload(gidList)
+                if (gidList != null) {
+                    deferredMgr.await().stopRangeDownload(gidList)
                 }
             }
 
-            ACTION_STOP_ALL -> {
-                if (mDownloadManager != null) {
-                    mDownloadManager!!.stopAllDownload()
-                }
-            }
+            ACTION_STOP_ALL -> deferredMgr.await().stopAllDownload()
 
             ACTION_DELETE -> {
                 val gid = intent.getLongExtra(KEY_GID, -1)
-                if (gid != -1L && mDownloadManager != null) {
-                    mDownloadManager!!.deleteDownload(gid)
+                if (gid != -1L) {
+                    deferredMgr.await().deleteDownload(gid)
                 }
             }
 
             ACTION_DELETE_RANGE -> {
                 val gidList = intent.getParcelableExtraCompat<LongList>(KEY_GID_LIST)
-                if (gidList != null && mDownloadManager != null) {
-                    mDownloadManager!!.deleteRangeDownload(gidList)
+                if (gidList != null) {
+                    deferredMgr.await().deleteRangeDownload(gidList)
                 }
             }
 
@@ -240,9 +227,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineSc
 
     override fun onGet509() {
         launch {
-            if (mDownloadManager != null) {
-                mDownloadManager!!.stopAllDownload()
-            }
+            deferredMgr.await().stopAllDownload()
             if (mNotifyManager == null) {
                 return@launch
             }
@@ -427,9 +412,11 @@ class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineSc
     }
 
     private fun checkStopSelf() {
-        if (mDownloadManager == null || mDownloadManager!!.isIdle) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
+        launch {
+            if (deferredMgr.await().isIdle) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }
         }
     }
 
