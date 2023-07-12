@@ -357,6 +357,7 @@ class DownloadsScene :
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         mViewTransition = null
         mAdapter = null
+        mLabelAdapter = null
         _binding = null
     }
 
