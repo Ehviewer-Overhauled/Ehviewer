@@ -153,19 +153,11 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val view = inflater.inflate(R.layout.scene_gallery_comments, container, false) as ViewGroup
-        _binding = SceneGalleryCommentsBinding.bind(view)
+        _binding = SceneGalleryCommentsBinding.inflate(inflater, container!!)
         setLiftOnScrollTargetView(binding.recyclerView)
         val tip = binding.tip
-
-        // Workaround for fab and edittext render out of screen
-        view.removeView(binding.fabLayout)
-        view.removeView(binding.editPanel.parent as View)
-        assert(container != null)
-        container!!.addView(binding.fabLayout)
-        container.addView(binding.editPanel.parent as View)
         ViewCompat.setWindowInsetsAnimationCallback(
-            view,
+            binding.root,
             WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 binding.editPanel,
@@ -269,7 +261,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         addAboveSnackView(binding.fabLayout)
         mViewTransition = ViewTransition(binding.recyclerView, tip)
         updateView(false)
-        return view
+        return binding.root
     }
 
     fun Spannable.clearSpan(start: Int, end: Int, url: Boolean) {

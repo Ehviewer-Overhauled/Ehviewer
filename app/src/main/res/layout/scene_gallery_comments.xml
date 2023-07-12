@@ -14,25 +14,23 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.hippo.ehviewer.ui.legacy.EasyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="@dimen/fab_rv_padding_size"
             android:paddingLeft="@dimen/keyline_margin"
             android:paddingRight="@dimen/keyline_margin"
+            android:paddingBottom="@dimen/fab_rv_padding_size"
             app:fitsSystemWindowsInsets="bottom" />
 
     </androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout>
@@ -70,13 +68,13 @@
                 android:layout_weight="1"
                 android:background="@null"
                 android:gravity="start|center_vertical"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:maxHeight="168dp"
                 android:minHeight="56dp"
-                android:textSize="16sp"
                 android:padding="@dimen/keyline_margin"
-                android:importantForAutofill="no"
-                android:textColor="?colorOnPrimaryContainer" />
+                android:textColor="?colorOnPrimaryContainer"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/send"
@@ -107,4 +105,4 @@
             app:srcCompat="@drawable/v_reply_dark_x24" />
 
     </com.hippo.ehviewer.ui.legacy.FabLayout>
-</FrameLayout>
+</merge>

@@ -252,14 +252,10 @@ class DownloadsScene :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = SceneDownloadBinding.inflate(inflater, container, false)
+        _binding = SceneDownloadBinding.inflate(inflater, container!!)
         binding.run {
             setLiftOnScrollTargetView(recyclerView)
-            // Workaround
-            (fabLayout.parent as ViewGroup).removeView(fabLayout)
-            container!!.addView(fabLayout)
-            mViewTransition =
-                ViewTransition(content, tip)
+            mViewTransition = ViewTransition(content, tip)
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_download)
             drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
             tip.setCompoundDrawables(null, drawable, null, null)
@@ -354,7 +350,6 @@ class DownloadsScene :
         super.onDestroyView()
         binding.recyclerView.stopScroll()
         removeAboveSnackView(binding.fabLayout)
-        (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         mViewTransition = null
         mAdapter = null
         mLabelAdapter = null
