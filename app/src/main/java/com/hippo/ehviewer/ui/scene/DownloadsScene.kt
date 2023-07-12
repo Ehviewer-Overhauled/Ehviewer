@@ -327,6 +327,7 @@ class DownloadsScene :
         binding.recyclerView.stopScroll()
         removeAboveSnackView(binding.fabLayout)
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
+        itemTouchHelper.attachToRecyclerView(null)
         mViewTransition = null
         mAdapter = null
         _binding = null
