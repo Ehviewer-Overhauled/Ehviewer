@@ -9,7 +9,7 @@ import androidx.room.Update
 @Dao
 interface DownloadLabelDao {
     @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC")
-    fun list(): List<DownloadLabel>
+    suspend fun list(): List<DownloadLabel>
 
     @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC LIMIT :limit OFFSET :offset")
     fun list(offset: Int, limit: Int): List<DownloadLabel>

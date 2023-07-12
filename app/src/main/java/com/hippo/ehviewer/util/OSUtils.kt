@@ -16,6 +16,8 @@
 package com.hippo.ehviewer.util
 
 import android.os.Looper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 import java.io.BufferedReader
 import java.io.FileReader
 import java.util.regex.Pattern
@@ -73,3 +75,5 @@ val isMainThread: Boolean
 fun assertNotMainThread() {
     check(!isMainThread) { "Cannot access database on the main thread since" + " it may potentially lock the UI for a long period of time." }
 }
+
+fun <T> runAssertingNotMainThread(block: suspend CoroutineScope.() -> T) = assertNotMainThread().run { runBlocking(block = block) }

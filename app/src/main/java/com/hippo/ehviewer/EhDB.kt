@@ -91,9 +91,7 @@ object EhDB {
         dao.deleteByKey(gid)
     }
 
-    @get:Synchronized
-    val allDownloadLabelList: List<DownloadLabel>
-        get() = db.downloadLabelDao().list()
+    suspend fun getAllDownloadLabelList() = db.downloadLabelDao().list()
 
     suspend fun addDownloadLabel(label: String): DownloadLabel {
         val dao = db.downloadLabelDao()

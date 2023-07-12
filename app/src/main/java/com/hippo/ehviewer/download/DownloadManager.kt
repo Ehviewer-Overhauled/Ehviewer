@@ -35,6 +35,7 @@ import com.hippo.ehviewer.util.ConcurrentPool
 import com.hippo.ehviewer.util.LongList
 import com.hippo.ehviewer.util.SimpleHandler
 import com.hippo.ehviewer.util.assertNotMainThread
+import com.hippo.ehviewer.util.runAssertingNotMainThread
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -47,7 +48,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import splitties.init.appCtx
 import splitties.preferences.edit
 import java.util.LinkedList
@@ -63,7 +63,7 @@ object DownloadManager : OnSpiderListener {
     private val map: MutableMap<String?, LinkedList<DownloadInfo>>
 
     // All labels without default label
-    val labelList = EhDB.allDownloadLabelList as MutableList<DownloadLabel>
+    val labelList = runAssertingNotMainThread { EhDB.getAllDownloadLabelList() } as MutableList<DownloadLabel>
 
     // Store download info with default label
     val defaultInfoList: LinkedList<DownloadInfo>
@@ -79,7 +79,7 @@ object DownloadManager : OnSpiderListener {
 
     init {
         assertNotMainThread()
-        map = runBlocking {
+        map = runAssertingNotMainThread {
             allInfoList.groupBy { it.label }.entries.associate {
                 it.key?.let { label ->
                     if (!containLabel(label)) {
