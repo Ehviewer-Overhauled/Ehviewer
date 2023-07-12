@@ -299,6 +299,34 @@ class DownloadsScene :
                 recyclerView.scrollToPosition(mInitPosition)
                 mInitPosition = -1
             }
+            val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
+                override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                    return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
+                }
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder,
+                ): Boolean {
+                    val fromPosition = viewHolder.bindingAdapterPosition
+                    val toPosition = target.bindingAdapterPosition
+                    if (fromPosition == toPosition) {
+                        return false
+                    }
+                    lifecycleScope.launchIO {
+                        when (mLabel) {
+                            null -> DownloadManager.moveDownload(fromPosition, toPosition)
+                            getString(R.string.default_download_label_name) -> DownloadManager.moveDownload(null, fromPosition, toPosition)
+                            else -> DownloadManager.moveDownload(mLabel, fromPosition, toPosition)
+                        }
+                        withUIContext {
+                            mAdapter!!.notifyItemMoved(fromPosition, toPosition)
+                        }
+                    }
+                    return true
+                }
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+            })
             itemTouchHelper.attachToRecyclerView(recyclerView)
             fastScroller.attachToRecyclerView(recyclerView)
             val handlerDrawable = HandlerDrawable()
@@ -327,7 +355,6 @@ class DownloadsScene :
         binding.recyclerView.stopScroll()
         removeAboveSnackView(binding.fabLayout)
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
-        itemTouchHelper.attachToRecyclerView(null)
         mViewTransition = null
         mAdapter = null
         _binding = null
@@ -1185,52 +1212,6 @@ class DownloadsScene :
                 }.show()
         }
     }
-
-    private val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
-        override fun getMovementFlags(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-        ): Int {
-            return makeMovementFlags(
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                0,
-            )
-        }
-
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder,
-        ): Boolean {
-            val fromPosition = viewHolder.bindingAdapterPosition
-            val toPosition = target.bindingAdapterPosition
-            if (fromPosition == toPosition) {
-                return false
-            }
-            lifecycleScope.launchIO {
-                when (mLabel) {
-                    null -> {
-                        DownloadManager.moveDownload(fromPosition, toPosition)
-                    }
-
-                    getString(R.string.default_download_label_name) -> {
-                        DownloadManager.moveDownload(null, fromPosition, toPosition)
-                    }
-
-                    else -> {
-                        DownloadManager.moveDownload(mLabel, fromPosition, toPosition)
-                    }
-                }
-                withUIContext {
-                    mAdapter!!.notifyItemMoved(fromPosition, toPosition)
-                }
-            }
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        }
-    })
 
     companion object {
         const val KEY_GID = "gid"
