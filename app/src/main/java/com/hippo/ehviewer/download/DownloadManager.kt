@@ -1096,7 +1096,7 @@ object DownloadManager : OnSpiderListener {
                     }
                 }
             }
-            if (mType != TYPE_ON_FINISH) mNotifyTaskPool.push(this)
+            mNotifyTaskPool.push(this)
         }
     }
 
