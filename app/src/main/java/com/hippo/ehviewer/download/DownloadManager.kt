@@ -769,7 +769,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    fun deleteLabel(label: String) {
+    suspend fun deleteLabel(label: String) {
         // Find in label list and remove
         var found = false
         val iterator = labelList.iterator()

@@ -141,10 +141,9 @@ object EhDB {
         dao.update(list)
     }
 
-    @Synchronized
-    fun removeDownloadLabel(raw: DownloadLabel?) {
+    suspend fun removeDownloadLabel(raw: DownloadLabel) {
         val dao = db.downloadLabelDao()
-        dao.delete(raw!!)
+        dao.delete(raw)
     }
 
     suspend fun removeLocalFavorites(gid: Long) {
