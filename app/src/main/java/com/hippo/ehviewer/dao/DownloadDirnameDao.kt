@@ -20,5 +20,5 @@ interface DownloadDirnameDao {
     suspend fun deleteByKey(gid: Long)
 
     @Query("SELECT * FROM DOWNLOAD_DIRNAME")
-    fun list(): List<DownloadDirname>
+    suspend fun list(): List<DownloadDirname>
 }
