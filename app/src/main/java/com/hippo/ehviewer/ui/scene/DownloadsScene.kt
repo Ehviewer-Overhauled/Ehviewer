@@ -99,7 +99,6 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
-import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.Dispatchers
@@ -642,23 +641,6 @@ class DownloadsScene :
         updateView()
     }
 
-    override fun onChange() {
-        lifecycleScope.launchUI {
-            mLabel = null
-            updateForLabel()
-            updateView()
-        }
-    }
-
-    override fun onRenameLabel(from: String, to: String) {
-        if (mLabel != from) {
-            return
-        }
-        mLabel = to
-        updateForLabel()
-        updateView()
-    }
-
     override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
         if (mList !== list) {
             return
@@ -1075,10 +1057,19 @@ class DownloadsScene :
             } else {
                 mBuilder.setError(null)
                 mDialog.dismiss()
-                downloadManager.renameLabel(mOriginalLabel!!, text)
-                if (mLabelAdapter != null) {
-                    initLabels()
-                    mLabelAdapter!!.notifyDataSetChanged()
+                lifecycleScope.launchIO {
+                    downloadManager.renameLabel(mOriginalLabel!!, text)
+                    if (mLabelAdapter != null) {
+                        withUIContext {
+                            initLabels()
+                            mLabelAdapter!!.notifyDataSetChanged()
+                            if (mLabel == mOriginalLabel) {
+                                mLabel = text
+                                updateForLabel()
+                                updateView()
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1160,6 +1151,9 @@ class DownloadsScene :
                         DownloadManager.deleteLabel(label)
                         mLabels.removeAt(position)
                         withUIContext {
+                            mLabel = null
+                            updateForLabel()
+                            updateView()
                             mLabelAdapter!!.notifyItemRemoved(position)
                         }
                     }

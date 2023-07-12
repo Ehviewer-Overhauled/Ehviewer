@@ -284,14 +284,6 @@ object DownloadManager : OnSpiderListener {
                 // No-op
             }
 
-            override fun onChange() {
-                // No-op
-            }
-
-            override fun onRenameLabel(from: String, to: String) {
-                // No-op
-            }
-
             override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
                 trySend(info)
             }
@@ -737,7 +729,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    fun renameLabel(from: String, to: String) {
+    suspend fun renameLabel(from: String, to: String) {
         // Find in label list
         var found = false
         for (raw in labelList) {
@@ -762,11 +754,6 @@ object DownloadManager : OnSpiderListener {
         }
         // Put list back with new label
         map[to] = list
-
-        // Notify listener
-        for (l in mDownloadInfoListeners) {
-            l.onRenameLabel(from, to)
-        }
     }
 
     suspend fun deleteLabel(label: String) {
@@ -797,11 +784,6 @@ object DownloadManager : OnSpiderListener {
 
         // Sort
         defaultInfoList.sortByDateDescending()
-
-        // Notify listener
-        for (l in mDownloadInfoListeners) {
-            l.onChange()
-        }
     }
 
     val isIdle: Boolean
@@ -900,16 +882,6 @@ object DownloadManager : OnSpiderListener {
          * Maybe all data is changed, maybe list is changed
          */
         fun onReload()
-
-        /**
-         * The list is gone, use default list please
-         */
-        fun onChange()
-
-        /**
-         * Rename label
-         */
-        fun onRenameLabel(from: String, to: String)
 
         /**
          * Remove the special info from the special position

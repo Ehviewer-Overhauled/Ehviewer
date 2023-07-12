@@ -112,10 +112,9 @@ object EhDB {
         return raw
     }
 
-    @Synchronized
-    fun updateDownloadLabel(raw: DownloadLabel?) {
+    suspend fun updateDownloadLabel(raw: DownloadLabel) {
         val dao = db.downloadLabelDao()
-        dao.update(raw!!)
+        dao.update(raw)
     }
 
     @Synchronized
@@ -332,32 +331,23 @@ object EhDB {
             it.close()
             context.deleteDatabase(tempDBName)
         } use { oldDB ->
-            // Download label
             runCatching {
                 val downloadLabelList = oldDB.downloadLabelDao().list()
                 DownloadManager.addDownloadLabel(downloadLabelList)
             }
-
-            // Downloads
             runCatching {
                 val downloadInfoList = oldDB.downloadsDao().list()
                 DownloadManager.addDownload(downloadInfoList, false)
             }
-
-            // Download dirname
             runCatching {
                 oldDB.downloadDirnameDao().list().forEach {
                     putDownloadDirname(it.gid, it.dirname)
                 }
             }
-
-            // History
             runCatching {
                 val historyInfoList = oldDB.historyDao().list()
                 putHistoryInfo(historyInfoList)
             }
-
-            // QuickSearch
             runCatching {
                 val quickSearchList = oldDB.quickSearchDao().list()
                 val currentQuickSearchList = db.quickSearchDao().list()
@@ -366,15 +356,11 @@ object EhDB {
                 }
                 importQuickSearch(importList)
             }
-
-            // LocalFavorites
             runCatching {
                 oldDB.localFavoritesDao().list().forEach {
                     putLocalFavorites(it)
                 }
             }
-
-            // Filter
             runCatching {
                 val filterList = oldDB.filterDao().list()
                 val currentFilterList = db.filterDao().list()
