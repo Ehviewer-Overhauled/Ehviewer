@@ -36,7 +36,7 @@ import com.hippo.ehviewer.util.sendTo
 import splitties.arch.room.roomDb
 
 object EhDB {
-    private val db = roomDb<EhDatabase>("eh.db")
+    private val db = roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() }
 
     // Fix state
     @get:Synchronized
