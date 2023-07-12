@@ -48,7 +48,6 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
         binding.viewer.onItemSelectedListener = { position ->
             val readingModeType = ReadingModeType.fromSpinner(position)
             ReaderPreferences.defaultReadingMode().set(readingModeType.flagValue)
-            (context as ReaderActivity).setGallery()
 
             val mangaViewer = ReaderPreferences.defaultReadingMode().get()
             if (mangaViewer == ReadingModeType.WEBTOON.flagValue || mangaViewer == ReadingModeType.CONTINUOUS_VERTICAL.flagValue) {
@@ -65,7 +64,6 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
         binding.rotationMode.onItemSelectedListener = { position ->
             val rotationType = OrientationType.fromSpinner(position)
             readerPreferences.defaultOrientationType().set(rotationType.flagValue)
-            (context as ReaderActivity).setGallery()
         }
         binding.rotationMode.setSelection(
             ReaderPreferences.defaultOrientationType().get()
