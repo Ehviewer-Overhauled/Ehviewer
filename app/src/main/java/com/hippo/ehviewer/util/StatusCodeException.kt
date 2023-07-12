@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hippo.ehviewer.network
+package com.hippo.ehviewer.util
 
 import android.util.SparseArray
 import com.hippo.ehviewer.R

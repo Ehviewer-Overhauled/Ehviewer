@@ -26,12 +26,12 @@ import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.coil.suspendEdit
-import com.hippo.ehviewer.cronet.isCronetSupported
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.ehviewer.image.Image.CloseableSource
 import com.hippo.ehviewer.image.rewriteGifSource2
 import com.hippo.ehviewer.util.FileUtils
+import com.hippo.ehviewer.util.isCronetSupported
 import com.hippo.ehviewer.util.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream

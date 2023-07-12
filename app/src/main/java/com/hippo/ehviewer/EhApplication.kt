@@ -29,7 +29,6 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.coil.MergeInterceptor
-import com.hippo.ehviewer.cronet.isCronetSupported
 import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
@@ -50,6 +49,7 @@ import com.hippo.ehviewer.util.FavouriteStatusRouter
 import com.hippo.ehviewer.util.FileUtils
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.util.isAtLeastQ
+import com.hippo.ehviewer.util.isCronetSupported
 import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext

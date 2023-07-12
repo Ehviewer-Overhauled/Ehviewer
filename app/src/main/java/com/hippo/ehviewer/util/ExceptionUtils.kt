@@ -17,7 +17,6 @@ package com.hippo.ehviewer.util
 
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.ehviewer.network.StatusCodeException
 import splitties.init.appCtx
 import java.io.IOException
 import java.net.MalformedURLException

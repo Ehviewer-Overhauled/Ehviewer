@@ -45,8 +45,8 @@ import com.hippo.ehviewer.client.parser.VoteCommentResult
 import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dailycheck.showEventNotification
 import com.hippo.ehviewer.dailycheck.today
-import com.hippo.ehviewer.network.StatusCodeException
 import com.hippo.ehviewer.util.AppConfig
+import com.hippo.ehviewer.util.StatusCodeException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.add
