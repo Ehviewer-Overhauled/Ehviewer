@@ -22,6 +22,8 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
+import com.hippo.ehviewer.dao.Search
+import com.hippo.ehviewer.dao.SearchDao
 import com.hippo.ehviewer.dao.SearchDatabase
 import com.hippo.ehviewer.databinding.ItemSimpleList2Binding
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
@@ -163,6 +165,13 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         onApplySearch = lambda
     }
 
+    private suspend fun addQuery(query: String) {
+        mSearchDatabase.deleteQuery(query)
+        if (query.isBlank()) return
+        val search = Search(System.currentTimeMillis(), query)
+        mSearchDatabase.insert(search)
+    }
+
     fun onApplySearch() {
         binding.toolbar.setText(binding.searchview.text)
         binding.searchview.hide()
@@ -170,7 +179,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         if (!mAllowEmptySearch && query.isEmpty()) {
             return
         }
-        lifecycleScope.launchIO { mSearchDatabase.addQuery(query) }
+        lifecycleScope.launchIO { addQuery(query) }
         onApplySearch(query)
     }
 
@@ -325,6 +334,8 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             binding.searchBarList.scrollToPosition(0)
         }
     }
+
+    private suspend fun SearchDao.suggestions(prefix: String, limit: Int) = (if (prefix.isBlank()) list(limit) else rawSuggestions(prefix, limit)).map { it.query }
 
     private fun mergedSuggestionFlow(): Flow<Suggestion> = flow {
         binding.searchview.editText.text?.toString()?.let { text ->

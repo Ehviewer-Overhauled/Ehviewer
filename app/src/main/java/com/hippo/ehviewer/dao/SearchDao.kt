@@ -17,13 +17,4 @@ interface SearchDao {
 
     @Insert
     suspend fun insert(search: Search)
-
-    suspend fun addQuery(query: String) {
-        deleteQuery(query)
-        if (query.isBlank()) return
-        val search = Search(System.currentTimeMillis(), query)
-        insert(search)
-    }
-
-    suspend fun suggestions(prefix: String, limit: Int) = (if (prefix.isBlank()) list(limit) else rawSuggestions(prefix, limit)).map { it.query }
 }
