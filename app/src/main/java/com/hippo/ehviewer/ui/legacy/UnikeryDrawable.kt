@@ -19,7 +19,7 @@ import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
 import coil.imageLoader
 import coil.request.ImageRequest
-import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.ktbuilder.imageRequest
 
 class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) :
     WrapDrawable(),

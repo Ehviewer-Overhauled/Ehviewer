@@ -53,8 +53,8 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
-import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
+import com.hippo.ehviewer.ktbuilder.imageRequest
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
 import com.hippo.ehviewer.ui.navToReader

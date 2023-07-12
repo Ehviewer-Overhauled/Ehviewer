@@ -26,7 +26,7 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.data.NormalGalleryPreview
-import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.ktbuilder.imageRequest
 import com.hippo.ehviewer.ui.tools.CropDefaults
 import com.hippo.ehviewer.ui.tools.CrystalCard
 

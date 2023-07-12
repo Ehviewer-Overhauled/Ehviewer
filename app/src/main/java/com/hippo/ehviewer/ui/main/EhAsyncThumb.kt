@@ -13,7 +13,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.ktbuilder.imageRequest
 import com.hippo.ehviewer.ui.tools.CropDefaults
 
 @Composable

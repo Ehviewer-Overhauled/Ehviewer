@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.okhttp
+package com.hippo.ehviewer.ktbuilder
 
 import okhttp3.Cache
 import okhttp3.OkHttpClient
