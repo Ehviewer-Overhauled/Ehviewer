@@ -18,7 +18,6 @@ package com.hippo.ehviewer
 
 import android.app.Application
 import android.content.ComponentCallbacks2
-import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -50,12 +49,12 @@ import com.hippo.ehviewer.util.Crash
 import com.hippo.ehviewer.util.FavouriteStatusRouter
 import com.hippo.ehviewer.util.FileUtils
 import com.hippo.ehviewer.util.ReadableTime
+import com.hippo.ehviewer.util.isAtLeastQ
 import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.launch
 import okhttp3.AsyncDns
-import okhttp3.Cookie
 import okhttp3.android.AndroidAsyncDns
 import okio.Path.Companion.toOkioPath
 import splitties.arch.room.roomDb
@@ -160,20 +159,16 @@ class EhApplication : Application(), ImageLoaderFactory {
         val nonCacheOkHttpClient by lazy {
             httpClient {
                 cookieJar(EhCookieStore)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) dns(AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6))
+                if (isAtLeastQ) {
+                    dns(AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6))
+                }
                 chunker { alwaysReadResponseBody(false) }
-                if (Settings.bypassCloudflare) addInterceptor(CloudflareInterceptor(appCtx))
-
+                if (Settings.bypassCloudflare) {
+                    addInterceptor(CloudflareInterceptor(appCtx))
+                }
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
                 if (isCronetSupported) {
-                    addInterceptor { chain ->
-                        val request = chain.request()
-                        val url = request.url
-                        val newRequest = request.newBuilder().addHeader("Cookie", EhCookieStore.getCookieHeader(url)).build()
-                        val response = chain.proceed(newRequest)
-                        EhCookieStore.saveFromResponse(url, Cookie.parseAll(url, response.headers))
-                        response
-                    }
+                    addInterceptor(EhCookieStore)
                     cronet(cronetHttpClient)
                 }
             }
