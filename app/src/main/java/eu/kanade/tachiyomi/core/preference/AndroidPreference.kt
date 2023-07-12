@@ -32,6 +32,7 @@ sealed class AndroidPreference<T>(
         return read(preferences, key, defaultValue)
     }
 
+    // Async, don't call get() immediately after this
     override fun set(value: T) {
         preferences.edit(action = write(key, value))
     }

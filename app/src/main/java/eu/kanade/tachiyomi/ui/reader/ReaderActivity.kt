@@ -731,9 +731,7 @@ class ReaderActivity : EhActivity() {
                     selectedItemId = ReaderPreferences.defaultReadingMode().get(),
                 ) {
                     val newReadingMode = ReadingModeType.fromPreference(itemId)
-
                     ReaderPreferences.defaultReadingMode().set(newReadingMode.flagValue)
-                    setGallery()
                 }
             }
         }
@@ -748,9 +746,7 @@ class ReaderActivity : EhActivity() {
                     selectedItemId = ReaderPreferences.defaultOrientationType().get(),
                 ) {
                     val newOrientation = OrientationType.fromPreference(itemId)
-
                     ReaderPreferences.defaultOrientationType().set(newOrientation.flagValue)
-                    setGallery()
                 }
             }
         }
@@ -908,6 +904,14 @@ class ReaderActivity : EhActivity() {
          * Initializes the reader subscriptions.
          */
         init {
+            ReaderPreferences.defaultReadingMode().changes()
+                .onEach { setGallery() }
+                .launchIn(lifecycleScope)
+
+            ReaderPreferences.defaultOrientationType().changes()
+                .onEach { setGallery() }
+                .launchIn(lifecycleScope)
+
             ReaderPreferences.readerTheme().changes()
                 .onEach { theme ->
                     binding.readerContainer.setBackgroundResource(
