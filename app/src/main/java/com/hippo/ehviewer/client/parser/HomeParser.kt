@@ -1,20 +1,19 @@
 package com.hippo.ehviewer.client.parser
 
 import android.os.Parcelable
+import com.hippo.ehviewer.client.exception.InsufficientFundsException
 import com.hippo.ehviewer.client.exception.ParseException
 import kotlinx.parcelize.Parcelize
 
 object HomeParser {
     private val PATTERN_FUNDS = Regex("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", RegexOption.DOT_MATCHES_ALL)
-    private const val RESET_SUCCEED = "Image limit was successfully reset."
+    private const val INSUFFICIENT_FUNDS = "Insufficient funds."
 
     fun parse(body: String) = parseLimit(body)
 
-    fun parseResetLimits(body: String): Limits? {
-        return if (body.contains(RESET_SUCCEED)) {
-            null
-        } else {
-            parse(body)
+    fun parseResetLimits(body: String) {
+        if (body.contains(INSUFFICIENT_FUNDS)) {
+            throw InsufficientFundsException()
         }
     }
 

@@ -127,8 +127,10 @@ fun EhScreen() {
                 val placeholder = stringResource(id = R.string.please_wait)
                 val resetImageLimitSucceed = stringResource(id = R.string.reset_limits_succeed)
                 val noImageLimits = stringResource(id = R.string.image_limits_summary, 0, 0)
+                var result by remember { mutableStateOf<HomeParser.Result?>(null) }
                 var summary by rememberSaveable { mutableStateOf(noImageLimits) }
                 suspend fun getImageLimits() = EhEngine.getImageLimits().also {
+                    result = it
                     summary = context.getString(R.string.image_limits_summary, it.limits.current, it.limits.maximum)
                 }
                 val deferredResult = remember { coroutineScope.async { runSuspendCatching { getImageLimits() } } }
@@ -144,15 +146,14 @@ fun EhScreen() {
                     fun bind(result: HomeParser.Result) {
                         val (current, maximum, resetCost) = result.limits
                         val (fundsGP, fundsC) = result.funds
-                        val cost = if (fundsGP >= resetCost) "$resetCost GP" else "$resetCost Credits"
-                        val message = context.getString(R.string.current_limits, "$current / $maximum", cost) + "\n" + context.getString(R.string.current_funds, "$fundsGP+", fundsC)
+                        val message = context.getString(R.string.current_limits, "$current / $maximum", resetCost) + "\n" + context.getString(R.string.current_funds, "$fundsGP+", fundsC)
                         dialog.setMessage(message)
-                        resetButton.isEnabled = resetCost in 1..maxOf(fundsGP, fundsC)
+                        resetButton.isEnabled = resetCost != 0
                     }
                     coroutineScope.launch {
                         runSuspendCatching {
-                            val result = deferredResult.await().getOrNull() ?: getImageLimits()
-                            withUIContext { bind(result) }
+                            result ?: deferredResult.await().getOrNull() ?: getImageLimits()
+                            withUIContext { bind(result!!) }
                         }.onFailure {
                             withUIContext { dialog.setMessage(it.localizedMessage) }
                         }
