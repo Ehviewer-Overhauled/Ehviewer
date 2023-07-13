@@ -35,7 +35,6 @@ import com.hippo.ehviewer.client.parser.GalleryPageApiParser
 import com.hippo.ehviewer.client.parser.GalleryPageParser
 import com.hippo.ehviewer.client.parser.GalleryTokenApiParser
 import com.hippo.ehviewer.client.parser.HomeParser
-import com.hippo.ehviewer.client.parser.Limits
 import com.hippo.ehviewer.client.parser.ProfileParser
 import com.hippo.ehviewer.client.parser.RateGalleryResult
 import com.hippo.ehviewer.client.parser.SignInParser
@@ -306,14 +305,11 @@ object EhEngine {
         return null
     }
 
-    suspend fun resetImageLimits(): Limits? {
-        return ehRequest(EhUrl.URL_HOME) {
-            formBody {
-                add("act", "limits")
-                add("reset", "Reset Limit")
-            }
-        }.executeAndParsingWith(HomeParser::parseResetLimits)
-    }
+    suspend fun resetImageLimits() = ehRequest(EhUrl.URL_HOME) {
+        formBody {
+            add("reset_imagelimit", "Reset Limit")
+        }
+    }.executeAndParsingWith(HomeParser::parseResetLimits)
 
     suspend fun modifyFavorites(url: String, gidArray: LongArray, dstCat: Int): FavoritesParser.Result {
         val catStr: String = when (dstCat) {

@@ -446,7 +446,7 @@
     <string name="insufficient_funds">餘額不足</string>
     <string name="image_limits">圖片配額</string>
     <string name="image_limits_summary">%1$d / %2$d（點擊以重新整理）</string>
-    <string name="current_limits">目前：%1$s\n重置花費：%2$s</string>
+    <string name="current_limits">目前：%1$s\n重置花費：%2$d GP</string>
     <string name="reset_limits_succeed">成功重置圖片配額</string>
     <string name="reset">重置</string>
     <string name="settings_privacy">隱私</string>

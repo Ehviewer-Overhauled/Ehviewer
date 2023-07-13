@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.client.parser
 
+import com.hippo.ehviewer.client.exception.InsufficientFundsException
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
 import org.jsoup.Jsoup
 
@@ -27,8 +28,10 @@ object ArchiveParser {
         Regex("<form id=\"hathdl_form\" action=\"[^\"]*?or=([^=\"]*?)\" method=\"post\">")
     private val PATTERN_HATH_ARCHIVE =
         Regex("<p><a href=\"[^\"]*\" onclick=\"return do_hathdl\\('([0-9]+|org)'\\)\">([^<]+)</a></p>\\s*<p>([\\w. ]+)</p>\\s*<p>([\\w. ]+)</p>")
-    private val PATTERN_NEED_HATH_CLIENT =
-        Regex("You must have a H@H client assigned to your account to use this feature\\.")
+    private const val ERROR_NEED_HATH_CLIENT =
+        "You must have a H@H client assigned to your account to use this feature."
+    private const val ERROR_INSUFFICIENT_FUNDS =
+        "You do not have enough funds to download this archive."
 
     fun parse(body: String): Result {
         val m = PATTERN_HATH_FORM.find(body)!!
@@ -66,7 +69,11 @@ object ArchiveParser {
     }
 
     fun parseArchiveUrl(body: String): String? {
-        if (PATTERN_NEED_HATH_CLIENT.containsMatchIn(body)) throw NoHAtHClientException("No H@H client")
+        if (body.contains(ERROR_NEED_HATH_CLIENT)) {
+            throw NoHAtHClientException("No H@H client")
+        } else if (body.contains(ERROR_INSUFFICIENT_FUNDS)) {
+            throw InsufficientFundsException()
+        }
         return Jsoup.parse(body).selectFirst("#continue>a[href]")
             ?.let { it.attr("href") + "?start=1" }
         // TODO: Check more errors

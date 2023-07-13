@@ -116,10 +116,10 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.ListUrlBuilder
+import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
 import com.hippo.ehviewer.client.parser.ArchiveParser
 import com.hippo.ehviewer.client.parser.HomeParser
-import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.TorrentResult
 import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.dao.DownloadInfo
@@ -1366,19 +1366,6 @@ class GalleryDetailScene : BaseScene() {
             val context = context
             val activity = mainActivity
             if (null != context && null != activity && null != mArchiveList && position < mArchiveList!!.size) {
-                if (mArchiveList!![position].name == "Insufficient Funds") {
-                    showTip(R.string.insufficient_funds, LENGTH_SHORT)
-                    return
-                } else if (mCurrentFunds != null) {
-                    val cost = ParserUtils.parseInt(
-                        mArchiveList!![position].cost.removeSuffix("GP").removeSuffix("Credits"),
-                        0,
-                    )
-                    if (cost > maxOf(mCurrentFunds!!.fundsGP, mCurrentFunds!!.fundsC)) {
-                        showTip(R.string.insufficient_funds, LENGTH_SHORT)
-                        return
-                    }
-                }
                 val res = mArchiveList!![position].res
                 val isHAtH = mArchiveList!![position].isHAtH
                 composeBindingGD?.run {
@@ -1400,10 +1387,18 @@ class GalleryDetailScene : BaseScene() {
                             }
                             showTip(R.string.download_archive_started, LENGTH_SHORT)
                         }.onFailure {
-                            if (it is NoHAtHClientException) {
-                                showTip(R.string.download_archive_failure_no_hath, LENGTH_LONG)
-                            } else {
-                                showTip(R.string.download_archive_failure, LENGTH_LONG)
+                            when (it) {
+                                is NoHAtHClientException -> {
+                                    showTip(R.string.download_archive_failure_no_hath, LENGTH_LONG)
+                                }
+
+                                is EhException -> {
+                                    showTip(ExceptionUtils.getReadableString(it), LENGTH_LONG)
+                                }
+
+                                else -> {
+                                    showTip(R.string.download_archive_failure, LENGTH_LONG)
+                                }
                             }
                         }
                     }
