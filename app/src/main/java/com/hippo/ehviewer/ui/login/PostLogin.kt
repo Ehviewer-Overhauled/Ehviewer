@@ -34,8 +34,10 @@ suspend fun postLogin() = coroutineScope {
 
         // Sad panda check
         Settings.gallerySite = EhUrl.SITE_EX
-        EhEngine.getUConfig()
+        // Explicitly use ex url since https://github.com/Ehviewer-Overhauled/Ehviewer/issues/1239#issuecomment-1632584525
+        EhEngine.getUConfig(EhUrl.URL_UCONFIG_EX)
     }.onFailure {
         Settings.gallerySite = EhUrl.SITE_E
+        Settings.needSignIn = false
     }.isSuccess
 }
