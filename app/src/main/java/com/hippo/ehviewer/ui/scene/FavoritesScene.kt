@@ -325,7 +325,8 @@ class FavoritesScene : SearchBarScene() {
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
                 binding.tip.setCompoundDrawables(null, drawable, null, null)
                 binding.tip.setOnClickListener { mAdapter?.refresh() }
-                val transition = ViewTransition(binding.recyclerView, binding.progress, binding.tip)
+                binding.refreshLayout.setOnRefreshListener { mAdapter?.refresh() }
+                val transition = ViewTransition(binding.refreshLayout, binding.progress, binding.tip)
                 val empty = getString(R.string.gallery_list_empty_hit)
                 adapter.addLoadStateListener {
                     lifecycleScope.launchUI {

@@ -259,7 +259,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         binding.fab.setOnClickListener(this)
         addAboveSnackView(binding.editPanel)
         addAboveSnackView(binding.fabLayout)
-        mViewTransition = ViewTransition(binding.recyclerView, tip)
+        mViewTransition = ViewTransition(binding.refreshLayout, tip)
         updateView(false)
         return binding.root
     }
