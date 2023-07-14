@@ -22,6 +22,8 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.client.exception.InsufficientFundsException
+import com.hippo.ehviewer.client.exception.NotLoggedInException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.ArchiveParser
 import com.hippo.ehviewer.client.parser.EventPaneParser
@@ -134,6 +136,17 @@ private suspend inline fun <T> Request.executeAndParsingWith(block: suspend Stri
 }
 
 object EhEngine {
+    suspend fun getOriginalImageUrl(url: String, referer: String?): String {
+        Log.d(TAG, url)
+        return ehRequest(url, referer).executeNoRedirect {
+            header("Location")?.apply {
+                if (contains("bounce_login")) {
+                    throw NotLoggedInException()
+                }
+            } ?: throw InsufficientFundsException()
+        }
+    }
+
     suspend fun getTorrentList(url: String, gid: Long, token: String?): TorrentResult {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         return ehRequest(url, referer).executeAndParsingWith(TorrentParser::parse)
