@@ -16,6 +16,7 @@
 package com.hippo.ehviewer.client
 
 import android.util.Log
+import com.hippo.ehviewer.EhApplication.Companion.noRedirectOkHttpClient
 import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import kotlinx.coroutines.coroutineScope
@@ -105,6 +106,7 @@ suspend inline fun <R> Call.usingCancellable(crossinline block: suspend Response
 
 suspend inline fun <R> Request.execute(block: Response.() -> R) = okHttpClient.newCall(this).executeAsync().use(block)
 suspend inline fun <R> Request.executeNonCache(crossinline block: suspend Response.() -> R) = nonCacheOkHttpClient.newCall(this).usingCancellable(block)
+suspend inline fun <R> Request.executeNoRedirect(block: Response.() -> R) = noRedirectOkHttpClient.newCall(this).executeAsync().use(block)
 
 suspend inline fun <reified T> Request.executeAndParseAs() = execute { parseAs<T>() }
 

@@ -29,6 +29,7 @@ import com.hippo.ehviewer.client.EhUrl.getGalleryMultiPageViewerUrl
 import com.hippo.ehviewer.client.EhUrl.referer
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehRequest
+import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePages
@@ -722,8 +723,14 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 val referer: String?
 
                 if ((Settings.downloadOriginImage || orgImg) && !originImageUrl.isNullOrBlank()) {
-                    targetImageUrl = originImageUrl
-                    referer = EhUrl.getPageUrl(mSpiderInfo.gid, index, pToken)
+                    val pageUrl = EhUrl.getPageUrl(mSpiderInfo.gid, index, pToken)
+                    targetImageUrl = runSuspendCatching {
+                        EhEngine.getOriginalImageUrl(originImageUrl!!, pageUrl)
+                    }.getOrElse {
+                        error = ExceptionUtils.getReadableString(it)
+                        if (it is EhException) break else continue
+                    }
+                    referer = EhUrl.referer
                 } else {
                     targetImageUrl = imageUrl
                     referer = null

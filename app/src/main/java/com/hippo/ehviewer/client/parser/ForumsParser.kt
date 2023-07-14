@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.client.exception.NotLoggedInException
 import com.hippo.ehviewer.util.ExceptionUtils
 import org.jsoup.Jsoup
 
@@ -29,7 +29,7 @@ object ForumsParser {
             child.attr("href")
         }.getOrElse {
             ExceptionUtils.throwIfFatal(it)
-            throw EhException("Not logged in")
+            throw NotLoggedInException()
         }
     }
 }

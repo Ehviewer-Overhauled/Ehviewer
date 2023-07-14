@@ -346,7 +346,7 @@
     <string name="settings_download_preload_image">预载图片</string>
     <string name="settings_download_preload_image_summary">向后预载 %s 张图片</string>
     <string name="settings_download_download_origin_image">下载原图</string>
-    <string name="settings_download_download_origin_image_summary">这很危险！勾选此项会导致下载配额迅速流失</string>
+    <string name="settings_download_download_origin_image_summary">警告！可能需要 GP</string>
     <string name="settings_download_media_scan">允许媒体扫描</string>
     <string name="settings_download_media_scan_summary_on">请避免他人翻看你的图库应用</string>
     <string name="settings_download_media_scan_summary_off">大多数图库应用将不会显示下载目录中的图片</string>

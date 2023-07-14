@@ -25,6 +25,7 @@ import androidx.lifecycle.coroutineScope
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
+import com.google.net.cronet.okhttptransport.RedirectStrategy.withoutRedirects
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
@@ -154,7 +155,7 @@ class EhApplication : Application(), ImageLoaderFactory {
     }
 
     companion object {
-        val nonCacheOkHttpClient by lazy {
+        private val baseOkHttpClient by lazy {
             httpClient {
                 cookieJar(EhCookieStore)
                 if (isAtLeastQ) {
@@ -164,10 +165,27 @@ class EhApplication : Application(), ImageLoaderFactory {
                 if (Settings.bypassCloudflare) {
                     addInterceptor(CloudflareInterceptor(appCtx))
                 }
+            }
+        }
+
+        val nonCacheOkHttpClient by lazy {
+            httpClient(baseOkHttpClient) {
                 // TODO: Rewrite CronetInterceptor to use android.net.http.HttpEngine and make it Android 14 only when released
                 if (isCronetSupported) {
                     addInterceptor(EhCookieStore)
                     cronet(cronetHttpClient)
+                }
+            }
+        }
+
+        val noRedirectOkHttpClient by lazy {
+            httpClient(baseOkHttpClient) {
+                followRedirects(false)
+                if (isCronetSupported) {
+                    addInterceptor(EhCookieStore)
+                    cronet(cronetHttpClient) {
+                        setRedirectStrategy(withoutRedirects())
+                    }
                 }
             }
         }
