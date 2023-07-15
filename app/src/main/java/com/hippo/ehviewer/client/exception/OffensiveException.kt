@@ -16,6 +16,6 @@
 package com.hippo.ehviewer.client.exception
 
 /**
- * It is an exception for get offensive tip for g.e-hentai.org
+ * It is an exception for get offensive tip for e-hentai.org
  */
 class OffensiveException : EhException("OFFENSIVE")
