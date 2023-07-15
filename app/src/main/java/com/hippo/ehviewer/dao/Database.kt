@@ -3,6 +3,7 @@ package com.hippo.ehviewer.dao
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteTable
+import androidx.room.RenameColumn
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
@@ -10,6 +11,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @DeleteTable(tableName = "BOOKMARKS")
 class DropBookMarkDao : AutoMigrationSpec
+
+@RenameColumn(tableName = "HISTORY", fromColumnName = "MODE", toColumnName = "FAVORITE_SLOT")
+class HistoryMigration : AutoMigrationSpec {
+    override fun onPostMigrate(db: SupportSQLiteDatabase) {
+        db.execSQL("UPDATE HISTORY SET FAVORITE_SLOT = FAVORITE_SLOT - 2")
+    }
+}
 
 class ThumbKeyMigration : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
@@ -33,7 +41,7 @@ class ThumbKeyMigration : AutoMigrationSpec {
 
 @Database(
     entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 9,
+    version = 10,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -57,6 +65,11 @@ class ThumbKeyMigration : AutoMigrationSpec {
         AutoMigration(
             from = 8,
             to = 9,
+        ),
+        AutoMigration(
+            from = 9,
+            to = 10,
+            spec = HistoryMigration::class,
         ),
     ],
 )
