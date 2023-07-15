@@ -2,7 +2,6 @@ import com.google.devtools.ksp.gradle.KspTaskJvm
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule.GROUP
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -47,29 +46,19 @@ android {
         enableV4Signing = true
     }
 
-    val commitSha by lazy {
-        val stdout = ByteArrayOutputStream()
-        exec {
-            commandLine = "git rev-parse --short=7 HEAD".split(' ')
-            standardOutput = stdout
-        }
-        stdout.toString().trim()
-    }
+    val commitSha = providers.exec {
+        commandLine = "git rev-parse --short=7 HEAD".split(' ')
+    }.standardOutput.asText.get().trim()
 
     val buildTime by lazy {
         val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(ZoneOffset.UTC)
         formatter.format(Instant.now())
     }
 
-    val repoName by lazy {
-        val stdout = ByteArrayOutputStream()
-        exec {
-            commandLine = "git remote get-url origin".split(' ')
-            standardOutput = stdout
-        }
-        stdout.toString().trim().removePrefix("https://github.com/").removePrefix("git@github.com:")
-            .removeSuffix(".git")
-    }
+    val repoName = providers.exec {
+        commandLine = "git remote get-url origin".split(' ')
+    }.standardOutput.asText.get().trim().removePrefix("https://github.com/").removePrefix("git@github.com:")
+        .removeSuffix(".git")
 
     defaultConfig {
         applicationId = "moe.tarsin.ehviewer"
