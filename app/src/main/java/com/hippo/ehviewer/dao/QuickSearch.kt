@@ -11,7 +11,7 @@ data class QuickSearch(
     var id: Long? = null,
 
     @ColumnInfo(name = "NAME")
-    var name: String? = null,
+    var name: String,
 
     @ColumnInfo(name = "MODE")
     var mode: Int = 0,

@@ -532,13 +532,13 @@ class GalleryListScene : SearchBarScene() {
             return
         }
         val gi = mAdapter?.peek(binding.recyclerView.layoutManager!!.firstVisibleItemPosition)
-        val next = if (gi != null) "@" + (gi.gid + 1) else null
+        val next = gi?.gid?.plus(1)
 
         // Check duplicate
         for (q in mQuickSearchList) {
             if (mUrlBuilder.equalsQuickSearch(q)) {
-                val i = q.name!!.lastIndexOf("@")
-                if (i != -1 && q.name!!.substring(i) == next) {
+                val nextStr = q.name.substringAfterLast('@', "").takeIf { it.isNotEmpty() }
+                if (nextStr?.toLongOrNull() == next) {
                     showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_LONG)
                     return
                 }
@@ -568,7 +568,7 @@ class GalleryListScene : SearchBarScene() {
                     return@launchIO
                 }
                 if (checked[0] && next != null) {
-                    text += next
+                    text += "@$next"
                     Settings.qSSaveProgress = true
                 } else {
                     Settings.qSSaveProgress = false
@@ -585,8 +585,7 @@ class GalleryListScene : SearchBarScene() {
                 }
                 builder.setError(null)
                 dialog.dismiss()
-                val quickSearch = mUrlBuilder.toQuickSearch()
-                quickSearch.name = text
+                val quickSearch = mUrlBuilder.toQuickSearch(text)
                 EhDB.insertQuickSearch(quickSearch)
                 mQuickSearchList.add(quickSearch)
                 withUIContext {
@@ -913,10 +912,9 @@ class GalleryListScene : SearchBarScene() {
             if (!mIsTopList) {
                 holder.itemView.setOnClickListener {
                     val q = mQuickSearchList[holder.bindingAdapterPosition]
-                    val i = q.name!!.lastIndexOf("@")
-                    val goto = if (i != -1) q.name!!.substring(i + 1) else null
-                    val args = ListUrlBuilder().apply { set(q) }.toStartArgs().apply { putString(KEY_GOTO, goto) }
-                    navAnimated(R.id.galleryListScene, args, true)
+                    mUrlBuilder.set(q)
+                    onUpdateUrlBuilder()
+                    mAdapter?.refresh()
                     setState(State.NORMAL)
                     closeDrawer(GravityCompat.END)
                 }
