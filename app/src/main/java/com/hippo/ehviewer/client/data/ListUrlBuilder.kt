@@ -81,6 +81,7 @@ data class ListUrlBuilder(
         }
 
     fun set(q: QuickSearch) {
+        reset()
         mode = q.mode
         this.category = q.category
         mKeyword = q.keyword
@@ -88,21 +89,20 @@ data class ListUrlBuilder(
         minRating = q.minRating
         pageFrom = q.pageFrom
         pageTo = q.pageTo
-        imagePath = null
-        isUseSimilarityScan = false
-        isOnlySearchCovers = false
+        mNext = q.name.substringAfterLast('@', "").takeIf { it.isNotEmpty() }
     }
 
-    fun toQuickSearch(): QuickSearch {
-        val q = QuickSearch()
-        q.mode = mode
-        q.category = this.category
-        q.keyword = mKeyword
-        q.advanceSearch = advanceSearch
-        q.minRating = minRating
-        q.pageFrom = pageFrom
-        q.pageTo = pageTo
-        return q
+    fun toQuickSearch(name: String): QuickSearch {
+        return QuickSearch(
+            name = name,
+            mode = mode,
+            category = category,
+            keyword = mKeyword,
+            advanceSearch = advanceSearch,
+            minRating = minRating,
+            pageFrom = pageFrom,
+            pageTo = pageTo,
+        )
     }
 
     fun equalsQuickSearch(q: QuickSearch?): Boolean {

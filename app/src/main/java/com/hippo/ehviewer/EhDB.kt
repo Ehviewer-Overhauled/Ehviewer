@@ -172,7 +172,6 @@ object EhDB {
 
     suspend fun insertQuickSearch(quickSearch: QuickSearch) {
         val dao = db.quickSearchDao()
-        quickSearch.id = null
         quickSearch.time = System.currentTimeMillis()
         quickSearch.id = dao.insert(quickSearch)
     }
