@@ -4,22 +4,15 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 
 @Entity(tableName = "HISTORY")
 class HistoryInfo() : BaseGalleryInfo() {
     @ColumnInfo(name = "TIME")
     var time: Long = 0
 
-    // Trick: Use MODE for favoriteSlot
-    @ColumnInfo(name = "MODE")
-    var favoriteSlotBackingField: Int = 0
-
-    override var favoriteSlot: Int
-        get() = favoriteSlotBackingField - 2
-        set(value) {
-            favoriteSlotBackingField = value + 2
-        }
-    // Trick end
+    @ColumnInfo(name = "FAVORITE_SLOT")
+    override var favoriteSlot: Int = NOT_FAVORITED
 
     constructor(galleryInfo: GalleryInfo) : this() {
         gid = galleryInfo.gid
