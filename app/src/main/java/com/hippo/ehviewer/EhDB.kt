@@ -33,6 +33,7 @@ import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.util.sendTo
+import kotlinx.coroutines.flow.Flow
 import splitties.arch.room.roomDb
 
 object EhDB {
@@ -213,6 +214,9 @@ object EhDB {
 
     val localFavLazyList: PagingSource<Int, LocalFavoriteInfo>
         get() = db.localFavoritesDao().listLazy()
+
+    val localFavCount: Flow<Int>
+        get() = db.localFavoritesDao().count()
 
     fun searchLocalFav(keyword: String) = db.localFavoritesDao().listLazy("%$keyword%")
 

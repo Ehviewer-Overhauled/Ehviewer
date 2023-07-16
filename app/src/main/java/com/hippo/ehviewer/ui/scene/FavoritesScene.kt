@@ -29,7 +29,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
@@ -143,6 +145,7 @@ class VMStorage : ViewModel() {
         }
     }.flow.cachedIn(viewModelScope)
     fun dataflow() = if (urlBuilder.favCat == -2) localFavDataFlow else cloudDataFlow
+    val localFavCount = EhDB.localFavCount
 }
 
 class FavoritesScene : SearchBarScene() {
@@ -413,6 +416,7 @@ class FavoritesScene : SearchBarScene() {
         savedInstanceState: Bundle?,
     ) = ComposeView(inflater.context).apply {
         setMD3Content {
+            val localFavCount by vm.localFavCount.collectAsState(0)
             ElevatedCard {
                 TopAppBar(title = { Text(text = stringResource(id = R.string.collections)) })
                 val scope = currentRecomposeScope
@@ -422,7 +426,7 @@ class FavoritesScene : SearchBarScene() {
                     }
                 }
                 val faves = arrayOf(
-                    stringResource(id = R.string.local_favorites) to Settings.favLocalCount,
+                    stringResource(id = R.string.local_favorites) to localFavCount,
                     stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
                     *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
                 )
