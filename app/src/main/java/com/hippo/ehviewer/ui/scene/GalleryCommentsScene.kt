@@ -73,7 +73,6 @@ import com.hippo.ehviewer.databinding.ItemGalleryCommentProgressBinding
 import com.hippo.ehviewer.databinding.SceneGalleryCommentsBinding
 import com.hippo.ehviewer.ui.jumpToReaderByPage
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
@@ -373,7 +372,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         val builder = BaseDialogBuilder(context)
         val builderContext = builder.context
         val inflater = LayoutInflater.from(builderContext)
-        val rv = inflater.inflate(R.layout.dialog_recycler_view, null) as EasyRecyclerView
+        val rv = inflater.inflate(R.layout.dialog_recycler_view, null) as RecyclerView
         rv.adapter = object : RecyclerView.Adapter<VoteHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VoteHolder {
                 return VoteHolder(ItemDrawerFavoritesBinding.inflate(inflater, parent, false))
@@ -444,7 +443,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             }.show()
     }
 
-    fun onItemClick(parent: EasyRecyclerView?, view2: View?, position: Int): Boolean {
+    fun onItemClick(parent: RecyclerView?, view2: View?, position: Int): Boolean {
         val activity = mainActivity ?: return false
         val holder = parent!!.getChildViewHolder(view2!!)
         if (holder is ActualCommentHolder) {
