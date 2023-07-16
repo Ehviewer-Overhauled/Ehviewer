@@ -15,7 +15,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : RecyclerView(context, attrs, defStyle) {
     private var customChoiceListener: CustomChoiceListener? = null
-    private var mOutOfCustomChoiceModing = false
+    private var outOfCustomChoiceModifying = false
     var isInCustomChoice = false
         private set
     val checkedItemCount
@@ -46,12 +46,12 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
     }
 
     fun outOfCustomChoiceMode() {
-        if (isInCustomChoice && !mOutOfCustomChoiceModing) {
-            mOutOfCustomChoiceModing = true
+        if (isInCustomChoice && !outOfCustomChoiceModifying) {
+            outOfCustomChoiceModifying = true
             clearChoices()
             isInCustomChoice = false
             customChoiceListener?.onOutOfCustomChoice(this)
-            mOutOfCustomChoiceModing = false
+            outOfCustomChoiceModifying = false
         }
     }
 
@@ -82,11 +82,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
         customChoiceListener = listener
     }
 
-    private fun updateOnScreenCheckedViews() {
-        forEach {
-            checkChild(it)
-        }
-    }
+    private fun updateOnScreenCheckedViews() = forEach { checkChild(it) }
 
     override fun onSaveInstanceState() = SavedState(
         isInCustomChoice,
@@ -117,7 +113,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
 
 private fun setViewChecked(view: View, checked: Boolean) {
     if (view is Checkable) {
-        (view as Checkable).isChecked = checked
+        view.isChecked = checked
     } else {
         view.isActivated = checked
     }
