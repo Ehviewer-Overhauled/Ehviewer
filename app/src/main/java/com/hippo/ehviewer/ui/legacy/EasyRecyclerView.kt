@@ -20,38 +20,24 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.SparseBooleanArray
-import android.view.ActionMode
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Checkable
 import androidx.collection.LongSparseArray
 import androidx.core.os.ParcelCompat.readParcelable
 import androidx.recyclerview.widget.RecyclerView
 
-/**
- * Add setChoiceMode for RecyclerView
- */
-// Get some code from twoway-view and AbsListView.
-open class EasyRecyclerView : RecyclerView {
+class EasyRecyclerView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0,
+) : RecyclerView(context, attrs, defStyle) {
     // Fling friction
-    var pageScrollThreshold = 0f
-
-    /**
-     * Wrapper for the multiple choice mode callback; AbsListView needs to perform
-     * a few extra actions around what application code does.
-     */
-    var mMultiChoiceModeCallback: MultiChoiceModeWrapper? = null
+    private var pageScrollThreshold = 0f
 
     /**
      * Controls if/how the user may choose/check items in the list
      */
     private var mChoiceMode = CHOICE_MODE_NONE
-
-    /**
-     * Controls CHOICE_MODE_MULTIPLE_MODAL. null when inactive.
-     */
-    private var mChoiceActionMode: ActionMode? = null
 
     /**
      * Listener for custom multiple choices
@@ -84,22 +70,6 @@ open class EasyRecyclerView : RecyclerView {
      */
     private var mCheckedIdStates: LongSparseArray<Int>? = null
     private var mAdapter: Adapter<*>? = null
-
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle,
-    ) {
-        init(context)
-    }
 
     /**
      * {@inheritDoc}
@@ -212,22 +182,13 @@ open class EasyRecyclerView : RecyclerView {
      * Sets all items checked.
      */
     fun checkAll() {
-        if (mChoiceMode == CHOICE_MODE_NONE || mChoiceMode == CHOICE_MODE_SINGLE) {
+        if (mChoiceMode == CHOICE_MODE_NONE) {
             return
         }
 
         // Check is intoCheckMode
         check(!(mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM && !isInCustomChoice)) { "Call intoCheckMode first" }
 
-        // Start selection mode if needed. We don't need to if we're unchecking something.
-        if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mChoiceActionMode == null) {
-            check(mMultiChoiceModeCallback != null && mMultiChoiceModeCallback!!.hasWrappedCallback()) {
-                "EasyRecyclerView: attempted to start selection mode " +
-                    "for CHOICE_MODE_MULTIPLE_MODAL but no choice mode callback was " +
-                    "supplied. Call setMultiChoiceModeListener to set a callback."
-            }
-            mChoiceActionMode = startActionMode(mMultiChoiceModeCallback)
-        }
         for (i in 0 until mAdapter!!.itemCount) {
             val oldValue = mCheckStates!![i]
             mCheckStates!!.put(i, true)
@@ -236,15 +197,6 @@ open class EasyRecyclerView : RecyclerView {
             }
             if (!oldValue) {
                 checkedItemCount++
-            }
-            if (mChoiceActionMode != null) {
-                val id = mAdapter!!.getItemId(i)
-                mMultiChoiceModeCallback!!.onItemCheckedStateChanged(
-                    mChoiceActionMode!!,
-                    i,
-                    id,
-                    true,
-                )
             }
             if (mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM) {
                 val id = mAdapter!!.getItemId(i)
@@ -275,17 +227,7 @@ open class EasyRecyclerView : RecyclerView {
 
         // Check is intoCheckMode
         check(!(mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM && !isInCustomChoice)) { "Call intoCheckMode first" }
-
-        // Start selection mode if needed. We don't need to if we're unchecking something.
-        if (value && mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mChoiceActionMode == null) {
-            check(mMultiChoiceModeCallback != null && mMultiChoiceModeCallback!!.hasWrappedCallback()) {
-                "EasyRecyclerView: attempted to start selection mode " +
-                    "for CHOICE_MODE_MULTIPLE_MODAL but no choice mode callback was " +
-                    "supplied. Call setMultiChoiceModeListener to set a callback."
-            }
-            mChoiceActionMode = startActionMode(mMultiChoiceModeCallback)
-        }
-        if (mChoiceMode == CHOICE_MODE_MULTIPLE || mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL || mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM) {
+        if (mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM) {
             val oldValue = mCheckStates!![position]
             mCheckStates!!.put(position, value)
             if (mCheckedIdStates != null && mAdapter!!.hasStableIds()) {
@@ -301,11 +243,6 @@ open class EasyRecyclerView : RecyclerView {
                 } else {
                     checkedItemCount--
                 }
-            }
-            if (mChoiceActionMode != null) {
-                val id = mAdapter!!.getItemId(position)
-                mMultiChoiceModeCallback!!
-                    .onItemCheckedStateChanged(mChoiceActionMode!!, position, id, value)
             }
             if (mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM) {
                 val id = mAdapter!!.getItemId(position)
@@ -347,10 +284,6 @@ open class EasyRecyclerView : RecyclerView {
      */
     fun setChoiceMode(choiceMode: Int) {
         mChoiceMode = choiceMode
-        if (mChoiceActionMode != null) {
-            mChoiceActionMode!!.finish()
-            mChoiceActionMode = null
-        }
         if (mChoiceMode != CHOICE_MODE_NONE) {
             if (mCheckStates == null) {
                 mCheckStates = SparseBooleanArray(0)
@@ -358,11 +291,7 @@ open class EasyRecyclerView : RecyclerView {
             if (mCheckedIdStates == null && mAdapter != null && mAdapter!!.hasStableIds()) {
                 mCheckedIdStates = LongSparseArray(0)
             }
-            // Modal multi-choice mode only has choices when the mode is active. Clear them.
-            if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL) {
-                clearChoices()
-                isLongClickable = true
-            } else if (mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM) {
+            if (mChoiceMode == CHOICE_MODE_MULTIPLE_CUSTOM) {
                 if (mTempCheckStates == null) {
                     mTempCheckStates = SparseBooleanArray(0)
                 }
@@ -389,7 +318,7 @@ open class EasyRecyclerView : RecyclerView {
         }
     }
 
-    private fun init(context: Context) {
+    init {
         val scale = context.resources.displayMetrics.density
         // g (m/s^2)
         // inch/meter
@@ -398,7 +327,7 @@ open class EasyRecyclerView : RecyclerView {
         pageScrollThreshold = scale * 80
     }
 
-    public override fun onSaveInstanceState(): Parcelable? {
+    override fun onSaveInstanceState(): Parcelable {
         val ss = SavedState(super.onSaveInstanceState())
         ss.choiceMode = mChoiceMode
         ss.customChoice = isInCustomChoice
@@ -408,7 +337,7 @@ open class EasyRecyclerView : RecyclerView {
         return ss
     }
 
-    public override fun onRestoreInstanceState(state: Parcelable) {
+    override fun onRestoreInstanceState(state: Parcelable) {
         val ss = state as SavedState
         super.onRestoreInstanceState(ss.superState)
         setChoiceMode(ss.choiceMode)
@@ -420,34 +349,7 @@ open class EasyRecyclerView : RecyclerView {
         if (ss.checkIdState != null) {
             mCheckedIdStates = ss.checkIdState
         }
-        if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && checkedItemCount > 0) {
-            mChoiceActionMode = startActionMode(mMultiChoiceModeCallback)
-        }
         updateOnScreenCheckedViews()
-    }
-
-    /**
-     * A MultiChoiceModeListener receives events for [android.widget.AbsListView.CHOICE_MODE_MULTIPLE_MODAL].
-     * It acts as the [android.view.ActionMode.Callback] for the selection mode and also receives
-     * [.onItemCheckedStateChanged] events when the user
-     * selects and deselects list items.
-     */
-    interface MultiChoiceModeListener : ActionMode.Callback {
-        /**
-         * Called when an item is checked or unchecked during selection mode.
-         *
-         * @param mode     The [android.view.ActionMode] providing the selection mode
-         * @param position Adapter position of the item that was checked or unchecked
-         * @param id       Adapter ID of the item that was checked or unchecked
-         * @param checked  `true` if the item is now checked, `false`
-         * if the item is now unchecked.
-         */
-        fun onItemCheckedStateChanged(
-            mode: ActionMode,
-            position: Int,
-            id: Long,
-            checked: Boolean,
-        )
     }
 
     /**
@@ -554,79 +456,9 @@ open class EasyRecyclerView : RecyclerView {
         }
     }
 
-    inner class MultiChoiceModeWrapper : MultiChoiceModeListener {
-        private val mWrapped: MultiChoiceModeListener? = null
-        fun hasWrappedCallback(): Boolean {
-            return mWrapped != null
-        }
-
-        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-            if (mWrapped!!.onCreateActionMode(mode, menu)) {
-                // Initialize checked graphic state?
-                isLongClickable = false
-                return true
-            }
-            return false
-        }
-
-        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            return mWrapped!!.onPrepareActionMode(mode, menu)
-        }
-
-        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            return mWrapped!!.onActionItemClicked(mode, item)
-        }
-
-        override fun onDestroyActionMode(mode: ActionMode) {
-            mWrapped!!.onDestroyActionMode(mode)
-            mChoiceActionMode = null
-
-            // Ending selection mode means deselecting everything.
-            clearChoices()
-            requestLayout()
-            isLongClickable = true
-        }
-
-        override fun onItemCheckedStateChanged(
-            mode: ActionMode,
-            position: Int,
-            id: Long,
-            checked: Boolean,
-        ) {
-            mWrapped!!.onItemCheckedStateChanged(mode, position, id, checked)
-
-            // If there are no items selected we no longer need the selection mode.
-            if (checkedItemCount == 0) {
-                mode.finish()
-            }
-        }
-    }
-
     companion object {
-        /**
-         * Normal list that does not indicate choices
-         */
         const val CHOICE_MODE_NONE = 0
-
-        /**
-         * The list allows up to one choice
-         */
-        const val CHOICE_MODE_SINGLE = 1
-
-        /**
-         * The list allows multiple choices
-         */
-        const val CHOICE_MODE_MULTIPLE = 2
-
-        /**
-         * The list allows multiple choices in a modal selection mode
-         */
-        const val CHOICE_MODE_MULTIPLE_MODAL = 3
-
-        /**
-         * The list allows multiple choices in custom action
-         */
-        const val CHOICE_MODE_MULTIPLE_CUSTOM = 4
+        const val CHOICE_MODE_MULTIPLE_CUSTOM = 1
         fun setViewChecked(view: View, checked: Boolean) {
             if (view is Checkable) {
                 (view as Checkable).isChecked = checked
