@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.hippo.ehviewer.ui.legacy.EasyRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Indicating"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

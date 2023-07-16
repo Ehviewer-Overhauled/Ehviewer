@@ -83,7 +83,6 @@ import com.hippo.ehviewer.ui.doGalleryInfoAction
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.BringOutTransition
-import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
@@ -521,7 +520,7 @@ class GalleryListScene : SearchBarScene() {
 
     private fun showAddQuickSearchDialog(
         adapter: QsDrawerAdapter,
-        recyclerView: EasyRecyclerView,
+        recyclerView: RecyclerView,
         tip: TextView,
     ) {
         val context = context ?: return
