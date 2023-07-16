@@ -334,7 +334,6 @@ object EhEngine {
             formBody {
                 add("ddact", catStr)
                 gidArray.forEach { add("modifygids[]", it.toString()) }
-                add("apply", "Apply")
             }
         }.executeAndParsingWith(FavoritesParser::parse).apply { fillGalleryList(galleryInfoList, url, false) }
     }
@@ -481,7 +480,7 @@ object EhEngine {
         if (filter) list.removeAll { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
     }
 
-    suspend fun addFavoritesRange(gidTokenArray: Array<Pair<Long, String>>, dstCat: Int) {
-        gidTokenArray.forEach { (gid, token) -> addFavorites(gid, token, dstCat) }
+    suspend fun addFavoritesRange(galleryList: List<Pair<Long, String>>, dstCat: Int) {
+        galleryList.forEach { (gid, token) -> addFavorites(gid, token, dstCat) }
     }
 }

@@ -495,8 +495,8 @@ class FavoritesScene : SearchBarScene() {
                     val gidArray = info.map { it.gid }.toLongArray()
                     EhDB.removeLocalFavorites(gidArray)
                 } else {
-                    val delArray = info.map { it.gid to it.token!! }.toTypedArray()
-                    EhEngine.addFavoritesRange(delArray, -1)
+                    val delList = info.map { it.gid to it.token!! }
+                    EhEngine.addFavoritesRange(delList, -1)
                 }
                 mAdapter?.refresh()
             }
@@ -514,15 +514,20 @@ class FavoritesScene : SearchBarScene() {
                     // Move from local to cloud
                     val gidArray = info.map { it.gid }.toLongArray()
                     EhDB.removeLocalFavorites(gidArray)
-                }
-                if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
+                    val galleryList = info.map { it.gid to it.token!! }
+                    runCatching {
+                        EhEngine.addFavoritesRange(galleryList, dstCat)
+                    }
+                } else if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                     // Move from cloud to local
                     EhDB.putLocalFavorites(info)
                 } else {
-                    // Move from cloud/local to cloud
+                    // Move from cloud to cloud
                     val gidArray = info.map { it.gid }.toLongArray()
                     val url = ehUrl { addPathSegments(EhUrl.FAV_PATH) }.toString()
-                    EhEngine.modifyFavorites(url, gidArray, dstCat)
+                    runCatching {
+                        EhEngine.modifyFavorites(url, gidArray, dstCat)
+                    }
                 }
                 mAdapter?.refresh()
             }
