@@ -23,7 +23,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.hippo.ehviewer.ui.legacy.EasyRecyclerView
+        <com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

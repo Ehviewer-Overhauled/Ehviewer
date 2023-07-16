@@ -79,8 +79,6 @@ import com.hippo.ehviewer.spider.putToDownloadDir
 import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
-import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
-import com.hippo.ehviewer.ui.legacy.EasyRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
@@ -88,6 +86,8 @@ import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
+import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView
+import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.main.requestOf
 import com.hippo.ehviewer.ui.navToReader
@@ -277,7 +277,7 @@ class DownloadsScene :
             recyclerView.layoutManager = layoutManager
             recyclerView.clipToPadding = false
             recyclerView.clipChildren = false
-            recyclerView.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
+            recyclerView.gidGetter = { mList?.get(it)?.gid }
             recyclerView.setCustomCheckedListener(DownloadChoiceListener())
             // Cancel change animation
             val itemAnimator = recyclerView.itemAnimator
@@ -566,16 +566,12 @@ class DownloadsScene :
             if (collectDownloadInfo) {
                 downloadInfoList = LinkedList()
             }
-            val stateArray = binding.recyclerView.checkedItemPositions!!
-            for (i in 0 until stateArray.size()) {
-                if (stateArray.valueAt(i)) {
-                    val info = list[stateArray.keyAt(i)]
-                    if (collectDownloadInfo) {
-                        downloadInfoList!!.add(info)
-                    }
-                    if (collectGid) {
-                        gidList!!.add(info.gid)
-                    }
+            binding.recyclerView.checkedItemGid.mapNotNull { gid -> list.find { it.gid == gid } }.forEach {
+                if (collectDownloadInfo) {
+                    downloadInfoList!!.add(it)
+                }
+                if (collectGid) {
+                    gidList!!.add(it.gid)
                 }
             }
             when (position) {
@@ -1050,26 +1046,21 @@ class DownloadsScene :
     }
 
     private inner class DownloadChoiceListener : CustomChoiceListener {
-        override fun onIntoCustomChoice(view: EasyRecyclerView) {
+        override fun onIntoCustomChoice(view: SelectableGalleryInfoRecyclerView) {
             binding.fabLayout.isExpanded = true
             // Lock drawer
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
         }
 
-        override fun onOutOfCustomChoice(view: EasyRecyclerView) {
+        override fun onOutOfCustomChoice(view: SelectableGalleryInfoRecyclerView) {
             binding.fabLayout.isExpanded = false
             // Unlock drawer
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         }
 
-        override fun onItemCheckedStateChanged(
-            view: EasyRecyclerView,
-            position: Int,
-            id: Long,
-            checked: Boolean,
-        ) {
+        override fun onItemCheckedStateChanged(view: SelectableGalleryInfoRecyclerView) {
             if (view.checkedItemCount == 0) {
                 view.outOfCustomChoiceMode()
             }

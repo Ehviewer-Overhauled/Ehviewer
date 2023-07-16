@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.util.valueIterator
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
@@ -72,12 +71,12 @@ import com.hippo.ehviewer.databinding.SceneFavoritesBinding
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
-import com.hippo.ehviewer.ui.legacy.EasyRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
+import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView
+import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
@@ -354,11 +353,11 @@ class FavoritesScene : SearchBarScene() {
                         }
                     }
                 }
+                gidGetter = { adapter.peek(it)?.gid }
             }
             switchFav(Settings.recentFavCat)
-            setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
             setCustomCheckedListener(object : CustomChoiceListener {
-                override fun onIntoCustomChoice(view: EasyRecyclerView) {
+                override fun onIntoCustomChoice(view: SelectableGalleryInfoRecyclerView) {
                     showSelectionFab()
                     binding.fabLayout.setAutoCancel(false)
                     // Delay expanding action to make layout work fine
@@ -369,7 +368,7 @@ class FavoritesScene : SearchBarScene() {
                     setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                 }
 
-                override fun onOutOfCustomChoice(view: EasyRecyclerView) {
+                override fun onOutOfCustomChoice(view: SelectableGalleryInfoRecyclerView) {
                     showNormalFab()
                     binding.fabLayout.setAutoCancel(true)
                     binding.fabLayout.isExpanded = false
@@ -379,7 +378,7 @@ class FavoritesScene : SearchBarScene() {
                     setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                 }
 
-                override fun onItemCheckedStateChanged(view: EasyRecyclerView, position: Int, id: Long, checked: Boolean) {
+                override fun onItemCheckedStateChanged(view: SelectableGalleryInfoRecyclerView) {
                     if (view.checkedItemCount == 0) {
                         view.outOfCustomChoiceMode()
                     }
@@ -470,9 +469,8 @@ class FavoritesScene : SearchBarScene() {
     }
 
     private fun takeCheckedInfo() = run {
-        val stateArray = binding.recyclerView.checkedItemPositions!!
-        stateArray.valueIterator().asSequence().withIndex().filter { it.value }
-            .mapNotNull { mAdapter?.peek(stateArray.keyAt(it.index)) }.toList()
+        val snapshot = mAdapter?.snapshot()?.items
+        binding.recyclerView.checkedItemGid.mapNotNull { gid -> snapshot?.find { it.gid == gid } }
     }.also { binding.recyclerView.outOfCustomChoiceMode() }
 
     private fun checkedSize() = binding.recyclerView.checkedItemCount
