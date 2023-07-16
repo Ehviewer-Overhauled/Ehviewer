@@ -21,6 +21,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
     val checkedItemCount
         get() = checkedGid.size
     lateinit var gidGetter: (Int) -> Long?
+    lateinit var allGid: () -> List<Long>
     private var checkedGid = mutableSetOf<Long>()
 
     private fun checkChild(child: View) {
@@ -61,8 +62,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
 
     fun checkAll() {
         check(isInCustomChoice) { "Call intoCheckMode first" }
-        // Foreach checked
-        // Notify customChoiceListener!!.onItemCheckedStateChanged(this)
+        checkedGid.addAll(allGid())
         updateOnScreenCheckedViews()
     }
 
@@ -74,7 +74,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
         } else {
             checkedGid.add(gid)
         }
-        customChoiceListener?.onItemCheckedStateChanged(this)
+        if (checkedGid.isEmpty()) outOfCustomChoiceMode()
         updateOnScreenCheckedViews()
     }
 
@@ -105,7 +105,6 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
     interface CustomChoiceListener {
         fun onIntoCustomChoice(view: SelectableGalleryInfoRecyclerView)
         fun onOutOfCustomChoice(view: SelectableGalleryInfoRecyclerView)
-        fun onItemCheckedStateChanged(view: SelectableGalleryInfoRecyclerView)
     }
 
     @Parcelize

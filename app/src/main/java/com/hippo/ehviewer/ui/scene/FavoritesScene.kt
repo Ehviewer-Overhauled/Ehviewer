@@ -354,6 +354,7 @@ class FavoritesScene : SearchBarScene() {
                     }
                 }
                 gidGetter = { adapter.peek(it)?.gid }
+                allGid = { adapter.snapshot().items.map { it.gid } }
             }
             switchFav(Settings.recentFavCat)
             setCustomCheckedListener(object : CustomChoiceListener {
@@ -376,12 +377,6 @@ class FavoritesScene : SearchBarScene() {
                     // Unlock drawer
                     setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
                     setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-                }
-
-                override fun onItemCheckedStateChanged(view: SelectableGalleryInfoRecyclerView) {
-                    if (view.checkedItemCount == 0) {
-                        view.outOfCustomChoiceMode()
-                    }
                 }
             })
         }

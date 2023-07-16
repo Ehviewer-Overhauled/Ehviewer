@@ -278,6 +278,7 @@ class DownloadsScene :
             recyclerView.clipToPadding = false
             recyclerView.clipChildren = false
             recyclerView.gidGetter = { mList?.get(it)?.gid }
+            recyclerView.allGid = { mList?.map { it.gid }.orEmpty() }
             recyclerView.setCustomCheckedListener(DownloadChoiceListener())
             // Cancel change animation
             val itemAnimator = recyclerView.itemAnimator
@@ -1058,12 +1059,6 @@ class DownloadsScene :
             // Unlock drawer
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-        }
-
-        override fun onItemCheckedStateChanged(view: SelectableGalleryInfoRecyclerView) {
-            if (view.checkedItemCount == 0) {
-                view.outOfCustomChoiceMode()
-            }
         }
     }
 
