@@ -4,9 +4,13 @@ import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocalFavoritesDao {
+    @Query("SELECT COUNT(*) FROM LOCAL_FAVORITES")
+    fun count(): Flow<Int>
+
     @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
     suspend fun list(): List<LocalFavoriteInfo>
 
