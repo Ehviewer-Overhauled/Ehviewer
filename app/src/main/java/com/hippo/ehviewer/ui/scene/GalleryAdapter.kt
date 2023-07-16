@@ -44,8 +44,8 @@ private val diffCallback = object : DiffUtil.ItemCallback<GalleryInfo>() {
 class GalleryAdapter(
     private val recyclerView: RecyclerView,
     private val showFavorite: Boolean,
-    private val onItemClick: (GalleryInfo, Int) -> Unit,
-    private val onItemLongClick: (GalleryInfo, Int) -> Unit,
+    private val onItemClick: (GalleryInfo) -> Unit,
+    private val onItemLongClick: (GalleryInfo) -> Unit,
 ) : PagingDataAdapter<GalleryInfo, GalleryHolder>(diffCallback) {
     private val resources = recyclerView.context.resources
     private val layoutManager: AutoStaggeredGridLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
@@ -53,6 +53,7 @@ class GalleryAdapter(
     private var mListDecoration: ItemDecoration? = null
     private var mGirdDecoration: MarginItemDecoration? = null
     private var mType = TYPE_INVALID
+    var tracker: GallerySelectionTracker<GalleryInfo>? = null
 
     var type: Int
         get() = mType
@@ -161,10 +162,12 @@ class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
         val gi = getItem(position) ?: return
+        holder.galleryId = gi.gid
         holder.bind(
             gi,
-            { onItemClick(gi, position) },
-            { onItemLongClick(gi, position) },
+            tracker?.isSelected(gi.gid) ?: false,
+            { onItemClick(gi) },
+            { onItemLongClick(gi) },
         )
     }
 

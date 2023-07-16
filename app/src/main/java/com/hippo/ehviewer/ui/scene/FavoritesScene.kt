@@ -75,8 +75,6 @@ import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
-import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView
-import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.setMD3Content
@@ -153,6 +151,7 @@ class FavoritesScene : SearchBarScene() {
     private var _binding: SceneFavoritesBinding? = null
     private val binding get() = _binding!!
     private var mAdapter: GalleryAdapter? = null
+    private val tracker get() = mAdapter!!.tracker!!
     private val showNormalFabsRunnable = Runnable {
         updateJumpFab() // index: 0, 2
         binding.fabLayout.run {
@@ -164,7 +163,7 @@ class FavoritesScene : SearchBarScene() {
     private fun onItemClick(position: Int) {
         if (isDrawerOpen(GravityCompat.END)) {
             // Skip if in search mode
-            if (!binding.recyclerView.isInCustomChoice) {
+            if (!tracker.isInCustomChoice) {
                 switchFav(position - 2)
                 updateJumpFab()
                 closeDrawer(GravityCompat.END)
@@ -202,6 +201,11 @@ class FavoritesScene : SearchBarScene() {
         Settings.recentFavCat = urlBuilder.favCat
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mAdapter?.let { tracker.saveSelection(outState) }
+    }
+
     override fun onResume() {
         super.onResume()
         mAdapter?.type = Settings.listMode
@@ -214,14 +218,13 @@ class FavoritesScene : SearchBarScene() {
     ): View {
         _binding = SceneFavoritesBinding.inflate(inflater, container!!)
         setOnApplySearch {
-            if (!binding.recyclerView.isInCustomChoice) {
+            if (!tracker.isInCustomChoice) {
                 switchFav(urlBuilder.favCat, it)
             }
         }
         binding.fastScroller.attachToRecyclerView(binding.recyclerView)
         binding.fastScroller.setHandlerDrawable(HandlerDrawable().apply { setColor(inflater.context.theme.resolveColor(androidx.appcompat.R.attr.colorPrimary)) })
         binding.fabLayout.run {
-            addOnExpandListener { if (!it && binding.recyclerView.isInCustomChoice) binding.recyclerView.outOfCustomChoiceMode() }
             ViewCompat.setWindowInsetsAnimationCallback(binding.root, WindowInsetsAnimationHelper(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP, this))
             updateJumpFab()
             val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
@@ -232,15 +235,15 @@ class FavoritesScene : SearchBarScene() {
             setHidePrimaryFab(false)
             setOnClickFabListener(object : OnClickFabListener {
                 override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-                    if (binding.recyclerView.isInCustomChoice) {
-                        binding.recyclerView.outOfCustomChoiceMode()
+                    if (tracker.isInCustomChoice) {
+                        tracker.clearSelection()
                     } else {
                         binding.fabLayout.toggle()
                     }
                 }
 
                 override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
-                    if (!binding.recyclerView.isInCustomChoice) {
+                    if (!tracker.isInCustomChoice) {
                         when (position) {
                             0 -> showGoToDialog()
                             1 -> switchFav(urlBuilder.favCat)
@@ -254,7 +257,7 @@ class FavoritesScene : SearchBarScene() {
                     }
                     when (position) {
                         // Check all
-                        3 -> binding.recyclerView.checkAll()
+                        3 -> tracker.selectAll()
                         // Download
                         4 -> CommonOperations.startDownload(mainActivity!!, takeCheckedInfo(), false)
                         // Delete
@@ -283,6 +286,7 @@ class FavoritesScene : SearchBarScene() {
                     addDelete.setDelete(ANIMATE_TIME)
                 } else {
                     addDelete.setAdd(ANIMATE_TIME)
+                    if (tracker.isInCustomChoice) tracker.clearSelection()
                 }
             }
             addAboveSnackView(this)
@@ -293,7 +297,7 @@ class FavoritesScene : SearchBarScene() {
             }
 
             override fun onEndDragHandler() {
-                if (!binding.recyclerView.isInCustomChoice) {
+                if (!tracker.isInCustomChoice) {
                     setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                 }
                 showSearchBar()
@@ -303,25 +307,16 @@ class FavoritesScene : SearchBarScene() {
             mAdapter = GalleryAdapter(
                 this@run,
                 false,
-                { info, pos ->
-                    if (binding.recyclerView.isInCustomChoice) {
-                        binding.recyclerView.toggleItemChecked(pos)
-                    } else {
-                        navAnimated(
-                            R.id.galleryDetailScene,
-                            bundleOf(
-                                GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
-                                GalleryDetailScene.KEY_GALLERY_INFO to info,
-                            ),
-                        )
-                    }
+                { info ->
+                    navAnimated(
+                        R.id.galleryDetailScene,
+                        bundleOf(
+                            GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                            GalleryDetailScene.KEY_GALLERY_INFO to info,
+                        ),
+                    )
                 },
-                { _, pos ->
-                    if (!binding.recyclerView.isInCustomChoice) {
-                        binding.recyclerView.intoCustomChoiceMode()
-                    }
-                    binding.recyclerView.toggleItemChecked(pos)
-                },
+                {},
             ).also { adapter ->
                 val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
@@ -353,32 +348,34 @@ class FavoritesScene : SearchBarScene() {
                         }
                     }
                 }
-                gidGetter = { adapter.peek(it)?.gid }
-                allGid = { adapter.snapshot().items.map { it.gid } }
+                adapter.tracker = GallerySelectionTracker(
+                    "favorite-selection",
+                    this,
+                    { adapter.snapshot().items },
+                    { (this as GalleryHolder).galleryId },
+                ).apply {
+                    addCustomChoiceListener({
+                        showSelectionFab()
+                        binding.fabLayout.setAutoCancel(false)
+                        // Delay expanding action to make layout work fine
+                        SimpleHandler.post { binding.fabLayout.isExpanded = true }
+                        binding.refreshLayout.isEnabled = false
+                        // Lock drawer
+                        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+                        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                    }) {
+                        showNormalFab()
+                        binding.fabLayout.setAutoCancel(true)
+                        binding.fabLayout.isExpanded = false
+                        binding.refreshLayout.isEnabled = true
+                        // Unlock drawer
+                        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+                        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                    }
+                    restoreSelection(savedInstanceState)
+                }
             }
             switchFav(Settings.recentFavCat)
-            setCustomCheckedListener(object : CustomChoiceListener {
-                override fun onIntoCustomChoice(view: SelectableGalleryInfoRecyclerView) {
-                    showSelectionFab()
-                    binding.fabLayout.setAutoCancel(false)
-                    // Delay expanding action to make layout work fine
-                    SimpleHandler.post { binding.fabLayout.isExpanded = true }
-                    binding.refreshLayout.isEnabled = false
-                    // Lock drawer
-                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-                }
-
-                override fun onOutOfCustomChoice(view: SelectableGalleryInfoRecyclerView) {
-                    showNormalFab()
-                    binding.fabLayout.setAutoCancel(true)
-                    binding.fabLayout.isExpanded = false
-                    binding.refreshLayout.isEnabled = true
-                    // Unlock drawer
-                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-                }
-            })
         }
         setAllowEmptySearch(false)
         return binding.root
@@ -463,12 +460,9 @@ class FavoritesScene : SearchBarScene() {
         }
     }
 
-    private fun takeCheckedInfo() = run {
-        val snapshot = mAdapter?.snapshot()?.items
-        binding.recyclerView.checkedItemGid.mapNotNull { gid -> snapshot?.find { it.gid == gid } }
-    }.also { binding.recyclerView.outOfCustomChoiceMode() }
+    private fun takeCheckedInfo() = tracker.getAndClearSelection()
 
-    private fun checkedSize() = binding.recyclerView.checkedItemCount
+    private fun checkedSize() = tracker.selectionSize
 
     private fun showNormalFab() {
         // Delay showing normal fab to avoid mutation
