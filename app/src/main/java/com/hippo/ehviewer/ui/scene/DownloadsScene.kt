@@ -82,12 +82,9 @@ import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
-import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
 import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
-import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView
-import com.hippo.ehviewer.ui.legacy.SelectableGalleryInfoRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.main.requestOf
 import com.hippo.ehviewer.ui.navToReader
@@ -105,7 +102,6 @@ import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import rikka.core.res.resolveColor
-import java.util.LinkedList
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 @SuppressLint("RtlHardcoded")
@@ -127,6 +123,7 @@ class DownloadsScene :
     private val binding get() = _binding!!
     private var mViewTransition: ViewTransition? = null
     private var mAdapter: DownloadAdapter? = null
+    private val tracker get() = mAdapter!!.tracker!!
     private var mInitPosition = -1
     private var mLabelAdapter: DownloadLabelAdapter? = null
     private lateinit var mLabels: MutableList<String>
@@ -140,7 +137,7 @@ class DownloadsScene :
         mLabels.add(getString(R.string.download_all))
         mLabels.add(getString(R.string.default_download_label_name))
         listLabel.forEach {
-            mLabels.add(it.label!!)
+            mLabels.add(it.label)
         }
     }
 
@@ -192,23 +189,11 @@ class DownloadsScene :
 
     @SuppressLint("NotifyDataSetChanged")
     private fun updateForLabel() {
-        var list: List<DownloadInfo>?
-        when (mLabel) {
-            null -> {
-                list = DownloadManager.allInfoList
-            }
-
-            getString(R.string.default_download_label_name) -> {
-                list = DownloadManager.defaultInfoList
-            }
-
-            else -> {
-                list = DownloadManager.getLabelDownloadInfoList(mLabel)
-                if (list == null) {
-                    mLabel = null
-                    list = DownloadManager.allInfoList
-                }
-            }
+        val list = when (mLabel) {
+            null -> DownloadManager.allInfoList
+            getString(R.string.default_download_label_name) -> DownloadManager.defaultInfoList
+            else -> DownloadManager.getLabelDownloadInfoList(mLabel)
+                ?: DownloadManager.allInfoList.also { mLabel = null }
         }
         mList = if (mType != -1) {
             list.filter { it.state == mType }
@@ -245,6 +230,7 @@ class DownloadsScene :
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_LABEL, mLabel)
+        mAdapter?.let { tracker.saveSelection(outState) }
     }
 
     override fun onCreateViewWithToolbar(
@@ -262,6 +248,25 @@ class DownloadsScene :
             mAdapter = DownloadAdapter()
             mAdapter!!.setHasStableIds(true)
             recyclerView.adapter = mAdapter
+            mAdapter!!.tracker = GallerySelectionTracker(
+                "download-selection",
+                recyclerView,
+                { mList!! },
+                { (this as DownloadHolder).itemId },
+            ).apply {
+                addCustomChoiceListener({
+                    binding.fabLayout.isExpanded = true
+                    // Lock drawer
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                }) {
+                    binding.fabLayout.isExpanded = false
+                    // Unlock drawer
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                }
+                restoreSelection(savedInstanceState)
+            }
             val layoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
             layoutManager.setColumnSize(
                 resources.getDimensionPixelOffset(
@@ -277,9 +282,6 @@ class DownloadsScene :
             recyclerView.layoutManager = layoutManager
             recyclerView.clipToPadding = false
             recyclerView.clipChildren = false
-            recyclerView.gidGetter = { mList?.get(it)?.gid }
-            recyclerView.allGid = { mList?.map { it.gid }.orEmpty() }
-            recyclerView.setCustomCheckedListener(DownloadChoiceListener())
             // Cancel change animation
             val itemAnimator = recyclerView.itemAnimator
             if (itemAnimator is SimpleItemAnimator) {
@@ -330,8 +332,8 @@ class DownloadsScene :
             handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
             fastScroller.setHandlerDrawable(handlerDrawable)
             fastScroller.setOnDragHandlerListener(this@DownloadsScene)
-            fabLayout.addOnExpandListener(FabLayoutListener())
             fabLayout.setExpanded(expanded = false, animation = false)
+            fabLayout.addOnExpandListener { if (!it && tracker.isInCustomChoice) tracker.clearSelection() }
             fabLayout.setHidePrimaryFab(true)
             fabLayout.setAutoCancel(false)
             fabLayout.setOnClickFabListener(this@DownloadsScene)
@@ -368,7 +370,7 @@ class DownloadsScene :
     override fun onMenuItemClick(item: MenuItem): Boolean {
         // Skip when in choice mode
         val activity: Activity? = mainActivity
-        if (null == activity || binding.recyclerView.isInCustomChoice) {
+        if (null == activity || tracker.isInCustomChoice) {
             return false
         }
         when (item.itemId) {
@@ -471,7 +473,7 @@ class DownloadsScene :
                 NewLabelDialogHelper(builder, dialog)
                 return@setOnMenuItemClickListener true
             } else if (id == R.id.action_default_download_label) {
-                val list = DownloadManager.labelList.mapNotNull { it.label }.toTypedArray()
+                val list = DownloadManager.labelList.map { it.label }.toTypedArray()
                 val items = arrayOf(
                     getString(R.string.let_me_select),
                     getString(R.string.default_download_label_name),
@@ -513,37 +515,24 @@ class DownloadsScene :
 
     override fun onEndDragHandler() {
         // Restore right drawer
-        if (!binding.recyclerView.isInCustomChoice) {
+        if (!tracker.isInCustomChoice) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         }
     }
 
     fun onItemClick(position: Int): Boolean {
         val context = context ?: return false
-        return if (binding.recyclerView.isInCustomChoice) {
-            binding.recyclerView.toggleItemChecked(position)
-            true
-        } else {
-            val list = mList ?: return false
-            if (position < 0 || position >= list.size) {
-                return false
-            }
-            context.navToReader(list[position])
-            true
+        val list = mList ?: return false
+        if (position < 0 || position >= list.size) {
+            return false
         }
-    }
-
-    fun onItemLongClick(position: Int): Boolean {
-        if (!binding.recyclerView.isInCustomChoice) {
-            binding.recyclerView.intoCustomChoiceMode()
-        }
-        binding.recyclerView.toggleItemChecked(position)
+        context.navToReader(list[position])
         return true
     }
 
     override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-        if (binding.recyclerView.isInCustomChoice) {
-            binding.recyclerView.outOfCustomChoiceMode()
+        if (tracker.isInCustomChoice) {
+            tracker.clearSelection()
         }
     }
 
@@ -554,26 +543,13 @@ class DownloadsScene :
             return
         }
         if (0 == position) {
-            binding.recyclerView.checkAll()
+            tracker.selectAll()
         } else {
-            val list = mList ?: return
-            var gidList: LongList? = null
-            var downloadInfoList: MutableList<DownloadInfo>? = null
-            val collectGid = position == 1 || position == 2 || position == 3 // Start, Stop, Delete
-            val collectDownloadInfo = position == 3 || position == 4 // Delete or Move
-            if (collectGid) {
-                gidList = LongList()
-            }
-            if (collectDownloadInfo) {
-                downloadInfoList = LinkedList()
-            }
-            binding.recyclerView.checkedItemGid.mapNotNull { gid -> list.find { it.gid == gid } }.forEach {
-                if (collectDownloadInfo) {
-                    downloadInfoList!!.add(it)
-                }
-                if (collectGid) {
-                    gidList!!.add(it.gid)
-                }
+            val downloadInfoList = tracker.getAndClearSelection()
+            val gidList = if (position in 1..3) {
+                LongList(downloadInfoList.map(DownloadInfo::gid).toMutableList())
+            } else {
+                null
             }
             when (position) {
                 1 -> {
@@ -582,17 +558,11 @@ class DownloadsScene :
                     intent.action = DownloadService.ACTION_START_RANGE
                     intent.putExtra(DownloadService.KEY_GID_LIST, gidList)
                     ContextCompat.startForegroundService(activity, intent)
-                    // Cancel check mode
-                    binding.recyclerView.outOfCustomChoiceMode()
                 }
 
                 2 -> {
+                    // Stop
                     lifecycleScope.launchIO {
-                        withUIContext {
-                            // Cancel check mode
-                            binding.recyclerView.outOfCustomChoiceMode()
-                        }
-                        // Stop
                         DownloadManager.stopRangeDownload(gidList!!)
                     }
                 }
@@ -606,7 +576,7 @@ class DownloadsScene :
                         Settings.removeImageFiles,
                     )
                     val helper = DeleteRangeDialogHelper(
-                        downloadInfoList!!,
+                        downloadInfoList,
                         gidList,
                         builder,
                     )
@@ -621,10 +591,10 @@ class DownloadsScene :
                     val labelList: MutableList<String> = ArrayList(labelRawList.size + 1)
                     labelList.add(getString(R.string.default_download_label_name))
                     labelRawList.forEach {
-                        labelList.add(it.label!!)
+                        labelList.add(it.label)
                     }
                     val labels = labelList.toTypedArray()
-                    val helper = MoveDialogHelper(labels, downloadInfoList!!)
+                    val helper = MoveDialogHelper(labels, downloadInfoList)
                     BaseDialogBuilder(context)
                         .setTitle(R.string.download_move_dialog_title)
                         .setItems(labels, helper)
@@ -780,9 +750,6 @@ class DownloadsScene :
                 return
             }
 
-            // Cancel check mode
-            binding.recyclerView.outOfCustomChoiceMode()
-
             lifecycleScope.launchIO {
                 // Delete image files
                 val checked = mBuilder.isChecked
@@ -810,9 +777,7 @@ class DownloadsScene :
     ) : DialogInterface.OnClickListener {
         @SuppressLint("NotifyDataSetChanged")
         override fun onClick(dialog: DialogInterface, which: Int) {
-            // Cancel check mode
             context ?: return
-            binding.recyclerView.outOfCustomChoiceMode()
             val label: String? = if (which == 0) {
                 null
             } else {
@@ -837,13 +802,16 @@ class DownloadsScene :
             // TODO cancel on click listener when select items
             binding.start.setOnClickListener(this)
             binding.stop.setOnClickListener(this)
+            binding.thumb.setMD3Content {
+                Spacer(modifier = Modifier.height(height).fillMaxWidth())
+            }
         }
 
         override fun onClick(v: View) {
             val context = context
             val activity: Activity? = mainActivity
             val recyclerView = this@DownloadsScene.binding.recyclerView
-            if (null == context || null == activity || recyclerView.isInCustomChoice) {
+            if (null == context || null == activity || tracker.isInCustomChoice) {
                 return
             }
             val list = mList ?: return
@@ -880,10 +848,8 @@ class DownloadsScene :
 
         private val height = (3 * listThumbSize * 3).pxToDp.dp
 
-        fun bind(info: DownloadInfo) {
-            binding.thumb.setMD3Content {
-                Spacer(modifier = Modifier.height(height).fillMaxWidth())
-            }
+        fun bind(info: DownloadInfo, isChecked: Boolean) {
+            binding.root.isChecked = isChecked
             lifecycleScope.launchIO {
                 val downloadDir = getGalleryDownloadDir(info.gid) ?: run {
                     info.putToDownloadDir()
@@ -999,6 +965,7 @@ class DownloadsScene :
 
     private inner class DownloadAdapter : RecyclerView.Adapter<DownloadHolder>() {
         private val mInflater: LayoutInflater = layoutInflater
+        var tracker: GallerySelectionTracker<DownloadInfo>? = null
 
         override fun getItemId(position: Int): Long {
             return if (mList == null || position < 0 || position >= mList!!.size) {
@@ -1011,12 +978,14 @@ class DownloadsScene :
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadHolder {
             val holder = DownloadHolder(ItemDownloadBinding.inflate(mInflater, parent, false))
             holder.itemView.setOnClickListener { onItemClick(holder.bindingAdapterPosition) }
-            holder.itemView.setOnLongClickListener { onItemLongClick(holder.bindingAdapterPosition) }
             return holder
         }
 
         override fun onBindViewHolder(holder: DownloadHolder, position: Int) {
-            mList?.let { holder.bind(it[position]) }
+            mList?.let {
+                val info = it[position]
+                holder.bind(info, tracker?.isSelected(info.gid) ?: false)
+            }
         }
 
         override fun onBindViewHolder(
@@ -1037,28 +1006,6 @@ class DownloadsScene :
 
         override fun getItemCount(): Int {
             return if (mList == null) 0 else mList!!.size
-        }
-    }
-
-    private inner class FabLayoutListener : OnExpandListener {
-        override fun onExpand(expanded: Boolean) {
-            if (!expanded && binding.recyclerView.isInCustomChoice) binding.recyclerView.outOfCustomChoiceMode()
-        }
-    }
-
-    private inner class DownloadChoiceListener : CustomChoiceListener {
-        override fun onIntoCustomChoice(view: SelectableGalleryInfoRecyclerView) {
-            binding.fabLayout.isExpanded = true
-            // Lock drawer
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-        }
-
-        override fun onOutOfCustomChoice(view: SelectableGalleryInfoRecyclerView) {
-            binding.fabLayout.isExpanded = false
-            // Unlock drawer
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         }
     }
 
