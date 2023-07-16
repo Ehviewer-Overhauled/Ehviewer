@@ -5,7 +5,7 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Checkable
-import androidx.core.view.children
+import androidx.core.view.forEach
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.parcelize.Parcelize
 
@@ -24,7 +24,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
     private var checkedGid = mutableSetOf<Long>()
 
     private fun checkChild(child: View) {
-        val position = getChildAdapterPosition(child)
+        val position = getChildAdapterPosition(child).takeIf { it != NO_POSITION } ?: return
         val gid = gidGetter(position) ?: return
         setViewChecked(child, gid in checkedGid)
     }
@@ -83,7 +83,7 @@ class SelectableGalleryInfoRecyclerView @JvmOverloads constructor(
     }
 
     private fun updateOnScreenCheckedViews() {
-        children.forEach {
+        forEach {
             checkChild(it)
         }
     }

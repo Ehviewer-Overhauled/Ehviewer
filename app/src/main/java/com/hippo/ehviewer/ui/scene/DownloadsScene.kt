@@ -587,12 +587,12 @@ class DownloadsScene :
 
                 2 -> {
                     lifecycleScope.launchIO {
-                        // Stop
-                        DownloadManager.stopRangeDownload(gidList!!)
                         withUIContext {
                             // Cancel check mode
                             binding.recyclerView.outOfCustomChoiceMode()
                         }
+                        // Stop
+                        DownloadManager.stopRangeDownload(gidList!!)
                     }
                 }
 
