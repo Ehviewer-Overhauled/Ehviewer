@@ -41,8 +41,11 @@ import com.hippo.ehviewer.ui.main.GalleryInfoListItem
 import eu.kanade.tachiyomi.util.system.pxToDp
 
 abstract class GalleryHolder(composeView: CheckableComposeView) : RecyclerView.ViewHolder(composeView) {
+    var galleryId = 0L
+
     abstract fun bind(
         galleryInfo: GalleryInfo,
+        isChecked: Boolean,
         onClick: () -> Unit,
         onLongClick: () -> Unit,
     )
@@ -53,7 +56,8 @@ class ListGalleryHolder(private val composeView: CheckableComposeView, private v
     private val height = (3 * listThumbSize * 3).pxToDp.dp
     private val showPages = Settings.showGalleryPages
 
-    override fun bind(galleryInfo: GalleryInfo, onClick: () -> Unit, onLongClick: () -> Unit) {
+    override fun bind(galleryInfo: GalleryInfo, isChecked: Boolean, onClick: () -> Unit, onLongClick: () -> Unit) {
+        composeView.isChecked = isChecked
         composeView.setMD3Content {
             GalleryInfoListItem(
                 onClick = onClick,
@@ -68,7 +72,8 @@ class ListGalleryHolder(private val composeView: CheckableComposeView, private v
 }
 
 class GridGalleryHolder(private val composeView: CheckableComposeView) : GalleryHolder(composeView) {
-    override fun bind(galleryInfo: GalleryInfo, onClick: () -> Unit, onLongClick: () -> Unit) {
+    override fun bind(galleryInfo: GalleryInfo, isChecked: Boolean, onClick: () -> Unit, onLongClick: () -> Unit) {
+        composeView.isChecked = isChecked
         composeView.setMD3Content {
             GalleryInfoGridItem(
                 onClick = onClick,

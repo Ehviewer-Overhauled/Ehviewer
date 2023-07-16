@@ -369,7 +369,7 @@ class GalleryListScene : SearchBarScene() {
         mAdapter = GalleryAdapter(
             binding.recyclerView,
             true,
-            { info, _ ->
+            { info ->
                 navAnimated(
                     R.id.galleryDetailScene,
                     bundleOf(
@@ -378,7 +378,7 @@ class GalleryListScene : SearchBarScene() {
                     ),
                 )
             },
-            { info, _ ->
+            { info ->
                 lifecycleScope.launchIO {
                     dialogState.doGalleryInfoAction(info, requireContext())
                 }
