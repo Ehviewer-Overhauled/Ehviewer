@@ -76,6 +76,18 @@
             android:textAllCaps="true"
             android:textColor="@android:color/white" />
 
+        <ImageView
+            android:id="@+id/handle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/thumb"
+            android:layout_toStartOf="@+id/actions"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            app:srcCompat="@drawable/ic_baseline_reorder_24" />
+
         <FrameLayout
             android:id="@+id/actions"
             android:layout_width="wrap_content"
