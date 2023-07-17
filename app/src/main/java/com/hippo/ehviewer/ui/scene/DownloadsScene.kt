@@ -23,6 +23,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -47,6 +48,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -123,6 +125,7 @@ class DownloadsScene :
     private val binding get() = _binding!!
     private var mViewTransition: ViewTransition? = null
     private var mAdapter: DownloadAdapter? = null
+    private var mItemTouchHelper: ItemTouchHelper? = null
     private val tracker get() = mAdapter!!.tracker!!
     private var mInitPosition = -1
     private var mLabelAdapter: DownloadLabelAdapter? = null
@@ -298,7 +301,14 @@ class DownloadsScene :
                 recyclerView.scrollToPosition(mInitPosition)
                 mInitPosition = -1
             }
-            val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
+            mItemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
+                override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                    super.onSelectedChanged(viewHolder, actionState)
+                    if (actionState == ACTION_STATE_DRAG) {
+                        tracker.clearSelection()
+                    }
+                }
+                override fun isLongPressDragEnabled() = false
                 override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                     return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
                 }
@@ -326,7 +336,7 @@ class DownloadsScene :
                 }
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
             })
-            itemTouchHelper.attachToRecyclerView(recyclerView)
+            mItemTouchHelper!!.attachToRecyclerView(recyclerView)
             fastScroller.attachToRecyclerView(recyclerView)
             val handlerDrawable = HandlerDrawable()
             handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
@@ -356,6 +366,7 @@ class DownloadsScene :
         mViewTransition = null
         mAdapter = null
         mLabelAdapter = null
+        mItemTouchHelper = null
         _binding = null
     }
 
@@ -794,6 +805,7 @@ class DownloadsScene :
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private inner class DownloadHolder(
         private val binding: ItemDownloadBinding,
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
@@ -804,6 +816,12 @@ class DownloadsScene :
             binding.stop.setOnClickListener(this)
             binding.thumb.setMD3Content {
                 Spacer(modifier = Modifier.height(height).fillMaxWidth())
+            }
+            binding.handle.setOnTouchListener { _, event ->
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                    mItemTouchHelper!!.startDrag(this)
+                }
+                false
             }
         }
 
