@@ -84,7 +84,7 @@ object DownloadManager : OnSpiderListener {
                 it.key?.let { label ->
                     if (!containLabel(label)) {
                         // Add non existing label to DB and list
-                        labelList.add(EhDB.addDownloadLabel(label))
+                        labelList.add(EhDB.addDownloadLabel(DownloadLabel(label, position = labelList.size)))
                     }
                 }
                 it.key to LinkedList(it.value)
@@ -347,7 +347,7 @@ object DownloadManager : OnSpiderListener {
                 map[info.label] = list
                 if (!containLabel(info.label)) {
                     // Add label to DB and list
-                    labelList.add(EhDB.addDownloadLabel(info.label!!))
+                    labelList.add(EhDB.addDownloadLabel(DownloadLabel(info.label!!, position = labelList.size)))
                 }
             }
             list.add(info)
@@ -374,12 +374,11 @@ object DownloadManager : OnSpiderListener {
     }
 
     suspend fun addDownloadLabel(downloadLabelList: List<DownloadLabel>) {
-        for (label in downloadLabelList) {
-            val labelString = label.label
-            if (!containLabel(labelString)) {
-                map[labelString] = LinkedList()
-                labelList.add(EhDB.addDownloadLabel(label))
-            }
+        val offset = downloadLabelList.size
+        downloadLabelList.filterNot { containLabel(it.label) }.forEachIndexed { index, label ->
+            map[label.label] = LinkedList()
+            label.position = index + offset
+            labelList.add(EhDB.addDownloadLabel(label))
         }
     }
 
@@ -714,14 +713,17 @@ object DownloadManager : OnSpiderListener {
         if (label == null || containLabel(label)) {
             return
         }
-        labelList.add(EhDB.addDownloadLabel(label))
+        labelList.add(EhDB.addDownloadLabel(DownloadLabel(label, position = labelList.size)))
         map[label] = LinkedList()
     }
 
     suspend fun moveLabel(fromPosition: Int, toPosition: Int) {
         val item = labelList.removeAt(fromPosition)
         labelList.add(toPosition, item)
-        EhDB.moveDownloadLabel(fromPosition, toPosition)
+        val range = if (fromPosition < toPosition) fromPosition..toPosition else toPosition..fromPosition
+        val list = labelList.slice(range)
+        list.zip(range).forEach { it.first.position = it.second }
+        EhDB.updateDownloadLabel(list)
     }
 
     suspend fun renameLabel(from: String, to: String) {
