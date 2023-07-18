@@ -19,6 +19,12 @@ class HistoryMigration : AutoMigrationSpec {
     }
 }
 
+class QuickSearchMigration : AutoMigrationSpec {
+    override fun onPostMigrate(db: SupportSQLiteDatabase) {
+        db.execSQL("UPDATE QUICK_SEARCH SET POSITION = (SELECT COUNT(*) FROM QUICK_SEARCH T WHERE T.TIME < QUICK_SEARCH.TIME)")
+    }
+}
+
 class ThumbKeyMigration : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         val needMigrationTables = arrayOf(
@@ -41,7 +47,7 @@ class ThumbKeyMigration : AutoMigrationSpec {
 
 @Database(
     entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 10,
+    version = 11,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -70,6 +76,11 @@ class ThumbKeyMigration : AutoMigrationSpec {
             from = 9,
             to = 10,
             spec = HistoryMigration::class,
+        ),
+        AutoMigration(
+            from = 10,
+            to = 11,
+            spec = QuickSearchMigration::class,
         ),
     ],
 )

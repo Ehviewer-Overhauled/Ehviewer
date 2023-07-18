@@ -173,40 +173,23 @@ object EhDB {
 
     suspend fun insertQuickSearch(quickSearch: QuickSearch) {
         val dao = db.quickSearchDao()
-        quickSearch.time = System.currentTimeMillis()
         quickSearch.id = dao.insert(quickSearch)
     }
 
     private suspend fun importQuickSearch(quickSearchList: List<QuickSearch>) {
         val dao = db.quickSearchDao()
-        for (quickSearch in quickSearchList) {
-            dao.insert(quickSearch)
-        }
+        dao.insert(quickSearchList)
     }
 
     suspend fun deleteQuickSearch(quickSearch: QuickSearch) {
         val dao = db.quickSearchDao()
         dao.delete(quickSearch)
+        dao.fill(quickSearch.position)
     }
 
-    suspend fun moveQuickSearch(fromPosition: Int, toPosition: Int) {
-        if (fromPosition == toPosition) return
-        val reverse = fromPosition > toPosition
-        val offset = if (reverse) toPosition else fromPosition
-        val limit = if (reverse) fromPosition - toPosition + 1 else toPosition - fromPosition + 1
+    suspend fun updateQuickSearch(quickSearchList: List<QuickSearch>) {
         val dao = db.quickSearchDao()
-        val list = dao.list(offset, limit)
-        val step = if (reverse) 1 else -1
-        val start = if (reverse) limit - 1 else 0
-        val end = if (reverse) 0 else limit - 1
-        val toTime = list[end].time
-        var i = end
-        while (if (reverse) i < start else i > 0) {
-            list[i].time = list[i + step].time
-            i += step
-        }
-        list[start].time = toTime
-        dao.update(list)
+        dao.update(quickSearchList)
     }
 
     val historyLazyList: PagingSource<Int, HistoryInfo>
@@ -338,9 +321,10 @@ object EhDB {
             runCatching {
                 val quickSearchList = oldDB.quickSearchDao().list()
                 val currentQuickSearchList = db.quickSearchDao().list()
+                val offset = currentQuickSearchList.size
                 val importList = quickSearchList.filter { newQS ->
                     currentQuickSearchList.none { it.name == newQS.name }
-                }
+                }.onEachIndexed { index, q -> q.position = index + offset }
                 importQuickSearch(importList)
             }
             runCatching {
