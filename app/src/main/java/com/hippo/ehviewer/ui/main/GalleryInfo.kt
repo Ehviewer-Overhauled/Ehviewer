@@ -61,7 +61,7 @@ fun GalleryInfoListItem(
             Card {
                 EhAsyncCropThumb(
                     key = info,
-                    modifier = Modifier.aspectRatio(0.6666667F).fillMaxSize(),
+                    modifier = Modifier.aspectRatio(DEFAULT_ASPECT).fillMaxSize(),
                 )
             }
             val showFav by produceState(false, info.gid) {
@@ -182,7 +182,11 @@ fun GalleryInfoGridItem(
     info: GalleryInfo,
     modifier: Modifier = Modifier,
 ) {
-    val aspect = (info.thumbWidth.toFloat() / info.thumbHeight).coerceIn(0.33F, 1.5F).takeUnless { it.isNaN() } ?: 1F
+    val aspect = if (info.thumbHeight != 0) {
+        (info.thumbWidth.toFloat() / info.thumbHeight).coerceIn(MIN_ASPECT, MAX_ASPECT)
+    } else {
+        DEFAULT_ASPECT
+    }
     val color = EhUtils.getCategoryColor(info.category)
     val simpleLang = info.simpleLanguage
     ElevatedCard(
@@ -209,3 +213,7 @@ fun GalleryInfoGridItem(
         }
     }
 }
+
+private const val MIN_ASPECT = 0.33F
+private const val MAX_ASPECT = 1.5F
+private const val DEFAULT_ASPECT = 0.67F
