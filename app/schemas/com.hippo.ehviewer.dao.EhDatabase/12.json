@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 12,
-    "identityHash": "db1bcec4e605d5da70726d57ed3f203b",
+    "identityHash": "d40b38b0ba3b1c53b773728cdee328c8",
     "entities": [
       {
         "tableName": "DOWNLOADS",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`STATE` INTEGER NOT NULL, `LEGACY` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, `LABEL` TEXT, `GID` INTEGER NOT NULL, `TOKEN` TEXT, `TITLE` TEXT, `TITLE_JPN` TEXT, `THUMB` TEXT, `CATEGORY` INTEGER NOT NULL, `POSTED` TEXT, `UPLOADER` TEXT, `RATING` REAL NOT NULL, `SIMPLE_LANGUAGE` TEXT, PRIMARY KEY(`GID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`STATE` INTEGER NOT NULL, `LEGACY` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, `LABEL` TEXT, `POSITION` INTEGER NOT NULL, `GID` INTEGER NOT NULL, `TOKEN` TEXT, `TITLE` TEXT, `TITLE_JPN` TEXT, `THUMB` TEXT, `CATEGORY` INTEGER NOT NULL, `POSTED` TEXT, `UPLOADER` TEXT, `RATING` REAL NOT NULL, `SIMPLE_LANGUAGE` TEXT, PRIMARY KEY(`GID`))",
         "fields": [
           {
             "fieldPath": "state",
@@ -31,6 +31,12 @@
             "columnName": "LABEL",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "POSITION",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "gid",
@@ -104,7 +110,7 @@
       },
       {
         "tableName": "DOWNLOAD_LABELS",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`LABEL` TEXT NOT NULL, `TIME` INTEGER NOT NULL, `POSITION` INTEGER NOT NULL DEFAULT 0, `_id` INTEGER, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`LABEL` TEXT NOT NULL, `POSITION` INTEGER NOT NULL, `_id` INTEGER, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "label",
@@ -113,17 +119,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "time",
-            "columnName": "TIME",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "position",
             "columnName": "POSITION",
             "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
+            "notNull": true
           },
           {
             "fieldPath": "id",
@@ -373,7 +372,7 @@
       },
       {
         "tableName": "QUICK_SEARCH",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER, `NAME` TEXT NOT NULL, `MODE` INTEGER NOT NULL, `CATEGORY` INTEGER NOT NULL, `KEYWORD` TEXT, `ADVANCE_SEARCH` INTEGER NOT NULL, `MIN_RATING` INTEGER NOT NULL, `PAGE_FROM` INTEGER NOT NULL, `PAGE_TO` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, `POSITION` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER, `NAME` TEXT NOT NULL, `MODE` INTEGER NOT NULL, `CATEGORY` INTEGER NOT NULL, `KEYWORD` TEXT, `ADVANCE_SEARCH` INTEGER NOT NULL, `MIN_RATING` INTEGER NOT NULL, `PAGE_FROM` INTEGER NOT NULL, `PAGE_TO` INTEGER NOT NULL, `POSITION` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -430,17 +429,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "time",
-            "columnName": "TIME",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "position",
             "columnName": "POSITION",
             "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -456,7 +448,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'db1bcec4e605d5da70726d57ed3f203b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd40b38b0ba3b1c53b773728cdee328c8')"
     ]
   }
 }

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 11,
-    "identityHash": "ae2e43e12a77ce0d90ac30c9a7f79e5d",
+    "identityHash": "92915e937cb7ccc536d352fda5cf287f",
     "entities": [
       {
         "tableName": "DOWNLOADS",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`STATE` INTEGER NOT NULL, `LEGACY` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, `LABEL` TEXT, `GID` INTEGER NOT NULL, `TOKEN` TEXT, `TITLE` TEXT, `TITLE_JPN` TEXT, `THUMB` TEXT, `CATEGORY` INTEGER NOT NULL, `POSTED` TEXT, `UPLOADER` TEXT, `RATING` REAL NOT NULL, `SIMPLE_LANGUAGE` TEXT, PRIMARY KEY(`GID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`STATE` INTEGER NOT NULL, `LEGACY` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, `LABEL` TEXT, `POSITION` INTEGER NOT NULL DEFAULT 0, `GID` INTEGER NOT NULL, `TOKEN` TEXT, `TITLE` TEXT, `TITLE_JPN` TEXT, `THUMB` TEXT, `CATEGORY` INTEGER NOT NULL, `POSTED` TEXT, `UPLOADER` TEXT, `RATING` REAL NOT NULL, `SIMPLE_LANGUAGE` TEXT, PRIMARY KEY(`GID`))",
         "fields": [
           {
             "fieldPath": "state",
@@ -31,6 +31,13 @@
             "columnName": "LABEL",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "POSITION",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "gid",
@@ -104,7 +111,7 @@
       },
       {
         "tableName": "DOWNLOAD_LABELS",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`LABEL` TEXT NOT NULL, `TIME` INTEGER NOT NULL, `_id` INTEGER, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`LABEL` TEXT NOT NULL, `TIME` INTEGER NOT NULL, `POSITION` INTEGER NOT NULL DEFAULT 0, `_id` INTEGER, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "label",
@@ -117,6 +124,13 @@
             "columnName": "TIME",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "POSITION",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "id",
@@ -449,7 +463,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ae2e43e12a77ce0d90ac30c9a7f79e5d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '92915e937cb7ccc536d352fda5cf287f')"
     ]
   }
 }
