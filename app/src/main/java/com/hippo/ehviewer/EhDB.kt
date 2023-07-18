@@ -88,13 +88,6 @@ object EhDB {
 
     suspend fun getAllDownloadLabelList() = db.downloadLabelDao().list()
 
-    suspend fun addDownloadLabel(label: String): DownloadLabel {
-        val dao = db.downloadLabelDao()
-        val raw = DownloadLabel(label, System.currentTimeMillis())
-        raw.id = dao.insert(raw)
-        return raw
-    }
-
     suspend fun addDownloadLabel(raw: DownloadLabel): DownloadLabel {
         // Reset id
         raw.id = null
@@ -108,29 +101,15 @@ object EhDB {
         dao.update(raw)
     }
 
-    suspend fun moveDownloadLabel(fromPosition: Int, toPosition: Int) {
-        if (fromPosition == toPosition) return
-        val reverse = fromPosition > toPosition
-        val offset = if (reverse) toPosition else fromPosition
-        val limit = if (reverse) fromPosition - toPosition + 1 else toPosition - fromPosition + 1
+    suspend fun updateDownloadLabel(downloadLabels: List<DownloadLabel>) {
         val dao = db.downloadLabelDao()
-        val list = dao.list(offset, limit)
-        val step = if (reverse) 1 else -1
-        val start = if (reverse) limit - 1 else 0
-        val end = if (reverse) 0 else limit - 1
-        val toTime = list[end].time
-        var i = end
-        while (if (reverse) i < start else i > 0) {
-            list[i].time = list[i + step].time
-            i += step
-        }
-        list[start].time = toTime
-        dao.update(list)
+        dao.update(downloadLabels)
     }
 
     suspend fun removeDownloadLabel(raw: DownloadLabel) {
         val dao = db.downloadLabelDao()
         dao.delete(raw)
+        dao.fill(raw.position)
     }
 
     suspend fun removeLocalFavorites(gid: Long) {
