@@ -84,7 +84,7 @@ object DownloadManager : OnSpiderListener {
                 it.key?.let { label ->
                     if (!containLabel(label)) {
                         // Add non existing label to DB and list
-                        labelList.add(EhDB.addDownloadLabel(DownloadLabel(label, position = labelList.size)))
+                        labelList.add(EhDB.addDownloadLabel(DownloadLabel(label, labelList.size)))
                     }
                 }
                 it.key to LinkedList(it.value)
@@ -677,7 +677,7 @@ object DownloadManager : OnSpiderListener {
         if (label == null || containLabel(label)) {
             return
         }
-        labelList.add(EhDB.addDownloadLabel(DownloadLabel(label, position = labelList.size)))
+        labelList.add(EhDB.addDownloadLabel(DownloadLabel(label, labelList.size)))
         map[label] = LinkedList()
     }
 

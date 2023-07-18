@@ -2,6 +2,7 @@ package com.hippo.ehviewer.dao
 
 import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.DeleteColumn
 import androidx.room.DeleteTable
 import androidx.room.RenameColumn
 import androidx.room.RoomDatabase
@@ -19,23 +20,17 @@ class HistoryMigration : AutoMigrationSpec {
     }
 }
 
-class QuickSearchMigration : AutoMigrationSpec {
+class AddPositionColumn : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         db.execSQL("UPDATE QUICK_SEARCH SET POSITION = (SELECT COUNT(*) FROM QUICK_SEARCH T WHERE T.TIME < QUICK_SEARCH.TIME)")
-    }
-}
-
-class DownloadLabelMigration : AutoMigrationSpec {
-    override fun onPostMigrate(db: SupportSQLiteDatabase) {
         db.execSQL("UPDATE DOWNLOAD_LABELS SET POSITION = (SELECT COUNT(*) FROM DOWNLOAD_LABELS T WHERE T.TIME < DOWNLOAD_LABELS.TIME)")
-    }
-}
-
-class DownloadMigration : AutoMigrationSpec {
-    override fun onPostMigrate(db: SupportSQLiteDatabase) {
         db.execSQL("UPDATE DOWNLOADS SET POSITION = (SELECT COUNT(*) FROM DOWNLOADS T WHERE T.TIME < DOWNLOADS.TIME)")
     }
 }
+
+@DeleteColumn(tableName = "QUICK_SEARCH", columnName = "TIME")
+@DeleteColumn(tableName = "DOWNLOAD_LABELS", columnName = "TIME")
+class DropTimeColumn : AutoMigrationSpec
 
 class ThumbKeyMigration : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
@@ -59,7 +54,7 @@ class ThumbKeyMigration : AutoMigrationSpec {
 
 @Database(
     entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 13,
+    version = 12,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -92,17 +87,12 @@ class ThumbKeyMigration : AutoMigrationSpec {
         AutoMigration(
             from = 10,
             to = 11,
-            spec = QuickSearchMigration::class,
+            spec = AddPositionColumn::class,
         ),
         AutoMigration(
             from = 11,
             to = 12,
-            spec = DownloadLabelMigration::class,
-        ),
-        AutoMigration(
-            from = 12,
-            to = 13,
-            spec = DownloadMigration::class,
+            spec = DropTimeColumn::class,
         ),
     ],
 )
