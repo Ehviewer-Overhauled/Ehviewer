@@ -279,8 +279,7 @@ object EhDB {
         db.filterDao().delete(filter)
     }
 
-    suspend fun triggerFilter(filter: Filter) {
-        filter.enable = !filter.enable
+    suspend fun updateFilter(filter: Filter) {
         db.filterDao().update(filter)
     }
 

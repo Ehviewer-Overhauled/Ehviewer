@@ -23,7 +23,10 @@ object EhFilter : CoroutineScope {
     fun Filter.remember(callback: ((Boolean) -> Unit)? = null) = launchOps(callback) {
         EhDB.addFilter(this).also { if (it) filters.await().add(this) }
     }
-    fun Filter.trigger(callback: ((Unit) -> Unit)? = null) = launchOps(callback) { EhDB.triggerFilter(this) }
+    fun Filter.trigger(callback: ((Unit) -> Unit)? = null) = launchOps(callback) {
+        enable = !enable
+        EhDB.updateFilter(this)
+    }
     fun Filter.forget(callback: ((Unit) -> Unit)? = null) = launchOps(callback) {
         EhDB.deleteFilter(this)
         filters.await().remove(this)
