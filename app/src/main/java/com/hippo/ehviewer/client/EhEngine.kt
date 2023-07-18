@@ -53,6 +53,7 @@ import kotlinx.coroutines.delay
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.addJsonArray
 import kotlinx.serialization.json.put
+import moe.tarsin.coroutines.removeAllSuspend
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Headers
 import okhttp3.MediaType
@@ -457,7 +458,7 @@ object EhEngine {
 
     private suspend fun fillGalleryList(list: MutableList<GalleryInfo>, url: String, filter: Boolean) {
         // Filter title and uploader
-        if (filter) list.removeAll { EhFilter.filterTitle(it) || EhFilter.filterUploader(it) }
+        if (filter) list.removeAllSuspend { EhFilter.filterTitle(it) || EhFilter.filterUploader(it) }
 
         var hasTags = false
         var hasPages = false
@@ -477,7 +478,7 @@ object EhEngine {
         if (needApi) fillGalleryListByApi(list, url)
 
         // Filter tag, thumbnail mode need filter uploader again
-        if (filter) list.removeAll { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
+        if (filter) list.removeAllSuspend { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
     }
 
     suspend fun addFavoritesRange(galleryList: List<Pair<Long, String>>, dstCat: Int) {

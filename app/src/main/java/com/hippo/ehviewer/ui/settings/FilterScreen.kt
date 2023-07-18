@@ -31,6 +31,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -47,12 +49,22 @@ import com.hippo.ehviewer.dao.FilterMode
 import com.hippo.ehviewer.databinding.DialogAddFilterBinding
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.tools.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import moe.tarsin.coroutines.groupByToObserved
 
 @Composable
 fun FilterScreen() {
     val navController = LocalNavController.current
     val context = LocalContext.current
+    val scope = rememberCoroutineScope { Dispatchers.IO }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val allFilterMap = remember {
+        scope.async {
+            EhFilter.filters.await().groupByToObserved { it.mode }
+        }
+    }
     class AddFilterDialogHelper(private val dialog: AlertDialog) : View.OnClickListener {
         private val mArray = dialog.context.resources.getStringArray(R.array.filter_entries)
         private val binding = DialogAddFilterBinding.bind(dialog.findViewById(R.id.base)!!)
@@ -114,65 +126,72 @@ fun FilterScreen() {
             }
         },
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            contentPadding = paddingValues,
-        ) {
-            var showTip = true
-            fun filterType(list: List<Filter>, @StringRes title: Int) = list.takeIf { it.isNotEmpty() }?.let {
-                stickyHeader {
-                    Text(
-                        text = stringResource(id = title),
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-                items(list) { filter ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        val filterCheckBoxRecomposeScope = currentRecomposeScope
-                        Checkbox(
-                            checked = filter.enable,
-                            onCheckedChange = { filter.trigger { filterCheckBoxRecomposeScope.invalidate() } },
+        Deferred({ allFilterMap.await() }) { filter ->
+            LazyColumn(
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                contentPadding = paddingValues,
+            ) {
+                var showTip = true
+                fun filterType(list: List<Filter>, @StringRes title: Int) = list.takeIf { it.isNotEmpty() }?.let {
+                    stickyHeader {
+                        Text(
+                            text = stringResource(id = title),
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                            color = MaterialTheme.colorScheme.tertiary,
+                            style = MaterialTheme.typography.titleMedium,
                         )
-                        Text(text = filter.text)
-                        Spacer(modifier = Modifier.weight(1F))
-                        IconButton(
-                            onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { filter.forget() } }.setNegativeButton(android.R.string.cancel, null).show() },
+                    }
+                    items(list) { filter ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                            val filterCheckBoxRecomposeScope = currentRecomposeScope
+                            Checkbox(
+                                checked = filter.enable,
+                                onCheckedChange = { filter.trigger { filterCheckBoxRecomposeScope.invalidate() } },
+                            )
+                            Text(text = filter.text)
+                            Spacer(modifier = Modifier.weight(1F))
+                            IconButton(
+                                onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { filter.forget() } }.setNegativeButton(android.R.string.cancel, null).show() },
+                            ) {
+                                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                            }
                         }
                     }
+                    showTip = false
                 }
-                showTip = false
-            }
-            filterType(EhFilter.titleFilterList, R.string.filter_title)
-            filterType(EhFilter.tagFilterList, R.string.filter_tag)
-            filterType(EhFilter.commentFilterList, R.string.filter_comment)
-            filterType(EhFilter.commenterFilterList, R.string.filter_commenter)
-            filterType(EhFilter.uploaderFilterList, R.string.filter_uploader)
-            filterType(EhFilter.tagNamespaceFilterList, R.string.filter_tag_namespace)
-            if (showTip) {
-                item {
-                    Column(
-                        modifier = Modifier.padding(paddingValues).fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Spacer(modifier = Modifier.size(80.dp))
-                        Icon(
-                            imageVector = Icons.Default.FilterAlt,
-                            contentDescription = null,
-                            modifier = Modifier.padding(16.dp).size(120.dp),
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                        Text(
-                            text = stringResource(id = R.string.filter),
-                            style = MaterialTheme.typography.headlineMedium,
-                        )
+                filter.forEach { (filterMode, filters) ->
+                    val title = when (filterMode) {
+                        FilterMode.TITLE -> R.string.filter_title
+                        FilterMode.UPLOADER -> R.string.filter_uploader
+                        FilterMode.TAG -> R.string.filter_tag
+                        FilterMode.TAG_NAMESPACE -> R.string.filter_tag_namespace
+                        FilterMode.COMMENTER -> R.string.filter_commenter
+                        FilterMode.COMMENT -> R.string.filter_comment
+                    }
+                    filterType(filters, title)
+                }
+                if (showTip) {
+                    item {
+                        Column(
+                            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Spacer(modifier = Modifier.size(80.dp))
+                            Icon(
+                                imageVector = Icons.Default.FilterAlt,
+                                contentDescription = null,
+                                modifier = Modifier.padding(16.dp).size(120.dp),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                            Text(
+                                text = stringResource(id = R.string.filter),
+                                style = MaterialTheme.typography.headlineMedium,
+                            )
+                        }
                     }
                 }
             }

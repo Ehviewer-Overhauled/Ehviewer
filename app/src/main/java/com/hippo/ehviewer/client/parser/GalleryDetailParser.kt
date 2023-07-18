@@ -329,7 +329,7 @@ object GalleryDetailParser {
         }
     }
 
-    private fun parseComment(element: Element): GalleryComment? {
+    private suspend fun parseComment(element: Element): GalleryComment? {
         return try {
             val comment = GalleryComment()
             // Id
@@ -418,7 +418,7 @@ object GalleryDetailParser {
     /**
      * Parse comments with html parser
      */
-    fun parseComments(document: Document): GalleryCommentList {
+    suspend fun parseComments(document: Document): GalleryCommentList {
         return try {
             val cdiv = document.getElementById("cdiv")!!
             val c1s = cdiv.getElementsByClass("c1")
