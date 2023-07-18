@@ -207,6 +207,7 @@ object DownloadManager : OnSpiderListener {
             info.label = label
             info.state = DownloadInfo.STATE_WAIT
             info.time = System.currentTimeMillis()
+            info.position = allInfoList.size
 
             // Add to label download list
             val list = getInfoListForLabel(info.label)
@@ -326,33 +327,21 @@ object DownloadManager : OnSpiderListener {
     }
 
     suspend fun addDownload(downloadInfoList: List<DownloadInfo>, notify: Boolean = true) {
-        for (info in downloadInfoList) {
-            if (containDownloadInfo(info.gid)) {
-                // Contain
-                return
-            }
-
+        downloadInfoList.filterNot { containDownloadInfo(it.gid) }.forEach { info ->
             // Ensure download state
             if (DownloadInfo.STATE_WAIT == info.state ||
                 DownloadInfo.STATE_DOWNLOAD == info.state
             ) {
                 info.state = DownloadInfo.STATE_NONE
             }
+            info.position = allInfoList.size
 
             // Add to label download list
-            var list = getInfoListForLabel(info.label)
-            if (null == list) {
-                // Can't find the label in label list
-                list = LinkedList()
-                map[info.label] = list
-                if (!containLabel(info.label)) {
-                    // Add label to DB and list
-                    labelList.add(EhDB.addDownloadLabel(DownloadLabel(info.label!!, position = labelList.size)))
-                }
-            }
+            val list = getInfoListForLabel(info.label)
+                ?: addLabel(info.label).let { getInfoListForLabel(info.label)!! }
             list.add(info)
             // Sort
-            list.sortByDateDescending()
+            list.sortByPositionDescending()
 
             // Add to all download list and map
             allInfoList.add(info)
@@ -363,7 +352,7 @@ object DownloadManager : OnSpiderListener {
         }
 
         // Sort all download list
-        allInfoList.sortByDateDescending()
+        allInfoList.sortByPositionDescending()
 
         // Notify
         if (notify) {
@@ -393,6 +382,7 @@ object DownloadManager : OnSpiderListener {
         info.label = label
         info.state = DownloadInfo.STATE_NONE
         info.time = System.currentTimeMillis()
+        info.position = allInfoList.size
 
         // Add to label download list
         val list = getInfoListForLabel(info.label)
@@ -508,25 +498,11 @@ object DownloadManager : OnSpiderListener {
 
     suspend fun deleteRangeDownload(gidList: LongList) {
         stopRangeDownloadInternal(gidList)
-        for (i in 0 until gidList.size) {
-            val gid = gidList[i]
-            val info = mAllInfoMap[gid]
-            if (null == info) {
-                Log.d(TAG, "Can't get download info with gid: $gid")
-                continue
-            }
-
-            // Remove from DB
-            EhDB.removeDownloadInfo(info)
-
-            // Remove from all info map
-            allInfoList.remove(info)
-            mAllInfoMap.remove(info.gid)
-
-            // Remove from label list
-            val list = getInfoListForLabel(info.label)
-            list?.remove(info)
+        val list = gidList.mapNotNull { gid ->
+            mAllInfoMap.remove(gid)?.also { getInfoListForLabel(it.label)?.remove(it) }
         }
+        EhDB.removeDownloadInfo(list)
+        allInfoList.removeAll(list.toSet())
 
         // Update listener
         for (l in mDownloadInfoListeners) {
@@ -537,36 +513,24 @@ object DownloadManager : OnSpiderListener {
         ensureDownload()
     }
 
-    suspend fun moveDownload(fromPosition: Int, toPosition: Int) {
-        if (fromPosition > toPosition) {
-            val time = allInfoList[toPosition].time
-            for (i in toPosition until fromPosition) {
-                allInfoList[i].time = allInfoList[i + 1].time
-            }
-            allInfoList[fromPosition].time = time
-            EhDB.updateDownloadInfo(allInfoList.slice(toPosition..fromPosition))
-        } else {
-            val time = allInfoList[fromPosition].time
-            for (i in fromPosition until toPosition) {
-                allInfoList[i].time = allInfoList[i + 1].time
-            }
-            allInfoList[toPosition].time = time
-            EhDB.updateDownloadInfo(allInfoList.slice(fromPosition..toPosition))
-        }
+    fun moveDownload(fromPosition: Int, toPosition: Int): List<DownloadInfo> {
+        val info = allInfoList.removeAt(fromPosition)
+        allInfoList.add(toPosition, info)
+        val range = if (fromPosition < toPosition) fromPosition..toPosition else toPosition..fromPosition
+        val list = allInfoList.slice(range)
+        val limit = allInfoList.size - 1
+        list.zip(range).forEach { it.first.position = limit - it.second }
         val label = allInfoList[fromPosition].label
-        allInfoList.sortByDateDescending()
-        val list = getInfoListForLabel(label)!!
-        list.sortByDateDescending()
+        getInfoListForLabel(label)!!.sortByPositionDescending()
+        return list
     }
 
-    suspend fun moveDownload(label: String?, fromPosition: Int, toPosition: Int) {
-        val list = getInfoListForLabel(label)
-        list?.let {
+    fun moveDownload(label: String?, fromPosition: Int, toPosition: Int) =
+        getInfoListForLabel(label)!!.let {
             val absFromPosition = allInfoList.indexOf(it[fromPosition])
             val absToPosition = allInfoList.indexOf(it[toPosition])
             moveDownload(absFromPosition, absToPosition)
         }
-    }
 
     suspend fun resetAllReadingProgress() = coroutineScope {
         mAllInfoMap.keys.forEach { gid ->
@@ -699,7 +663,7 @@ object DownloadManager : OnSpiderListener {
             srcList.remove(info)
             dstList.add(info)
             info.label = label
-            dstList.sortByDateDescending()
+            dstList.sortByPositionDescending()
 
             // Save to DB
             EhDB.putDownloadInfo(info)
@@ -780,7 +744,7 @@ object DownloadManager : OnSpiderListener {
         }
 
         // Sort
-        defaultInfoList.sortByDateDescending()
+        defaultInfoList.sortByPositionDescending()
     }
 
     val isIdle: Boolean
@@ -1199,8 +1163,8 @@ object DownloadManager : OnSpiderListener {
     private const val TYPE_ON_PAGE_FAILURE = 4
     private const val TYPE_ON_FINISH = 5
 
-    private fun MutableList<DownloadInfo>.sortByDateDescending() {
-        sortByDescending { it.time }
+    private fun MutableList<DownloadInfo>.sortByPositionDescending() {
+        sortByDescending { it.position }
     }
 }
 

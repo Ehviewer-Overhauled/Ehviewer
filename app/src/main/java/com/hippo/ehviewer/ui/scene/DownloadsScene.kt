@@ -322,15 +322,14 @@ class DownloadsScene :
                     if (fromPosition == toPosition) {
                         return false
                     }
+                    val list = when (mLabel) {
+                        null -> DownloadManager.moveDownload(fromPosition, toPosition)
+                        getString(R.string.default_download_label_name) -> DownloadManager.moveDownload(null, fromPosition, toPosition)
+                        else -> DownloadManager.moveDownload(mLabel, fromPosition, toPosition)
+                    }
+                    mAdapter!!.notifyItemMoved(fromPosition, toPosition)
                     lifecycleScope.launchIO {
-                        when (mLabel) {
-                            null -> DownloadManager.moveDownload(fromPosition, toPosition)
-                            getString(R.string.default_download_label_name) -> DownloadManager.moveDownload(null, fromPosition, toPosition)
-                            else -> DownloadManager.moveDownload(mLabel, fromPosition, toPosition)
-                        }
-                        withUIContext {
-                            mAdapter!!.notifyItemMoved(fromPosition, toPosition)
-                        }
+                        EhDB.updateDownloadInfo(list)
                     }
                     return true
                 }
