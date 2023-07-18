@@ -36,4 +36,7 @@ data class QuickSearch(
 
     @ColumnInfo(name = "TIME")
     var time: Long = 0,
+
+    @ColumnInfo(name = "POSITION", defaultValue = "0")
+    var position: Int = 0,
 )

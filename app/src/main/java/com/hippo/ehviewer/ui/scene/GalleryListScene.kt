@@ -585,6 +585,7 @@ class GalleryListScene : SearchBarScene() {
                 builder.setError(null)
                 dialog.dismiss()
                 val quickSearch = mUrlBuilder.toQuickSearch(text)
+                quickSearch.position = mQuickSearchList.size
                 EhDB.insertQuickSearch(quickSearch)
                 mQuickSearchList.add(quickSearch)
                 withUIContext {
@@ -1043,13 +1044,14 @@ class GalleryListScene : SearchBarScene() {
             if (fromPosition == toPosition) {
                 return false
             }
+            val item = mQuickSearchList.removeAt(fromPosition)
+            mQuickSearchList.add(toPosition, item)
+            mAdapter.notifyItemMoved(fromPosition, toPosition)
             lifecycleScope.launchIO {
-                EhDB.moveQuickSearch(fromPosition, toPosition)
-                val item = mQuickSearchList.removeAt(fromPosition)
-                mQuickSearchList.add(toPosition, item)
-                withUIContext {
-                    mAdapter.notifyItemMoved(fromPosition, toPosition)
-                }
+                val range = if (fromPosition < toPosition) fromPosition..toPosition else toPosition..fromPosition
+                val list = mQuickSearchList.slice(range)
+                list.zip(range).forEach { it.first.position = it.second }
+                EhDB.updateQuickSearch(list)
             }
             return true
         }
