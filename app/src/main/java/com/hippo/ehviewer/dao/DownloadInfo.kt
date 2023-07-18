@@ -20,6 +20,9 @@ class DownloadInfo() : BaseGalleryInfo() {
     @ColumnInfo(name = "LABEL")
     var label: String? = null
 
+    @ColumnInfo(name = "POSITION", defaultValue = "0")
+    var position: Int = 0
+
     @Ignore
     var speed: Long = 0
 

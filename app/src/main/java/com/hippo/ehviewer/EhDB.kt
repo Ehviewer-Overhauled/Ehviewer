@@ -61,7 +61,15 @@ object EhDB {
     }
 
     suspend fun removeDownloadInfo(downloadInfo: DownloadInfo) {
-        db.downloadsDao().delete(downloadInfo)
+        val dao = db.downloadsDao()
+        dao.delete(downloadInfo)
+        dao.fill(downloadInfo.position)
+    }
+
+    suspend fun removeDownloadInfo(downloadInfo: List<DownloadInfo>) {
+        val dao = db.downloadsDao()
+        dao.delete(downloadInfo)
+        dao.fill(downloadInfo.first().position, downloadInfo.size)
     }
 
     suspend fun getDownloadDirname(gid: Long): String? {

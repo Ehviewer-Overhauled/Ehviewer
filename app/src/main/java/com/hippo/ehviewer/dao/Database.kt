@@ -31,6 +31,12 @@ class DownloadLabelMigration : AutoMigrationSpec {
     }
 }
 
+class DownloadMigration : AutoMigrationSpec {
+    override fun onPostMigrate(db: SupportSQLiteDatabase) {
+        db.execSQL("UPDATE DOWNLOADS SET POSITION = (SELECT COUNT(*) FROM DOWNLOADS T WHERE T.TIME < DOWNLOADS.TIME)")
+    }
+}
+
 class ThumbKeyMigration : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         val needMigrationTables = arrayOf(
@@ -53,7 +59,7 @@ class ThumbKeyMigration : AutoMigrationSpec {
 
 @Database(
     entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 12,
+    version = 13,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -92,6 +98,11 @@ class ThumbKeyMigration : AutoMigrationSpec {
             from = 11,
             to = 12,
             spec = DownloadLabelMigration::class,
+        ),
+        AutoMigration(
+            from = 12,
+            to = 13,
+            spec = DownloadMigration::class,
         ),
     ],
 )
