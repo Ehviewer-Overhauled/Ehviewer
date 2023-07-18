@@ -30,10 +30,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -53,6 +51,7 @@ import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.tools.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import moe.tarsin.coroutines.groupByToObserved
 
 @Composable
 fun FilterScreen() {
@@ -60,14 +59,7 @@ fun FilterScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope { Dispatchers.IO }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val allFilterMap = remember {
-        scope.async {
-            LinkedHashMap<FilterMode, SnapshotStateList<Filter>>().also { dest ->
-                FilterMode.entries.forEach { dest[it] = mutableStateListOf() }
-                EhFilter.filters.await().forEach { requireNotNull(dest[it.mode]).add(it) }
-            }
-        }
-    }
+    val allFilterMap = remember { scope.async { EhFilter.filters.await().groupByToObserved { it.mode } } }
     class AddFilterDialogHelper(private val dialog: AlertDialog) : View.OnClickListener {
         private val mArray = dialog.context.resources.getStringArray(R.array.filter_entries)
         private val binding = DialogAddFilterBinding.bind(dialog.findViewById(R.id.base)!!)
