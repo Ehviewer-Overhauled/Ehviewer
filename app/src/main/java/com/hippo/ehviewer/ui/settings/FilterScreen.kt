@@ -2,7 +2,6 @@ package com.hippo.ehviewer.ui.settings
 
 import android.content.DialogInterface
 import android.view.View
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,8 +30,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -52,7 +53,6 @@ import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.tools.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import moe.tarsin.coroutines.groupByToObserved
 
 @Composable
 fun FilterScreen() {
@@ -62,7 +62,10 @@ fun FilterScreen() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val allFilterMap = remember {
         scope.async {
-            EhFilter.filters.await().groupByToObserved { it.mode }
+            LinkedHashMap<FilterMode, SnapshotStateList<Filter>>().also { dest ->
+                FilterMode.entries.forEach { dest[it] = mutableStateListOf() }
+                EhFilter.filters.await().forEach { requireNotNull(dest[it.mode]).add(it) }
+            }
         }
     }
     class AddFilterDialogHelper(private val dialog: AlertDialog) : View.OnClickListener {
@@ -92,9 +95,12 @@ fun FilterScreen() {
                 }
             }
             binding.textInputLayout.run {
-                Filter(FilterMode.entries[mArray.indexOf(text1)], text!!).remember {
+                val mode = FilterMode.entries[mArray.indexOf(text1)]
+                val filter = Filter(mode, text!!)
+                filter.remember {
                     if (it) {
                         post { dialog.dismiss() }
+                        requireNotNull(allFilterMap.getCompleted()[mode]).add(filter)
                     } else {
                         post { error = context.getString(R.string.label_text_exist) }
                     }
@@ -126,43 +132,13 @@ fun FilterScreen() {
             }
         },
     ) { paddingValues ->
-        Deferred({ allFilterMap.await() }) { filter ->
+        Deferred({ allFilterMap.await() }) { filters ->
             LazyColumn(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                 contentPadding = paddingValues,
             ) {
                 var showTip = true
-                fun filterType(list: List<Filter>, @StringRes title: Int) = list.takeIf { it.isNotEmpty() }?.let {
-                    stickyHeader {
-                        Text(
-                            text = stringResource(id = title),
-                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                            color = MaterialTheme.colorScheme.tertiary,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    }
-                    items(list) { filter ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            val filterCheckBoxRecomposeScope = currentRecomposeScope
-                            Checkbox(
-                                checked = filter.enable,
-                                onCheckedChange = { filter.trigger { filterCheckBoxRecomposeScope.invalidate() } },
-                            )
-                            Text(text = filter.text)
-                            Spacer(modifier = Modifier.weight(1F))
-                            IconButton(
-                                onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { filter.forget() } }.setNegativeButton(android.R.string.cancel, null).show() },
-                            ) {
-                                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
-                            }
-                        }
-                    }
-                    showTip = false
-                }
-                filter.forEach { (filterMode, filters) ->
+                filters.forEach { (filterMode, filters) ->
                     val title = when (filterMode) {
                         FilterMode.TITLE -> R.string.filter_title
                         FilterMode.UPLOADER -> R.string.filter_uploader
@@ -171,7 +147,36 @@ fun FilterScreen() {
                         FilterMode.COMMENTER -> R.string.filter_commenter
                         FilterMode.COMMENT -> R.string.filter_comment
                     }
-                    filterType(filters, title)
+                    if (filters.isNotEmpty()) {
+                        stickyHeader {
+                            Text(
+                                text = stringResource(id = title),
+                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                                color = MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        }
+                        items(filters) { filter ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                val filterCheckBoxRecomposeScope = currentRecomposeScope
+                                Checkbox(
+                                    checked = filter.enable,
+                                    onCheckedChange = { filter.trigger { filterCheckBoxRecomposeScope.invalidate() } },
+                                )
+                                Text(text = filter.text)
+                                Spacer(modifier = Modifier.weight(1F))
+                                IconButton(
+                                    onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { filter.forget { filters.remove(filter) } } }.setNegativeButton(android.R.string.cancel, null).show() },
+                                ) {
+                                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                                }
+                            }
+                        }
+                        showTip = false
+                    }
                 }
                 if (showTip) {
                     item {

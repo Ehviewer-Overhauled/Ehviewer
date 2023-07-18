@@ -24,7 +24,7 @@ object EhFilter : CoroutineScope {
         EhDB.addFilter(this).also { if (it) filters.await().add(this) }
     }
     fun Filter.trigger(callback: ((Unit) -> Unit)? = null) = launchOps(callback) { EhDB.triggerFilter(this) }
-    fun Filter.forget() = launchOps {
+    fun Filter.forget(callback: ((Unit) -> Unit)? = null) = launchOps(callback) {
         EhDB.deleteFilter(this)
         filters.await().remove(this)
     }
