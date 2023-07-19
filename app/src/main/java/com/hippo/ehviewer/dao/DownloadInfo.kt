@@ -3,11 +3,18 @@ package com.hippo.ehviewer.dao
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
+import com.hippo.ehviewer.client.data.AbstractGalleryInfo
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 
+@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 @Entity(tableName = "DOWNLOADS")
-class DownloadInfo() : BaseGalleryInfo() {
+class DownloadInfo(
+    @Ignore
+    val galleryInfo: GalleryInfo = BaseGalleryInfo(),
+) : BaseGalleryInfo(), AbstractGalleryInfo by galleryInfo {
+    constructor() : this(galleryInfo = BaseGalleryInfo())
+
     @ColumnInfo(name = "STATE")
     var state = 0
 
@@ -37,20 +44,6 @@ class DownloadInfo() : BaseGalleryInfo() {
 
     @Ignore
     var total = 0
-
-    constructor(galleryInfo: GalleryInfo) : this() {
-        gid = galleryInfo.gid
-        token = galleryInfo.token
-        title = galleryInfo.title
-        titleJpn = galleryInfo.titleJpn
-        thumbKey = galleryInfo.thumbKey
-        this.category = galleryInfo.category
-        posted = galleryInfo.posted
-        uploader = galleryInfo.uploader
-        rating = galleryInfo.rating
-        simpleTags = galleryInfo.simpleTags
-        simpleLanguage = galleryInfo.simpleLanguage
-    }
 
     companion object {
         const val STATE_INVALID = -1
