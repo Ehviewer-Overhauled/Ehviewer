@@ -262,6 +262,7 @@ object EhDB {
             it.close()
             context.deleteDatabase(ehExportName)
         } use { newDb ->
+            db.galleryDao().list().let { newDb.galleryDao().insert(it) }
             db.downloadsDao().list().forEach { newDb.downloadsDao().insert(it) }
             db.downloadLabelDao().list().forEach { newDb.downloadLabelDao().insert(it) }
             db.downloadDirnameDao().list().forEach { newDb.downloadDirnameDao().insert(it) }
@@ -288,6 +289,9 @@ object EhDB {
             it.close()
             context.deleteDatabase(tempDBName)
         } use { oldDB ->
+            runCatching {
+                db.galleryDao().insert(oldDB.galleryDao().list())
+            }
             runCatching {
                 val downloadLabelList = oldDB.downloadLabelDao().list()
                 DownloadManager.addDownloadLabel(downloadLabelList)

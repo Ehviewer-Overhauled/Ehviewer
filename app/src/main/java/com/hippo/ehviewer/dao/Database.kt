@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 
 @DeleteTable(tableName = "BOOKMARKS")
 class DropBookMarkDao : AutoMigrationSpec
@@ -22,15 +23,38 @@ class HistoryMigration : AutoMigrationSpec {
 
 class AddPositionColumn : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
-        db.execSQL("UPDATE QUICK_SEARCH SET POSITION = (SELECT COUNT(*) FROM QUICK_SEARCH T WHERE T.TIME < QUICK_SEARCH.TIME)")
-        db.execSQL("UPDATE DOWNLOAD_LABELS SET POSITION = (SELECT COUNT(*) FROM DOWNLOAD_LABELS T WHERE T.TIME < DOWNLOAD_LABELS.TIME)")
-        db.execSQL("UPDATE DOWNLOADS SET POSITION = (SELECT COUNT(*) FROM DOWNLOADS T WHERE T.TIME < DOWNLOADS.TIME)")
+        val needMigrationTables = arrayOf(
+            "QUICK_SEARCH",
+            "DOWNLOAD_LABELS",
+            "DOWNLOADS",
+        )
+        needMigrationTables.forEach { table ->
+            // TODO: Rewrite this with row_number() when min sdk is 30 (SQLite 3.28.0)
+            db.execSQL("UPDATE $table SET POSITION = (SELECT COUNT(*) FROM $table T WHERE T.TIME < $table.TIME)")
+        }
     }
 }
 
 @DeleteColumn(tableName = "QUICK_SEARCH", columnName = "TIME")
 @DeleteColumn(tableName = "DOWNLOAD_LABELS", columnName = "TIME")
 class DropTimeColumn : AutoMigrationSpec
+
+class AddGalleryTable : AutoMigrationSpec {
+    override fun onPostMigrate(db: SupportSQLiteDatabase) {
+        val needMigrationTables = arrayOf(
+            "HISTORY",
+            "DOWNLOADS",
+            "LOCAL_FAVORITES",
+        )
+        needMigrationTables.forEachIndexed { index, table ->
+            db.execSQL(
+                "INSERT OR IGNORE INTO GALLERIES " +
+                    "SELECT GID, TOKEN, TITLE, TITLE_JPN, THUMB, CATEGORY, POSTED, UPLOADER, RATING, SIMPLE_LANGUAGE, " +
+                    "${if (index == 0) "FAVORITE_SLOT" else NOT_FAVORITED} FROM $table",
+            )
+        }
+    }
+}
 
 class ThumbKeyMigration : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
@@ -53,8 +77,8 @@ class ThumbKeyMigration : AutoMigrationSpec {
 }
 
 @Database(
-    entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 12,
+    entities = [CommonGalleryInfo::class, DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
+    version = 13,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -94,10 +118,16 @@ class ThumbKeyMigration : AutoMigrationSpec {
             to = 12,
             spec = DropTimeColumn::class,
         ),
+        AutoMigration(
+            from = 12,
+            to = 13,
+            spec = AddGalleryTable::class,
+        ),
     ],
 )
 @TypeConverters(FilterModeConverter::class)
 abstract class EhDatabase : RoomDatabase() {
+    abstract fun galleryDao(): GalleryDao
     abstract fun downloadDirnameDao(): DownloadDirnameDao
     abstract fun downloadLabelDao(): DownloadLabelDao
     abstract fun downloadsDao(): DownloadsDao
