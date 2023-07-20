@@ -273,10 +273,6 @@ ksp {
     arg("room.generateKotlin", "true")
 }
 
-tasks.withType<KspTaskJvm>().configureEach {
-    compilerOptions.jvmTarget.set(JVM_17)
-}
-
 aboutLibraries {
     duplicationMode = MERGE
     duplicationRule = GROUP
