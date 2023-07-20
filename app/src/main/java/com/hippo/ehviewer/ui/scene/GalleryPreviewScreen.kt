@@ -72,7 +72,7 @@ class GalleryPreviewScreen : Fragment() {
         setMD3Content {
             val galleryDetail = remember { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
             val context = LocalContext.current
-            fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail, index)
+            fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail.galleryInfo, index)
             var toNextPage by rememberSaveable { mutableStateOf(requireArguments().getBoolean(KEY_NEXT_PAGE)) }
             val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
             val columnCount = calculateSuitableSpanCount()

@@ -65,7 +65,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_NORMAL
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_SUBSCRIPTION
@@ -123,8 +123,8 @@ import java.util.Locale
 class VMStorage1 : ViewModel() {
     var urlBuilder = ListUrlBuilder()
     val dataFlow = Pager(PagingConfig(25)) {
-        object : PagingSource<String, GalleryInfo>() {
-            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
+        object : PagingSource<String, BaseGalleryInfo>() {
+            override fun getRefreshKey(state: PagingState<String, BaseGalleryInfo>): String? = null
             override suspend fun load(params: LoadParams<String>) = withIOContext {
                 if (urlBuilder.mode == MODE_TOPLIST) {
                     // TODO: Since we know total pages, let pager support jump

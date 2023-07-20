@@ -48,7 +48,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
@@ -64,8 +63,8 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
-import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehUrl
 import com.hippo.ehviewer.databinding.SceneFavoritesBinding
 import com.hippo.ehviewer.ui.CommonOperations
@@ -102,8 +101,8 @@ import java.util.Locale
 class VMStorage : ViewModel() {
     var urlBuilder = FavListUrlBuilder(favCat = Settings.recentFavCat)
     private val cloudDataFlow = Pager(PagingConfig(25)) {
-        object : PagingSource<String, GalleryInfo>() {
-            override fun getRefreshKey(state: PagingState<String, GalleryInfo>): String? = null
+        object : PagingSource<String, BaseGalleryInfo>() {
+            override fun getRefreshKey(state: PagingState<String, BaseGalleryInfo>): String? = null
             override suspend fun load(params: LoadParams<String>) = withIOContext {
                 when (params) {
                     is LoadParams.Prepend -> urlBuilder.setIndex(params.key, isNext = false)
@@ -182,8 +181,7 @@ class FavoritesScene : SearchBarScene() {
         collectJob?.cancel()
         collectJob = viewLifecycleOwner.lifecycleScope.launchIO {
             vm.dataflow().collectLatest {
-                @Suppress("UNCHECKED_CAST")
-                mAdapter?.submitData(it as PagingData<GalleryInfo>)
+                mAdapter?.submitData(it)
             }
         }
         mAdapter?.refresh()
@@ -483,8 +481,7 @@ class FavoritesScene : SearchBarScene() {
             val info = takeCheckedInfo()
             lifecycleScope.launchIO {
                 if (urlBuilder.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
-                    val gidArray = info.map { it.gid }.toLongArray()
-                    EhDB.removeLocalFavorites(gidArray)
+                    EhDB.removeLocalFavorites(info)
                 } else {
                     val delList = info.map { it.gid to it.token!! }
                     EhEngine.addFavoritesRange(delList, -1)
@@ -503,8 +500,7 @@ class FavoritesScene : SearchBarScene() {
             lifecycleScope.launchIO {
                 if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                     // Move from local to cloud
-                    val gidArray = info.map { it.gid }.toLongArray()
-                    EhDB.removeLocalFavorites(gidArray)
+                    EhDB.removeLocalFavorites(info)
                     val galleryList = info.map { it.gid to it.token!! }
                     runCatching {
                         EhEngine.addFavoritesRange(galleryList, dstCat)

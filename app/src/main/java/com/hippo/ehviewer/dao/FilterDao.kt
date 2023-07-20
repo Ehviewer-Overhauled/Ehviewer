@@ -17,6 +17,9 @@ interface FilterDao {
     @Insert
     suspend fun insert(t: Filter): Long
 
+    @Insert
+    suspend fun insert(filters: List<Filter>)
+
     @Delete
     suspend fun delete(filter: Filter)
 

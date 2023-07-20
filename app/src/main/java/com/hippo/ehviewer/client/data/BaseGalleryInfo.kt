@@ -15,13 +15,16 @@
  */
 package com.hippo.ehviewer.client.data
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
+import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
+@Entity(tableName = "GALLERIES")
 open class BaseGalleryInfo(
     @PrimaryKey
     @ColumnInfo(name = "GID")
@@ -72,7 +75,7 @@ open class BaseGalleryInfo(
     @ColumnInfo(name = "SIMPLE_LANGUAGE")
     override var simpleLanguage: String? = null,
 
-    @Ignore
+    @ColumnInfo(name = "FAVORITE_SLOT")
     override var favoriteSlot: Int = NOT_FAVORITED,
 
     @Ignore
@@ -80,4 +83,6 @@ open class BaseGalleryInfo(
 
     @Ignore
     override var favoriteNote: String? = null,
-) : GalleryInfo
+) : GalleryInfo, Parcelable {
+    constructor() : this(0)
+}

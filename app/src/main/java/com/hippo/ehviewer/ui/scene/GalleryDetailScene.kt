@@ -110,6 +110,7 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter.remember
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -183,7 +184,7 @@ class GalleryDetailScene : BaseScene() {
     private var mToken: String? = null
     private var mPage = 0
 
-    private var composeBindingGI by mutableStateOf<GalleryInfo?>(null)
+    private var composeBindingGI by mutableStateOf<BaseGalleryInfo?>(null)
     private var composeBindingGD by mutableStateOf<GalleryDetail?>(null)
     private var readButtonText by mutableStateOf("")
     private var downloadButtonText by mutableStateOf("")
@@ -637,7 +638,7 @@ class GalleryDetailScene : BaseScene() {
             EhPreviewItem(
                 galleryPreview = it,
                 position = it.position,
-                onClick = { context?.navToReader(gd, it.position) },
+                onClick = { context?.navToReader(gd.galleryInfo, it.position) },
             )
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
@@ -787,7 +788,7 @@ class GalleryDetailScene : BaseScene() {
         if (EhDownloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
             CommonOperations.startDownload(
                 activity as MainActivity,
-                galleryDetail,
+                galleryDetail.galleryInfo,
                 false,
             )
         } else {
@@ -838,7 +839,7 @@ class GalleryDetailScene : BaseScene() {
                 EhEngine.getGalleryDetail(url)
             }.onSuccess { galleryDetail ->
                 galleryDetailCache.put(galleryDetail.gid, galleryDetail)
-                EhDB.putHistoryInfo(galleryDetail)
+                EhDB.putHistoryInfo(galleryDetail.galleryInfo)
                 if (Settings.preloadThumbAggressively) {
                     lifecycleScope.launchIO {
                         galleryDetail.previewList.forEach {
@@ -847,7 +848,7 @@ class GalleryDetailScene : BaseScene() {
                     }
                 }
                 composeBindingGD = galleryDetail
-                composeBindingGI = galleryDetail
+                composeBindingGI = galleryDetail.galleryInfo
                 updateDownloadState()
                 bindViewSecond()
             }.onFailure {
@@ -873,7 +874,7 @@ class GalleryDetailScene : BaseScene() {
             favoritesLock.withLock {
                 var remove = false
                 runCatching {
-                    remove = !dialogState.addToFavorites(galleryDetail)
+                    remove = !dialogState.addToFavorites(galleryDetail.galleryInfo)
                     if (remove) {
                         showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
                     } else {
@@ -947,9 +948,9 @@ class GalleryDetailScene : BaseScene() {
                 requireActivity().findViewById(R.id.snackbar),
                 getString(R.string.read_from, mPage),
                 Snackbar.LENGTH_LONG,
-            ).setAction(R.string.read) { context?.navToReader(gd, mPage) }.show()
+            ).setAction(R.string.read) { context?.navToReader(gd.galleryInfo, mPage) }.show()
         }
-        composeBindingGI = gd
+        composeBindingGI = gd.galleryInfo
         composeBindingGD = gd
         updateDownloadText()
         updateFavoriteDrawable()

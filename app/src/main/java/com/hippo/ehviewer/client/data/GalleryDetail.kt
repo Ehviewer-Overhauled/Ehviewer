@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.client.data
 
+import android.os.Parcelable
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.S_LANGS
 import kotlinx.parcelize.Parcelize
 
@@ -37,14 +38,14 @@ private val LANGUAGES = arrayOf(
 
 @Parcelize
 class GalleryDetail(
-    val galleryInfo: GalleryInfo = BaseGalleryInfo(),
+    val galleryInfo: BaseGalleryInfo = BaseGalleryInfo(),
     var apiUid: Long = -1L,
     var apiKey: String? = null,
     var torrentCount: Int = 0,
     var torrentUrl: String? = null,
     var archiveUrl: String? = null,
     var parent: String? = null,
-    var newerVersions: ArrayList<GalleryInfo> = ArrayList(),
+    var newerVersions: ArrayList<BaseGalleryInfo> = ArrayList(),
     var visible: String? = null,
     var language: String? = null,
     var size: String? = null,
@@ -54,7 +55,7 @@ class GalleryDetail(
     var comments: GalleryCommentList,
     val previewPages: Int,
     val previewList: List<GalleryPreview>,
-) : AbstractGalleryInfo by galleryInfo, GalleryInfo {
+) : GalleryInfo by galleryInfo, Parcelable {
     override fun generateSLang() {
         val index = LANGUAGES.indexOf(language)
         if (index != -1) simpleLanguage = S_LANGS[index]

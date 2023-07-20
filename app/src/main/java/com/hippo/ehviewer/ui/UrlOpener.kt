@@ -40,13 +40,13 @@ fun Context.openBrowser(url: String) {
 fun Context.jumpToReaderByPage(url: String, detail: GalleryDetail): Boolean {
     GalleryPageUrlParser.parse(url)?.let {
         if (it.gid == detail.gid) {
-            navToReader(detail, it.page)
+            navToReader(detail.galleryInfo, it.page)
             return true
         }
     }
     if (url.startsWith("#c")) {
         runCatching {
-            navToReader(detail, url.replace("#c", "").toInt() - 1)
+            navToReader(detail.galleryInfo, url.replace("#c", "").toInt() - 1)
             return true
         }
     }

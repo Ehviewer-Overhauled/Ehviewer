@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 
 @DeleteTable(tableName = "BOOKMARKS")
@@ -56,6 +57,36 @@ class AddGalleryTable : AutoMigrationSpec {
     }
 }
 
+@DeleteColumn(tableName = "HISTORY", columnName = "TOKEN")
+@DeleteColumn(tableName = "HISTORY", columnName = "TITLE")
+@DeleteColumn(tableName = "HISTORY", columnName = "TITLE_JPN")
+@DeleteColumn(tableName = "HISTORY", columnName = "THUMB")
+@DeleteColumn(tableName = "HISTORY", columnName = "CATEGORY")
+@DeleteColumn(tableName = "HISTORY", columnName = "POSTED")
+@DeleteColumn(tableName = "HISTORY", columnName = "UPLOADER")
+@DeleteColumn(tableName = "HISTORY", columnName = "RATING")
+@DeleteColumn(tableName = "HISTORY", columnName = "SIMPLE_LANGUAGE")
+@DeleteColumn(tableName = "HISTORY", columnName = "FAVORITE_SLOT")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "TOKEN")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "TITLE")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "TITLE_JPN")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "THUMB")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "CATEGORY")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "POSTED")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "UPLOADER")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "RATING")
+@DeleteColumn(tableName = "LOCAL_FAVORITES", columnName = "SIMPLE_LANGUAGE")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "TOKEN")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "TITLE")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "TITLE_JPN")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "THUMB")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "CATEGORY")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "POSTED")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "UPLOADER")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "RATING")
+@DeleteColumn(tableName = "DOWNLOADS", columnName = "SIMPLE_LANGUAGE")
+class GalleryTableMigration : AutoMigrationSpec
+
 class ThumbKeyMigration : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         val needMigrationTables = arrayOf(
@@ -77,8 +108,8 @@ class ThumbKeyMigration : AutoMigrationSpec {
 }
 
 @Database(
-    entities = [CommonGalleryInfo::class, DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 13,
+    entities = [BaseGalleryInfo::class, DownloadEntity::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
+    version = 14,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -122,6 +153,11 @@ class ThumbKeyMigration : AutoMigrationSpec {
             from = 12,
             to = 13,
             spec = AddGalleryTable::class,
+        ),
+        AutoMigration(
+            from = 13,
+            to = 14,
+            spec = GalleryTableMigration::class,
         ),
     ],
 )

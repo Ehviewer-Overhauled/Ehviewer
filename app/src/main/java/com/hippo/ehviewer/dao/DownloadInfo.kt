@@ -1,50 +1,61 @@
 package com.hippo.ehviewer.dao
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Ignore
-import com.hippo.ehviewer.client.data.AbstractGalleryInfo
+import androidx.room.PrimaryKey
+import androidx.room.Relation
+import com.hippo.ehviewer.client.data.AbstractDownloadInfo
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
+import java.time.Instant
 
-@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
-@Entity(tableName = "DOWNLOADS")
-class DownloadInfo(
-    @Ignore
-    val galleryInfo: GalleryInfo = BaseGalleryInfo(),
-) : BaseGalleryInfo(), AbstractGalleryInfo by galleryInfo {
-    constructor() : this(galleryInfo = BaseGalleryInfo())
+@Entity(tableName = "DOWNLOADS", foreignKeys = [ForeignKey(BaseGalleryInfo::class, ["GID"], ["GID"])])
+class DownloadEntity(
+    @PrimaryKey
+    @ColumnInfo(name = "GID")
+    var gid: Long,
 
     @ColumnInfo(name = "STATE")
-    var state = 0
+    override var state: Int = 0,
 
     @ColumnInfo(name = "LEGACY")
-    var legacy = 0
+    override var legacy: Int = 0,
 
     @ColumnInfo(name = "TIME")
-    var time: Long = 0
+    override var time: Long = Instant.now().toEpochMilli(),
 
     @ColumnInfo(name = "LABEL")
-    var label: String? = null
+    override var label: String? = null,
 
     @ColumnInfo(name = "POSITION")
-    var position: Int = 0
+    override var position: Int = 0,
+) : AbstractDownloadInfo {
+    @Ignore
+    override var speed: Long = 0
 
     @Ignore
-    var speed: Long = 0
+    override var remaining: Long = 0
 
     @Ignore
-    var remaining: Long = 0
+    override var finished = 0
 
     @Ignore
-    var finished = 0
+    override var downloaded = 0
 
     @Ignore
-    var downloaded = 0
+    override var total = 0
+}
 
-    @Ignore
-    var total = 0
+data class DownloadInfo(
+    @Relation(parentColumn = "GID", entityColumn = "GID")
+    val galleryInfo: BaseGalleryInfo,
 
+    @Embedded
+    val downloadInfo: DownloadEntity = DownloadEntity(galleryInfo.gid),
+) : GalleryInfo by galleryInfo, AbstractDownloadInfo by downloadInfo {
     companion object {
         const val STATE_INVALID = -1
         const val STATE_NONE = 0
