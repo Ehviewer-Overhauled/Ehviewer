@@ -108,8 +108,8 @@ class ThumbKeyMigration : AutoMigrationSpec {
 }
 
 @Database(
-    entities = [BaseGalleryInfo::class, DownloadEntity::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 15,
+    entities = [BaseGalleryInfo::class, DownloadLabel::class, DownloadEntity::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
+    version = 16,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
@@ -162,6 +162,10 @@ class ThumbKeyMigration : AutoMigrationSpec {
         AutoMigration(
             from = 14,
             to = 15,
+        ),
+        AutoMigration(
+            from = 15,
+            to = 16,
         ),
     ],
 )

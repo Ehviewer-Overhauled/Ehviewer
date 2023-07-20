@@ -12,7 +12,19 @@ import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 import java.time.Instant
 
-@Entity(tableName = "DOWNLOADS", foreignKeys = [ForeignKey(BaseGalleryInfo::class, ["GID"], ["GID"])])
+@Entity(
+    tableName = "DOWNLOADS",
+    foreignKeys = [
+        ForeignKey(BaseGalleryInfo::class, ["GID"], ["GID"]),
+        ForeignKey(
+            DownloadLabel::class,
+            ["LABEL"],
+            ["LABEL"],
+            onDelete = ForeignKey.SET_NULL,
+            onUpdate = ForeignKey.CASCADE,
+        ),
+    ],
+)
 class DownloadEntity(
     @PrimaryKey
     @ColumnInfo(name = "GID")
@@ -27,7 +39,7 @@ class DownloadEntity(
     @ColumnInfo(name = "TIME")
     override var time: Long = Instant.now().toEpochMilli(),
 
-    @ColumnInfo(name = "LABEL")
+    @ColumnInfo(name = "LABEL", index = true)
     override var label: String? = null,
 
     @ColumnInfo(name = "POSITION")
