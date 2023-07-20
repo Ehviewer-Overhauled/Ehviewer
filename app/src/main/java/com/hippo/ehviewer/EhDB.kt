@@ -281,7 +281,7 @@ object EhDB {
                 DownloadManager.addDownloadLabel(downloadLabelList)
             }
             runCatching {
-                val downloadInfoList = oldDB.downloadsDao().joinList()
+                val downloadInfoList = oldDB.downloadsDao().joinList().asReversed()
                 DownloadManager.addDownload(downloadInfoList, false)
             }
             runCatching {
