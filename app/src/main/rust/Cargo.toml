@@ -28,3 +28,4 @@ once_cell = "1.18.0"
 strip = true
 opt-level = "z"
 lto = true
+codegen-units = 1
