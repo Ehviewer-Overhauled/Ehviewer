@@ -247,8 +247,8 @@ object EhDB {
             context.deleteDatabase(ehExportName)
         } use { newDb ->
             db.galleryDao().list().let { newDb.galleryDao().insertOrIgnore(it) }
-            db.downloadsDao().list().let { newDb.downloadsDao().insert(it) }
             db.downloadLabelDao().list().let { newDb.downloadLabelDao().insert(it) }
+            db.downloadsDao().list().let { newDb.downloadsDao().insert(it) }
             db.downloadDirnameDao().list().let { newDb.downloadDirnameDao().insert(it) }
             db.historyDao().list().let { newDb.historyDao().insertOrIgnore(it) }
             db.quickSearchDao().list().let { newDb.quickSearchDao().insert(it) }

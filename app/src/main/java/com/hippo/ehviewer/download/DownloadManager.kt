@@ -708,8 +708,6 @@ object DownloadManager : OnSpiderListener {
         // Update info label
         for (info in list) {
             info.label = to
-            // Update in DB
-            EhDB.putDownloadInfo(info)
         }
         // Put list back with new label
         map[to] = list
@@ -736,8 +734,6 @@ object DownloadManager : OnSpiderListener {
         // Update info label
         for (info in list) {
             info.label = null
-            // Update in DB
-            EhDB.putDownloadInfo(info)
             defaultInfoList.add(info)
         }
 
