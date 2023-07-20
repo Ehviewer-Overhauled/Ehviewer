@@ -1,7 +1,5 @@
-import com.google.devtools.ksp.gradle.KspTaskJvm
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule.GROUP
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
