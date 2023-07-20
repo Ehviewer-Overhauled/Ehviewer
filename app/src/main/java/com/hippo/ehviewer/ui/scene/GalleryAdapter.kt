@@ -28,7 +28,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.Settings.detailSize
 import com.hippo.ehviewer.Settings.thumbSizeDp
-import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.MarginItemDecoration
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
@@ -36,24 +36,24 @@ import com.hippo.ehviewer.ui.legacy.STRATEGY_SUITABLE_SIZE
 import com.hippo.ehviewer.util.dp2px
 import splitties.init.appCtx
 
-private val diffCallback = object : DiffUtil.ItemCallback<GalleryInfo>() {
-    override fun areItemsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
-    override fun areContentsTheSame(oldItem: GalleryInfo, newItem: GalleryInfo) = oldItem.gid == newItem.gid
+private val diffCallback = object : DiffUtil.ItemCallback<BaseGalleryInfo>() {
+    override fun areItemsTheSame(oldItem: BaseGalleryInfo, newItem: BaseGalleryInfo) = oldItem.gid == newItem.gid
+    override fun areContentsTheSame(oldItem: BaseGalleryInfo, newItem: BaseGalleryInfo) = oldItem.gid == newItem.gid
 }
 
 class GalleryAdapter(
     private val recyclerView: RecyclerView,
     private val showFavorite: Boolean,
-    private val onItemClick: (GalleryInfo) -> Unit,
-    private val onItemLongClick: (GalleryInfo) -> Unit,
-) : PagingDataAdapter<GalleryInfo, GalleryHolder>(diffCallback) {
+    private val onItemClick: (BaseGalleryInfo) -> Unit,
+    private val onItemLongClick: (BaseGalleryInfo) -> Unit,
+) : PagingDataAdapter<BaseGalleryInfo, GalleryHolder>(diffCallback) {
     private val resources = recyclerView.context.resources
     private val layoutManager: AutoStaggeredGridLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
     private val mPaddingTopSB: Int = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
     private var mListDecoration: ItemDecoration? = null
     private var mGirdDecoration: MarginItemDecoration? = null
     private var mType = TYPE_INVALID
-    var tracker: GallerySelectionTracker<GalleryInfo>? = null
+    var tracker: GallerySelectionTracker<BaseGalleryInfo>? = null
 
     var type: Int
         get() = mType

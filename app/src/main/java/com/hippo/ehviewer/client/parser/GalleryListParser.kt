@@ -17,7 +17,7 @@ package com.hippo.ehviewer.client.parser
 
 import android.util.Log
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
 import com.hippo.ehviewer.client.exception.ParseException
@@ -120,8 +120,8 @@ object GalleryListParser {
         var prev: String? = null
         var next: String? = null
         var noWatchedTags = false
-        val galleryInfoList = mutableListOf<GalleryInfo>()
+        val galleryInfoList = mutableListOf<BaseGalleryInfo>()
     }
 }
 
-private external fun parseGalleryInfo(e: String): GalleryInfo
+private external fun parseGalleryInfo(e: String): BaseGalleryInfo

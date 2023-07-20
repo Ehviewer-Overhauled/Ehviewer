@@ -21,7 +21,7 @@ import android.util.SparseLongArray
 import com.google.android.material.math.MathUtils
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.DownloadLabel
 import com.hippo.ehviewer.image.Image
@@ -175,7 +175,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    suspend fun startDownload(galleryInfo: GalleryInfo, label: String?) {
+    suspend fun startDownload(galleryInfo: BaseGalleryInfo, label: String?) {
         if (mCurrentTask != null && mCurrentTask!!.gid == galleryInfo.gid) {
             // It is current task
             return
@@ -206,7 +206,6 @@ object DownloadManager : OnSpiderListener {
             info = DownloadInfo(galleryInfo)
             info.label = label
             info.state = DownloadInfo.STATE_WAIT
-            info.time = System.currentTimeMillis()
             info.position = allInfoList.size
 
             // Add to label download list
@@ -236,7 +235,7 @@ object DownloadManager : OnSpiderListener {
 
             launchIO {
                 // Add it to history
-                EhDB.putHistoryInfo(info)
+                EhDB.putHistoryInfo(info.galleryInfo)
             }
         }
     }
@@ -371,7 +370,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    suspend fun addDownload(galleryInfo: GalleryInfo, label: String?) {
+    suspend fun addDownload(galleryInfo: BaseGalleryInfo, label: String?) {
         if (containDownloadInfo(galleryInfo.gid)) {
             // Contain
             return
@@ -381,7 +380,6 @@ object DownloadManager : OnSpiderListener {
         val info = DownloadInfo(galleryInfo)
         info.label = label
         info.state = DownloadInfo.STATE_NONE
-        info.time = System.currentTimeMillis()
         info.position = allInfoList.size
 
         // Add to label download list

@@ -66,7 +66,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.databinding.ReaderActivityBinding
 import com.hippo.ehviewer.gallery.ArchivePageLoader
 import com.hippo.ehviewer.gallery.EhPageLoader
@@ -121,7 +121,7 @@ class ReaderActivity : EhActivity() {
     private var mAction: String? = null
     private var mFilename: String? = null
     private var mUri: Uri? = null
-    private var mGalleryInfo: GalleryInfo? = null
+    private var mGalleryInfo: BaseGalleryInfo? = null
     private var mPage: Int = 0
     private var mCacheFileName: String? = null
 

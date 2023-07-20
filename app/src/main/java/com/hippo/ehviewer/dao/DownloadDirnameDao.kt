@@ -3,18 +3,18 @@ package com.hippo.ehviewer.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Upsert
 
 @Dao
 interface DownloadDirnameDao {
     @Query("SELECT * FROM DOWNLOAD_DIRNAME WHERE GID = :gid")
     suspend fun load(gid: Long): DownloadDirname?
 
-    @Update
-    suspend fun update(downloadDirname: DownloadDirname)
+    @Upsert
+    suspend fun upsert(downloadDirname: DownloadDirname)
 
     @Insert
-    suspend fun insert(t: DownloadDirname): Long
+    suspend fun insert(downloadDirnameList: List<DownloadDirname>)
 
     @Query("DELETE FROM DOWNLOAD_DIRNAME WHERE GID = :gid")
     suspend fun deleteByKey(gid: Long)

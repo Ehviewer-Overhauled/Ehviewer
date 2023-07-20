@@ -31,7 +31,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.DownloadsScene
@@ -96,7 +96,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener, CoroutineSc
     private suspend fun handleIntent(intent: Intent?) {
         when (intent?.action) {
             ACTION_START -> {
-                val gi = intent.getParcelableExtraCompat<GalleryInfo>(KEY_GALLERY_INFO)
+                val gi = intent.getParcelableExtraCompat<BaseGalleryInfo>(KEY_GALLERY_INFO)
                 val label = intent.getStringExtra(KEY_LABEL)
                 if (gi != null) {
                     deferredMgr.await().startDownload(gi, label)

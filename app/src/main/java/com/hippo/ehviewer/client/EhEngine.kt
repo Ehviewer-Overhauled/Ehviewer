@@ -20,6 +20,7 @@ import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.InsufficientFundsException
@@ -456,7 +457,7 @@ object EhEngine {
         }
     }.executeAndParsingWith(GalleryListParser::parse).apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
 
-    private suspend fun fillGalleryList(list: MutableList<GalleryInfo>, url: String, filter: Boolean) {
+    private suspend fun fillGalleryList(list: MutableList<BaseGalleryInfo>, url: String, filter: Boolean) {
         // Filter title and uploader
         if (filter) list.removeAllSuspend { EhFilter.filterTitle(it) || EhFilter.filterUploader(it) }
 

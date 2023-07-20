@@ -36,6 +36,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.NOT_FAVORITED
@@ -62,14 +63,14 @@ import rikka.core.util.ContextUtils.requireActivity
 import splitties.init.appCtx
 
 object CommonOperations {
-    fun startDownload(activity: MainActivity?, galleryInfo: GalleryInfo, forceDefault: Boolean) {
+    fun startDownload(activity: MainActivity?, galleryInfo: BaseGalleryInfo, forceDefault: Boolean) {
         startDownload(activity!!, listOf(galleryInfo), forceDefault)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun startDownload(
         activity: MainActivity,
-        galleryInfos: List<GalleryInfo>,
+        galleryInfos: List<BaseGalleryInfo>,
         forceDefault: Boolean,
     ) {
         launchNow {
@@ -82,11 +83,11 @@ object CommonOperations {
 
     private fun doStartDownload(
         activity: MainActivity,
-        galleryInfos: List<GalleryInfo>,
+        galleryInfos: List<BaseGalleryInfo>,
         forceDefault: Boolean,
     ) {
         val toStart = LongList()
-        val toAdd: MutableList<GalleryInfo> = ArrayList()
+        val toAdd: MutableList<BaseGalleryInfo> = ArrayList()
         for (gi in galleryInfos) {
             if (DownloadManager.containDownloadInfo(gi.gid)) {
                 toStart.add(gi.gid)
@@ -194,7 +195,7 @@ suspend fun keepNoMediaFileStatus() {
     }
 }
 
-suspend fun DialogState.addToFavorites(galleryInfo: GalleryInfo): Boolean {
+suspend fun DialogState.addToFavorites(galleryInfo: BaseGalleryInfo): Boolean {
     val localFavorited = EhDB.containLocalFavorites(galleryInfo.gid)
     val localFav = if (localFavorited) {
         Icons.Default.Favorite
@@ -219,7 +220,7 @@ suspend fun DialogState.addToFavorites(galleryInfo: GalleryInfo): Boolean {
 }
 
 private suspend fun doAddToFavorites(
-    galleryInfo: GalleryInfo,
+    galleryInfo: BaseGalleryInfo,
     slot: Int = NOT_FAVORITED,
     note: String = "",
     localFavorited: Boolean = true,
@@ -229,14 +230,14 @@ private suspend fun doAddToFavorites(
             if (galleryInfo.favoriteSlot > LOCAL_FAVORITED) {
                 EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token)
             } else if (localFavorited) {
-                EhDB.removeLocalFavorites(galleryInfo.gid)
+                EhDB.removeLocalFavorites(galleryInfo)
             }
             false
         }
 
         LOCAL_FAVORITED -> {
             if (localFavorited) {
-                EhDB.removeLocalFavorites(galleryInfo.gid)
+                EhDB.removeLocalFavorites(galleryInfo)
             } else {
                 EhDB.putLocalFavorites(galleryInfo)
             }
@@ -265,9 +266,9 @@ private suspend fun doAddToFavorites(
     return add
 }
 
-suspend fun removeFromFavorites(galleryInfo: GalleryInfo) = doAddToFavorites(galleryInfo)
+suspend fun removeFromFavorites(galleryInfo: BaseGalleryInfo) = doAddToFavorites(galleryInfo)
 
-fun Context.navToReader(info: GalleryInfo, page: Int = -1) {
+fun Context.navToReader(info: BaseGalleryInfo, page: Int = -1) {
     val intent = Intent(this, ReaderActivity::class.java)
     intent.action = ReaderActivity.ACTION_EH
     intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
@@ -275,7 +276,7 @@ fun Context.navToReader(info: GalleryInfo, page: Int = -1) {
     startActivity(intent)
 }
 
-suspend fun DialogState.doGalleryInfoAction(info: GalleryInfo, context: Context) {
+suspend fun DialogState.doGalleryInfoAction(info: BaseGalleryInfo, context: Context) {
     val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
     val favourite = info.favoriteSlot != NOT_FAVORITED
     val selected = if (!downloaded) {

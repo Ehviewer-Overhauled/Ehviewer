@@ -536,7 +536,7 @@ class DownloadsScene :
         if (position < 0 || position >= list.size) {
             return false
         }
-        context.navToReader(list[position])
+        context.navToReader(list[position].galleryInfo)
         return true
     }
 
@@ -844,14 +844,14 @@ class DownloadsScene :
                         GalleryDetailScene.KEY_ACTION,
                         GalleryDetailScene.ACTION_GALLERY_INFO,
                     )
-                    args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index])
+                    args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index].galleryInfo)
                     navAnimated(R.id.galleryDetailScene, args)
                 }
 
                 binding.start -> {
                     val intent = Intent(activity, DownloadService::class.java)
                     intent.action = DownloadService.ACTION_START
-                    intent.putExtra(DownloadService.KEY_GALLERY_INFO, list[index])
+                    intent.putExtra(DownloadService.KEY_GALLERY_INFO, list[index].galleryInfo)
                     ContextCompat.startForegroundService(activity, intent)
                 }
 
