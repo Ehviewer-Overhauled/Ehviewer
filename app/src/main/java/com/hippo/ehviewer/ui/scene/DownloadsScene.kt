@@ -761,12 +761,12 @@ class DownloadsScene :
             }
 
             lifecycleScope.launchIO {
+                // Delete
+                DownloadManager.deleteRangeDownload(mGidList)
                 // Delete image files
                 val checked = mBuilder.isChecked
                 Settings.removeImageFiles = checked
                 if (checked) {
-                    // Delete
-                    DownloadManager.deleteRangeDownload(mGidList)
                     val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
                     for ((i, info) in mDownloadInfoList.withIndex()) {
                         // Put file
