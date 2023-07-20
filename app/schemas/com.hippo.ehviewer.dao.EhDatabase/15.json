@@ -1,0 +1,412 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 15,
+    "identityHash": "991a3a3ddc4fe8d4dbcb39b975ab73b8",
+    "entities": [
+      {
+        "tableName": "GALLERIES",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`GID` INTEGER NOT NULL, `TOKEN` TEXT, `TITLE` TEXT, `TITLE_JPN` TEXT, `THUMB` TEXT, `CATEGORY` INTEGER NOT NULL, `POSTED` TEXT, `UPLOADER` TEXT, `RATING` REAL NOT NULL, `SIMPLE_LANGUAGE` TEXT, `FAVORITE_SLOT` INTEGER NOT NULL, PRIMARY KEY(`GID`))",
+        "fields": [
+          {
+            "fieldPath": "gid",
+            "columnName": "GID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "token",
+            "columnName": "TOKEN",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "TITLE",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "titleJpn",
+            "columnName": "TITLE_JPN",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbKey",
+            "columnName": "THUMB",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "CATEGORY",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "posted",
+            "columnName": "POSTED",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploader",
+            "columnName": "UPLOADER",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "RATING",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "simpleLanguage",
+            "columnName": "SIMPLE_LANGUAGE",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "favoriteSlot",
+            "columnName": "FAVORITE_SLOT",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "GID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "DOWNLOADS",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`GID` INTEGER NOT NULL, `STATE` INTEGER NOT NULL, `LEGACY` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, `LABEL` TEXT, `POSITION` INTEGER NOT NULL, PRIMARY KEY(`GID`), FOREIGN KEY(`GID`) REFERENCES `GALLERIES`(`GID`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "gid",
+            "columnName": "GID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "STATE",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "legacy",
+            "columnName": "LEGACY",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "TIME",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "LABEL",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "POSITION",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "GID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "GALLERIES",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "GID"
+            ],
+            "referencedColumns": [
+              "GID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "DOWNLOAD_LABELS",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`LABEL` TEXT NOT NULL, `POSITION` INTEGER NOT NULL, `_id` INTEGER, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "label",
+            "columnName": "LABEL",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "POSITION",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_DOWNLOAD_LABELS_LABEL",
+            "unique": true,
+            "columnNames": [
+              "LABEL"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_DOWNLOAD_LABELS_LABEL` ON `${TABLE_NAME}` (`LABEL`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "DOWNLOAD_DIRNAME",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`GID` INTEGER NOT NULL, `DIRNAME` TEXT NOT NULL, PRIMARY KEY(`GID`))",
+        "fields": [
+          {
+            "fieldPath": "gid",
+            "columnName": "GID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dirname",
+            "columnName": "DIRNAME",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "GID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "FILTER",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`MODE` INTEGER NOT NULL, `TEXT` TEXT NOT NULL, `ENABLE` INTEGER NOT NULL, `_id` INTEGER, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "mode",
+            "columnName": "MODE",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "TEXT",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enable",
+            "columnName": "ENABLE",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "HISTORY",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`GID` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, PRIMARY KEY(`GID`), FOREIGN KEY(`GID`) REFERENCES `GALLERIES`(`GID`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "gid",
+            "columnName": "GID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "TIME",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "GID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "GALLERIES",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "GID"
+            ],
+            "referencedColumns": [
+              "GID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "LOCAL_FAVORITES",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`GID` INTEGER NOT NULL, `TIME` INTEGER NOT NULL, PRIMARY KEY(`GID`), FOREIGN KEY(`GID`) REFERENCES `GALLERIES`(`GID`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "gid",
+            "columnName": "GID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "TIME",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "GID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "GALLERIES",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "GID"
+            ],
+            "referencedColumns": [
+              "GID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "QUICK_SEARCH",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER, `NAME` TEXT NOT NULL, `MODE` INTEGER NOT NULL, `CATEGORY` INTEGER NOT NULL, `KEYWORD` TEXT, `ADVANCE_SEARCH` INTEGER NOT NULL, `MIN_RATING` INTEGER NOT NULL, `PAGE_FROM` INTEGER NOT NULL, `PAGE_TO` INTEGER NOT NULL, `POSITION` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "NAME",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mode",
+            "columnName": "MODE",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "CATEGORY",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keyword",
+            "columnName": "KEYWORD",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "advanceSearch",
+            "columnName": "ADVANCE_SEARCH",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "minRating",
+            "columnName": "MIN_RATING",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageFrom",
+            "columnName": "PAGE_FROM",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageTo",
+            "columnName": "PAGE_TO",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "POSITION",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '991a3a3ddc4fe8d4dbcb39b975ab73b8')"
+    ]
+  }
+}
