@@ -19,4 +19,4 @@ quote = "1.0"
 proc-macro2 = "1.0"
 
 [dev-dependencies]
-jni = "0.20"
+jni = "0.21"
