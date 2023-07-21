@@ -94,6 +94,11 @@ object EhDB {
         dao.deleteByKey(gid)
     }
 
+    private suspend fun importDownloadDirname(downloadDirnameList: List<DownloadDirname>) {
+        val dao = db.downloadDirnameDao()
+        dao.insertOrIgnore(downloadDirnameList)
+    }
+
     suspend fun getAllDownloadLabelList() = db.downloadLabelDao().list()
 
     suspend fun addDownloadLabel(raw: DownloadLabel): DownloadLabel {
@@ -248,8 +253,8 @@ object EhDB {
         } use { newDb ->
             db.galleryDao().list().let { newDb.galleryDao().insertOrIgnore(it) }
             db.downloadLabelDao().list().let { newDb.downloadLabelDao().insert(it) }
+            db.downloadDirnameDao().list().let { newDb.downloadDirnameDao().insertOrIgnore(it) }
             db.downloadsDao().list().let { newDb.downloadsDao().insert(it) }
-            db.downloadDirnameDao().list().let { newDb.downloadDirnameDao().insert(it) }
             db.historyDao().list().let { newDb.historyDao().insertOrIgnore(it) }
             db.quickSearchDao().list().let { newDb.quickSearchDao().insert(it) }
             db.localFavoritesDao().list().let { newDb.localFavoritesDao().insertOrIgnore(it) }
@@ -281,13 +286,13 @@ object EhDB {
                 DownloadManager.addDownloadLabel(downloadLabelList)
             }
             runCatching {
-                val downloadInfoList = oldDB.downloadsDao().joinList().asReversed()
-                DownloadManager.addDownload(downloadInfoList, false)
+                oldDB.downloadDirnameDao().list().let {
+                    importDownloadDirname(it)
+                }
             }
             runCatching {
-                oldDB.downloadDirnameDao().list().forEach {
-                    putDownloadDirname(it.gid, it.dirname)
-                }
+                val downloadInfoList = oldDB.downloadsDao().joinList().asReversed()
+                DownloadManager.addDownload(downloadInfoList, false)
             }
             runCatching {
                 val historyInfoList = oldDB.historyDao().list()

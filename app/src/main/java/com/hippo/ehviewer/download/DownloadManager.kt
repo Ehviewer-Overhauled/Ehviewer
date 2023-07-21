@@ -27,7 +27,7 @@ import com.hippo.ehviewer.dao.DownloadLabel
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
-import com.hippo.ehviewer.spider.getGalleryDownloadDir
+import com.hippo.ehviewer.spider.putToDownloadDir
 import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.spider.write
 import com.hippo.ehviewer.util.AppConfig
@@ -203,7 +203,7 @@ object DownloadManager : OnSpiderListener {
             }
         } else {
             // It is new download info
-            info = DownloadInfo(galleryInfo)
+            info = DownloadInfo(galleryInfo, galleryInfo.putToDownloadDir())
             info.label = label
             info.state = DownloadInfo.STATE_WAIT
             info.position = allInfoList.size
@@ -233,10 +233,8 @@ object DownloadManager : OnSpiderListener {
             // Make sure download is running
             ensureDownload()
 
-            launchIO {
-                // Add it to history
-                EhDB.putHistoryInfo(info.galleryInfo)
-            }
+            // Add it to history
+            EhDB.putHistoryInfo(info.galleryInfo)
         }
     }
 
@@ -370,24 +368,19 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    suspend fun addDownload(galleryInfo: BaseGalleryInfo, label: String?) {
+    suspend fun restoreDownload(galleryInfo: BaseGalleryInfo, dirname: String) {
         if (containDownloadInfo(galleryInfo.gid)) {
             // Contain
             return
         }
 
         // It is new download info
-        val info = DownloadInfo(galleryInfo)
-        info.label = label
+        val info = DownloadInfo(galleryInfo, dirname)
         info.state = DownloadInfo.STATE_NONE
         info.position = allInfoList.size
 
-        // Add to label download list
-        val list = getInfoListForLabel(info.label)
-        if (list == null) {
-            Log.e(TAG, "Can't find download info list with label: $label")
-            return
-        }
+        // Add to default label download list
+        val list = defaultInfoList
         list.addFirst(info)
 
         // Add to all download list and map
@@ -465,7 +458,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    suspend fun deleteDownload(gid: Long) {
+    suspend fun deleteDownload(gid: Long, deleteFiles: Boolean = false) {
         stopDownloadInternal(gid)
         val info = mAllInfoMap[gid]
         if (info != null) {
@@ -491,6 +484,11 @@ object DownloadManager : OnSpiderListener {
 
             // Ensure download
             ensureDownload()
+
+            if (deleteFiles) {
+                info.downloadDir?.delete()
+                EhDB.removeDownloadDirname(info.gid)
+            }
         }
     }
 
@@ -531,10 +529,10 @@ object DownloadManager : OnSpiderListener {
         }
 
     suspend fun resetAllReadingProgress() = coroutineScope {
-        mAllInfoMap.keys.forEach { gid ->
+        allInfoList.forEach { info ->
             launch {
                 runCatching {
-                    resetReadingProgress(gid)
+                    resetReadingProgress(info)
                     Log.d(TAG, "Current thread: ${Thread.currentThread().name}")
                 }.onFailure {
                     Log.e(TAG, "Can't write SpiderInfo", it)
@@ -543,8 +541,8 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    private suspend fun resetReadingProgress(gid: Long) {
-        val downloadDir = getGalleryDownloadDir(gid) ?: return
+    private fun resetReadingProgress(info: DownloadInfo) {
+        val downloadDir = info.downloadDir ?: return
         val file = downloadDir.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return
         val spiderInfo = readCompatFromUniFile(file) ?: return
         spiderInfo.startPage = 0
@@ -1184,3 +1182,5 @@ var downloadLocation: UniFile
             downloadFragment = encodedFragment
         }
     }
+
+val DownloadInfo.downloadDir get() = dirname?.let { downloadLocation.subFile(it) }

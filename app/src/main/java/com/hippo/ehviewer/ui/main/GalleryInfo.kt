@@ -216,4 +216,4 @@ fun GalleryInfoGridItem(
 
 private const val MIN_ASPECT = 0.33F
 private const val MAX_ASPECT = 1.5F
-private const val DEFAULT_ASPECT = 0.67F
+const val DEFAULT_ASPECT = 0.67F

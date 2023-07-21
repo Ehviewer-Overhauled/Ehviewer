@@ -65,6 +65,9 @@ data class DownloadInfo(
     @Relation(parentColumn = "GID", entityColumn = "GID")
     val galleryInfo: BaseGalleryInfo,
 
+    @ColumnInfo(name = "DIRNAME")
+    val dirname: String?,
+
     @Embedded
     val downloadInfo: DownloadEntity = DownloadEntity(galleryInfo.gid),
 ) : GalleryInfo by galleryInfo, AbstractDownloadInfo by downloadInfo {

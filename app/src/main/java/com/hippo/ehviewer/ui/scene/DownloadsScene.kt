@@ -75,9 +75,8 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
+import com.hippo.ehviewer.download.downloadDir
 import com.hippo.ehviewer.ktbuilder.imageRequest
-import com.hippo.ehviewer.spider.getGalleryDownloadDir
-import com.hippo.ehviewer.spider.putToDownloadDir
 import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
@@ -88,6 +87,7 @@ import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.ViewTransition
+import com.hippo.ehviewer.ui.main.DEFAULT_ASPECT
 import com.hippo.ehviewer.ui.main.requestOf
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.setMD3Content
@@ -767,15 +767,12 @@ class DownloadsScene :
                 val checked = mBuilder.isChecked
                 Settings.removeImageFiles = checked
                 if (checked) {
-                    val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
-                    for ((i, info) in mDownloadInfoList.withIndex()) {
-                        // Put file
-                        files[i] = getGalleryDownloadDir(info.gid)
+                    mDownloadInfoList.forEach { info ->
+                        // Delete file
+                        info.downloadDir?.delete()
                         // Remove download path
                         EhDB.removeDownloadDirname(info.gid)
                     }
-                    // Delete file
-                    files.forEach { it?.delete() }
                 }
             }
         }
@@ -867,23 +864,13 @@ class DownloadsScene :
 
         fun bind(info: DownloadInfo, isChecked: Boolean) {
             binding.root.isChecked = isChecked
-            lifecycleScope.launchIO {
-                val downloadDir = getGalleryDownloadDir(info.gid) ?: run {
-                    info.putToDownloadDir()
-                    getGalleryDownloadDir(info.gid)!!
-                }
-                downloadDir.ensureDir()
-                val thumbLocation = downloadDir.subFile(".thumb")!!
-                withUIContext {
-                    binding.thumb.setMD3Content {
-                        Card(onClick = ::onClick.partially1(binding.thumb)) {
-                            CompanionAsyncThumb(
-                                info = info,
-                                path = thumbLocation,
-                                modifier = Modifier.height(height).aspectRatio(0.6666667F),
-                            )
-                        }
-                    }
+            binding.thumb.setMD3Content {
+                Card(onClick = ::onClick.partially1(binding.thumb)) {
+                    CompanionAsyncThumb(
+                        info = info,
+                        path = info.downloadDir?.subFile(".thumb"),
+                        modifier = Modifier.height(height).aspectRatio(DEFAULT_ASPECT),
+                    )
                 }
             }
             binding.title.text = EhUtils.getSuitableTitle(info)
@@ -1172,14 +1159,14 @@ class DownloadsScene :
 @Composable
 private fun CompanionAsyncThumb(
     info: GalleryInfo,
-    path: UniFile,
+    path: UniFile?,
     modifier: Modifier = Modifier,
 ) {
     var contentScale by remember(info.gid) { mutableStateOf(ContentScale.Fit) }
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val context = LocalContext.current
     var localReq by remember(info.gid) {
-        path.takeIf { it.isFile }?.uri?.let {
+        path?.takeIf { it.isFile }?.uri?.let {
             context.imageRequest {
                 data(it.toString())
                 memoryCacheKey(info.thumbKey)
@@ -1197,28 +1184,32 @@ private fun CompanionAsyncThumb(
                         contentScale = ContentScale.Crop
                     }
                 }
-                coroutineScope.launch {
-                    runCatching {
-                        if (!path.exists() && path.ensureFile()) {
-                            val key = info.thumbKey!!
-                            imageCache.read(key) {
-                                UniFile.fromFile(data.toFile())!!.openFileDescriptor("r").use { src ->
-                                    path.openFileDescriptor("w").use { dst ->
-                                        src sendTo dst
+                path?.let {
+                    coroutineScope.launch {
+                        runCatching {
+                            if (!path.exists() && path.ensureFile()) {
+                                val key = info.thumbKey!!
+                                imageCache.read(key) {
+                                    UniFile.fromFile(data.toFile())!!.openFileDescriptor("r").use { src ->
+                                        path.openFileDescriptor("w").use { dst ->
+                                            src sendTo dst
+                                        }
                                     }
                                 }
                             }
+                        }.onFailure {
+                            it.printStackTrace()
                         }
-                    }.onFailure {
-                        it.printStackTrace()
                     }
                 }
             }
             if (state is AsyncImagePainter.State.Error) {
-                coroutineScope.launch {
-                    if (path.exists()) {
-                        path.delete()
-                        localReq = null
+                path?.let {
+                    coroutineScope.launch {
+                        if (path.exists()) {
+                            path.delete()
+                            localReq = null
+                        }
                     }
                 }
             }
