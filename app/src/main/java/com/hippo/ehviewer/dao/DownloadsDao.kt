@@ -14,7 +14,7 @@ interface DownloadsDao {
     suspend fun list(): List<DownloadEntity>
 
     @Transaction
-    @Query("SELECT * FROM DOWNLOADS ORDER BY POSITION DESC")
+    @Query("SELECT * FROM DOWNLOADS LEFT JOIN DOWNLOAD_DIRNAME USING(GID) ORDER BY POSITION DESC")
     suspend fun joinList(): List<DownloadInfo>
 
     @Query("UPDATE DOWNLOADS SET POSITION = POSITION - :offset WHERE POSITION > :position")

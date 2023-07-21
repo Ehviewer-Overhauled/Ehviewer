@@ -133,7 +133,6 @@ import com.hippo.ehviewer.databinding.ItemGalleryCommentBinding
 import com.hippo.ehviewer.ktbuilder.imageRequest
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
-import com.hippo.ehviewer.spider.getGalleryDownloadDir
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
@@ -1266,18 +1265,9 @@ class GalleryDetailScene : BaseScene() {
             }
 
             lifecycleScope.launchIO {
-                // Delete
-                EhDownloadManager.deleteDownload(mGalleryInfo.gid)
-                // Delete image files
                 val checked = mBuilder.isChecked
                 Settings.removeImageFiles = checked
-                if (checked) {
-                    runCatching {
-                        val file = getGalleryDownloadDir(mGalleryInfo.gid)
-                        EhDB.removeDownloadDirname(mGalleryInfo.gid)
-                        file?.delete()
-                    }
-                }
+                EhDownloadManager.deleteDownload(mGalleryInfo.gid, checked)
             }
         }
     }

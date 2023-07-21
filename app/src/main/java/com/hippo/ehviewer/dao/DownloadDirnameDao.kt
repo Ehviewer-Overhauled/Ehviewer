@@ -2,6 +2,7 @@ package com.hippo.ehviewer.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 
@@ -13,8 +14,8 @@ interface DownloadDirnameDao {
     @Upsert
     suspend fun upsert(downloadDirname: DownloadDirname)
 
-    @Insert
-    suspend fun insert(downloadDirnameList: List<DownloadDirname>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOrIgnore(downloadDirnameList: List<DownloadDirname>)
 
     @Query("DELETE FROM DOWNLOAD_DIRNAME WHERE GID = :gid")
     suspend fun deleteByKey(gid: Long)

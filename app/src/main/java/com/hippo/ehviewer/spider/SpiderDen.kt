@@ -44,7 +44,7 @@ import java.util.Locale
 import kotlin.io.path.readText
 import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
 
-class SpiderDen(private val mGalleryInfo: GalleryInfo) {
+class SpiderDen(mGalleryInfo: GalleryInfo) {
     private val mGid = mGalleryInfo.gid
     var downloadDir: UniFile? = null
 
@@ -56,7 +56,6 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     suspend fun setMode(value: Int) {
         mode = value
         if (mode == SpiderQueen.MODE_DOWNLOAD && downloadDir == null) {
-            mGalleryInfo.putToDownloadDir()
             downloadDir = getGalleryDownloadDir(mGid)!!.apply { check(ensureDir()) { "Download directory $uri is not valid directory!" } }
         }
     }
@@ -283,10 +282,11 @@ private fun findImageFile(dir: UniFile, index: Int): UniFile? {
     return COMPAT_IMAGE_EXTENSIONS.firstNotNullOfOrNull { dir.findFile(perFilename(index, it)) }
 }
 
-suspend fun GalleryInfo.putToDownloadDir() {
+suspend fun GalleryInfo.putToDownloadDir(): String {
     val title = getSuitableTitle(this)
     val dirname = FileUtils.sanitizeFilename("$gid-$title")
     EhDB.putDownloadDirname(gid, dirname)
+    return dirname
 }
 
 suspend fun getGalleryDownloadDir(gid: Long): UniFile? {
