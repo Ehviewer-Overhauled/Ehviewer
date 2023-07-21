@@ -200,13 +200,13 @@ fun GalleryInfoGridItem(
                 modifier = Modifier.aspectRatio(aspect).fillMaxWidth(),
                 contentScale = ContentScale.Crop,
             )
-            simpleLang?.let {
-                val container = Color(color)
-                Badge(
-                    modifier = Modifier.align(Alignment.TopEnd).width(32.dp).height(24.dp),
-                    containerColor = container,
-                    contentColor = contentColorFor(container),
-                ) {
+            val container = Color(color)
+            Badge(
+                modifier = Modifier.align(Alignment.TopEnd).width(32.dp).height(24.dp),
+                containerColor = container,
+                contentColor = contentColorFor(container),
+            ) {
+                simpleLang?.let {
                     Text(text = it.uppercase())
                 }
             }
