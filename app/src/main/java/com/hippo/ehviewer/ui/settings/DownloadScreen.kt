@@ -158,12 +158,23 @@ fun DownloadScreen() {
                 title = stringResource(id = R.string.settings_download_restore_download_items),
                 summary = stringResource(id = R.string.settings_download_restore_download_items_summary),
             ) {
-                fun getRestoreItem(file: UniFile): RestoreItem? {
+                var restoreDirCount = 0
+                suspend fun getRestoreItem(file: UniFile): RestoreItem? {
                     if (!file.isDirectory) return null
                     val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
                     return runCatching {
                         val spiderInfo = readCompatFromUniFile(siFile) ?: return null
+                        val gid = spiderInfo.gid
                         val dirname = file.name ?: return null
+                        if (DownloadManager.containDownloadInfo(gid)) {
+                            // Restore download dir to avoid redownload
+                            val dbdirname = EhDB.getDownloadDirname(gid)
+                            if (null == dbdirname || dirname != dbdirname) {
+                                EhDB.putDownloadDirname(gid, dirname)
+                                restoreDirCount++
+                            }
+                            return null
+                        }
                         RestoreItem(dirname).also {
                             it.gid = spiderInfo.gid
                             it.token = spiderInfo.token
@@ -183,11 +194,15 @@ fun DownloadScreen() {
                     if (result == null) {
                         launchSnackBar(restoreFailed)
                     } else {
-                        val count = result.filterNot { it.title.isNullOrBlank() }.map {
-                            EhDB.putDownloadDirname(it.gid, it.dirname)
-                            DownloadManager.restoreDownload(it, it.dirname)
-                        }.size
-                        launchSnackBar(RESTORE_COUNT_MSG(count))
+                        if (result.isEmpty()) {
+                            launchSnackBar(RESTORE_COUNT_MSG(restoreDirCount))
+                        } else {
+                            val count = result.filterNot { it.title.isNullOrBlank() }.map {
+                                EhDB.putDownloadDirname(it.gid, it.dirname)
+                                DownloadManager.restoreDownload(it, it.dirname)
+                            }.size
+                            launchSnackBar(RESTORE_COUNT_MSG(count + restoreDirCount))
+                        }
                     }
                 }.onFailure {
                     it.printStackTrace()
