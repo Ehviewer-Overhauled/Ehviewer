@@ -1,13 +1,13 @@
 use std::borrow::Cow;
 
 use catch_panic::catch_panic;
-use html_escape::decode_html_entities;
 use jni_fn::jni_fn;
 use jnix::jni::objects::{JClass, JString};
 use jnix::jni::sys::jobject;
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
+use quick_xml::escape::unescape;
 
 use query_childs_first_match_attr;
 use {get_node_attr, get_node_handle_attr, regex};
@@ -179,7 +179,7 @@ pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject 
         Some(BaseGalleryInfo {
             gid,
             token,
-            title: decode_html_entities(title.trim()).to_string(),
+            title: unescape(title.trim()).ok()?.to_string(),
             titleJpn: None,
             thumbKey: get_thumb_key(thumb),
             category: to_category_i32(&category.trim().to_lowercase()),
