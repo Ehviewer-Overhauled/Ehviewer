@@ -369,12 +369,6 @@ object DownloadManager : OnSpiderListener {
     }
 
     suspend fun restoreDownload(galleryInfo: BaseGalleryInfo, dirname: String) {
-        if (containDownloadInfo(galleryInfo.gid)) {
-            // Contain
-            return
-        }
-
-        // It is new download info
         val info = DownloadInfo(galleryInfo, dirname)
         info.state = DownloadInfo.STATE_NONE
         info.position = allInfoList.size
