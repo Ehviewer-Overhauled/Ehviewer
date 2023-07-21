@@ -55,7 +55,7 @@ SET(LIBARCHIVE_CUSTOM_LIBS "nettle" "liblzma")
 
 FetchContent_Declare(libarchive
         GIT_REPOSITORY https://github.com/libarchive/libarchive
-        GIT_TAG v3.6.2
+        GIT_TAG v3.7.0
         PATCH_COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-shared-lib.patch ${CMAKE_CURRENT_LIST_DIR}/0002-Insert-link-libs.patch || cd .
         )
 
