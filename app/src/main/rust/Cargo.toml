@@ -7,9 +7,9 @@ resolver = "2"
 crate_type = ["cdylib"]
 
 [dependencies]
-regex = { default-features = false, features = ["std", "unicode-perl"], version = "1" }
+regex = { default-features = false, features = ["std", "unicode-perl"], version = "1.9" }
 jnix = { path = "jnix" }
-jnix-macros = "*"
+jnix-macros = "0.4"
 catch_panic = { path = "catch_panic" }
 catch_panic_macros = { path = "catch_panic_macros" }
 jni_fn = { path = "jni_fn" }
@@ -22,6 +22,6 @@ once_cell = { default-features = false, version = "1.18" }
 
 [profile.release]
 strip = true
-opt-level = 's'
+opt-level = "s"
 lto = true
 codegen-units = 1

@@ -17,6 +17,6 @@ categories = ["api-bindings"]
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "*"
-quote = "*"
-syn = { version = "1", features = ["full"] }
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["full"] }
