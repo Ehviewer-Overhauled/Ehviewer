@@ -3,7 +3,7 @@ project(ehviewer C ASM)
 include(FetchContent)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops -flto=thin \
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops -flto \
            -mllvm -polly \
            -mllvm -polly-run-dce \
            -mllvm -polly-run-inliner \
