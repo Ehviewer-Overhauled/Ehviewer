@@ -1,0 +1,29 @@
+From 57da49f9b0ed8538573f6cfe289f835ee0078eec Mon Sep 17 00:00:00 2001
+From: tarsin <yuanqingxiang233@163.com>
+Date: Sat, 22 Jul 2023 17:50:08 +0800
+Subject: [PATCH] Hide symbols
+
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 646484b7..67a71272 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2060,10 +2060,10 @@ SET(OLD_CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
+ SET(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -fvisibility=hidden -Werror")
+ CHECK_C_SOURCE_COMPILES("void __attribute__((visibility(\"default\"))) foo(void);
+ int main() { return 0; }" HAVE_VISIBILITY_ATTR)
+-IF (HAVE_VISIBILITY_ATTR)
++IF (0)
+   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+   ADD_DEFINITIONS(-D__LIBARCHIVE_ENABLE_VISIBILITY)
+-ENDIF(HAVE_VISIBILITY_ATTR)
++ENDIF(0)
+ SET(CMAKE_REQUIRED_FLAGS "${OLD_CMAKE_REQUIRED_FLAGS}")
+ 
+ # Generate "config.h" from "build/cmake/config.h.in"
+-- 
+2.41.0
+
