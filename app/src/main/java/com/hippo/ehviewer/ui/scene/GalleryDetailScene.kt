@@ -1364,17 +1364,19 @@ class GalleryDetailScene : BaseScene() {
                         runSuspendCatching {
                             EhEngine.downloadArchive(gid, token, mArchiveFormParamOr, res, isHAtH)
                         }.onSuccess { result ->
-                            val r = DownloadManager.Request(Uri.parse(result))
-                            val name = "$gid-" + EhUtils.getSuitableTitle(this@run) + ".zip"
-                            r.setDestinationInExternalPublicDir(
-                                Environment.DIRECTORY_DOWNLOADS,
-                                FileUtils.sanitizeFilename(name),
-                            )
-                            r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                            runCatching {
-                                downloadManager.enqueue(r)
-                            }.onFailure {
-                                it.printStackTrace()
+                            result?.let {
+                                val r = DownloadManager.Request(Uri.parse(result))
+                                val name = "$gid-" + EhUtils.getSuitableTitle(this@run) + ".zip"
+                                r.setDestinationInExternalPublicDir(
+                                    Environment.DIRECTORY_DOWNLOADS,
+                                    FileUtils.sanitizeFilename(name),
+                                )
+                                r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                runCatching {
+                                    downloadManager.enqueue(r)
+                                }.onFailure {
+                                    it.printStackTrace()
+                                }
                             }
                             showTip(R.string.download_archive_started, LENGTH_SHORT)
                         }.onFailure {
