@@ -56,6 +56,7 @@ option(ENABLE_TAR OFF)
 option(ENABLE_CPIO OFF)
 option(ENABLE_CAT OFF)
 option(ENABLE_UNZIP OFF)
+option(ENABLE_TEST OFF)
 
 # Configure libarchive link's static lib
 SET(LIBARCHIVE_CUSTOM_LIBS "nettle" "liblzma")
