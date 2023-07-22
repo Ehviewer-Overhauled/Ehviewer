@@ -50,13 +50,18 @@ SET(HAVE_LZMA_STREAM_ENCODER_MT 1)
 SET(HAVE_LZMADEC_H 1)
 SET(HAVE_LIBLZMADEC 1)
 
+option(ENABLE_TAR OFF)
+option(ENABLE_CPIO OFF)
+option(ENABLE_CAT OFF)
+option(ENABLE_UNZIP OFF)
+
 # Configure libarchive link's static lib
 SET(LIBARCHIVE_CUSTOM_LIBS "nettle" "liblzma")
 
 FetchContent_Declare(libarchive
         GIT_REPOSITORY https://github.com/libarchive/libarchive
-        GIT_TAG v3.6.2
-        PATCH_COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-shared-lib.patch ${CMAKE_CURRENT_LIST_DIR}/0002-Insert-link-libs.patch || cd .
+        GIT_TAG v3.7.0
+        PATCH_COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/0002-Insert-link-libs.patch || cd .
         )
 
 FetchContent_MakeAvailable(libarchive)
