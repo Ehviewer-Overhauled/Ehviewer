@@ -474,6 +474,8 @@ class GalleryDetailScene : BaseScene() {
                                 contentPadding = it,
                                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                             )
+                        } else if (getDetailError.isNotBlank()) {
+                            GalleryDetailErrorTip(error = getDetailError, onClick = ::actionRefresh)
                         } else {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
