@@ -20,9 +20,11 @@ endif (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 get_filename_component(deps "../_deps" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
 set(FETCHCONTENT_BASE_DIR ${deps})
 
+set(BUILD_TESTING 0)
+
 FetchContent_Declare(liblzma
         GIT_REPOSITORY https://git.tukaani.org/xz.git
-        GIT_TAG v5.4.1
+        GIT_TAG v5.4.3
         PATCH_COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-other-binarys.patch || cd .
         )
 
