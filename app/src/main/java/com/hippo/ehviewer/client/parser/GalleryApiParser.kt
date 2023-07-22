@@ -20,6 +20,7 @@ import com.hippo.ehviewer.client.EhUtils.handleThumbUrlResolution
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.getThumbKey
 import com.hippo.ehviewer.client.parseAs
+import com.hippo.ehviewer.util.unescapeXml
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -28,11 +29,11 @@ object GalleryApiParser {
         body.parseAs<Result>().items.forEach { item ->
             val gi = galleryInfoList.find { it.gid == item.gid } ?: return@forEach
             gi.apply {
-                title = item.title
-                titleJpn = item.titleJpn
+                title = item.title.unescapeXml()
+                titleJpn = item.titleJpn.unescapeXml()
                 category = getCategory(item.category)
                 thumbKey = getThumbKey(handleThumbUrlResolution(item.thumb)!!)
-                uploader = item.uploader
+                uploader = item.uploader.unescapeXml()
                 posted = ParserUtils.formatDate(item.posted * 1000)
                 rating = item.rating
                 simpleTags = item.tags
