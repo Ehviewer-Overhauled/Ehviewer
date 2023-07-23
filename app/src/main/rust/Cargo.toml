@@ -13,7 +13,7 @@ jnix-macros = "0.4"
 catch_panic = { path = "catch_panic" }
 catch_panic_macros = { path = "catch_panic_macros" }
 jni_fn = { path = "jni_fn" }
-quick-xml = { default-features = false, version = "0.29" }
+quick-xml = { default-features = false, version = "0.30" }
 tl = "0.7"
 log = "0.4"
 android_logger = { default-features = false, version = "0.13" }
