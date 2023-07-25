@@ -256,7 +256,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-okio:$serialization")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jsoup:jsoup:1.16.1")
 
     val chunker = "4.0.0"
