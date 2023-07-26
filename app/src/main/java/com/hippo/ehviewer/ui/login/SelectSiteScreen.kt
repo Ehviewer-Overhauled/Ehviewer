@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,10 +54,10 @@ fun SelectSiteScreen() {
         )
         Spacer(modifier = Modifier.weight(1f))
         SingleChoiceSegmentedButtonRow {
-            SegmentedButton(selected = !siteEx, onClick = { siteEx = false }) {
+            SegmentedButton(selected = !siteEx, onClick = { siteEx = false }, shape = SegmentedButtonDefaults.shape(0, 2)) {
                 Text(text = stringResource(id = R.string.site_e))
             }
-            SegmentedButton(selected = siteEx, onClick = { siteEx = true }) {
+            SegmentedButton(selected = siteEx, onClick = { siteEx = true }, shape = SegmentedButtonDefaults.shape(1, 2)) {
                 Text(text = stringResource(id = R.string.site_ex))
             }
         }
