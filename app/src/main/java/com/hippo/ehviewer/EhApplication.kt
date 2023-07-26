@@ -18,6 +18,7 @@ package com.hippo.ehviewer
 
 import android.app.Application
 import android.content.ComponentCallbacks2
+import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -29,6 +30,7 @@ import com.google.net.cronet.okhttptransport.RedirectStrategy.withoutRedirects
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.coil.CronetHttpUriFetcher
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.download.DownloadManager
@@ -54,6 +56,7 @@ import eu.kanade.tachiyomi.network.interceptor.CloudflareInterceptor
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.launch
+import moe.tarsin.kt.unreachable
 import okhttp3.AsyncDns
 import okhttp3.android.AndroidAsyncDns
 import okio.Path.Companion.toOkioPath
@@ -142,8 +145,16 @@ class EhApplication : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader() = imageLoader {
-        okHttpClient(nonCacheOkHttpClient)
         components {
+            if (isCronetSupported) {
+                callFactory { unreachable() }
+                add { data: Uri, options, loader ->
+                    if (data.scheme != "http" && data.scheme != "https") return@add null
+                    CronetHttpUriFetcher(data.toString(), options, loader)
+                }
+            } else {
+                okHttpClient(nonCacheOkHttpClient)
+            }
             add { result, options, _ -> ImageDecoderDecoder(result.source, options, false) }
             add(MergeInterceptor)
         }
