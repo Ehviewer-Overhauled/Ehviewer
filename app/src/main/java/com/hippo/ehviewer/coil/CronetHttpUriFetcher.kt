@@ -1,6 +1,10 @@
+@file:Suppress("BlockingMethodInNonBlockingContext")
+
 package com.hippo.ehviewer.coil
 
+import android.net.Uri
 import android.webkit.MimeTypeMap
+import coil.ComponentRegistry
 import coil.ImageLoader
 import coil.decode.DataSource
 import coil.decode.ImageSource
@@ -13,7 +17,7 @@ import com.hippo.ehviewer.spider.cronetRequest
 import com.hippo.ehviewer.spider.execute
 import java.io.RandomAccessFile
 
-class CronetHttpUriFetcher(val data: String, val options: Options, val imageLoader: ImageLoader) : Fetcher {
+class CronetHttpUriFetcher(private val data: String, private val options: Options, private val imageLoader: ImageLoader) : Fetcher {
     override suspend fun fetch(): FetchResult {
         val diskCacheKey = options.diskCacheKey ?: data
         val diskCache = requireNotNull(imageLoader.diskCache)
@@ -40,6 +44,11 @@ class CronetHttpUriFetcher(val data: String, val options: Options, val imageLoad
             dataSource = DataSource.DISK,
         )
     }
+}
+
+fun ComponentRegistry.Builder.installCronetHttpUriFetcher() = add { data: Uri, options, loader ->
+    if (data.scheme != "http" && data.scheme != "https") return@add null
+    CronetHttpUriFetcher(data.toString(), options, loader)
 }
 
 private fun getMimeType(url: String) = MimeTypeMap.getSingleton().getMimeTypeFromUrl(url)
