@@ -5,7 +5,6 @@ import com.hippo.ehviewer.client.CHROME_ACCEPT
 import com.hippo.ehviewer.client.CHROME_ACCEPT_LANGUAGE
 import com.hippo.ehviewer.client.CHROME_USER_AGENT
 import com.hippo.ehviewer.client.EhCookieStore
-import com.hippo.ehviewer.util.runIf
 import eu.kanade.tachiyomi.util.system.logcat
 import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.coroutineScope
@@ -24,7 +23,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 private const val TAG = "CronetRequest"
-private val pool = DirectByteBufferPool(32)
+val pool = DirectByteBufferPool(32)
 
 val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
     enableBrotli(true)
@@ -39,7 +38,7 @@ val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
 val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.executorService
 
 // TODO: Rewrite this to use android.net.http.HttpEngine and make it Android 14 only when released
-class CronetRequest : AutoCloseable {
+class CronetRequest {
     lateinit var consumer: (ByteBuffer) -> Unit
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
@@ -58,8 +57,6 @@ class CronetRequest : AutoCloseable {
         override fun onReadCompleted(req: UrlRequest, info: UrlResponseInfo, data: ByteBuffer) {
             data.flip()
             consumer(data)
-            buffer.clear()
-            request.read(buffer)
         }
 
         override fun onSucceeded(req: UrlRequest, info: UrlResponseInfo) {
@@ -72,10 +69,6 @@ class CronetRequest : AutoCloseable {
             daemonCont.resumeWithException(e)
         }
     }
-
-    lateinit var buffer: ByteBuffer
-
-    override fun close() = runIf(::buffer.isInitialized) { pool.recycle(buffer) }
 }
 
 inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
@@ -88,20 +81,28 @@ inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.
     }.apply(conf).build()
 }
 
-suspend fun CronetRequest.awaitBodyFully(callback: (ByteBuffer) -> Unit) = suspendCancellableCoroutine { cont ->
-    consumer = callback
-    readerCont = cont
-    buffer = pool.borrow()
-    request.read(buffer)
+suspend inline fun CronetRequest.awaitBodyFully(crossinline callback: (ByteBuffer) -> Unit): Long {
+    val buffer = pool.borrow()
+    return try {
+        suspendCancellableCoroutine { cont ->
+            consumer = {
+                callback(it)
+                buffer.clear()
+                request.read(buffer)
+            }
+            readerCont = cont
+            request.read(buffer)
+        }
+    } finally {
+        pool.recycle(buffer)
+    }
 }
 
-suspend fun CronetRequest.execute(callback: suspend CronetRequest.(UrlResponseInfo) -> Unit) = use {
-    coroutineScope {
-        onResponse = { launch { callback(it) } }
-        suspendCancellableCoroutine { cont ->
-            cont.invokeOnCancellation { request.cancel() }
-            daemonCont = cont
-            request.start()
-        }
+suspend inline fun CronetRequest.execute(crossinline callback: suspend CronetRequest.(UrlResponseInfo) -> Unit) = coroutineScope {
+    onResponse = { launch { callback(it) } }
+    suspendCancellableCoroutine { cont ->
+        cont.invokeOnCancellation { request.cancel() }
+        daemonCont = cont
+        request.start()
     }
 }
