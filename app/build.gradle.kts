@@ -197,7 +197,7 @@ dependencies {
     val paging = "3.2.0-rc01"
     implementation("androidx.paging:paging-compose:$paging")
     implementation("androidx.paging:paging-runtime-ktx:$paging")
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.1")
     implementation("androidx.recyclerview:recyclerview-selection:1.2.0-alpha01")
 
     // https://developer.android.com/jetpack/androidx/releases/room
