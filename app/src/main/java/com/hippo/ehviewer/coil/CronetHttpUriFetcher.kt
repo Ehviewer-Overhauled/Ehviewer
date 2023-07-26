@@ -17,11 +17,15 @@ import com.hippo.ehviewer.spider.cronetRequest
 import com.hippo.ehviewer.spider.execute
 import java.io.RandomAccessFile
 
+/**
+ * A HttpUriFetcher impl use Cronet for jvmheapless IO
+ * cacheHeader is never respected | recorded since thumb is immutable
+ */
 class CronetHttpUriFetcher(private val data: String, private val options: Options, private val imageLoader: ImageLoader) : Fetcher {
     override suspend fun fetch(): FetchResult {
         val diskCacheKey = options.diskCacheKey ?: data
         val diskCache = requireNotNull(imageLoader.diskCache)
-        val snapshot = diskCache.openSnapshot(diskCacheKey) ?: kotlin.run {
+        val snapshot = diskCache.openSnapshot(diskCacheKey) ?: run {
             cronetRequest(data) {
                 disableCache()
             }.execute {
@@ -35,11 +39,11 @@ class CronetHttpUriFetcher(private val data: String, private val options: Option
                 }
                 check(success)
             }
+            // diskcache snapshot MUST exist here
             requireNotNull(diskCache.openSnapshot(diskCacheKey))
         }
-        val src = ImageSource(snapshot.data, diskCache.fileSystem, diskCacheKey, snapshot)
         return SourceResult(
-            source = src,
+            source = ImageSource(snapshot.data, diskCache.fileSystem, diskCacheKey, snapshot),
             mimeType = getMimeType(data),
             dataSource = DataSource.DISK,
         )
