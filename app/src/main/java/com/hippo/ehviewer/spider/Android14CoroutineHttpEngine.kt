@@ -5,6 +5,7 @@ import com.hippo.ehviewer.client.CHROME_ACCEPT
 import com.hippo.ehviewer.client.CHROME_ACCEPT_LANGUAGE
 import com.hippo.ehviewer.client.CHROME_USER_AGENT
 import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.util.runIf
 import eu.kanade.tachiyomi.util.system.logcat
 import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.coroutineScope
@@ -72,9 +73,9 @@ class CronetRequest : AutoCloseable {
         }
     }
 
-    val buffer = pool.borrow()
+    lateinit var buffer: ByteBuffer
 
-    override fun close() = pool.recycle(buffer)
+    override fun close() = runIf(::buffer.isInitialized) { pool.recycle(buffer) }
 }
 
 inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
@@ -87,23 +88,20 @@ inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.
     }.apply(conf).build()
 }
 
-suspend infix fun CronetRequest.awaitBodyFully(consumer: (ByteBuffer) -> Unit) = run {
-    this.consumer = consumer
-    suspendCancellableCoroutine { cont ->
-        readerCont = cont
-        request.read(buffer)
-    }
+suspend fun CronetRequest.awaitBodyFully(callback: (ByteBuffer) -> Unit) = suspendCancellableCoroutine { cont ->
+    consumer = callback
+    readerCont = cont
+    buffer = pool.borrow()
+    request.read(buffer)
 }
 
-suspend inline fun CronetRequest.execute(noinline onResponse: suspend CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
-    return use {
-        coroutineScope {
-            this@execute.onResponse = { launch { onResponse(it) } }
-            suspendCancellableCoroutine { cont ->
-                cont.invokeOnCancellation { request.cancel() }
-                daemonCont = cont
-                request.start()
-            }
+suspend fun CronetRequest.execute(callback: suspend CronetRequest.(UrlResponseInfo) -> Unit) = use {
+    coroutineScope {
+        onResponse = { launch { callback(it) } }
+        suspendCancellableCoroutine { cont ->
+            cont.invokeOnCancellation { request.cancel() }
+            daemonCont = cont
+            request.start()
         }
     }
 }
