@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.legacy
 
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.DrawableWrapper
 import android.text.Html
 import android.widget.TextView
@@ -16,6 +17,7 @@ class CoilImageGetter(
                 crossfade(false)
                 target { drawable ->
                     setDrawable(drawable)
+                    if (drawable is Animatable) drawable.start()
                     setBounds(0, 0, intrinsicWidth, intrinsicHeight)
                     textView.text = textView.text
                 }
