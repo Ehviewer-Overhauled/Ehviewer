@@ -18,6 +18,7 @@ import org.chromium.net.UrlRequest
 import org.chromium.net.UrlResponseInfo
 import splitties.init.appCtx
 import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -96,6 +97,11 @@ suspend inline fun CronetRequest.awaitBodyFully(crossinline callback: (ByteBuffe
     } finally {
         pool.recycle(buffer)
     }
+}
+
+suspend inline fun CronetRequest.copyToChannel(chan: FileChannel, crossinline listener: ((Int) -> Unit) = {}) = awaitBodyFully {
+    val bytes = chan.write(it)
+    listener(bytes)
 }
 
 suspend inline fun CronetRequest.execute(crossinline callback: suspend CronetRequest.(UrlResponseInfo) -> Unit) = coroutineScope {

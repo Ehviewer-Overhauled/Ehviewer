@@ -12,7 +12,7 @@ import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.fetch.SourceResult
 import coil.request.Options
-import com.hippo.ehviewer.cronet.awaitBodyFully
+import com.hippo.ehviewer.cronet.copyToChannel
 import com.hippo.ehviewer.cronet.cronetRequest
 import com.hippo.ehviewer.cronet.execute
 import java.io.RandomAccessFile
@@ -30,11 +30,8 @@ class CronetHttpUriFetcher(private val data: String, private val options: Option
                 disableCache()
             }.execute {
                 val success = diskCache.suspendEdit(diskCacheKey) {
-                    RandomAccessFile(data.toFile(), "rw").use { f ->
-                        val chan = f.channel
-                        awaitBodyFully { buffer ->
-                            chan.write(buffer)
-                        }
+                    RandomAccessFile(data.toFile(), "rw").use {
+                        copyToChannel(it.channel)
                     }
                 }
                 check(success)

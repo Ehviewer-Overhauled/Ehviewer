@@ -26,7 +26,7 @@ import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.coil.suspendEdit
-import com.hippo.ehviewer.cronet.awaitBodyFully
+import com.hippo.ehviewer.cronet.copyToChannel
 import com.hippo.ehviewer.cronet.cronetRequest
 import com.hippo.ehviewer.cronet.execute
 import com.hippo.ehviewer.download.downloadLocation
@@ -141,11 +141,10 @@ class SpiderDen(mGalleryInfo: GalleryInfo) {
                 val type = headers["Content-Type"]?.first()?.toMediaType()?.subtype ?: "jpg"
                 val length = headers["Content-Length"]!!.first().toLong()
                 saveResponseMeta(index, type, length) { file ->
-                    file.openOutputStream().use {
-                        val chan = it.channel
-                        awaitBodyFully { buffer ->
-                            val read = chan.write(buffer)
-                            notifyProgress(length, info.receivedByteCount, read)
+                    file.openOutputStream().use { os ->
+                        val chan = os.channel
+                        copyToChannel(chan) {
+                            notifyProgress(length, info.receivedByteCount, it)
                         }.also { size -> if (chan.size() != size) chan.truncate(size) }
                     }
                 }
