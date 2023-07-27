@@ -249,7 +249,6 @@ dependencies {
     implementation("io.ktor:ktor-utils-jvm:$ktor")
 
     implementation("org.chromium.net:cronet-embedded:113.5672.61")
-    implementation("com.google.guava:guava:32.0.1-android")
 
     val serialization = "1.5.1"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serialization")

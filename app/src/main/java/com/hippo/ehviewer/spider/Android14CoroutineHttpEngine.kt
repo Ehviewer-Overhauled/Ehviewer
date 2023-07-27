@@ -35,7 +35,7 @@ val cronetHttpClient: CronetEngine = CronetEngine.Builder(appCtx).apply {
     addQuicHint("exhentai.org", 443, 443)
 }.build()
 
-val cronetHttpClientExecutor = EhApplication.nonCacheOkHttpClient.dispatcher.executorService
+val cronetHttpClientExecutor = EhApplication.baseOkHttpClient.dispatcher.executorService
 
 // TODO: Rewrite this to use android.net.http.HttpEngine and make it Android 14 only when released
 class CronetRequest {

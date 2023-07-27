@@ -19,7 +19,7 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
+import com.hippo.ehviewer.EhApplication.Companion.baseOkHttpClient
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.util.AppConfig
 import com.hippo.ehviewer.util.FileUtils
@@ -245,11 +245,9 @@ object EhTagDatabase : CoroutineScope {
                     FileUtils.delete(dataFile)
                 }
 
-                val client = nonCacheOkHttpClient
-
                 // Save new sha1
                 val tempSha1File = File(dir, "$sha1Name.tmp")
-                check(save(client, sha1Url, tempSha1File))
+                check(save(baseOkHttpClient, sha1Url, tempSha1File))
                 val tempSha1 = getFileContent(tempSha1File)
 
                 // Check new sha1 and current sha1
@@ -261,7 +259,7 @@ object EhTagDatabase : CoroutineScope {
 
                 // Save new data
                 val tempDataFile = File(dir, "$dataName.tmp")
-                check(save(client, dataUrl, tempDataFile))
+                check(save(baseOkHttpClient, dataUrl, tempDataFile))
 
                 // Check new sha1 and new data
                 if (!checkData(tempSha1, tempDataFile)) {
