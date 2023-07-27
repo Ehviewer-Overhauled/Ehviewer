@@ -34,6 +34,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudDone
@@ -86,6 +88,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LocalPinnableContainer
@@ -991,13 +994,14 @@ class GalleryDetailScene : BaseScene() {
         } else {
             stringResource(R.string.more_comment)
         }
-        CrystalCard(onClick = ::onNavigateToCommentScene) {
+        CrystalCard {
             if (commentsList != null) {
                 val length = maxShowCount.coerceAtMost(commentsList.size)
                 for (i in 0 until length) {
                     val comment = commentsList[i]
                     AndroidView(factory = { context ->
                         ItemGalleryCommentBinding.inflate(LayoutInflater.from(context), null, false).apply {
+                            card.setOnClickListener { onNavigateToCommentScene() }
                             user.text = comment.user
                             user.setBackgroundColor(Color.TRANSPARENT)
                             time.text = ReadableTime.getTimeAgo(comment.time)
@@ -1008,9 +1012,8 @@ class GalleryDetailScene : BaseScene() {
                 }
             }
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = dimensionResource(id = R.dimen.strip_item_padding_v)),
+                modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.strip_item_padding_v))
+                    .clip(RoundedCornerShape(16.dp)).clickable(onClick = ::onNavigateToCommentScene),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(commentText)

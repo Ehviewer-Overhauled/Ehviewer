@@ -41,3 +41,13 @@ fun CrystalCard(
     border = crystalCardBorder(),
     content = content,
 )
+
+@Composable
+fun CrystalCard(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) = OutlinedCard(
+    modifier = modifier,
+    border = crystalCardBorder(),
+    content = content,
+)
