@@ -1,5 +1,3 @@
-mod net;
-
 use crate::{IntoJava, JnixEnv};
 use jni::sys::jfloat;
 use jni::{

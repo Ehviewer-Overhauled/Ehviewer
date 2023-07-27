@@ -1,5 +1,3 @@
-mod net;
-
 use crate::{FromJava, JnixEnv};
 use jni::signature::ReturnType;
 use jni::{
