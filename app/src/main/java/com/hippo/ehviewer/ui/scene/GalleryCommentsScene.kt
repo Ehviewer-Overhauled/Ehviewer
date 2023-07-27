@@ -40,6 +40,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.text.getSpans
@@ -73,9 +74,8 @@ import com.hippo.ehviewer.databinding.ItemGalleryCommentProgressBinding
 import com.hippo.ehviewer.databinding.SceneGalleryCommentsBinding
 import com.hippo.ehviewer.ui.jumpToReaderByPage
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.legacy.CoilImageGetter
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
-import com.hippo.ehviewer.ui.legacy.ObservedTextView
-import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.openBrowser
@@ -759,10 +759,10 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
         private fun generateComment(
             context: Context,
-            textView: ObservedTextView,
+            textView: TextView,
             comment: GalleryComment,
         ): CharSequence {
-            sp = comment.comment.orEmpty().parseAsHtml(imageGetter = URLImageGetter(textView))
+            sp = comment.comment.orEmpty().parseAsHtml(imageGetter = CoilImageGetter(textView))
             val ssb = SpannableStringBuilder(sp)
             if (0L != comment.id && 0 != comment.score) {
                 val score = comment.score

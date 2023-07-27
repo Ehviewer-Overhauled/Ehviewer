@@ -21,11 +21,12 @@ import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.util.AttributeSet
 import android.view.MotionEvent
+import androidx.appcompat.widget.AppCompatTextView
 
 class LinkifyTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : ObservedTextView(context, attrs) {
+) : AppCompatTextView(context, attrs) {
     var currentSpan: ClickableSpan? = null
         private set
 

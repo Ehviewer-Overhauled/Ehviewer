@@ -139,9 +139,9 @@ import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
+import com.hippo.ehviewer.ui.legacy.CoilImageGetter
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
-import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
 import com.hippo.ehviewer.ui.main.GalleryDetailErrorTip
@@ -996,15 +996,14 @@ class GalleryDetailScene : BaseScene() {
                 val length = maxShowCount.coerceAtMost(commentsList.size)
                 for (i in 0 until length) {
                     val comment = commentsList[i]
-                    AndroidView(factory = {
-                        ItemGalleryCommentBinding.inflate(LayoutInflater.from(it), null, false)
-                            .apply {
-                                user.text = comment.user
-                                user.setBackgroundColor(Color.TRANSPARENT)
-                                time.text = ReadableTime.getTimeAgo(comment.time)
-                                this.comment.maxLines = 5
-                                this.comment.text = comment.comment.orEmpty().parseAsHtml(imageGetter = URLImageGetter(this.comment))
-                            }.root
+                    AndroidView(factory = { context ->
+                        ItemGalleryCommentBinding.inflate(LayoutInflater.from(context), null, false).apply {
+                            user.text = comment.user
+                            user.setBackgroundColor(Color.TRANSPARENT)
+                            time.text = ReadableTime.getTimeAgo(comment.time)
+                            this.comment.maxLines = 5
+                            this.comment.text = comment.comment.orEmpty().parseAsHtml(imageGetter = CoilImageGetter(this.comment))
+                        }.root
                     })
                 }
             }
