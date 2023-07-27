@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.spider
+package com.hippo.ehviewer.cronet
 
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.client.CHROME_ACCEPT

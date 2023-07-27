@@ -26,6 +26,9 @@ import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.coil.suspendEdit
+import com.hippo.ehviewer.cronet.awaitBodyFully
+import com.hippo.ehviewer.cronet.cronetRequest
+import com.hippo.ehviewer.cronet.execute
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.ehviewer.image.Image.CloseableSource

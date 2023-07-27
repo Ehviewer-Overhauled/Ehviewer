@@ -12,9 +12,9 @@ import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.fetch.SourceResult
 import coil.request.Options
-import com.hippo.ehviewer.spider.awaitBodyFully
-import com.hippo.ehviewer.spider.cronetRequest
-import com.hippo.ehviewer.spider.execute
+import com.hippo.ehviewer.cronet.awaitBodyFully
+import com.hippo.ehviewer.cronet.cronetRequest
+import com.hippo.ehviewer.cronet.execute
 import java.io.RandomAccessFile
 
 /**
