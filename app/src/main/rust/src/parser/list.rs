@@ -8,6 +8,7 @@ use jnix_macros::IntoJava;
 use parse_jni_string;
 use quick_xml::escape::unescape;
 use std::borrow::Cow;
+use std::ops::Index;
 use tl::{Node, Parser};
 use {get_element_by_id, get_vdom_first_element_by_class_name};
 use {get_first_element_by_class_name, query_childs_first_match_attr};
@@ -37,6 +38,15 @@ pub struct BaseGalleryInfo {
     favoriteSlot: i32,
     favoriteName: Option<String>,
     favoriteNote: Option<String>,
+}
+
+#[derive(Default, IntoJava)]
+#[allow(non_snake_case)]
+#[jnix(package = "com.hippo.ehviewer.client.parser")]
+pub struct GalleryListResult {
+    prev: Option<String>,
+    next: Option<String>,
+    galleryInfoList: Vec<BaseGalleryInfo>,
 }
 
 fn to_category_i32(category: &str) -> i32 {
@@ -196,7 +206,29 @@ pub fn parseGalleryInfoList(env: JNIEnv, _class: JClass, input: JString) -> jobj
         let info: Vec<BaseGalleryInfo> = iter
             .filter_map(|x| parse_gallery_info(x.get(parser)?, parser))
             .collect();
-        Some(info)
+        let prev = dom.get_element_by_id("uprev").and_then(|e| {
+            let str = get_node_handle_attr(&e, parser, "href")?;
+            Some(
+                regex!("prev=(\\d+(-\\d+)?)")
+                    .captures(str)?
+                    .index(1)
+                    .to_string(),
+            )
+        });
+        let next = dom.get_element_by_id("unext").and_then(|e| {
+            let str = get_node_handle_attr(&e, parser, "href")?;
+            Some(
+                regex!("next=(\\d+(-\\d+)?)")
+                    .captures(str)?
+                    .index(1)
+                    .to_string(),
+            )
+        });
+        Some(GalleryListResult {
+            prev,
+            next,
+            galleryInfoList: info,
+        })
     })
     .unwrap()
     .into_java(&env)
