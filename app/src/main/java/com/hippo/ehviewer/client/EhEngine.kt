@@ -45,10 +45,14 @@ import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.client.parser.TorrentResult
 import com.hippo.ehviewer.client.parser.VoteCommentResult
 import com.hippo.ehviewer.client.parser.VoteTagParser
+import com.hippo.ehviewer.cronet.awaitBodyFully
+import com.hippo.ehviewer.cronet.cronetRequest
+import com.hippo.ehviewer.cronet.execute
 import com.hippo.ehviewer.dailycheck.showEventNotification
 import com.hippo.ehviewer.dailycheck.today
 import com.hippo.ehviewer.util.AppConfig
 import com.hippo.ehviewer.util.StatusCodeException
+import io.ktor.utils.io.pool.DirectByteBufferPool
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.add
@@ -65,6 +69,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import org.jsoup.Jsoup
 import splitties.init.appCtx
 import java.io.File
+import java.nio.ByteBuffer
 import kotlin.math.ceil
 
 private const val TAG = "EhEngine"
@@ -124,6 +129,25 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     throw e
 }
 
+val httpContentPool = DirectByteBufferPool(16, 16384)
+
+suspend inline fun <T> fetchCompat(url: String, referer: String? = null, crossinline parser: (ByteBuffer) -> T): T {
+    val ret: T
+    cronetRequest(url, referer).execute {
+        val buffer = httpContentPool.borrow()
+        try {
+            awaitBodyFully {
+                buffer.put(it)
+            }
+            buffer.flip()
+            ret = parser(buffer)
+        } finally {
+            httpContentPool.recycle(buffer)
+        }
+    }
+    return ret
+}
+
 @Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 private suspend inline fun <T> Request.executeAndParsingWith(block: suspend String.() -> T): T {
     Log.d(TAG, url.toString())
@@ -151,7 +175,7 @@ object EhEngine {
 
     suspend fun getTorrentList(url: String, gid: Long, token: String?): TorrentResult {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        return ehRequest(url, referer).executeAndParsingWith(TorrentParser::parse)
+        return fetchCompat(url, referer, TorrentParser::parse)
     }
 
     suspend fun getArchiveList(url: String, gid: Long, token: String?) = ehRequest(url, EhUrl.getGalleryDetailUrl(gid, token))

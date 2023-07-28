@@ -1,7 +1,9 @@
 package com.hippo.ehviewer.client.parser
 
+import java.nio.ByteBuffer
+
 object TorrentParser {
-    fun parse(body: String) = parseTorrent(body)
+    fun parse(body: ByteBuffer) = parseTorrent(body)
 }
 
 class Torrent(
@@ -18,4 +20,4 @@ fun Torrent.format() = "[$posted] $name [$size] [↑$seeds ↓$peers ✓$downloa
 
 typealias TorrentResult = ArrayList<Torrent>
 
-private external fun parseTorrent(body: String): ArrayList<Torrent>
+private external fun parseTorrent(body: ByteBuffer, size: Int = body.limit()): ArrayList<Torrent>

@@ -13,11 +13,13 @@ extern crate regex_lite;
 extern crate tl;
 
 use android_logger::Config;
-use jnix::jni::objects::JString;
+use jnix::jni::objects::{JByteBuffer, JString};
 use jnix::jni::sys::{jint, JavaVM, JNI_VERSION_1_6};
 use jnix::JnixEnv;
 use log::LevelFilter;
 use std::ffi::c_void;
+use std::ptr::slice_from_raw_parts;
+use std::str::from_utf8;
 use tl::{Bytes, Node, NodeHandle, Parser, VDom};
 
 #[macro_export]
@@ -66,6 +68,20 @@ where
 {
     let html = env.get_string(*str).ok()?;
     let dom = tl::parse(html.to_str().ok()?, tl::ParserOptions::default()).ok()?;
+    let parser = dom.parser();
+    f(&dom, parser, env)
+}
+
+fn parse_bytebuffer<F, R>(env: &mut JnixEnv, str: JByteBuffer, limit: jint, mut f: F) -> Option<R>
+where
+    F: FnMut(&VDom, &Parser, &JnixEnv) -> Option<R>,
+{
+    let ptr = env.get_direct_buffer_address(str).ok()?;
+    let html = unsafe {
+        let buff = slice_from_raw_parts(ptr, limit as usize);
+        from_utf8(&*buff).ok()?
+    };
+    let dom = tl::parse(html, tl::ParserOptions::default()).ok()?;
     let parser = dom.parser();
     f(&dom, parser, env)
 }

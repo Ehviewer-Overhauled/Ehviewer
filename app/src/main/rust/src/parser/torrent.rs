@@ -1,12 +1,13 @@
 use catch_panic::catch_panic;
 use jni_fn::jni_fn;
-use jnix::jni::objects::{JClass, JString};
-use jnix::jni::sys::jobject;
+use jnix::jni::objects::{JByteBuffer, JClass};
+use jnix::jni::sys::{jint, jobject};
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
+use parse_bytebuffer;
 use quick_xml::escape::unescape;
-use {parse_jni_string, regex};
+use regex;
 
 #[derive(Default, IntoJava)]
 #[jnix(package = "com.hippo.ehviewer.client.parser")]
@@ -24,9 +25,9 @@ pub struct Torrent {
 #[catch_panic(default = "std::ptr::null_mut()")]
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.TorrentParserKt")]
-pub fn parseTorrent(env: JNIEnv, _class: JClass, input: JString) -> jobject {
+pub fn parseTorrent(env: JNIEnv, _class: JClass, buffer: JByteBuffer, limit: jint) -> jobject {
     let mut env = JnixEnv { env };
-    parse_jni_string(&mut env, &input, |dom, parser, _env| {
+    parse_bytebuffer(&mut env, buffer, limit, |dom, parser, _env| {
         Some(dom.query_selector("table")?.filter_map(|e| {
             let html = e.get(parser)?.inner_html(parser);
             let grp = regex!("</span> ([0-9-]+) [0-9:]+</td>[\\s\\S]+</span> ([0-9.]+ [KMGT]B)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span>([^<]+)</td>[\\s\\S]+onclick=\"document.location='([^\"]+)'[^<]+>([^<]+)</a>").captures(&html)?;

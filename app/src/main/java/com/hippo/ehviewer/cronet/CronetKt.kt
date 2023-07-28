@@ -19,6 +19,8 @@ import org.chromium.net.UrlResponseInfo
 import splitties.init.appCtx
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -72,7 +74,7 @@ class CronetRequest {
     }
 }
 
-inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.Builder.() -> Unit) = CronetRequest().apply {
+inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.Builder.() -> Unit = {}) = CronetRequest().apply {
     request = cronetHttpClient.newUrlRequestBuilder(url, callback, cronetHttpClientExecutor).apply {
         addHeader("Cookie", EhCookieStore.getCookieHeader(url.toHttpUrl()))
         addHeader("User-Agent", CHROME_USER_AGENT)
@@ -104,11 +106,16 @@ suspend inline fun CronetRequest.copyToChannel(chan: FileChannel, crossinline li
     listener(bytes)
 }
 
-suspend inline fun CronetRequest.execute(crossinline callback: suspend CronetRequest.(UrlResponseInfo) -> Unit) = coroutineScope {
-    onResponse = { launch { callback(it) } }
-    suspendCancellableCoroutine { cont ->
-        cont.invokeOnCancellation { request.cancel() }
-        daemonCont = cont
-        request.start()
+suspend inline fun CronetRequest.execute(crossinline callback: suspend CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
+    contract {
+        callsInPlace(callback, InvocationKind.EXACTLY_ONCE)
+    }
+    return coroutineScope {
+        onResponse = { launch { callback(it) } }
+        suspendCancellableCoroutine { cont ->
+            cont.invokeOnCancellation { request.cancel() }
+            daemonCont = cont
+            request.start()
+        }
     }
 }
