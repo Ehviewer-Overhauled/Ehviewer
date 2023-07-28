@@ -20,10 +20,8 @@ import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.Interceptor
-import okhttp3.Response
 
-object EhCookieStore : CookieJar, Interceptor {
+object EhCookieStore : CookieJar {
     private val manager = CookieManager.getInstance()
     fun signOut() = manager.removeAllCookies(null)
     fun contains(url: HttpUrl, name: String) = get(url).any { it.name == name }
@@ -102,14 +100,5 @@ object EhCookieStore : CookieJar, Interceptor {
                 this
             }
         }
-    }
-
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val url = request.url
-        val newRequest = request.newBuilder().addHeader("Cookie", getCookieHeader(url)).build()
-        val response = chain.proceed(newRequest)
-        saveFromResponse(url, Cookie.parseAll(url, response.headers))
-        return response
     }
 }
