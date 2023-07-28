@@ -46,7 +46,7 @@ class CronetRequest {
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
     lateinit var daemonCont: Continuation<Boolean>
-    lateinit var readerCont: Continuation<Long>
+    lateinit var readerCont: Continuation<Unit>
     val callback = object : UrlRequest.Callback() {
         override fun onRedirectReceived(req: UrlRequest, info: UrlResponseInfo, url: String) {
             logcat(tag = TAG) { "Redirected to $url" }
@@ -63,8 +63,7 @@ class CronetRequest {
         }
 
         override fun onSucceeded(req: UrlRequest, info: UrlResponseInfo) {
-            val length = info.receivedByteCount
-            readerCont.resume(length)
+            readerCont.resume(Unit)
             daemonCont.resume(true)
         }
 
@@ -84,7 +83,7 @@ inline fun cronetRequest(url: String, referer: String? = null, conf: UrlRequest.
     }.apply(conf).build()
 }
 
-suspend inline fun CronetRequest.awaitBodyFully(crossinline callback: (ByteBuffer) -> Unit): Long {
+suspend inline fun CronetRequest.awaitBodyFully(crossinline callback: (ByteBuffer) -> Unit) {
     val buffer = pool.borrow()
     return try {
         suspendCancellableCoroutine { cont ->

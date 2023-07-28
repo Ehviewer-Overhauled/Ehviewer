@@ -160,25 +160,24 @@ class SpiderDen(mGalleryInfo: GalleryInfo) {
         }
     }
 
-    private suspend fun saveResponseMeta(index: Int, ext: String, length: Long, fops: suspend (UniFile) -> Long): Boolean {
+    private suspend fun saveResponseMeta(index: Int, ext: String, length: Long, fops: suspend (UniFile) -> Unit): Boolean {
         suspend fun realFops(f: UniFile) = fops(f).apply {
             if (ext.lowercase() == "gif") {
                 f.openFileDescriptor("rw").use { rewriteGifSource2(it.fd) }
             }
         }
         findDownloadFileForIndex(index, ext)?.run {
-            return realFops(this) == length
+            realFops(this)
+            return true
         }
 
         // Read Mode, allow save to cache
         if (mode == SpiderQueen.MODE_READ) {
             val key = getImageKey(mGid, index)
-            var received = 0L
-            sCache.suspendEdit(key) {
+            return sCache.suspendEdit(key) {
                 metadata.toFile().writeText(ext)
-                received = realFops(UniFile.fromFile(data.toFile())!!)
+                realFops(UniFile.fromFile(data.toFile())!!)
             }
-            return received == length
         }
         return false
     }
