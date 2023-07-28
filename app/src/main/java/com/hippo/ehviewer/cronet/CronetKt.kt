@@ -45,7 +45,7 @@ class CronetRequest {
     lateinit var consumer: (ByteBuffer) -> Unit
     lateinit var onResponse: CronetRequest.(UrlResponseInfo) -> Unit
     lateinit var request: UrlRequest
-    lateinit var daemonCont: Continuation<Boolean>
+    lateinit var onError: (Throwable) -> Unit
     lateinit var readerCont: Continuation<Unit>
     val callback = object : UrlRequest.Callback() {
         override fun onRedirectReceived(req: UrlRequest, info: UrlResponseInfo, url: String) {
@@ -64,11 +64,10 @@ class CronetRequest {
 
         override fun onSucceeded(req: UrlRequest, info: UrlResponseInfo) {
             readerCont.resume(Unit)
-            daemonCont.resume(true)
         }
 
         override fun onFailed(req: UrlRequest, info: UrlResponseInfo?, e: CronetException) {
-            daemonCont.resumeWithException(e)
+            onError(e)
         }
     }
 }
@@ -92,6 +91,7 @@ suspend inline fun CronetRequest.awaitBodyFully(crossinline callback: (ByteBuffe
                 buffer.clear()
                 request.read(buffer)
             }
+            onError = { readerCont.resumeWithException(it) }
             readerCont = cont
             request.read(buffer)
         }
@@ -105,15 +105,15 @@ suspend inline fun CronetRequest.copyToChannel(chan: FileChannel, crossinline li
     listener(bytes)
 }
 
-suspend inline fun CronetRequest.execute(crossinline callback: suspend CronetRequest.(UrlResponseInfo) -> Unit): Boolean {
+suspend inline fun <R> CronetRequest.execute(crossinline callback: suspend CronetRequest.(UrlResponseInfo) -> R): R {
     contract {
         callsInPlace(callback, InvocationKind.EXACTLY_ONCE)
     }
     return coroutineScope {
-        onResponse = { launch { callback(it) } }
         suspendCancellableCoroutine { cont ->
+            onResponse = { launch { cont.resume(callback(it)) } }
             cont.invokeOnCancellation { request.cancel() }
-            daemonCont = cont
+            onError = { cont.resumeWithException(it) }
             request.start()
         }
     }

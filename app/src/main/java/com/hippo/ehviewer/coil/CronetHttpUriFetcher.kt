@@ -26,16 +26,16 @@ class CronetHttpUriFetcher(private val data: String, private val options: Option
         val diskCacheKey = options.diskCacheKey ?: data
         val diskCache = requireNotNull(imageLoader.diskCache)
         val snapshot = diskCache.openSnapshot(diskCacheKey) ?: run {
-            cronetRequest(data) {
+            val success = cronetRequest(data) {
                 disableCache()
             }.execute {
-                val success = diskCache.suspendEdit(diskCacheKey) {
+                diskCache.suspendEdit(diskCacheKey) {
                     RandomAccessFile(data.toFile(), "rw").use {
                         copyToChannel(it.channel)
                     }
                 }
-                check(success)
             }
+            check(success)
             // diskcache snapshot MUST exist here
             requireNotNull(diskCache.openSnapshot(diskCacheKey))
         }

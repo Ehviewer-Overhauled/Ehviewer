@@ -133,8 +133,7 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
 val httpContentPool = DirectByteBufferPool(16, 16384)
 
 suspend inline fun <T> fetchCompat(url: String, referer: String? = null, crossinline parser: (ByteBuffer) -> T): T {
-    val ret: T
-    if (isCronetSupported) {
+    return if (isCronetSupported) {
         cronetRequest(url, referer).execute {
             val buffer = httpContentPool.borrow()
             try {
@@ -142,7 +141,7 @@ suspend inline fun <T> fetchCompat(url: String, referer: String? = null, crossin
                     buffer.put(it)
                 }
                 buffer.flip()
-                ret = parser(buffer)
+                parser(buffer)
             } finally {
                 httpContentPool.recycle(buffer)
             }
@@ -155,13 +154,12 @@ suspend inline fun <T> fetchCompat(url: String, referer: String? = null, crossin
                     if (body.source().read(buffer) == -1) break
                 }
                 buffer.flip()
-                ret = parser(buffer)
+                parser(buffer)
             } finally {
                 httpContentPool.recycle(buffer)
             }
         }
     }
-    return ret
 }
 
 @Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
