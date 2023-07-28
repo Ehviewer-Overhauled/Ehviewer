@@ -14,7 +14,6 @@
 -keep class androidx.viewpager.widget.ViewPager$LayoutParams { int position; }
 
 -keep class com.hippo.ehviewer.client.parser.Torrent { *; }
--keep class com.hippo.ehviewer.client.parser.TorrentResult { *; }
 -keep class com.hippo.ehviewer.client.parser.Limits { *; }
 -keep class com.hippo.ehviewer.client.data.BaseGalleryInfo { *; }
 
