@@ -7,7 +7,7 @@ resolver = "2"
 crate_type = ["cdylib"]
 
 [dependencies]
-regex = { default-features = false, features = ["std", "unicode-perl"], version = "1.9" }
+regex-lite = { version = "0.1" }
 jnix = { path = "jnix" }
 jnix-macros = "0.4"
 catch_panic = { path = "catch_panic" }

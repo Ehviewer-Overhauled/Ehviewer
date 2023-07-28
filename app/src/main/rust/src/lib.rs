@@ -9,7 +9,7 @@ extern crate jnix_macros;
 extern crate log;
 extern crate once_cell;
 extern crate quick_xml;
-extern crate regex;
+extern crate regex_lite;
 extern crate tl;
 
 use android_logger::Config;
@@ -23,8 +23,8 @@ use tl::{Bytes, Node, NodeHandle, Parser, VDom};
 #[macro_export]
 macro_rules! regex {
     ($re:literal $(,)?) => {{
-        static RE: once_cell::sync::OnceCell<regex::Regex> = once_cell::sync::OnceCell::new();
-        RE.get_or_init(|| regex::Regex::new($re).unwrap())
+        static RE: once_cell::sync::OnceCell<regex_lite::Regex> = once_cell::sync::OnceCell::new();
+        RE.get_or_init(|| regex_lite::Regex::new($re).unwrap())
     }};
 }
 
