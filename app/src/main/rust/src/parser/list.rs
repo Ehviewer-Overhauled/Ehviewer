@@ -111,7 +111,7 @@ fn parse_thumb_resolution(str: &str) -> (i32, i32) {
 }
 
 fn parse_gallery_info(node: &Node, parser: &Parser) -> Option<BaseGalleryInfo> {
-    let html = node.inner_html(parser);
+    let html = node.outer_html(parser);
     let dom = tl::parse(&html, tl::ParserOptions::default()).ok()?;
     let parser = dom.parser();
     let title = dom
