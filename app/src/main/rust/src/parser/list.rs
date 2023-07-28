@@ -10,10 +10,10 @@ use jnix_macros::IntoJava;
 use quick_xml::escape::unescape;
 use tl::{Node, Parser};
 
-use get_element_by_id;
+use parse_jni_string;
+use {get_element_by_id, get_vdom_first_element_by_class_name};
 use {get_first_element_by_class_name, query_childs_first_match_attr};
 use {get_node_attr, get_node_handle_attr, regex};
-use {parse_jni_string, Anon};
 use {EHGT_PREFIX, EX_PREFIX};
 
 #[derive(Default, IntoJava)]
@@ -195,7 +195,7 @@ fn parse_gallery_info(node: &Node, parser: &Parser) -> Option<BaseGalleryInfo> {
 pub fn parseGalleryInfoList(env: JNIEnv, _class: JClass, input: JString) -> jobject {
     let mut env = JnixEnv { env };
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
-        let itg = dom.get_first_element_by_class_name("itg")?;
+        let itg = get_vdom_first_element_by_class_name(dom, "itg")?;
         let children = itg.children()?;
         let iter = children.top().iter();
         let info: Vec<BaseGalleryInfo> = iter

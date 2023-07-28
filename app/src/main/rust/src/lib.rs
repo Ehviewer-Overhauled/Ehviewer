@@ -36,31 +36,24 @@ macro_rules! regex {
 const EHGT_PREFIX: &str = "https://ehgt.org/";
 const EX_PREFIX: &str = "https://s.exhentai.org/";
 
-trait Anon {
-    fn get_first_element_by_class_name(&self, name: &str) -> Option<&Node>;
+fn get_vdom_first_element_by_class_name<'a>(dom: &'a VDom, name: &str) -> Option<&'a Node<'a>> {
+    let handle = dom.get_elements_by_class_name(name).next()?;
+    handle.get(dom.parser())
 }
 
-impl<'a> Anon for VDom<'a> {
-    fn get_first_element_by_class_name(&self, name: &str) -> Option<&Node> {
-        let handle = self.get_elements_by_class_name(name).next()?;
-        handle.get(self.parser())
-    }
-}
-
-pub fn get_first_element_by_class_name<'b>(
-    node: &'b Node,
-    parser: &'b Parser,
-    id: &'b str,
-) -> Option<&'b Node<'b>> {
+fn get_first_element_by_class_name<'a>(
+    node: &'a Node,
+    parser: &'a Parser,
+    id: &str,
+) -> Option<&'a Node<'a>> {
     let handle = node.find_node(parser, &mut |n| match n.as_tag() {
         None => false,
         Some(tag) => tag.attributes().is_class_member(id),
     })?;
-    let node = handle.get(parser)?;
-    Some(node)
+    handle.get(parser)
 }
 
-pub fn get_element_by_id<'b, S>(node: &'b Node, parser: &'b Parser, id: S) -> Option<&'b Node<'b>>
+fn get_element_by_id<'b, S>(node: &'b Node, parser: &'b Parser, id: S) -> Option<&'b Node<'b>>
 where
     S: Into<Bytes<'b>>,
 {
@@ -69,8 +62,7 @@ where
         None => false,
         Some(tag) => tag.attributes().id().map_or(false, |x| x.eq(&bytes)),
     })?;
-    let node = handle.get(parser)?;
-    Some(node)
+    handle.get(parser)
 }
 
 fn parse_jni_string<F, R>(env: &mut JnixEnv, str: &JString, mut f: F) -> Option<R>
