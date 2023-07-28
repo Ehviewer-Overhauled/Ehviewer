@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import android.util.Log
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.LOCAL_FAVORITED
@@ -80,32 +79,14 @@ object GalleryListParser {
             e.printStackTrace()
         }
         try {
-            val itg = d.getElementsByClass("itg").first()
-            val es = if ("table".equals(itg!!.tagName(), ignoreCase = true)) {
-                itg.child(0).children().let {
-                    // First one is table header in non-extended mode, skip it
-                    if (!itg.hasClass("glte")) it.drop(1) else it
-                }
-            } else {
-                // Thumbnail mode
-                itg.children()
-            }
-            val list = result.galleryInfoList
-            list.addAll(
-                es.mapNotNull {
-                    runCatching { parseGalleryInfo(it.toString()) }.onFailure { it.printStackTrace() }.getOrNull()?.apply {
-                        if (favoriteSlot == NOT_FAVORITED && EhDB.containLocalFavorites(gid)) {
-                            favoriteSlot = LOCAL_FAVORITED
-                        }
-                        generateSLang()
+            result.galleryInfoList.addAll(
+                parseGalleryInfoList(body).onEach {
+                    if (it.favoriteSlot == NOT_FAVORITED && EhDB.containLocalFavorites(it.gid)) {
+                        it.favoriteSlot = LOCAL_FAVORITED
                     }
+                    it.generateSLang()
                 },
             )
-            if (list.isEmpty()) {
-                if (es.size < 2 || NO_UNFILTERED_TEXT != es[1].text()) {
-                    Log.d(TAG, "No gallery found")
-                }
-            }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
             e.printStackTrace()
@@ -124,4 +105,4 @@ object GalleryListParser {
     }
 }
 
-private external fun parseGalleryInfo(e: String): BaseGalleryInfo
+private external fun parseGalleryInfoList(e: String): ArrayList<BaseGalleryInfo>

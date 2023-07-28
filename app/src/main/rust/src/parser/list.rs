@@ -8,6 +8,7 @@ use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
 use quick_xml::escape::unescape;
+use tl::{Node, Parser};
 
 use query_childs_first_match_attr;
 use {get_node_attr, get_node_handle_attr, regex};
@@ -80,13 +81,13 @@ fn get_thumb_key(url: &str) -> String {
         .to_string()
 }
 
-fn parse_token_and_gid(str: &str) -> (i64, String) {
+fn parse_token_and_gid(str: &str) -> Option<(i64, String)> {
     let reg =
         regex!("https?://(?:exhentai.org|e-hentai.org(?:/lofi)?)/(?:g|mpv)/(\\d+)/([0-9a-f]{10})");
-    let grp = reg.captures(str).unwrap();
+    let grp = reg.captures(str)?;
     let token = &grp[2];
-    let gid = grp[1].parse().unwrap();
-    (gid, token.to_string())
+    let gid = grp[1].parse().ok()?;
+    Some((gid, token.to_string()))
 }
 
 fn parse_uploader_and_pages(str: &str) -> (Option<String>, bool, i32) {
@@ -109,94 +110,103 @@ fn parse_thumb_resolution(str: &str) -> (i32, i32) {
     }
 }
 
+fn parse_gallery_info(node: &Node, parser: &Parser) -> Option<BaseGalleryInfo> {
+    let html = node.inner_html(parser);
+    let dom = tl::parse(&html, tl::ParserOptions::default()).ok()?;
+    let parser = dom.parser();
+    let title = dom
+        .get_first_element_by_class_name("glink")?
+        .inner_text(parser);
+    let glname = dom.get_first_element_by_class_name("glname")?;
+    let gdlink = match query_childs_first_match_attr(glname, parser, "href") {
+        None => query_childs_first_match_attr(&dom.nodes()[0], parser, "href")?,
+        Some(attr) => attr,
+    };
+    let (gid, token) = parse_token_and_gid(gdlink)?;
+    let simple_tags = dom
+        .query_selector(".gt, .gtl")?
+        .filter_map(|tag| get_node_handle_attr(&tag, parser, "title").map(str::to_string))
+        .collect();
+    let (thumb, (thumb_height, thumb_width)) = match dom.query_selector("[data-src]")?.next() {
+        None => match dom.query_selector("[src]")?.next() {
+            None => panic!("No thumb found"),
+            Some(thumb) => (
+                get_node_handle_attr(&thumb, parser, "src")?,
+                parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
+            ),
+        },
+        Some(thumb) => (
+            get_node_handle_attr(&thumb, parser, "data-src")?,
+            parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
+        ),
+    };
+    let category = match dom.get_first_element_by_class_name("cn") {
+        None => match dom.get_first_element_by_class_name("cs") {
+            None => Cow::from("unknown"),
+            Some(cs) => cs.inner_text(parser),
+        },
+        Some(cn) => cn.inner_text(parser),
+    };
+    let (posted, favorite_name) = match dom.get_element_by_id(format!("posted_{gid}").as_str()) {
+        None => ("".to_string(), None),
+        Some(e) => {
+            let node = e.get(parser)?;
+            (
+                node.inner_text(parser).trim().to_string(),
+                get_node_attr(node, "title").map(str::to_string),
+            )
+        }
+    };
+    let ir = dom
+        .get_first_element_by_class_name("ir")?
+        .as_tag()?
+        .attributes();
+    let ir_c = ir.class()?.try_as_utf8_str()?;
+    let rating = ir.get("style")??.try_as_utf8_str()?;
+    let (uploader, disowned, pages) = match dom.query_selector(".glhide, .gl3e, .gl5t")?.next() {
+        None => (None, false, 0),
+        Some(node) => parse_uploader_and_pages(&node.get(parser)?.inner_html(parser)),
+    };
+    let favorite_note = dom
+        .get_element_by_id(format!("favnote_{gid}").as_str())
+        .map(|e| e.get(parser).unwrap().inner_text(parser).to_string());
+    Some(BaseGalleryInfo {
+        gid,
+        token,
+        title: unescape(title.trim()).ok()?.to_string(),
+        titleJpn: None,
+        thumbKey: get_thumb_key(thumb),
+        category: to_category_i32(&category.trim().to_lowercase()),
+        posted,
+        uploader,
+        disowned,
+        rating: parse_rating(rating),
+        rated: ir_c.contains("irr") || ir_c.contains("irg") || ir_c.contains("irb"),
+        simpleTags: simple_tags,
+        pages,
+        thumbWidth: thumb_width,
+        thumbHeight: thumb_height,
+        simpleLanguage: None,
+        favoriteSlot: if favorite_name.is_some() { 0 } else { -2 },
+        favoriteName: favorite_name,
+        favoriteNote: favorite_note,
+    })
+}
+
 #[no_mangle]
 #[catch_panic(default = "std::ptr::null_mut()")]
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.GalleryListParserKt")]
-pub fn parseGalleryInfo(env: JNIEnv, _class: JClass, input: JString) -> jobject {
+pub fn parseGalleryInfoList(env: JNIEnv, _class: JClass, input: JString) -> jobject {
     let mut env = JnixEnv { env };
     parse_jni_string(&mut env, &input, |dom, parser, _env| {
-        let title = match dom.get_first_element_by_class_name("glink") {
-            None => panic!("No title found"),
-            Some(glink) => glink.inner_text(parser),
-        };
-        let gdlink = match dom.get_first_element_by_class_name("glname") {
-            None => panic!("Cannot parse token and gid!"),
-            Some(glname) => match query_childs_first_match_attr(glname, parser, "href") {
-                None => query_childs_first_match_attr(&dom.nodes()[0], parser, "href")?,
-                Some(attr) => attr,
-            },
-        };
-        let (gid, token) = parse_token_and_gid(gdlink);
-        let simpleTags = dom
-            .query_selector(".gt, .gtl")?
-            .filter_map(|tag| get_node_handle_attr(&tag, parser, "title").map(str::to_string))
+        let itg = dom.get_first_element_by_class_name("itg")?;
+        let children = itg.children()?;
+        let iter = children.top().iter();
+        let info: Vec<BaseGalleryInfo> = iter
+            .filter_map(|x| parse_gallery_info(x.get(parser)?, parser))
             .collect();
-        let (thumb, (thumbHeight, thumbWidth)) = match dom.query_selector("[data-src]")?.next() {
-            None => match dom.query_selector("[src]")?.next() {
-                None => panic!("No thumb found"),
-                Some(thumb) => (
-                    get_node_handle_attr(&thumb, parser, "src")?,
-                    parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
-                ),
-            },
-            Some(thumb) => (
-                get_node_handle_attr(&thumb, parser, "data-src")?,
-                parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
-            ),
-        };
-        let category = match dom.get_first_element_by_class_name("cn") {
-            None => match dom.get_first_element_by_class_name("cs") {
-                None => Cow::from("unknown"),
-                Some(cs) => cs.inner_text(parser),
-            },
-            Some(cn) => cn.inner_text(parser),
-        };
-        let (posted, favoriteName) = match dom.get_element_by_id(format!("posted_{gid}").as_str()) {
-            None => ("".to_string(), None),
-            Some(e) => {
-                let node = e.get(parser)?;
-                (
-                    node.inner_text(parser).trim().to_string(),
-                    get_node_attr(node, "title").map(str::to_string),
-                )
-            }
-        };
-        let ir = dom
-            .get_first_element_by_class_name("ir")?
-            .as_tag()?
-            .attributes();
-        let ir_c = ir.class()?.try_as_utf8_str()?;
-        let rating = ir.get("style")??.try_as_utf8_str()?;
-        let (uploader, disowned, pages) = match dom.query_selector(".glhide, .gl3e, .gl5t")?.next()
-        {
-            None => (None, false, 0),
-            Some(node) => parse_uploader_and_pages(&node.get(parser)?.inner_html(parser)),
-        };
-        let favoriteNote = dom
-            .get_element_by_id(format!("favnote_{gid}").as_str())
-            .map(|e| e.get(parser).unwrap().inner_text(parser).to_string());
-        Some(BaseGalleryInfo {
-            gid,
-            token,
-            title: unescape(title.trim()).ok()?.to_string(),
-            titleJpn: None,
-            thumbKey: get_thumb_key(thumb),
-            category: to_category_i32(&category.trim().to_lowercase()),
-            posted,
-            uploader,
-            disowned,
-            rating: parse_rating(rating),
-            rated: ir_c.contains("irr") || ir_c.contains("irg") || ir_c.contains("irb"),
-            simpleTags,
-            pages,
-            thumbWidth,
-            thumbHeight,
-            simpleLanguage: None,
-            favoriteSlot: if favoriteName.is_some() { 0 } else { -2 },
-            favoriteName,
-            favoriteNote,
-        })
+        Some(info)
     })
     .unwrap()
     .into_java(&env)
