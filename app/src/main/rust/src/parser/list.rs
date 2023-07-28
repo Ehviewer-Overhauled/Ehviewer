@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use catch_panic::catch_panic;
 use jni_fn::jni_fn;
 use jnix::jni::objects::{JClass, JString};
@@ -7,10 +5,10 @@ use jnix::jni::sys::jobject;
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
-use quick_xml::escape::unescape;
-use tl::{Node, Parser};
-
 use parse_jni_string;
+use quick_xml::escape::unescape;
+use std::borrow::Cow;
+use tl::{Node, Parser};
 use {get_element_by_id, get_vdom_first_element_by_class_name};
 use {get_first_element_by_class_name, query_childs_first_match_attr};
 use {get_node_attr, get_node_handle_attr, regex};
