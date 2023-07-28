@@ -4,12 +4,13 @@ import android.os.Parcelable
 import com.hippo.ehviewer.client.exception.InsufficientFundsException
 import com.hippo.ehviewer.client.exception.ParseException
 import kotlinx.parcelize.Parcelize
+import java.nio.ByteBuffer
 
 object HomeParser {
     private val PATTERN_FUNDS = Regex("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", RegexOption.DOT_MATCHES_ALL)
     private const val INSUFFICIENT_FUNDS = "Insufficient funds."
 
-    fun parse(body: String) = parseLimit(body)
+    fun parse(body: ByteBuffer) = parseLimit(body)
 
     fun parseResetLimits(body: String) {
         if (body.contains(INSUFFICIENT_FUNDS)) {
@@ -34,4 +35,4 @@ object HomeParser {
 @Parcelize
 data class Limits(val current: Int, val maximum: Int, val resetCost: Int) : Parcelable
 
-private external fun parseLimit(body: String): Limits
+private external fun parseLimit(body: ByteBuffer, limit: Int = body.limit()): Limits

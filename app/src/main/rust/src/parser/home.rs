@@ -1,12 +1,11 @@
 use catch_panic::catch_panic;
-use get_vdom_first_element_by_class_name;
 use jni_fn::jni_fn;
-use jnix::jni::objects::{JClass, JString};
-use jnix::jni::sys::jobject;
+use jnix::jni::objects::{JByteBuffer, JClass};
+use jnix::jni::sys::{jint, jobject};
 use jnix::jni::JNIEnv;
 use jnix::{IntoJava, JnixEnv};
 use jnix_macros::IntoJava;
-use parse_jni_string;
+use {get_vdom_first_element_by_class_name, parse_bytebuffer};
 
 #[derive(Default, IntoJava)]
 #[allow(non_snake_case)]
@@ -21,9 +20,9 @@ pub struct Limits {
 #[catch_panic(default = "std::ptr::null_mut()")]
 #[allow(non_snake_case)]
 #[jni_fn("com.hippo.ehviewer.client.parser.HomeParserKt")]
-pub fn parseLimit(env: JNIEnv, _class: JClass, input: JString) -> jobject {
+pub fn parseLimit(env: JNIEnv, _class: JClass, input: JByteBuffer, limit: jint) -> jobject {
     let mut env = JnixEnv { env };
-    parse_jni_string(&mut env, &input, |dom, parser, _env| {
+    parse_bytebuffer(&mut env, input, limit, |dom, parser, _env| {
         let iter = get_vdom_first_element_by_class_name(dom, "homebox")?
             .as_tag()?
             .query_selector(parser, "strong")?;

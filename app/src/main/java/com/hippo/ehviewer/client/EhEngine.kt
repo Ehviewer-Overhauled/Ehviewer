@@ -199,7 +199,7 @@ object EhEngine {
         .apply { funds = funds ?: ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) }
 
     suspend fun getImageLimits() = parZip(
-        { ehRequest(EhUrl.URL_HOME).executeAndParsingWith(HomeParser::parse) },
+        { fetchCompat(EhUrl.URL_HOME, parser = HomeParser::parse) },
         { ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) },
         { limits, funds -> HomeParser.Result(limits, funds) },
     )
