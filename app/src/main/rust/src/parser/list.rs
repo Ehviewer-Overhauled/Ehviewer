@@ -10,7 +10,8 @@ use jnix_macros::IntoJava;
 use quick_xml::escape::unescape;
 use tl::{Node, Parser};
 
-use query_childs_first_match_attr;
+use get_element_by_id;
+use {get_first_element_by_class_name, query_childs_first_match_attr};
 use {get_node_attr, get_node_handle_attr, regex};
 use {parse_jni_string, Anon};
 use {EHGT_PREFIX, EX_PREFIX};
@@ -111,65 +112,59 @@ fn parse_thumb_resolution(str: &str) -> (i32, i32) {
 }
 
 fn parse_gallery_info(node: &Node, parser: &Parser) -> Option<BaseGalleryInfo> {
-    let html = node.outer_html(parser);
-    let dom = tl::parse(&html, tl::ParserOptions::default()).ok()?;
-    let parser = dom.parser();
-    let title = dom
-        .get_first_element_by_class_name("glink")?
-        .inner_text(parser);
-    let glname = dom.get_first_element_by_class_name("glname")?;
+    let tag = node.as_tag()?;
+    let title = get_first_element_by_class_name(node, parser, "glink")?.inner_text(parser);
+    let glname = get_first_element_by_class_name(node, parser, "glname")?;
     let gdlink = match query_childs_first_match_attr(glname, parser, "href") {
-        None => query_childs_first_match_attr(&dom.nodes()[0], parser, "href")?,
+        None => query_childs_first_match_attr(node, parser, "href")?,
         Some(attr) => attr,
     };
     let (gid, token) = parse_token_and_gid(gdlink)?;
-    let simple_tags = dom
-        .query_selector(".gt, .gtl")?
+    let simple_tags = tag
+        .query_selector(parser, ".gt, .gtl")?
         .filter_map(|tag| get_node_handle_attr(&tag, parser, "title").map(str::to_string))
         .collect();
-    let (thumb, (thumb_height, thumb_width)) = match dom.query_selector("[data-src]")?.next() {
-        None => match dom.query_selector("[src]")?.next() {
-            None => panic!("No thumb found"),
+    let (thumb, (thumb_height, thumb_width)) =
+        match tag.query_selector(parser, "[data-src]")?.next() {
+            None => match tag.query_selector(parser, "[src]")?.next() {
+                None => panic!("No thumb found"),
+                Some(thumb) => (
+                    get_node_handle_attr(&thumb, parser, "src")?,
+                    parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
+                ),
+            },
             Some(thumb) => (
-                get_node_handle_attr(&thumb, parser, "src")?,
+                get_node_handle_attr(&thumb, parser, "data-src")?,
                 parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
             ),
-        },
-        Some(thumb) => (
-            get_node_handle_attr(&thumb, parser, "data-src")?,
-            parse_thumb_resolution(get_node_handle_attr(&thumb, parser, "style")?),
-        ),
-    };
-    let category = match dom.get_first_element_by_class_name("cn") {
-        None => match dom.get_first_element_by_class_name("cs") {
+        };
+    let category = match get_first_element_by_class_name(node, parser, "cn") {
+        None => match get_first_element_by_class_name(node, parser, "cs") {
             None => Cow::from("unknown"),
             Some(cs) => cs.inner_text(parser),
         },
         Some(cn) => cn.inner_text(parser),
     };
-    let (posted, favorite_name) = match dom.get_element_by_id(format!("posted_{gid}").as_str()) {
-        None => ("".to_string(), None),
-        Some(e) => {
-            let node = e.get(parser)?;
-            (
+    let (posted, favorite_name) =
+        match get_element_by_id(node, parser, format!("posted_{gid}").as_str()) {
+            None => ("".to_string(), None),
+            Some(node) => (
                 node.inner_text(parser).trim().to_string(),
                 get_node_attr(node, "title").map(str::to_string),
-            )
-        }
-    };
-    let ir = dom
-        .get_first_element_by_class_name("ir")?
+            ),
+        };
+    let ir = get_first_element_by_class_name(node, parser, "ir")?
         .as_tag()?
         .attributes();
     let ir_c = ir.class()?.try_as_utf8_str()?;
     let rating = ir.get("style")??.try_as_utf8_str()?;
-    let (uploader, disowned, pages) = match dom.query_selector(".glhide, .gl3e, .gl5t")?.next() {
-        None => (None, false, 0),
-        Some(node) => parse_uploader_and_pages(&node.get(parser)?.inner_html(parser)),
-    };
-    let favorite_note = dom
-        .get_element_by_id(format!("favnote_{gid}").as_str())
-        .map(|e| e.get(parser).unwrap().inner_text(parser).to_string());
+    let (uploader, disowned, pages) =
+        match tag.query_selector(parser, ".glhide, .gl3e, .gl5t")?.next() {
+            None => (None, false, 0),
+            Some(node) => parse_uploader_and_pages(&node.get(parser)?.inner_html(parser)),
+        };
+    let favorite_note = get_element_by_id(node, parser, format!("favnote_{gid}").as_str())
+        .map(|e| e.inner_text(parser).to_string());
     Some(BaseGalleryInfo {
         gid,
         token,

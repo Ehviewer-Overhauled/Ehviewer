@@ -23,7 +23,7 @@ use jnix::JnixEnv;
 use log::LevelFilter;
 use quick_xml::escape::unescape;
 use std::ffi::c_void;
-use tl::{Node, NodeHandle, Parser, VDom};
+use tl::{Bytes, Node, NodeHandle, Parser, VDom};
 
 #[macro_export]
 macro_rules! regex {
@@ -45,6 +45,32 @@ impl<'a> Anon for VDom<'a> {
         let handle = self.get_elements_by_class_name(name).next()?;
         handle.get(self.parser())
     }
+}
+
+pub fn get_first_element_by_class_name<'b>(
+    node: &'b Node,
+    parser: &'b Parser,
+    id: &'b str,
+) -> Option<&'b Node<'b>> {
+    let handle = node.find_node(parser, &mut |n| match n.as_tag() {
+        None => false,
+        Some(tag) => tag.attributes().is_class_member(id),
+    })?;
+    let node = handle.get(parser)?;
+    Some(node)
+}
+
+pub fn get_element_by_id<'b, S>(node: &'b Node, parser: &'b Parser, id: S) -> Option<&'b Node<'b>>
+where
+    S: Into<Bytes<'b>>,
+{
+    let bytes: Bytes = id.into();
+    let handle = node.find_node(parser, &mut |n| match n.as_tag() {
+        None => false,
+        Some(tag) => tag.attributes().id().map_or(false, |x| x.eq(&bytes)),
+    })?;
+    let node = handle.get(parser)?;
+    Some(node)
 }
 
 fn parse_jni_string<F, R>(env: &mut JnixEnv, str: &JString, mut f: F) -> Option<R>
