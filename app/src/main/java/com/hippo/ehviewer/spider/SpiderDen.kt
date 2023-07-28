@@ -145,7 +145,7 @@ class SpiderDen(mGalleryInfo: GalleryInfo) {
                         val chan = os.channel
                         copyToChannel(chan) {
                             notifyProgress(length, info.receivedByteCount, it)
-                        }.also { size -> if (chan.size() != size) chan.truncate(size) }
+                        }
                     }
                 }
             }
