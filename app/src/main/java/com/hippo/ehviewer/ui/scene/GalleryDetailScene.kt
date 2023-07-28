@@ -125,6 +125,7 @@ import com.hippo.ehviewer.client.exception.NoHAtHClientException
 import com.hippo.ehviewer.client.parser.ArchiveParser
 import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.TorrentResult
+import com.hippo.ehviewer.client.parser.format
 import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter

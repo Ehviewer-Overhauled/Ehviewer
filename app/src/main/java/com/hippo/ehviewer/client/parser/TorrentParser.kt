@@ -12,12 +12,10 @@ class Torrent(
     val downloads: Int,
     val url: String,
     val name: String,
-) {
-    fun format() = "[$posted] $name [$size] [↑$seeds ↓$peers ✓$downloads]"
-}
+)
 
-class TorrentResult(
-    val list: ArrayList<Torrent>,
-) : List<Torrent> by list
+fun Torrent.format() = "[$posted] $name [$size] [↑$seeds ↓$peers ✓$downloads]"
 
-private external fun parseTorrent(body: String): TorrentResult
+typealias TorrentResult = ArrayList<Torrent>
+
+private external fun parseTorrent(body: String): ArrayList<Torrent>

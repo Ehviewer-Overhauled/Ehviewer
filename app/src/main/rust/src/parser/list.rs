@@ -57,8 +57,7 @@ fn to_category_i32(category: &str) -> i32 {
 }
 
 fn parse_rating(str: &str) -> f32 {
-    let reg = regex!("\\d+px");
-    let mut iter = reg.find_iter(str);
+    let mut iter = regex!("\\d+px").find_iter(str);
     let mut next = || iter.next()?.as_str().replace("px", "").parse::<i32>().ok();
     match (next(), next()) {
         (Some(num1), Some(num2)) => {
@@ -81,20 +80,19 @@ fn get_thumb_key(url: &str) -> String {
 }
 
 fn parse_token_and_gid(str: &str) -> Option<(i64, String)> {
-    let reg =
-        regex!("https?://(?:exhentai.org|e-hentai.org(?:/lofi)?)/(?:g|mpv)/(\\d+)/([0-9a-f]{10})");
-    let grp = reg.captures(str)?;
+    let grp =
+        regex!("https?://(?:exhentai.org|e-hentai.org(?:/lofi)?)/(?:g|mpv)/(\\d+)/([0-9a-f]{10})")
+            .captures(str)?;
     let token = &grp[2];
     let gid = grp[1].parse().ok()?;
     Some((gid, token.to_string()))
 }
 
 fn parse_uploader_and_pages(str: &str) -> (Option<String>, bool, i32) {
-    let reg_uploader =
-        regex!(r#"<div><a href="https://e[x-]hentai.org/uploader/.*?">(.*?)</a></div>"#);
-    let reg_pages = regex!(r"<div>(\d+) pages</div>");
-    let uploader = reg_uploader.captures(str).map(|grp| grp[1].to_string());
-    let pages = match reg_pages.captures(str) {
+    let uploader = regex!(r#"<div><a href="https://e[x-]hentai.org/uploader/.*?">(.*?)</a></div>"#)
+        .captures(str)
+        .map(|grp| grp[1].to_string());
+    let pages = match regex!(r"<div>(\d+) pages</div>").captures(str) {
         None => 0,
         Some(grp) => grp[1].parse().unwrap(),
     };
@@ -102,8 +100,7 @@ fn parse_uploader_and_pages(str: &str) -> (Option<String>, bool, i32) {
 }
 
 fn parse_thumb_resolution(str: &str) -> (i32, i32) {
-    let reg = regex!(r"height:(\d+)px;width:(\d+)px");
-    match reg.captures(str) {
+    match regex!(r"height:(\d+)px;width:(\d+)px").captures(str) {
         None => (0, 0),
         Some(grp) => (grp[1].parse().unwrap(), grp[2].parse().unwrap()),
     }
