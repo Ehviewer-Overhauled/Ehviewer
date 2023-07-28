@@ -38,6 +38,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.executeAsync
 import okio.BufferedSource
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -104,7 +106,12 @@ suspend inline fun <R> Call.usingCancellable(crossinline block: suspend Response
     }
 }
 
-suspend inline fun <R> Request.execute(block: Response.() -> R) = okHttpClient.newCall(this).executeAsync().use(block)
+suspend inline fun <R> Request.execute(block: Response.() -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return okHttpClient.newCall(this).executeAsync().use(block)
+}
 suspend inline fun <R> Request.executeNonCache(crossinline block: suspend Response.() -> R) = baseOkHttpClient.newCall(this).usingCancellable(block)
 suspend inline fun <R> Request.executeNoRedirect(block: Response.() -> R) = noRedirectOkHttpClient.newCall(this).executeAsync().use(block)
 
