@@ -15,10 +15,15 @@
  */
 package com.hippo.ehviewer.client
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.material.R
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.color.utilities.Hct
+import com.google.android.material.color.utilities.MathUtils
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
 import java.util.regex.Pattern
@@ -96,6 +101,17 @@ object EhUtils {
         return CATEGORY_VALUES.getOrDefault(type, CATEGORY_VALUES[UNKNOWN])!![0]
     }
 
+    @SuppressLint("RestrictedApi")
+    fun harmonizeWithRole(context: Context, src: Int): Int {
+        val primary = MaterialColors.getColor(context, R.attr.colorPrimaryContainer, "EhUtils")
+        val fromHct = Hct.fromInt(src)
+        val toHct = Hct.fromInt(primary)
+        val differenceDegrees = MathUtils.differenceDegrees(fromHct.hue, toHct.hue)
+        val rotationDegrees = minOf(differenceDegrees * 0.5, 15.0)
+        val outputHue = MathUtils.sanitizeDegreesDouble(fromHct.hue + rotationDegrees * MathUtils.rotationDirection(fromHct.hue, toHct.hue))
+        return Hct.from(outputHue, toHct.chroma, toHct.tone).toInt()
+    }
+
     fun getCategoryColor(context: Context, category: Int): Int {
         val primary = when (category) {
             DOUJINSHI -> BG_COLOR_DOUJINSHI
@@ -110,11 +126,11 @@ object EhUtils {
             MISC -> BG_COLOR_MISC
             else -> BG_COLOR_UNKNOWN
         }.toInt()
-        return MaterialColors.harmonizeWithPrimary(context, primary)
+        return harmonizeWithRole(context, primary)
     }
 
     @Composable
-    fun getCategoryColor(category: Int) = getCategoryColor(LocalContext.current, category)
+    fun getCategoryColor(category: Int) = Color(getCategoryColor(LocalContext.current, category))
 
     fun signOut() {
         EhCookieStore.signOut()

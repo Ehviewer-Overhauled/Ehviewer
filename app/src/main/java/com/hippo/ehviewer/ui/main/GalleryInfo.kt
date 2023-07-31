@@ -21,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -29,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -103,7 +101,7 @@ fun GalleryInfoListItem(
                             bottom.linkTo(categoryRef.top)
                         },
                     )
-                    val categoryColor = Color(EhUtils.getCategoryColor(info.category))
+                    val categoryColor = EhUtils.getCategoryColor(info.category)
                     val categoryText = EhUtils.getCategory(info.category).uppercase()
                     Text(
                         text = categoryText,
@@ -111,7 +109,7 @@ fun GalleryInfoListItem(
                             start.linkTo(parent.start)
                             bottom.linkTo(parent.bottom)
                         }.clip(ShapeDefaults.Small).background(categoryColor).padding(vertical = 2.dp, horizontal = 8.dp),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         textAlign = TextAlign.Center,
                     )
                     Row(
@@ -189,7 +187,6 @@ fun GalleryInfoGridItem(
     } else {
         DEFAULT_ASPECT
     }
-    val color = EhUtils.getCategoryColor(info.category)
     val simpleLang = info.simpleLanguage
     ElevatedCard(
         modifier = modifier,
@@ -202,11 +199,10 @@ fun GalleryInfoGridItem(
                 modifier = Modifier.aspectRatio(aspect).fillMaxWidth(),
                 contentScale = ContentScale.Crop,
             )
-            val container = Color(color)
             Badge(
                 modifier = Modifier.align(Alignment.TopEnd).width(32.dp).height(24.dp),
-                containerColor = container,
-                contentColor = contentColorFor(container),
+                containerColor = EhUtils.getCategoryColor(info.category),
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ) {
                 simpleLang?.let {
                     Text(text = it.uppercase())
