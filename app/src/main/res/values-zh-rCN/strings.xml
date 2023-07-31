@@ -461,6 +461,10 @@
     <string name="settings_privacy">隐私</string>
     <string name="settings_privacy_secure">不允许屏幕抓取</string>
     <string name="settings_privacy_secure_summary">启用后，将不能截取该应用的屏幕截图，同时，将不会在系统任务切换器中显示该应用的内容预览，重新加载应用以生效此更改</string>
+    <string name="clear_search_history">清除设备上的搜索记录</string>
+    <string name="clear_search_history_summary">移除您在此设备上执行过的搜索查询的记录</string>
+    <string name="clear_search_history_confirm">要清除搜索记录吗？</string>
+    <string name="search_history_cleared">已清除搜索记录</string>
     <string name="download_service">下载服务</string>
     <string name="favorite_name">收藏画廊</string>
     <string name="black_dark_theme">纯黑深色主题</string>

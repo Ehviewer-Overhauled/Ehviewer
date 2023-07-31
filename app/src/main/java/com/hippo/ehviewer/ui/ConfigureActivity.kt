@@ -28,7 +28,7 @@ import com.hippo.ehviewer.ui.settings.EhScreen
 import com.hippo.ehviewer.ui.settings.FilterScreen
 import com.hippo.ehviewer.ui.settings.LicenseScreen
 import com.hippo.ehviewer.ui.settings.MyTagsScreen
-import com.hippo.ehviewer.ui.settings.SecurityScreen
+import com.hippo.ehviewer.ui.settings.PrivacyScreen
 import com.hippo.ehviewer.ui.settings.UConfigScreen
 
 class ConfigureActivity : EhActivity() {
@@ -72,8 +72,8 @@ class ConfigureActivity : EhActivity() {
                     composable(LICENSE_SCREEN) {
                         LicenseScreen()
                     }
-                    composable(SECURITY_SETTINGS_SCREEN) {
-                        SecurityScreen()
+                    composable(PRIVACY_SETTINGS_SCREEN) {
+                        PrivacyScreen()
                     }
                     composable(ADVANCED_SETTINGS_SCREEN) {
                         AdvancedScreen()
@@ -109,7 +109,7 @@ val LocalNavController = compositionLocalOf<NavController> { error("CompositionL
 const val BASE_SETTINGS_SCREEN = "Base"
 const val EH_SETTINGS_SCREEN = "Eh"
 const val DOWNLOAD_SETTINGS_SCREEN = "Download"
-const val SECURITY_SETTINGS_SCREEN = "Security"
+const val PRIVACY_SETTINGS_SCREEN = "Privacy"
 const val ADVANCED_SETTINGS_SCREEN = "Advanced"
 const val ABOUT_SETTINGS_SCREEN = "About"
 const val LICENSE_SCREEN = "License"

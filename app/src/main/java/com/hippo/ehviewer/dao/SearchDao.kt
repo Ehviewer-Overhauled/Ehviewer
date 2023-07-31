@@ -6,6 +6,9 @@ import androidx.room.Query
 
 @Dao
 interface SearchDao {
+    @Query("DELETE FROM suggestions")
+    suspend fun clear()
+
     @Query("DELETE FROM suggestions WHERE `query` = :query")
     suspend fun deleteQuery(query: String)
 

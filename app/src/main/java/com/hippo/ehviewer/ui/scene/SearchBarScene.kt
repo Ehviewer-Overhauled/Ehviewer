@@ -19,12 +19,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.search.SearchView
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.hippo.ehviewer.EhApplication.Companion.searchDatabase
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.dao.Search
 import com.hippo.ehviewer.dao.SearchDao
-import com.hippo.ehviewer.dao.SearchDatabase
 import com.hippo.ehviewer.databinding.ItemSimpleList2Binding
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -32,9 +32,6 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import splitties.arch.room.roomDb
-
-private val searchDatabase by lazy { roomDb<SearchDatabase>("search_database.db") }
 
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null

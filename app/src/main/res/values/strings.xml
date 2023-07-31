@@ -526,6 +526,10 @@
     <string name="settings_privacy">Privacy</string>
     <string name="settings_privacy_secure">Prevent screenshots</string>
     <string name="settings_privacy_secure_summary">Prevent the content of the app from being taken screenshots of or shown in the \"Recent Apps\" list.</string>
+    <string name="clear_search_history">Clear device search history</string>
+    <string name="clear_search_history_summary">Remove searches you have performed from this device</string>
+    <string name="clear_search_history_confirm">Clear search history?</string>
+    <string name="search_history_cleared">Search history cleared</string>
     <string name="download_service">Download Service</string>
     <string name="favorite_name">Favorite</string>
     <string name="black_dark_theme">Black dark theme</string>

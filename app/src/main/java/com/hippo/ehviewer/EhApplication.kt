@@ -31,6 +31,7 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.coil.installCronetHttpUriFetcher
 import com.hippo.ehviewer.dailycheck.checkDawn
+import com.hippo.ehviewer.dao.SearchDatabase
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ktbuilder.cache
 import com.hippo.ehviewer.ktbuilder.chunker
@@ -56,6 +57,7 @@ import moe.tarsin.kt.unreachable
 import okhttp3.AsyncDns
 import okhttp3.android.AndroidAsyncDns
 import okio.Path.Companion.toOkioPath
+import splitties.arch.room.roomDb
 import splitties.init.appCtx
 
 private val lifecycle = ProcessLifecycleOwner.get().lifecycle
@@ -202,5 +204,7 @@ class EhApplication : Application(), ImageLoaderFactory {
                 maxSizeBytes(Settings.readCacheSize.coerceIn(320, 5120).toLong() * 1024 * 1024)
             }
         }
+
+        val searchDatabase by lazy { roomDb<SearchDatabase>("search_database.db") }
     }
 }

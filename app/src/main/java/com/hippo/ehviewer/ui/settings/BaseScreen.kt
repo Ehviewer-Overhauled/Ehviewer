@@ -26,7 +26,7 @@ import com.hippo.ehviewer.ui.DOWNLOAD_SETTINGS_SCREEN
 import com.hippo.ehviewer.ui.EH_SETTINGS_SCREEN
 import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
 import com.hippo.ehviewer.ui.LocalNavController
-import com.hippo.ehviewer.ui.SECURITY_SETTINGS_SCREEN
+import com.hippo.ehviewer.ui.PRIVACY_SETTINGS_SCREEN
 
 @Composable
 fun BaseScreen() {
@@ -59,7 +59,7 @@ fun BaseScreen() {
             PreferenceHeader(
                 icon = Icons.Default.Security,
                 title = R.string.settings_privacy,
-                childRouteName = SECURITY_SETTINGS_SCREEN,
+                childRouteName = PRIVACY_SETTINGS_SCREEN,
             )
             PreferenceHeader(
                 icon = Icons.Default.Adb,
