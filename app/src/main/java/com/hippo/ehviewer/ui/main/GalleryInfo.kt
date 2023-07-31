@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
@@ -101,14 +103,14 @@ fun GalleryInfoListItem(
                             bottom.linkTo(categoryRef.top)
                         },
                     )
-                    val categoryColor = EhUtils.getCategoryColor(info.category)
+                    val categoryColor = Color(EhUtils.getCategoryColor(info.category))
                     val categoryText = EhUtils.getCategory(info.category).uppercase()
                     Text(
                         text = categoryText,
                         modifier = Modifier.constrainAs(categoryRef) {
                             start.linkTo(parent.start)
                             bottom.linkTo(parent.bottom)
-                        }.background(Color(categoryColor)).padding(vertical = 2.dp, horizontal = 8.dp),
+                        }.clip(ShapeDefaults.Small).background(categoryColor).padding(vertical = 2.dp, horizontal = 8.dp),
                         color = Color.White,
                         textAlign = TextAlign.Center,
                     )
