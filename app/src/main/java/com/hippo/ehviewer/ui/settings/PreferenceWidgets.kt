@@ -4,7 +4,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.ArrayRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -34,10 +38,10 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import arrow.atomic.Atomic
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.LocalNavController
-import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
 import com.jamal.composeprefs3.ui.prefs.DropDownPref
@@ -46,7 +50,6 @@ import com.jamal.composeprefs3.ui.prefs.SliderPref
 import com.jamal.composeprefs3.ui.prefs.SpannedTextPref
 import com.jamal.composeprefs3.ui.prefs.SwitchPref
 import com.jamal.composeprefs3.ui.prefs.TextPref
-import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -152,30 +155,59 @@ fun SimpleMenuPreference(title: String, @ArrayRes entry: Int, @ArrayRes entryVal
 }
 
 @Composable
+private fun ProgressDialog() {
+    AlertDialog(
+        onDismissRequest = { },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+    ) {
+        Surface(
+            modifier = Modifier.width(280.dp),
+            shape = AlertDialogDefaults.shape,
+            color = AlertDialogDefaults.containerColor,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(18.dp),
+            ) {
+                CircularProgressIndicator()
+                Spacer(modifier = Modifier.size(18.dp))
+                Text(text = stringResource(id = R.string.please_wait))
+            }
+        }
+    }
+}
+
+@Composable
 fun WorkPreference(title: String, summary: String? = null, work: suspend CoroutineScope.() -> Unit) {
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
-    val context = LocalContext.current
+    var completed by remember { mutableStateOf(true) }
+    if (!completed) {
+        ProgressDialog()
+    }
     Preference(title = title, summary = summary) {
-        val alertDialog = BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show()
-        coroutineScope.launch(block = work).invokeOnCompletion { if (alertDialog.isShowing) alertDialog.dismiss() }
+        completed = false
+        coroutineScope.launch(block = work).invokeOnCompletion { completed = true }
     }
 }
 
 @Composable
 fun <I, O> LauncherPreference(title: String, summary: String? = null, contract: ActivityResultContract<I, O>, key: I, work: suspend CoroutineScope.(O) -> Unit) {
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
-    val context = LocalContext.current
     val callback = remember { Atomic<(O) -> Unit> {} }
     val launcher = rememberLauncherForActivityResult(contract = contract) { callback.getAndSet { }.invoke(it) }
+    var completed by remember { mutableStateOf(true) }
+    if (!completed) {
+        ProgressDialog()
+    }
     Preference(title = title, summary = summary) {
-        var alertDialog: AlertDialog? = null
         coroutineScope.launch {
             val o = suspendCoroutine { cont ->
                 callback.set { cont.resume(it) }
                 launcher.launch(key)
             }
-            alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
+            completed = false
             work(o)
-        }.invokeOnCompletion { alertDialog?.dismiss() }
+        }.invokeOnCompletion { completed = true }
     }
 }
