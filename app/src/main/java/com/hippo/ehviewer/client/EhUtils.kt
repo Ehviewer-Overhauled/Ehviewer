@@ -109,7 +109,7 @@ object EhUtils {
         val differenceDegrees = MathUtils.differenceDegrees(fromHct.hue, toHct.hue)
         val rotationDegrees = minOf(differenceDegrees * 0.5, 15.0)
         val outputHue = MathUtils.sanitizeDegreesDouble(fromHct.hue + rotationDegrees * MathUtils.rotationDirection(fromHct.hue, toHct.hue))
-        return Hct.from(outputHue, toHct.chroma, toHct.tone).toInt()
+        return Hct.from(outputHue, fromHct.chroma, toHct.tone).toInt()
     }
 
     private fun getCategoryColor(context: Context, category: Int): Int {
