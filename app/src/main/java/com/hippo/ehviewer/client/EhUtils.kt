@@ -112,7 +112,7 @@ object EhUtils {
         return Hct.from(outputHue, toHct.chroma, toHct.tone).toInt()
     }
 
-    fun getCategoryColor(context: Context, category: Int): Int {
+    private fun getCategoryColor(context: Context, category: Int): Int {
         val primary = when (category) {
             DOUJINSHI -> BG_COLOR_DOUJINSHI
             MANGA -> BG_COLOR_MANGA

@@ -109,7 +109,6 @@ fun GalleryInfoListItem(
                             start.linkTo(parent.start)
                             bottom.linkTo(parent.bottom)
                         }.clip(ShapeDefaults.Small).background(categoryColor).padding(vertical = 2.dp, horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         textAlign = TextAlign.Center,
                     )
                     Row(
@@ -202,7 +201,7 @@ fun GalleryInfoGridItem(
             Badge(
                 modifier = Modifier.align(Alignment.TopEnd).width(32.dp).height(24.dp),
                 containerColor = EhUtils.getCategoryColor(info.category),
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface,
             ) {
                 simpleLang?.let {
                     Text(text = it.uppercase())

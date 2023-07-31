@@ -889,7 +889,6 @@ class DownloadsScene :
                 Text(
                     text = categoryText,
                     modifier = Modifier.clip(ShapeDefaults.Small).background(categoryColor).padding(vertical = 2.dp, horizontal = 8.dp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelLarge,
                 )
