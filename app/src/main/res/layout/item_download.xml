@@ -61,20 +61,13 @@
             android:layout_alignStart="@id/title"
             android:layout_marginBottom="2dp" />
 
-        <TextView
+        <androidx.compose.ui.platform.ComposeView
             android:id="@+id/category"
-            style="@style/CardMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignStart="@id/title"
             android:layout_alignBottom="@id/thumb"
-            android:layout_marginBottom="8dp"
-            android:paddingLeft="8dp"
-            android:paddingTop="2dp"
-            android:paddingRight="8dp"
-            android:paddingBottom="2dp"
-            android:textAllCaps="true"
-            android:textColor="?colorOnPrimaryContainer" />
+            android:layout_marginBottom="8dp" />
 
         <ImageView
             android:id="@+id/handle"

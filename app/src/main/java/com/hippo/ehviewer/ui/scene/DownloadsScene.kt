@@ -28,11 +28,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,8 +45,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -876,11 +883,16 @@ class DownloadsScene :
             binding.title.text = EhUtils.getSuitableTitle(info)
             binding.uploader.text = info.uploader
             binding.rating.rating = info.rating
-            val category = binding.category
-            val newCategoryText = EhUtils.getCategory(info.category)
-            if (!newCategoryText.contentEquals(category.text)) {
-                category.text = newCategoryText
-                category.setBackgroundColor(EhUtils.getCategoryColor(requireContext(), info.category))
+            binding.category.setMD3Content {
+                val categoryColor = EhUtils.getCategoryColor(info.category)
+                val categoryText = EhUtils.getCategory(info.category).uppercase()
+                Text(
+                    text = categoryText,
+                    modifier = Modifier.clip(ShapeDefaults.Small).background(categoryColor).padding(vertical = 2.dp, horizontal = 8.dp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
             bindForState(info)
         }
