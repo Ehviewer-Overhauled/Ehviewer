@@ -880,7 +880,7 @@ class DownloadsScene :
             val newCategoryText = EhUtils.getCategory(info.category)
             if (!newCategoryText.contentEquals(category.text)) {
                 category.text = newCategoryText
-                category.setBackgroundColor(EhUtils.getCategoryColor(info.category))
+                category.setBackgroundColor(EhUtils.getCategoryColor(requireContext(), info.category))
             }
             bindForState(info)
         }

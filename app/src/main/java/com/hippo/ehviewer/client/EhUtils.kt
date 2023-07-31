@@ -15,6 +15,10 @@
  */
 package com.hippo.ehviewer.client
 
+import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.material.color.MaterialColors
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
 import java.util.regex.Pattern
@@ -92,8 +96,8 @@ object EhUtils {
         return CATEGORY_VALUES.getOrDefault(type, CATEGORY_VALUES[UNKNOWN])!![0]
     }
 
-    fun getCategoryColor(category: Int): Int {
-        return when (category) {
+    fun getCategoryColor(context: Context, category: Int): Int {
+        val primary = when (category) {
             DOUJINSHI -> BG_COLOR_DOUJINSHI
             MANGA -> BG_COLOR_MANGA
             ARTIST_CG -> BG_COLOR_ARTIST_CG
@@ -106,7 +110,11 @@ object EhUtils {
             MISC -> BG_COLOR_MISC
             else -> BG_COLOR_UNKNOWN
         }.toInt()
+        return MaterialColors.harmonizeWithPrimary(context, primary)
     }
+
+    @Composable
+    fun getCategoryColor(category: Int) = getCategoryColor(LocalContext.current, category)
 
     fun signOut() {
         EhCookieStore.signOut()
