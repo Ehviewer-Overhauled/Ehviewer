@@ -30,7 +30,7 @@
         android:focusable="true"
         android:paddingHorizontal="16dp"
         android:foreground="?attr/selectableItemBackground"
-        android:text="@string/settings_download_download_origin_image"
+        android:text="@string/refresh_original"
         android:textColor="?attr/colorOnBackground"
         app:drawableStartCompat="@drawable/v_refresh_dark_x24"
         app:drawableTint="?attr/colorOnBackground" />
