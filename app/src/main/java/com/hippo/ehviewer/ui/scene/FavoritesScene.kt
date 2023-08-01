@@ -375,7 +375,7 @@ class FavoritesScene : SearchBarScene() {
             }
             switchFav(Settings.recentFavCat)
         }
-        setAllowEmptySearch(false)
+        allowEmptySearch = false
         return binding.root
     }
 

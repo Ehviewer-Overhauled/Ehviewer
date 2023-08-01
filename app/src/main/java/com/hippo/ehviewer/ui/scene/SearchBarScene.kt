@@ -19,12 +19,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.drawerlayout.widget.DrawerLayout
@@ -52,21 +52,15 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private val binding get() = _binding!!
     private var mSuggestionList by mutableStateOf(emptyList<Suggestion>())
     private var mSuggestionProvider: SuggestionProvider? = null
-    private var mAllowEmptySearch = true
+    var allowEmptySearch = true
     private val mSearchDatabase = searchDatabase.searchDao()
     private var onApplySearch: (String) -> Unit = {}
     protected val mSearchFab get() = binding.searchFab
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = SceneSearchbarBinding.inflate(inflater, container, false)
         binding.appbar.statusBarForeground = MaterialShapeDrawable.createWithElevationOverlay(context)
-        binding.searchview.editText.addTextChangedListener {
-            updateSuggestions()
-        }
+        binding.searchview.editText.addTextChangedListener { updateSuggestions() }
         binding.searchview.editText.setOnEditorActionListener { _, _, _ ->
             onApplySearch()
             true
@@ -91,7 +85,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
                                 )
                             }
                         },
-                        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier = Modifier.clickable { it.onClick() },
                     )
                 }
@@ -206,15 +200,9 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         binding.toolbar.setText(binding.searchview.text)
         binding.searchview.hide()
         val query = binding.toolbar.text.toString().trim()
-        if (!mAllowEmptySearch && query.isEmpty()) {
-            return
-        }
+        if (!allowEmptySearch && query.isEmpty()) return
         lifecycleScope.launchIO { addQuery(query) }
         onApplySearch(query)
-    }
-
-    fun setAllowEmptySearch(allowEmptySearch: Boolean) {
-        mAllowEmptySearch = allowEmptySearch
     }
 
     fun interface SuggestionProvider {
