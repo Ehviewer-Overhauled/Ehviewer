@@ -21,9 +21,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.InputType
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -961,66 +958,43 @@ class GalleryListScene : SearchBarScene() {
     }
 
     private abstract inner class UrlSuggestion : Suggestion() {
-        override fun getText(textView: TextView): CharSequence? {
-            return if (textView.id == android.R.id.text1) {
-                val bookImage =
-                    ContextCompat.getDrawable(textView.context, R.drawable.v_book_open_x24)
-                val ssb = SpannableStringBuilder("    ")
-                ssb.append(getString(R.string.gallery_list_search_bar_open_gallery))
-                val imageSize = (textView.textSize * 1.25).toInt()
-                if (bookImage != null) {
-                    bookImage.setBounds(0, 0, imageSize, imageSize)
-                    ssb.setSpan(ImageSpan(bookImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                }
-                ssb
-            } else {
-                null
-            }
-        }
-
+        override val keyword = getString(R.string.gallery_list_search_bar_open_gallery)
+        override val canOpenDirectly = true
         override fun onClick() {
-            navAnimated(getDestination(), getArgs())
+            navAnimated(destination, args)
             if (mState == State.SIMPLE_SEARCH) {
                 setState(State.NORMAL)
             } else if (mState == State.SEARCH_SHOW_LIST) {
                 setState(State.SEARCH)
             }
         }
-
-        abstract fun getDestination(): Int
-
-        abstract fun getArgs(): Bundle
+        abstract val destination: Int
+        abstract val args: Bundle
     }
 
     private inner class GalleryDetailUrlSuggestion(
-        private val mGid: Long,
-        private val mToken: String,
+        gid: Long,
+        token: String,
     ) : UrlSuggestion() {
-        override fun getDestination(): Int {
-            return R.id.galleryDetailScene
-        }
-
-        override fun getArgs() = bundleOf(
+        override val destination = R.id.galleryDetailScene
+        override val args = bundleOf(
             GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GID_TOKEN,
-            GalleryDetailScene.KEY_GID to mGid,
-            GalleryDetailScene.KEY_TOKEN to mToken,
+            GalleryDetailScene.KEY_GID to gid,
+            GalleryDetailScene.KEY_TOKEN to token,
         )
     }
 
     private inner class GalleryPageUrlSuggestion(
-        private val mGid: Long,
-        private val mPToken: String,
-        private val mPage: Int,
+        gid: Long,
+        pToken: String,
+        page: Int,
     ) : UrlSuggestion() {
-        override fun getDestination(): Int {
-            return R.id.progressScene
-        }
-
-        override fun getArgs() = bundleOf(
+        override val destination = R.id.progressScene
+        override val args = bundleOf(
             ProgressScene.KEY_ACTION to ProgressScene.ACTION_GALLERY_TOKEN,
-            ProgressScene.KEY_GID to mGid,
-            ProgressScene.KEY_PTOKEN to mPToken,
-            ProgressScene.KEY_PAGE to mPage,
+            ProgressScene.KEY_GID to gid,
+            ProgressScene.KEY_PTOKEN to pToken,
+            ProgressScene.KEY_PAGE to page,
         )
     }
 

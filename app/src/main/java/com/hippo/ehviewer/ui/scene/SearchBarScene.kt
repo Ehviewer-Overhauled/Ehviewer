@@ -8,15 +8,28 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CallSuper
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.search.SearchView
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.ehviewer.EhApplication.Companion.searchDatabase
@@ -25,9 +38,11 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.dao.Search
 import com.hippo.ehviewer.dao.SearchDao
-import com.hippo.ehviewer.databinding.ItemSimpleList2Binding
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.setMD3Content
+import com.jamal.composeprefs3.ui.ifNotNullThen
+import com.jamal.composeprefs3.ui.ifTrueThen
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
@@ -36,8 +51,7 @@ import kotlinx.coroutines.flow.flow
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null
     private val binding get() = _binding!!
-    private var mSuggestionList: List<Suggestion>? = null
-    private var mSuggestionAdapter: SuggestionAdapter? = null
+    private var mSuggestionList by mutableStateOf(emptyList<Suggestion>())
     private var mSuggestionProvider: SuggestionProvider? = null
     private var mAllowEmptySearch = true
     private val mSearchDatabase = searchDatabase.searchDao()
@@ -50,8 +64,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         savedInstanceState: Bundle?,
     ): View {
         _binding = SceneSearchbarBinding.inflate(inflater, container, false)
-        binding.appbar.statusBarForeground =
-            MaterialShapeDrawable.createWithElevationOverlay(context)
+        binding.appbar.statusBarForeground = MaterialShapeDrawable.createWithElevationOverlay(context)
         binding.searchview.editText.addTextChangedListener {
             updateSuggestions()
         }
@@ -59,11 +72,32 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             onApplySearch()
             true
         }
-        mSuggestionList = ArrayList()
-        mSuggestionAdapter = SuggestionAdapter(LayoutInflater.from(context))
-        binding.searchBarList.adapter = mSuggestionAdapter
-        val layoutManager = LinearLayoutManager(context)
-        binding.searchBarList.layoutManager = layoutManager
+        binding.searchBarList.setMD3Content {
+            LazyColumn {
+                items(mSuggestionList) {
+                    ListItem(
+                        headlineContent = { Text(text = it.keyword) },
+                        supportingContent = it.hint.ifNotNullThen { Text(text = it.hint!!) },
+                        leadingContent = it.canOpenDirectly.ifTrueThen {
+                            Icon(
+                                imageVector = Icons.Default.MenuBook,
+                                contentDescription = null,
+                            )
+                        },
+                        trailingContent = it.canDelete.ifTrueThen {
+                            IconButton(onClick = { deleteKeyword(it.keyword) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                        modifier = Modifier.clickable { it.onClick() },
+                    )
+                }
+            }
+        }
         binding.searchview.addTransitionListener { _, _, newState ->
             if (newState == SearchView.TransitionState.SHOWING) {
                 onSearchViewExpanded()
@@ -96,7 +130,6 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         super.onDestroyView()
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) mSearchViewOnBackPressedCallback.remove()
         _binding = null
-        mSuggestionAdapter = null
     }
 
     private var privLockModeStart: Int? = null
@@ -186,94 +219,42 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     interface SuggestionProvider {
-
         fun providerSuggestions(text: String): List<Suggestion>?
     }
 
+    private fun deleteKeyword(keyword: String) {
+        BaseDialogBuilder(requireContext())
+            .setMessage(requireContext().getString(R.string.delete_search_history, keyword))
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                lifecycleScope.launchIO {
+                    mSearchDatabase.deleteQuery(keyword)
+                    withUIContext {
+                        updateSuggestions(false)
+                    }
+                }
+            }
+            .show()
+    }
+
     abstract class Suggestion {
-
-        abstract fun getText(textView: TextView): CharSequence?
-
+        abstract val keyword: String
+        open val hint: String? = null
         abstract fun onClick()
-
-        open fun onLongClick(): Boolean {
-            return false
-        }
-    }
-
-    private class SuggestionHolder(private val binding: ItemSimpleList2Binding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(suggestion: Suggestion?) {
-            val text1 = suggestion?.getText(binding.text1)
-            val text2 = suggestion?.getText(binding.text2)
-            binding.text1.text = text1
-            if (text2 == null) {
-                binding.text2.visibility = View.GONE
-                binding.text2.text = ""
-            } else {
-                binding.text2.visibility = View.VISIBLE
-                binding.text2.text = text2
-            }
-        }
-    }
-
-    private inner class SuggestionAdapter(private val mInflater: LayoutInflater) :
-        RecyclerView.Adapter<SuggestionHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionHolder {
-            return SuggestionHolder(ItemSimpleList2Binding.inflate(mInflater, parent, false))
-        }
-
-        override fun onBindViewHolder(holder: SuggestionHolder, position: Int) {
-            val suggestion = mSuggestionList?.get(position)
-            holder.bind(suggestion)
-
-            holder.itemView.setOnClickListener {
-                mSuggestionList?.run {
-                    if (position < size) {
-                        this[position].onClick()
-                    }
-                }
-            }
-            holder.itemView.setOnLongClickListener {
-                mSuggestionList?.run {
-                    if (position < size) {
-                        return@setOnLongClickListener this[position].onLongClick()
-                    }
-                }
-                return@setOnLongClickListener false
-            }
-        }
-
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        override fun getItemCount(): Int {
-            return mSuggestionList?.size ?: 0
-        }
+        open val canDelete: Boolean = false
+        open val canOpenDirectly: Boolean = false
     }
 
     inner class TagSuggestion(
-        private var mHint: String?,
-        private var mKeyword: String,
-    ) :
-        Suggestion() {
-
-        override fun getText(textView: TextView): CharSequence? {
-            return if (textView.id == android.R.id.text1) {
-                mKeyword
-            } else {
-                mHint
-            }
-        }
-
+        override val hint: String?,
+        override val keyword: String,
+    ) : Suggestion() {
         override fun onClick() {
             val edittext = binding.searchview.editText
             edittext.let {
                 var keywords = it.text.toString().substringBeforeLast(' ', "")
                 if (keywords.isNotEmpty()) keywords += ' '
-                keywords += wrapTagKeyword(mKeyword)
+                keywords += wrapTagKeyword(keyword)
                 if (!keywords.endsWith(':')) keywords += ' '
                 it.setText(keywords)
                 it.setSelection(keywords.length)
@@ -281,37 +262,15 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
     }
 
-    inner class KeywordSuggestion(private val mKeyword: String) : Suggestion() {
-
-        override fun getText(textView: TextView): CharSequence? {
-            return if (textView.id == android.R.id.text1) {
-                mKeyword
-            } else {
-                null
-            }
-        }
-
+    inner class KeywordSuggestion(
+        override val keyword: String,
+    ) : Suggestion() {
+        override val canDelete = true
         override fun onClick() {
             binding.searchview.editText.run {
-                setText(mKeyword)
+                setText(keyword)
                 setSelection(length())
             }
-        }
-
-        override fun onLongClick(): Boolean {
-            BaseDialogBuilder(requireContext())
-                .setMessage(requireContext().getString(R.string.delete_search_history, mKeyword))
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.delete) { _, _ ->
-                    lifecycleScope.launchIO {
-                        mSearchDatabase.deleteQuery(mKeyword)
-                        withUIContext {
-                            updateSuggestions(false)
-                        }
-                    }
-                }
-                .show()
-            return true
         }
     }
 
@@ -323,13 +282,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             mergedSuggestionFlow().collect {
                 suggestions.add(it)
             }
-            withUIContext {
-                mSuggestionList = suggestions
-                mSuggestionAdapter?.notifyDataSetChanged()
-            }
-        }
-        if (scrollToTop) {
-            binding.searchBarList.scrollToPosition(0)
+            mSuggestionList = suggestions
         }
     }
 
