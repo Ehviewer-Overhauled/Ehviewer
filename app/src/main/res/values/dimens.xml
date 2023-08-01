@@ -27,7 +27,6 @@
 
     <!-- Text size -->
     <dimen name="text_little_small">16sp</dimen>
-    <dimen name="text_small">14sp</dimen>
     <dimen name="text_super_small">12sp</dimen>
 
     <!-- RatingView -->
@@ -53,7 +52,6 @@
     <dimen name="gallery_search_bar_margin_v">10dp</dimen>
 
     <dimen name="gallery_padding_top_search_bar">64dp</dimen>
-    <dimen name="gallery_padding_bottom_fab">80dp</dimen>
 
     <dimen name="gallery_list_column_width_long">480dp</dimen>
     <dimen name="gallery_list_column_width_short">320dp</dimen>
