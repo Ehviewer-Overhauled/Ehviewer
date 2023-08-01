@@ -15,6 +15,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.mikepenz.aboutlibraries.plugin")
     id("org.mozilla.rust-android-gradle.rust-android")
+    id("dev.shreyaspatil.compose-compiler-report-generator")
 }
 
 android {
