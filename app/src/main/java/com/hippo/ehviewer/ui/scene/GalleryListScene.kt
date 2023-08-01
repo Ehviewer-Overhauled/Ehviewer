@@ -255,33 +255,6 @@ class GalleryListScene : SearchBarScene() {
         setEditTextHint(getString(if (EhUtils.isExHentai) R.string.gallery_list_search_bar_hint_exhentai else R.string.gallery_list_search_bar_hint_e_hentai))
     }
 
-    private fun setSearchBarSuggestionProvider() {
-        setSuggestionProvider(object : SuggestionProvider {
-            override fun providerSuggestions(text: String): List<Suggestion>? {
-                val result1 = GalleryDetailUrlParser.parse(text, false)
-                if (result1 != null) {
-                    return listOf<Suggestion>(
-                        GalleryDetailUrlSuggestion(
-                            result1.gid,
-                            result1.token,
-                        ),
-                    )
-                }
-                val result2 = GalleryPageUrlParser.parse(text, false)
-                if (result2 != null) {
-                    return listOf<Suggestion>(
-                        GalleryPageUrlSuggestion(
-                            result2.gid,
-                            result2.pToken,
-                            result2.page,
-                        ),
-                    )
-                }
-                return null
-            }
-        })
-    }
-
     // Update search bar title, drawer checked item
     private fun onUpdateUrlBuilder() {
         _binding ?: return
@@ -440,7 +413,13 @@ class GalleryListScene : SearchBarScene() {
             onApplySearch(query)
         }
         setSearchBarHint()
-        setSearchBarSuggestionProvider()
+        setSuggestionProvider { text ->
+            GalleryDetailUrlParser.parse(text, false)?.run {
+                GalleryDetailUrlSuggestion(gid, token)
+            } ?: GalleryPageUrlParser.parse(text, false)?.run {
+                GalleryPageUrlSuggestion(gid, pToken, page)
+            }
+        }
         binding.fabLayout.setAutoCancel(true)
         binding.fabLayout.isExpanded = false
         binding.fabLayout.setHidePrimaryFab(false)

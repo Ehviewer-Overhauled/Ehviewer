@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.scene
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -44,9 +43,9 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.jamal.composeprefs3.ui.ifNotNullThen
 import com.jamal.composeprefs3.ui.ifTrueThen
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
 
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null
@@ -218,8 +217,8 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         mAllowEmptySearch = allowEmptySearch
     }
 
-    interface SuggestionProvider {
-        fun providerSuggestions(text: String): List<Suggestion>?
+    fun interface SuggestionProvider {
+        fun providerSuggestions(text: String): Suggestion?
     }
 
     private fun deleteKeyword(keyword: String) {
@@ -229,9 +228,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             .setPositiveButton(R.string.delete) { _, _ ->
                 lifecycleScope.launchIO {
                     mSearchDatabase.deleteQuery(keyword)
-                    withUIContext {
-                        updateSuggestions(false)
-                    }
+                    updateSuggestions()
                 }
             }
             .show()
@@ -250,8 +247,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         override val keyword: String,
     ) : Suggestion() {
         override fun onClick() {
-            val edittext = binding.searchview.editText
-            edittext.let {
+            binding.searchview.editText.let {
                 var keywords = it.text.toString().substringBeforeLast(' ', "")
                 if (keywords.isNotEmpty()) keywords += ' '
                 keywords += wrapTagKeyword(keyword)
@@ -274,15 +270,10 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun updateSuggestions(scrollToTop: Boolean = true) {
+    private fun updateSuggestions() {
         _binding ?: return
         viewLifecycleOwner.lifecycleScope.launchIO {
-            val suggestions = mutableListOf<Suggestion>()
-            mergedSuggestionFlow().collect {
-                suggestions.add(it)
-            }
-            mSuggestionList = suggestions
+            mSuggestionList = mergedSuggestionFlow().toList()
         }
     }
 
@@ -290,7 +281,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     private fun mergedSuggestionFlow(): Flow<Suggestion> = flow {
         binding.searchview.editText.text?.toString()?.let { text ->
-            mSuggestionProvider?.run { providerSuggestions(text)?.forEach { emit(it) } }
+            mSuggestionProvider?.run { providerSuggestions(text)?.let { emit(it) } }
             mSearchDatabase.suggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
             EhTagDatabase.takeIf { it.initialized }?.run {
                 if (text.isNotEmpty() && !text.endsWith(' ')) {
