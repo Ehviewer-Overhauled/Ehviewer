@@ -143,6 +143,7 @@ class SpiderDen(mGalleryInfo: GalleryInfo) {
                 saveResponseMeta(index, type, length) { file ->
                     file.openOutputStream().use { os ->
                         val chan = os.channel
+                        chan.truncate(0)
                         copyToChannel(chan) {
                             notifyProgress(length, info.receivedByteCount, it)
                         }
@@ -229,10 +230,6 @@ class SpiderDen(mGalleryInfo: GalleryInfo) {
                 }
             }
         }
-        return false
-    }
-
-    fun checkPlainText(index: Int): Boolean {
         return false
     }
 

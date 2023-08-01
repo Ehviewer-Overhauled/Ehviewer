@@ -41,6 +41,7 @@ import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchIO
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -556,13 +557,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     mSemaphore.withPermit {
                         doInJob(index, force, orgImg)
                     }
-                }.apply {
-                    invokeOnCompletion {
-                        if (getPageState(index) == STATE_DOWNLOADING) {
-                            Log.d(WORKER_DEBUG_TAG, "Download image cancelled $index")
-                            mSpiderDen.remove(index)
-                        }
-                    }
                 }
             }
         }
@@ -724,7 +718,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 }
                 Log.d(WORKER_DEBUG_TAG, targetImageUrl)
 
-                runSuspendCatching {
+                runCatching {
                     Log.d(WORKER_DEBUG_TAG, "Start download image $index")
                     val success: Boolean = mSpiderDen.makeHttpCallAndSaveImage(
                         index,
@@ -741,21 +735,22 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                         continue@loop
                     }
 
-                    if (mSpiderDen.checkPlainText(index)) {
-                        error = ""
-                        forceHtml = true
-                        continue@loop
-                    }
-
                     Log.d(WORKER_DEBUG_TAG, "Download image succeed $index")
-
                     updatePageState(index, STATE_FINISHED)
                     delay(mDownloadDelay.toLong())
                     return
                 }.onFailure {
-                    it.printStackTrace()
-                    error = NETWORK_ERROR
-                    forceHtml = true
+                    if (it is CancellationException) {
+                        Log.d(WORKER_DEBUG_TAG, "Download image cancelled $index")
+                        error = "Cancelled"
+                        mSpiderDen.remove(index)
+                        updatePageState(index, STATE_FAILED, error)
+                        throw it
+                    } else {
+                        it.printStackTrace()
+                        error = NETWORK_ERROR
+                        forceHtml = true
+                    }
                 }
                 Log.d(WORKER_DEBUG_TAG, "End download image $index")
             }
