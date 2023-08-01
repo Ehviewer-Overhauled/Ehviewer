@@ -20,9 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.GravityCompat
@@ -43,6 +41,7 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.jamal.composeprefs3.ui.ifNotNullThen
 import com.jamal.composeprefs3.ui.ifTrueThen
 import eu.kanade.tachiyomi.util.lang.launchIO
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
@@ -50,7 +49,7 @@ import kotlinx.coroutines.flow.toList
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null
     private val binding get() = _binding!!
-    private var mSuggestionList by mutableStateOf(emptyList<Suggestion>())
+    private val suggestionList = mutableStateListOf<Suggestion>()
     private var mSuggestionProvider: SuggestionProvider? = null
     var allowEmptySearch = true
     private val mSearchDatabase = searchDatabase.searchDao()
@@ -67,7 +66,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
         binding.searchBarList.setMD3Content {
             LazyColumn {
-                items(mSuggestionList) {
+                items(suggestionList) {
                     ListItem(
                         headlineContent = { Text(text = it.keyword) },
                         supportingContent = it.hint.ifNotNullThen { Text(text = it.hint!!) },
@@ -258,10 +257,14 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         }
     }
 
+    private var job: Job? = null
+
     private fun updateSuggestions() {
         _binding ?: return
-        viewLifecycleOwner.lifecycleScope.launchIO {
-            mSuggestionList = mergedSuggestionFlow().toList()
+        job?.cancel()
+        job = viewLifecycleOwner.lifecycleScope.launchIO {
+            suggestionList.clear()
+            mergedSuggestionFlow().toList(suggestionList)
         }
     }
 
