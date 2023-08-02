@@ -71,7 +71,7 @@ class DialogState {
         content = null
     }
 
-    suspend inline fun <R> dialog(crossinline block: @Composable (CancellableContinuation<R>) -> Unit) = suspendCancellableCoroutine<R> { cont ->
+    suspend inline fun <R> dialog(crossinline block: @Composable (CancellableContinuation<R>) -> Unit) = suspendCancellableCoroutine { cont ->
         cont.invokeOnCancellation { dismiss() }
         val realContinuation = object : CancellableContinuation<R> by cont {
             override fun resumeWith(result: Result<R>) {
@@ -93,7 +93,7 @@ class DialogState {
                         Text(text = stringResource(id = android.R.string.ok))
                     }
                 },
-                title = title?.let { { Text(text = stringResource(id = title)) } },
+                title = title.ifNotNullThen { Text(text = stringResource(id = title!!)) },
                 text = { block(impl) },
             )
         }
@@ -119,7 +119,7 @@ class DialogState {
                         Text(text = stringResource(id = android.R.string.ok))
                     }
                 },
-                title = title?.let { { Text(text = title) } },
+                title = title.ifNotNullThen { Text(text = title!!) },
                 text = {
                     OutlinedTextField(
                         value = state,
@@ -158,14 +158,12 @@ class DialogState {
                         Text(text = stringResource(id = confirmText ?: android.R.string.ok))
                     }
                 },
-                dismissButton = dismissText?.let {
-                    {
-                        TextButton(onClick = { cont.cancel() }) {
-                            Text(text = stringResource(id = dismissText))
-                        }
+                dismissButton = dismissText.ifNotNullThen {
+                    TextButton(onClick = { cont.cancel() }) {
+                        Text(text = stringResource(id = dismissText!!))
                     }
                 },
-                title = title?.let { { Text(text = stringResource(id = title)) } },
+                title = title.ifNotNullThen { Text(text = stringResource(id = title!!)) },
                 text = text,
             )
         }
