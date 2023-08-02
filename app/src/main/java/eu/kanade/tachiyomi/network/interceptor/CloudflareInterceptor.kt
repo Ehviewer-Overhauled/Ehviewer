@@ -20,9 +20,7 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
     private val executor = ContextCompat.getMainExecutor(context)
 
     override fun shouldIntercept(response: Response): Boolean {
-        // Check if Cloudflare anti-bot is on
-        return response.code in ERROR_CODES && response.header("Server") in SERVER_CHECK &&
-            response.header("X-Varnish") == null
+        return response.header("cf-mitigated") == "challenge"
     }
 
     override fun intercept(
@@ -111,5 +109,4 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
 }
 
 private val ERROR_CODES = intArrayOf(403, 503)
-private val SERVER_CHECK = arrayOf("cloudflare-nginx", "cloudflare")
 private const val COOKIE_NAME = "cf_clearance"
