@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.tools
 
-import android.graphics.Typeface
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -250,7 +249,7 @@ class DialogState {
                     value = note,
                     onValueChange = { note = it },
                     modifier = Modifier.width(128.dp),
-                    textStyle = TextStyle(fontFamily = FontFamily(Typeface.MONOSPACE)),
+                    textStyle = TextStyle(fontFamily = FontFamily.Monospace),
                     label = { Text(text = stringResource(id = hint)) },
                     trailingIcon = {
                         if (note.isNotEmpty()) {
