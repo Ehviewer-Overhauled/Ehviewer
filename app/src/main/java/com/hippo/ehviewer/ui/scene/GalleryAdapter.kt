@@ -19,11 +19,13 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
+import androidx.compose.ui.platform.ComposeView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import arrow.core.partially1
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.Settings.detailSize
@@ -153,8 +155,8 @@ class GalleryAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
-        TYPE_LIST -> ListGalleryHolder(CheckableComposeView(parent.context), showFavorite)
-        TYPE_GRID -> GridGalleryHolder(CheckableComposeView(parent.context))
+        TYPE_LIST -> ListGalleryHolder(ComposeView(parent.context), showFavorite)
+        TYPE_GRID -> GridGalleryHolder(ComposeView(parent.context))
         else -> error("Unexpected value: $viewType")
     }
 
@@ -162,13 +164,9 @@ class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
         val gi = getItem(position) ?: return
+        val selected = tracker?.isSelected(gi.gid) ?: false
         holder.galleryId = gi.gid
-        holder.bind(
-            gi,
-            tracker?.isSelected(gi.gid) ?: false,
-            { onItemClick(gi) },
-            { onItemLongClick(gi) },
-        )
+        holder.bind(gi, selected, onItemClick.partially1(gi), onItemLongClick.partially1(gi))
     }
 
     @IntDef(TYPE_LIST, TYPE_GRID)
