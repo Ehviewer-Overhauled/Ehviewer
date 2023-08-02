@@ -20,13 +20,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Menu
@@ -66,12 +64,13 @@ import com.hippo.ehviewer.Settings.listThumbSize
 import com.hippo.ehviewer.ui.doGalleryInfoAction
 import com.hippo.ehviewer.ui.main.GalleryInfoListItem
 import com.hippo.ehviewer.ui.setMD3Content
+import com.hippo.ehviewer.ui.tools.CrystalCard
 import com.hippo.ehviewer.ui.tools.Deferred
+import com.hippo.ehviewer.ui.tools.FastScrollLazyColumn
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.delay
-import my.nanihadesuka.compose.LazyColumnScrollbar
 
 class HistoryScene : BaseScene() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = ComposeView(inflater.context).apply {
@@ -109,65 +108,59 @@ class HistoryScene : BaseScene() {
                     )
                 },
             ) { paddingValues ->
-                val state = rememberLazyListState()
-                Box {
-                    val cardHeight = remember { (3 * listThumbSize * 3).pxToDp.dp }
-                    LazyColumn(
-                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
-                        state = state,
-                        contentPadding = paddingValues,
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
-                    ) {
-                        items(
-                            count = historyData.itemCount,
-                            key = historyData.itemKey(key = { item -> item.gid }),
-                            contentType = historyData.itemContentType(),
-                        ) { index ->
-                            val info = historyData[index]
-                            info?.let {
-                                val dismissState = rememberDismissState(
-                                    confirmValueChange = {
-                                        if (it == DismissValue.DismissedToStart) {
-                                            coroutineScope.launchIO {
-                                                EhDB.deleteHistoryInfo(info)
-                                            }
+                val cardHeight = remember { (3 * listThumbSize * 3).pxToDp.dp }
+                FastScrollLazyColumn(
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h)),
+                    contentPadding = paddingValues,
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
+                ) {
+                    items(
+                        count = historyData.itemCount,
+                        key = historyData.itemKey(key = { item -> item.gid }),
+                        contentType = historyData.itemContentType(),
+                    ) { index ->
+                        val info = historyData[index]
+                        if (info != null) {
+                            val dismissState = rememberDismissState(
+                                confirmValueChange = {
+                                    if (it == DismissValue.DismissedToStart) {
+                                        coroutineScope.launchIO {
+                                            EhDB.deleteHistoryInfo(info)
                                         }
-                                        true
-                                    },
-                                )
-
-                                SwipeToDismiss(
-                                    state = dismissState,
-                                    background = {},
-                                    dismissContent = {
-                                        // TODO: item delete & add animation
-                                        // Bug tracker: https://issuetracker.google.com/issues/150812265
-                                        GalleryInfoListItem(
-                                            onClick = {
-                                                navAnimated(
-                                                    R.id.galleryDetailScene,
-                                                    bundleOf(
-                                                        GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
-                                                        GalleryDetailScene.KEY_GALLERY_INFO to it,
-                                                    ),
-                                                )
-                                            },
-                                            onLongClick = {
-                                                coroutineScope.launchIO {
-                                                    dialogState.doGalleryInfoAction(info, context)
-                                                }
-                                            },
-                                            info = it,
-                                            modifier = Modifier.height(cardHeight),
-                                        )
-                                    },
-                                    directions = setOf(DismissDirection.EndToStart),
-                                )
-                            }
+                                    }
+                                    true
+                                },
+                            )
+                            SwipeToDismiss(
+                                state = dismissState,
+                                background = {},
+                                dismissContent = {
+                                    // TODO: item delete & add animation
+                                    // Bug tracker: https://issuetracker.google.com/issues/150812265
+                                    GalleryInfoListItem(
+                                        onClick = {
+                                            navAnimated(
+                                                R.id.galleryDetailScene,
+                                                bundleOf(
+                                                    GalleryDetailScene.KEY_ACTION to GalleryDetailScene.ACTION_GALLERY_INFO,
+                                                    GalleryDetailScene.KEY_GALLERY_INFO to info,
+                                                ),
+                                            )
+                                        },
+                                        onLongClick = {
+                                            coroutineScope.launchIO {
+                                                dialogState.doGalleryInfoAction(info, context)
+                                            }
+                                        },
+                                        info = info,
+                                        modifier = Modifier.height(cardHeight),
+                                    )
+                                },
+                                directions = setOf(DismissDirection.EndToStart),
+                            )
+                        } else {
+                            CrystalCard(modifier = Modifier.height(cardHeight).fillMaxWidth()) {}
                         }
-                    }
-                    Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
-                        LazyColumnScrollbar(listState = state)
                     }
                 }
                 Deferred({ delay(200) }) {

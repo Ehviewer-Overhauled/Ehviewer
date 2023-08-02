@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -59,13 +57,13 @@ import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.setMD3Content
+import com.hippo.ehviewer.ui.tools.FastScrollLazyVerticalGrid
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.rememberInVM
 import com.hippo.ehviewer.util.getParcelableCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
-import my.nanihadesuka.compose.LazyGridScrollbar
 
 class GalleryPreviewScreen : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = ComposeView(inflater.context).apply {
@@ -138,29 +136,24 @@ class GalleryPreviewScreen : Fragment() {
                     )
                 },
             ) { paddingValues ->
-                Box {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(columnCount),
-                        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection).padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
-                        state = state,
-                        contentPadding = paddingValues,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        items(
-                            count = data.itemCount,
-                            key = data.itemKey(key = { item -> item.position }),
-                            contentType = data.itemContentType(),
-                        ) { index ->
-                            val item = data[index]
-                            EhPreviewItem(item, index) {
-                                onPreviewCLick(index)
-                            }
+                FastScrollLazyVerticalGrid(
+                    columns = GridCells.Fixed(columnCount),
+                    modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection).padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h)),
+                    state = state,
+                    contentPadding = paddingValues,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(
+                        count = data.itemCount,
+                        key = data.itemKey(key = { item -> item.position }),
+                        contentType = data.itemContentType(),
+                    ) { index ->
+                        val item = data[index]
+                        EhPreviewItem(item, index) {
+                            onPreviewCLick(index)
                         }
                     }
-                }
-                Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
-                    LazyGridScrollbar(listState = state)
                 }
             }
         }
