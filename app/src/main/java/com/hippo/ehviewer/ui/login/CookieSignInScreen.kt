@@ -88,7 +88,7 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
     var signInJob by remember { mutableStateOf<Job?>(null) }
 
     val dialogState = rememberDialogState()
-    dialogState.Handler()
+    dialogState.Intercept()
 
     val noCookies = stringResource(R.string.from_clipboard_error)
 
@@ -129,7 +129,7 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
                 withUIContext { navController.navigate(if (canEx) SELECT_SITE_ROUTE_NAME else FINISH_ROUTE_NAME) }
             }.onFailure {
                 EhCookieStore.signOut()
-                dialogState.show(
+                dialogState.awaitPermissionOrCancel(
                     confirmText = R.string.get_it,
                     title = R.string.sign_in_failed,
                     text = {

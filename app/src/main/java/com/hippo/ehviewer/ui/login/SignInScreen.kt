@@ -89,7 +89,7 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
     var signInJob by remember { mutableStateOf<Job?>(null) }
 
     val dialogState = rememberDialogState()
-    dialogState.Handler()
+    dialogState.Intercept()
 
     BackHandler {
         (context as Activity).moveTaskToBack(true)
@@ -119,7 +119,7 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
             }.onFailure {
                 withUIContext {
                     focusManager.clearFocus()
-                    dialogState.show(
+                    dialogState.awaitPermissionOrCancel(
                         confirmText = R.string.get_it,
                         title = R.string.sign_in_failed,
                         text = {

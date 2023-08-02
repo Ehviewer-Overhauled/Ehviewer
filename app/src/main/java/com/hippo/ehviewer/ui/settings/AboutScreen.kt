@@ -68,7 +68,7 @@ fun AboutScreen() {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val dialogState = rememberDialogState()
-    dialogState.Handler()
+    dialogState.Intercept()
     fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     Scaffold(
         topBar = {
@@ -133,7 +133,7 @@ fun AboutScreen() {
 }
 
 suspend fun DialogState.showNewVersion(context: Context, release: Release) {
-    val download = show(
+    awaitPermissionOrCancel(
         confirmText = R.string.download,
         dismissText = android.R.string.cancel,
         title = R.string.new_version_available,
@@ -148,9 +148,7 @@ suspend fun DialogState.showNewVersion(context: Context, release: Release) {
         }
     }
     // TODO: Download in the background and show progress in notification
-    if (download) {
-        val file = File(AppConfig.tempDir, "update.apk").apply { delete() }
-        AppUpdater.downloadUpdate(release.downloadLink, file)
-        withUIContext { context.installPackage(file) }
-    }
+    val file = File(AppConfig.tempDir, "update.apk").apply { delete() }
+    AppUpdater.downloadUpdate(release.downloadLink, file)
+    withUIContext { context.installPackage(file) }
 }

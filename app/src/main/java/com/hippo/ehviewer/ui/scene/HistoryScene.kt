@@ -76,7 +76,7 @@ class HistoryScene : BaseScene() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = ComposeView(inflater.context).apply {
         setMD3Content {
             val dialogState = rememberDialogState()
-            dialogState.Handler()
+            dialogState.Intercept()
             val coroutineScope = rememberCoroutineScope()
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             val historyData = remember { Pager(PagingConfig(20, jumpThreshold = 40)) { EhDB.historyLazyList }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
@@ -93,12 +93,12 @@ class HistoryScene : BaseScene() {
                         actions = {
                             IconButton(onClick = {
                                 coroutineScope.launchIO {
-                                    val clear = dialogState.show(
+                                    dialogState.awaitPermissionOrCancel(
                                         confirmText = R.string.clear_all,
                                         dismissText = android.R.string.cancel,
                                         text = { Text(text = stringResource(id = R.string.clear_all_history)) },
                                     )
-                                    if (clear) EhDB.clearHistoryInfo()
+                                    EhDB.clearHistoryInfo()
                                 }
                             }) {
                                 Icon(imageVector = Icons.Default.ClearAll, contentDescription = null)

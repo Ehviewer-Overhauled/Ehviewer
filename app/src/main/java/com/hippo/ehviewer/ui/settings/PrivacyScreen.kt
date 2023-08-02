@@ -38,7 +38,7 @@ fun PrivacyScreen() {
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     val dialogState = rememberDialogState()
-    dialogState.Handler()
+    dialogState.Intercept()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -79,15 +79,13 @@ fun PrivacyScreen() {
                 summary = stringResource(id = R.string.clear_search_history_summary),
             ) {
                 coroutineScope.launch {
-                    val confirmed = dialogState.show(
+                    dialogState.awaitPermissionOrCancel(
                         confirmText = R.string.clear_all,
                         dismissText = android.R.string.cancel,
                         title = R.string.clear_search_history_confirm,
                     )
-                    if (confirmed) {
-                        searchDatabase.searchDao().clear()
-                        launchSnackBar(searchHistoryCleared)
-                    }
+                    searchDatabase.searchDao().clear()
+                    launchSnackBar(searchHistoryCleared)
                 }
             }
         }

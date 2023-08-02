@@ -45,6 +45,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -57,106 +58,90 @@ fun interface DismissDialogScope<R> {
 }
 
 class DialogState {
-    private var content: (@Composable () -> Unit)? by mutableStateOf(null)
+    var content: (@Composable () -> Unit)? by mutableStateOf(null)
 
     @Composable
-    fun Handler() = content?.invoke()
+    fun Intercept() = content?.invoke()
 
     fun dismiss() {
         content = null
     }
 
+    suspend inline fun <R> dialog(crossinline block: @Composable (CancellableContinuation<R>) -> Unit) = suspendCancellableCoroutine<R> { cont ->
+        cont.invokeOnCancellation { dismiss() }
+        content = { block(cont) }
+    }
+
     suspend fun <R> show(initial: R, @StringRes title: Int? = null, block: @Composable DialogScope<R>.() -> Unit): R {
-        return suspendCancellableCoroutine { cont ->
-            cont.invokeOnCancellation { dismiss() }
-            content = {
-                val state = remember(cont) { mutableStateOf(initial) }
-                val impl = remember(cont) { object : DialogScope<R> { override var expectedValue by state } }
-                AlertDialog(
-                    onDismissRequest = {
-                        cont.cancel()
+        return dialog { cont ->
+            val state = remember(cont) { mutableStateOf(initial) }
+            val impl = remember(cont) { object : DialogScope<R> { override var expectedValue by state } }
+            AlertDialog(
+                onDismissRequest = { cont.cancel() },
+                confirmButton = {
+                    TextButton(onClick = {
                         dismiss()
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            dismiss()
-                            cont.resume(state.value)
-                        }) {
-                            Text(text = stringResource(id = android.R.string.ok))
-                        }
-                    },
-                    title = title?.let { { Text(text = stringResource(id = title)) } },
-                    text = { block(impl) },
-                )
-            }
+                        cont.resume(state.value)
+                    }) {
+                        Text(text = stringResource(id = android.R.string.ok))
+                    }
+                },
+                title = title?.let { { Text(text = stringResource(id = title)) } },
+                text = { block(impl) },
+            )
         }
     }
 
-    suspend fun show(
+    suspend fun awaitPermissionOrCancel(
         @StringRes confirmText: Int? = null,
         @StringRes dismissText: Int? = null,
         @StringRes title: Int? = null,
         text: (@Composable () -> Unit)? = null,
-    ): Boolean {
-        return suspendCancellableCoroutine { cont ->
-            cont.invokeOnCancellation { dismiss() }
-            content = {
-                AlertDialog(
-                    onDismissRequest = {
+    ) {
+        return dialog { cont ->
+            AlertDialog(
+                onDismissRequest = { cont.cancel() },
+                confirmButton = {
+                    TextButton(onClick = {
                         dismiss()
-                        cont.resume(false)
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            dismiss()
-                            cont.resume(true)
-                        }) {
-                            Text(text = stringResource(id = confirmText ?: android.R.string.ok))
+                        cont.resume(Unit)
+                    }) {
+                        Text(text = stringResource(id = confirmText ?: android.R.string.ok))
+                    }
+                },
+                dismissButton = dismissText?.let {
+                    {
+                        TextButton(onClick = { cont.cancel() }) {
+                            Text(text = stringResource(id = dismissText))
                         }
-                    },
-                    dismissButton = dismissText?.let {
-                        {
-                            TextButton(onClick = {
-                                dismiss()
-                                cont.resume(false)
-                            }) {
-                                Text(text = stringResource(id = dismissText))
-                            }
-                        }
-                    },
-                    title = title?.let { { Text(text = stringResource(id = title)) } },
-                    text = text,
-                )
-            }
+                    }
+                },
+                title = title?.let { { Text(text = stringResource(id = title)) } },
+                text = text,
+            )
         }
     }
 
     private suspend fun <R> showNoButton(respectDefaultWidth: Boolean = true, block: @Composable DismissDialogScope<R>.() -> Unit): R {
-        return suspendCancellableCoroutine { cont ->
-            cont.invokeOnCancellation { dismiss() }
-            content = {
-                val impl = remember(cont) {
-                    DismissDialogScope<R> {
-                        dismiss()
-                        cont.resume(it)
-                    }
+        return dialog { cont ->
+            val impl = remember(cont) {
+                DismissDialogScope<R> {
+                    dismiss()
+                    cont.resume(it)
                 }
-                AlertDialog(
-                    onDismissRequest = {
-                        cont.cancel()
-                        dismiss()
-                    },
-                    content = {
-                        Surface(
-                            modifier = with(Modifier) { if (!respectDefaultWidth) defaultMinSize(280.dp) else width(280.dp) },
-                            shape = AlertDialogDefaults.shape,
-                            color = AlertDialogDefaults.containerColor,
-                            tonalElevation = AlertDialogDefaults.TonalElevation,
-                            content = { block(impl) },
-                        )
-                    },
-                )
             }
+            AlertDialog(
+                onDismissRequest = { cont.cancel() },
+                content = {
+                    Surface(
+                        modifier = with(Modifier) { if (!respectDefaultWidth) defaultMinSize(280.dp) else width(280.dp) },
+                        shape = AlertDialogDefaults.shape,
+                        color = AlertDialogDefaults.containerColor,
+                        tonalElevation = AlertDialogDefaults.TonalElevation,
+                        content = { block(impl) },
+                    )
+                },
+            )
         }
     }
 

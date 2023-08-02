@@ -300,7 +300,8 @@ suspend fun DialogState.doGalleryInfoAction(info: BaseGalleryInfo, context: Cont
             0 -> navToReader(info)
             1 -> withUIContext {
                 if (downloaded) {
-                    if (confirmRemoveDownload(info)) DownloadManager.deleteDownload(info.gid)
+                    confirmRemoveDownload(info)
+                    DownloadManager.deleteDownload(info.gid)
                 } else {
                     CommonOperations.startDownload(this@with, info, false)
                 }
@@ -330,7 +331,7 @@ suspend fun DialogState.doGalleryInfoAction(info: BaseGalleryInfo, context: Cont
 
 private const val MAX_FAVNOTE_CHAR = 200
 
-suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo): Boolean = show(
+suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo) = awaitPermissionOrCancel(
     confirmText = android.R.string.ok,
     dismissText = android.R.string.cancel,
     title = R.string.download_remove_dialog_title,

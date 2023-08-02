@@ -407,7 +407,7 @@ class GalleryDetailScene : BaseScene() {
                         updateDownloadState()
                     }
                 }
-                dialogState.Handler()
+                dialogState.Intercept()
                 val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                 Scaffold(
                     topBar = {

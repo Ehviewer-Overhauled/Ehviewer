@@ -313,7 +313,7 @@ class GalleryListScene : SearchBarScene() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = SceneGalleryListBinding.inflate(inflater, container!!)
-        container.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Handler() } })
+        container.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Intercept() } })
         checkForUpdates()
         requireActivity().onBackPressedDispatcher.addCallback(stateBackPressedCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop

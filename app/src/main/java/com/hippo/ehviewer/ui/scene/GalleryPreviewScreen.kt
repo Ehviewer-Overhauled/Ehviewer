@@ -76,7 +76,7 @@ class GalleryPreviewScreen : Fragment() {
             val columnCount = calculateSuitableSpanCount()
             val state = rememberLazyGridState()
             val dialogState = rememberDialogState()
-            dialogState.Handler()
+            dialogState.Intercept()
             val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
             val pages = galleryDetail.pages
             val pgSize = galleryDetail.previewList.size
