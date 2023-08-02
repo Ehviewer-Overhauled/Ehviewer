@@ -144,7 +144,6 @@ import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CoilImageGetter
-import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.main.EhPreviewItem
@@ -361,16 +360,13 @@ class GalleryDetailScene : BaseScene() {
             showTip(R.string.sign_in_first, LENGTH_LONG)
             return
         }
-        val builder =
-            EditTextDialogBuilder(requireContext(), "", getString(R.string.action_add_tag_tip))
-        builder.setPositiveButton(android.R.string.ok, null)
-        val dialog = builder.setTitle(R.string.action_add_tag)
-            .show()
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            .setOnClickListener {
-                voteTag(builder.text.trim { it <= ' ' }, 1)
-                dialog.dismiss()
-            }
+        lifecycleScope.launchIO {
+            val text = dialogState.awaitInputText(
+                title = getString(R.string.action_add_tag),
+                hint = getString(R.string.action_add_tag_tip),
+            )
+            voteTag(text.trim(), 1)
+        }
     }
 
     override fun onCreateView(

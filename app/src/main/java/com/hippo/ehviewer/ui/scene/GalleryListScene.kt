@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -628,31 +627,31 @@ class GalleryListScene : SearchBarScene() {
     }
 
     private fun showGoToDialog() {
-        val context = context ?: return
         mAdapter ?: return
         if (mIsTopList) {
-            val page = 1
             val pages = 200
-            val hint = getString(R.string.go_to_hint, page, pages)
-            val builder = EditTextDialogBuilder(context, null, hint)
-            builder.editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-            val dialog = builder.setTitle(R.string.go_to).setPositiveButton(android.R.string.ok, null).show()
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-                val text = builder.text.trim { it <= ' ' }
-                val goTo: Int = try {
-                    text.toInt() - 1
-                } catch (e: NumberFormatException) {
-                    builder.setError(getString(R.string.error_invalid_number))
-                    return@setOnClickListener
-                }
-                if (goTo < 0 || goTo >= pages) {
-                    builder.setError(getString(R.string.error_out_of_range))
-                    return@setOnClickListener
-                }
-                builder.setError(null)
-                mUrlBuilder.setJumpTo(goTo.toString())
+            val title = getString(R.string.go_to)
+            val hint = getString(R.string.go_to_hint, 1, 200)
+            lifecycleScope.launch {
+                val text = dialogState.awaitInputText(
+                    title = title,
+                    hint = hint,
+                    isNumber = true,
+                ) { oriText ->
+                    val text = oriText.trim()
+                    val goTo = runCatching {
+                        text.toInt() - 1
+                    }.onFailure {
+                        return@awaitInputText getString(R.string.error_invalid_number)
+                    }.getOrThrow()
+                    if (goTo < 0 || goTo >= pages) {
+                        getString(R.string.error_out_of_range)
+                    } else {
+                        null
+                    }
+                }.trim().toInt() - 1
+                mUrlBuilder.setJumpTo(text.toString())
                 mAdapter?.refresh()
-                dialog.dismiss()
             }
         } else {
             val local = LocalDateTime.of(2007, 3, 21, 0, 0)

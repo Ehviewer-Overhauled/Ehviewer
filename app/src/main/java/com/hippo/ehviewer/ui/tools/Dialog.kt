@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Icon
@@ -23,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,8 +46,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.jamal.composeprefs3.ui.ifNotNullThen
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -69,25 +74,73 @@ class DialogState {
 
     suspend inline fun <R> dialog(crossinline block: @Composable (CancellableContinuation<R>) -> Unit) = suspendCancellableCoroutine<R> { cont ->
         cont.invokeOnCancellation { dismiss() }
-        content = { block(cont) }
+        val realContinuation = object : CancellableContinuation<R> by cont {
+            override fun resumeWith(result: Result<R>) {
+                dismiss()
+                cont.resumeWith(result)
+            }
+        }
+        content = { block(realContinuation) }
     }
 
-    suspend fun <R> show(initial: R, @StringRes title: Int? = null, block: @Composable DialogScope<R>.() -> Unit): R {
+    suspend fun <R> awaitResult(initial: R, @StringRes title: Int? = null, block: @Composable DialogScope<R>.() -> Unit): R {
         return dialog { cont ->
             val state = remember(cont) { mutableStateOf(initial) }
             val impl = remember(cont) { object : DialogScope<R> { override var expectedValue by state } }
             AlertDialog(
                 onDismissRequest = { cont.cancel() },
                 confirmButton = {
-                    TextButton(onClick = {
-                        dismiss()
-                        cont.resume(state.value)
-                    }) {
+                    TextButton(onClick = { cont.resume(state.value) }) {
                         Text(text = stringResource(id = android.R.string.ok))
                     }
                 },
                 title = title?.let { { Text(text = stringResource(id = title)) } },
                 text = { block(impl) },
+            )
+        }
+    }
+
+    suspend fun awaitInputText(
+        initial: String = "",
+        title: String? = null,
+        hint: String? = null,
+        isNumber: Boolean = false,
+        invalidator: ((String) -> String?)? = null,
+    ): String {
+        return dialog { cont ->
+            var state by remember(cont) { mutableStateOf(initial) }
+            var error by remember(cont) { mutableStateOf<String?>(null) }
+            AlertDialog(
+                onDismissRequest = { cont.cancel() },
+                confirmButton = {
+                    TextButton(onClick = {
+                        error = invalidator?.invoke(state)
+                        error ?: cont.resume(state)
+                    }) {
+                        Text(text = stringResource(id = android.R.string.ok))
+                    }
+                },
+                title = title?.let { { Text(text = title) } },
+                text = {
+                    OutlinedTextField(
+                        value = state,
+                        onValueChange = { state = it },
+                        label = hint.ifNotNullThen {
+                            Text(text = hint!!)
+                        },
+                        trailingIcon = error.ifNotNullThen {
+                            Icon(
+                                imageVector = Icons.Filled.Info,
+                                contentDescription = null,
+                            )
+                        },
+                        supportingText = error.ifNotNullThen {
+                            Text(text = error!!)
+                        },
+                        isError = error != null,
+                        keyboardOptions = if (isNumber) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
+                    )
+                },
             )
         }
     }
@@ -102,10 +155,7 @@ class DialogState {
             AlertDialog(
                 onDismissRequest = { cont.cancel() },
                 confirmButton = {
-                    TextButton(onClick = {
-                        dismiss()
-                        cont.resume(Unit)
-                    }) {
+                    TextButton(onClick = { cont.resume(Unit) }) {
                         Text(text = stringResource(id = confirmText ?: android.R.string.ok))
                     }
                 },
@@ -126,7 +176,6 @@ class DialogState {
         return dialog { cont ->
             val impl = remember(cont) {
                 DismissDialogScope<R> {
-                    dismiss()
                     cont.resume(it)
                 }
             }
