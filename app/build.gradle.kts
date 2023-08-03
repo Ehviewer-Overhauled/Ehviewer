@@ -22,6 +22,7 @@ android {
     compileSdk = 34
     buildToolsVersion = "34.0.0"
     ndkVersion = "26.0.10404224"
+    androidResources.generateLocaleConfig = true
 
     splits {
         abi {
@@ -65,22 +66,6 @@ android {
         targetSdk = 34
         versionCode = 180042
         versionName = "1.8.9.0-SNAPSHOT"
-        resourceConfigurations.addAll(
-            listOf(
-                "zh",
-                "zh-rCN",
-                "zh-rHK",
-                "zh-rTW",
-                "es",
-                "ja",
-                "ko",
-                "fr",
-                "de",
-                "th",
-                "tr",
-                "nb-rNO",
-            ),
-        )
         buildConfigField("String", "COMMIT_SHA", "\"$commitSha\"")
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
         buildConfigField("String", "REPO_NAME", "\"$repoName\"")
@@ -294,7 +279,7 @@ cargo {
     if (isRelease) profile = "release"
 }
 
-tasks.whenObjectAdded {
+tasks.configureEach {
     if ((name == "mergeDebugJniLibFolders" || name == "mergeReleaseJniLibFolders")) {
         dependsOn("cargoBuild")
         // fix mergeDebugJniLibFolders  UP-TO-DATE
