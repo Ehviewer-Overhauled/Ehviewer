@@ -294,7 +294,7 @@ cargo {
     if (isRelease) profile = "release"
 }
 
-tasks.whenObjectAdded {
+tasks.configureEach {
     if ((name == "mergeDebugJniLibFolders" || name == "mergeReleaseJniLibFolders")) {
         dependsOn("cargoBuild")
         // fix mergeDebugJniLibFolders  UP-TO-DATE
