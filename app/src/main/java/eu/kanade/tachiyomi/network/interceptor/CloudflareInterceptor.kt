@@ -1,14 +1,13 @@
 package eu.kanade.tachiyomi.network.interceptor
 
 import android.content.Context
-import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.client.EhCookieStore
-import com.hippo.ehviewer.client.exception.EhException
-import eu.kanade.tachiyomi.util.system.logcat
+import com.hippo.ehviewer.client.exception.CloudflareBypassException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -20,7 +19,7 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
     private val executor = ContextCompat.getMainExecutor(context)
 
     override fun shouldIntercept(response: Response): Boolean {
-        return response.header("cf-mitigated") == "challenge"
+        return response.header(HEADER_NAME) == HEADER_VALUE
     }
 
     override fun intercept(
@@ -31,13 +30,9 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
         // Because OkHttp's enqueue only handles IOExceptions, wrap the exception so that
         // we don't crash the entire app
         return runCatching {
-            // TODO: Remove logging when it's stable
-            logcat { "Response code: ${response.code}" }
-            logcat { "Response body: ${response.body.string()}" }
             response.close()
             EhCookieStore.deleteCookie(request.url, COOKIE_NAME)
             resolveWithWebView(request)
-
             chain.proceed(request)
         }.getOrElse { throw IOException(it) }
     }
@@ -76,17 +71,19 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
                     }
                 }
 
-                override fun onReceivedError(
+                override fun onReceivedHttpError(
                     view: WebView,
                     request: WebResourceRequest,
-                    error: WebResourceError,
+                    errorResponse: WebResourceResponse,
                 ) {
-                    if (request.isForMainFrame && error.errorCode in ERROR_CODES) {
-                        // Found the Cloudflare challenge page.
-                        challengeFound = true
-                    } else {
-                        // Unlock thread, the challenge wasn't found.
-                        latch.countDown()
+                    if (request.isForMainFrame) {
+                        if (errorResponse.responseHeaders[HEADER_NAME] == HEADER_VALUE) {
+                            // Found the Cloudflare challenge page.
+                            challengeFound = true
+                        } else {
+                            // Unlock thread, the challenge wasn't found.
+                            latch.countDown()
+                        }
                     }
                 }
             }
@@ -104,9 +101,13 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
         }
 
         // Throw exception if we failed to bypass Cloudflare
-        if (!cloudflareBypassed) throw EhException("Failed to bypass Cloudflare")
+        if (!cloudflareBypassed) {
+            // TODO: Prompt user to open url in WebView and finish the challenge manually
+            throw CloudflareBypassException()
+        }
     }
 }
 
-private val ERROR_CODES = intArrayOf(403, 503)
 private const val COOKIE_NAME = "cf_clearance"
+private const val HEADER_NAME = "cf-mitigated"
+private const val HEADER_VALUE = "challenge"
