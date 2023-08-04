@@ -403,6 +403,7 @@
     <string name="delete_favorites_dialog_title">移除收藏</string>
     <string name="delete_favorites_dialog_message">將 %d 項收藏移除？</string>
     <string name="move_favorites_dialog_title">移動收藏</string>
+    <string name="default_favorites_collection">預設收藏夾</string>
     <string name="let_me_select">讓我每次都選擇</string>
     <string name="collections">收藏夾</string>
     <string name="need_sign_in">需要登入</string>

@@ -357,6 +357,7 @@
     <string name="delete_favorites_dialog_title">Eliminar de favoritos</string>
     <string name="delete_favorites_dialog_message">¿Eliminar %d galerías de favoritos?</string>
     <string name="move_favorites_dialog_title">Mover favoritos</string>
+    <string name="default_favorites_collection">Colección de favoritos por defecto</string>
     <string name="let_me_select">Déjame elegir</string>
     <string name="collections">Colección</string>
     <string name="need_sign_in">Se necesita iniciar sesión</string>

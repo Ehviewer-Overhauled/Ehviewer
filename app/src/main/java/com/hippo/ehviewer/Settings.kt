@@ -66,6 +66,7 @@ object Settings : DataStorePreferences(null) {
     var bypassCloudflare by boolPref("bypass_cloudflare", false)
     var thumbSizeDp by intPref("thumb_size_", 120)
     var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_LOCAL)
+    var defaultFavSlot by intPref("default_favorite_slot", -2)
     var securityDelay by intPref("require_unlock_delay", 0)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
     var listThumbSize by intPref("list_tile_size", 40)

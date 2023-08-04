@@ -367,6 +367,7 @@
     <string name="delete_favorites_dialog_title">즐겨찾기에서 삭제</string>
     <string name="delete_favorites_dialog_message">%d개 항목을 즐겨찾기에서 삭제하시겠습니까?</string>
     <string name="move_favorites_dialog_title">즐겨찾기 이동</string>
+    <string name="default_favorites_collection">기본 즐겨찾기 컬렉션</string>
     <string name="let_me_select">직접 선택</string>
     <string name="collections">컬렉션</string>
     <string name="need_sign_in">로그인 필요</string>

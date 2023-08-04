@@ -53,6 +53,7 @@ import com.hippo.ehviewer.ui.UCONFIG_SCREEN
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.tools.TimePickerDialog
 import com.hippo.ehviewer.ui.tools.observed
+import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.rememberedAccessor
 import com.hippo.ehviewer.util.whisperClipboard
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -71,6 +72,8 @@ fun EhScreen() {
     val context = LocalContext.current
     fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     val signin = EhCookieStore.hasSignedIn()
+    val dialogState = rememberDialogState()
+    dialogState.Intercept()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -241,6 +244,27 @@ fun EhScreen() {
                 entryValueRes = R.array.thumb_resolution_entry_values,
                 value = thumbResolution,
             )
+            var defaultFavSlot by Settings::defaultFavSlot.observed
+            val disabled = stringResource(id = R.string.disabled_nav)
+            val localFav = stringResource(id = R.string.local_favorites)
+            val summary = when (defaultFavSlot) {
+                -1 -> localFav
+                in 0..9 -> Settings.favCat[defaultFavSlot]
+                else -> stringResource(id = R.string.default_favorites_warning)
+            }
+            val items = if (signin) {
+                arrayOf(disabled, localFav, *Settings.favCat)
+            } else {
+                arrayOf(disabled, localFav)
+            }
+            Preference(
+                title = stringResource(id = R.string.default_favorites_collection),
+                summary = summary,
+            ) {
+                coroutineScope.launch {
+                    defaultFavSlot = dialogState.showSelectItem(*items, title = R.string.default_favorites_collection) - 2
+                }
+            }
             SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_force_eh_thumb),
                 summary = stringResource(id = R.string.settings_eh_force_eh_thumb_summary),

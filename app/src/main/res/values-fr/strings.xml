@@ -396,6 +396,7 @@
     <string name="delete_favorites_dialog_title">Effacer de favoris</string>
     <string name="delete_favorites_dialog_message">Effacer %d objets de favoris ?</string>
     <string name="move_favorites_dialog_title">Déplacer favoris</string>
+    <string name="default_favorites_collection">Collection favoris par défaut</string>
     <string name="let_me_select">Sélectionner manuellement</string>
     <string name="collections">Collections</string>
     <string name="need_sign_in">Vous devez vous connecter</string>
