@@ -382,6 +382,7 @@
     <string name="delete_favorites_dialog_title">ลบออกจากรายการโปรด</string>
     <string name="delete_favorites_dialog_message">ต้องการลบ %d รายการออกจากรายการโปรดหรือไม่?</string>
     <string name="move_favorites_dialog_title">ย้ายรายการโปรด</string>
+    <string name="default_favorites_collection">ค่าเริ่มต้นของที่เก็บรายการโปรด</string>
     <string name="let_me_select">ขอให้ฉันเลือกนะ</string>
     <string name="collections">คอลเลคชั่น</string>
     <string name="need_sign_in">จำเป็นต้องลงชื่อเข้าใช้ก่อน</string>

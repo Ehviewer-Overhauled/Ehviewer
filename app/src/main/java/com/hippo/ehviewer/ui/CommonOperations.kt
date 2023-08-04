@@ -202,34 +202,39 @@ fun getFavoriteIcon(favorited: Boolean) =
 suspend fun DialogState.modifyFavorites(galleryInfo: BaseGalleryInfo): Boolean {
     val localFavorited = EhDB.containLocalFavorites(galleryInfo.gid)
     if (EhCookieStore.hasSignedIn()) {
-        val localFav = getFavoriteIcon(localFavorited) to appCtx.getString(R.string.local_favorites)
-        val cloudFav = Settings.favCat.mapIndexed { index, name ->
-            getFavoriteIcon(galleryInfo.favoriteSlot == index) to name
-        }.toTypedArray()
         val isFavorited = galleryInfo.favoriteSlot != NOT_FAVORITED
-        val items = if (isFavorited) {
-            val remove = Icons.Default.HeartBroken to appCtx.getString(R.string.remove_from_favourites)
-            arrayOf(remove, localFav, *cloudFav)
+        val defaultFavSlot = Settings.defaultFavSlot
+        if (defaultFavSlot == -2) {
+            val localFav = getFavoriteIcon(localFavorited) to appCtx.getString(R.string.local_favorites)
+            val cloudFav = Settings.favCat.mapIndexed { index, name ->
+                getFavoriteIcon(galleryInfo.favoriteSlot == index) to name
+            }.toTypedArray()
+            val items = if (isFavorited) {
+                val remove = Icons.Default.HeartBroken to appCtx.getString(R.string.remove_from_favourites)
+                arrayOf(remove, localFav, *cloudFav)
+            } else {
+                arrayOf(localFav, *cloudFav)
+            }
+            val (slot, note) = showSelectItemWithIconAndTextField(
+                *items,
+                title = R.string.add_favorites_dialog_title,
+                hint = R.string.favorite_note,
+                maxChar = MAX_FAVNOTE_CHAR,
+            )
+            return doModifyFavorites(galleryInfo, if (isFavorited) slot - 2 else slot - 1, localFavorited, note)
         } else {
-            arrayOf(localFav, *cloudFav)
+            return doModifyFavorites(galleryInfo, if (isFavorited) NOT_FAVORITED else defaultFavSlot, localFavorited)
         }
-        val (slot, note) = showSelectItemWithIconAndTextField(
-            *items,
-            title = R.string.add_favorites_dialog_title,
-            hint = R.string.favorite_note,
-            maxChar = MAX_FAVNOTE_CHAR,
-        )
-        return doModifyFavorites(galleryInfo, if (isFavorited) slot - 2 else slot - 1, note, localFavorited)
     } else {
-        return doModifyFavorites(galleryInfo, LOCAL_FAVORITED, localFavorited = localFavorited)
+        return doModifyFavorites(galleryInfo, LOCAL_FAVORITED, localFavorited)
     }
 }
 
 private suspend fun doModifyFavorites(
     galleryInfo: BaseGalleryInfo,
     slot: Int = NOT_FAVORITED,
-    note: String = "",
     localFavorited: Boolean = true,
+    note: String = "",
 ): Boolean {
     val add = when (slot) {
         NOT_FAVORITED -> { // Remove from cloud favorites first

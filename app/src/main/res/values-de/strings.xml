@@ -297,6 +297,7 @@
     <string name="delete_favorites_dialog_title">Aus Favoriten löschen</string>
     <string name="delete_favorites_dialog_message">%d Elemente aus Favoriten löschen?</string>
     <string name="move_favorites_dialog_title">Favoriten verschieben</string>
+    <string name="default_favorites_collection">Standard-Favoriten</string>
     <string name="let_me_select">Manuell auswählen</string>
     <string name="collections">Kollektionen</string>
     <string name="need_sign_in">Du musst dich zuerst anmelden</string>
