@@ -33,6 +33,7 @@ import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.ui.LocalNavController
@@ -176,41 +177,43 @@ fun AdvancedScreen() {
                     }
                 }
             }
-            val backupNothing = stringResource(id = R.string.settings_advanced_backup_favorite_nothing)
-            val backupFailed = stringResource(id = R.string.settings_advanced_backup_favorite_failed)
-            val backupSucceed = stringResource(id = R.string.settings_advanced_backup_favorite_success)
-            Preference(
-                title = stringResource(id = R.string.settings_advanced_backup_favorite),
-                summary = stringResource(id = R.string.settings_advanced_backup_favorite_summary),
-            ) {
-                val favListUrlBuilder = FavListUrlBuilder()
-                var favTotal = 0
-                var favIndex = 0
-                tailrec suspend fun doBackup() {
-                    val result = EhEngine.getFavorites(favListUrlBuilder.build())
-                    if (result.galleryInfoList.isEmpty()) {
-                        launchSnackBar(backupNothing)
-                    } else {
-                        if (favTotal == 0) favTotal = result.countArray.sum()
-                        favIndex += result.galleryInfoList.size
-                        val status = "($favIndex/$favTotal)"
-                        EhDB.putLocalFavorites(result.galleryInfoList)
-                        launchSnackBar(context.getString(R.string.settings_advanced_backup_favorite_start, status))
-                        if (result.next != null) {
-                            delay(Settings.downloadDelay.toLong())
-                            favListUrlBuilder.setIndex(result.next, true)
-                            doBackup()
+            if (EhCookieStore.hasSignedIn()) {
+                val backupNothing = stringResource(id = R.string.settings_advanced_backup_favorite_nothing)
+                val backupFailed = stringResource(id = R.string.settings_advanced_backup_favorite_failed)
+                val backupSucceed = stringResource(id = R.string.settings_advanced_backup_favorite_success)
+                Preference(
+                    title = stringResource(id = R.string.settings_advanced_backup_favorite),
+                    summary = stringResource(id = R.string.settings_advanced_backup_favorite_summary),
+                ) {
+                    val favListUrlBuilder = FavListUrlBuilder()
+                    var favTotal = 0
+                    var favIndex = 0
+                    tailrec suspend fun doBackup() {
+                        val result = EhEngine.getFavorites(favListUrlBuilder.build())
+                        if (result.galleryInfoList.isEmpty()) {
+                            launchSnackBar(backupNothing)
+                        } else {
+                            if (favTotal == 0) favTotal = result.countArray.sum()
+                            favIndex += result.galleryInfoList.size
+                            val status = "($favIndex/$favTotal)"
+                            EhDB.putLocalFavorites(result.galleryInfoList)
+                            launchSnackBar(context.getString(R.string.settings_advanced_backup_favorite_start, status))
+                            if (result.next != null) {
+                                delay(Settings.downloadDelay.toLong())
+                                favListUrlBuilder.setIndex(result.next, true)
+                                doBackup()
+                            }
                         }
                     }
-                }
-                coroutineScope.launch {
-                    runSuspendCatching {
-                        doBackup()
-                    }.onSuccess {
-                        launchSnackBar(backupSucceed)
-                    }.onFailure {
-                        it.printStackTrace()
-                        launchSnackBar(backupFailed)
+                    coroutineScope.launch {
+                        runSuspendCatching {
+                            doBackup()
+                        }.onSuccess {
+                            launchSnackBar(backupSucceed)
+                        }.onFailure {
+                            it.printStackTrace()
+                            launchSnackBar(backupFailed)
+                        }
                     }
                 }
             }

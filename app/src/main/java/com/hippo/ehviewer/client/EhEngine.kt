@@ -290,7 +290,7 @@ object EhEngine {
      * @param dstCat -1 for delete, 0 - 9 for cloud favorite, others throw Exception
      * @param note   max 250 characters
      */
-    suspend fun addFavorites(
+    suspend fun modifyFavorites(
         gid: Long,
         token: String?,
         dstCat: Int = -1,
@@ -519,7 +519,7 @@ object EhEngine {
         if (filter) list.removeAllSuspend { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
     }
 
-    suspend fun addFavoritesRange(galleryList: List<Pair<Long, String>>, dstCat: Int) {
-        galleryList.forEach { (gid, token) -> addFavorites(gid, token, dstCat) }
+    suspend fun modifyFavoritesRange(galleryList: List<Pair<Long, String>>, dstCat: Int) {
+        galleryList.forEach { (gid, token) -> modifyFavorites(gid, token, dstCat) }
     }
 }

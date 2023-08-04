@@ -58,8 +58,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Difference
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -140,7 +138,7 @@ import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.addToFavorites
+import com.hippo.ehviewer.ui.getFavoriteIcon
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CoilImageGetter
@@ -150,6 +148,7 @@ import com.hippo.ehviewer.ui.main.EhPreviewItem
 import com.hippo.ehviewer.ui.main.GalleryDetailErrorTip
 import com.hippo.ehviewer.ui.main.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.main.GalleryTags
+import com.hippo.ehviewer.ui.modifyFavorites
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
@@ -694,7 +693,7 @@ class GalleryDetailScene : BaseScene() {
                 onCheckedChange = { modifyFavourite() },
             ) {
                 Icon(
-                    imageVector = if (favored) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    imageVector = getFavoriteIcon(favored),
                     contentDescription = null,
                 )
             }
@@ -875,7 +874,7 @@ class GalleryDetailScene : BaseScene() {
             favoritesLock.withLock {
                 var remove = false
                 runCatching {
-                    remove = !dialogState.addToFavorites(galleryDetail.galleryInfo)
+                    remove = !dialogState.modifyFavorites(galleryDetail.galleryInfo)
                     if (remove) {
                         showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
                     } else {

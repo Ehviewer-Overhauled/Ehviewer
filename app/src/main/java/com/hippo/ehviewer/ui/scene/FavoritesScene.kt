@@ -61,6 +61,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
@@ -271,9 +272,12 @@ class FavoritesScene : SearchBarScene() {
                         6 -> {
                             val helper = MoveDialogHelper()
                             // First is local favorite, the other 10 is cloud favorite
-                            val array = arrayOfNulls<String>(11)
-                            array[0] = getString(R.string.local_favorites)
-                            System.arraycopy(Settings.favCat, 0, array, 1, 10)
+                            val localFav = getString(R.string.local_favorites)
+                            val array = if (EhCookieStore.hasSignedIn()) {
+                                arrayOf(localFav, *Settings.favCat)
+                            } else {
+                                arrayOf(localFav)
+                            }
                             BaseDialogBuilder(context).setTitle(R.string.move_favorites_dialog_title).setItems(array, helper).show()
                         }
                     }
@@ -414,11 +418,16 @@ class FavoritesScene : SearchBarScene() {
                         scope.invalidate()
                     }
                 }
-                val faves = arrayOf(
-                    stringResource(id = R.string.local_favorites) to localFavCount,
-                    stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
-                    *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
-                )
+                val localFav = stringResource(id = R.string.local_favorites) to localFavCount
+                val faves = if (EhCookieStore.hasSignedIn()) {
+                    arrayOf(
+                        localFav,
+                        stringResource(id = R.string.cloud_favorites) to Settings.favCloudCount,
+                        *Settings.favCat.zip(Settings.favCount.toTypedArray()).toTypedArray(),
+                    )
+                } else {
+                    arrayOf(localFav)
+                }
                 LazyColumn {
                     itemsIndexed(faves) { index, (name, count) ->
                         ListItem(
@@ -484,7 +493,7 @@ class FavoritesScene : SearchBarScene() {
                     EhDB.removeLocalFavorites(info)
                 } else {
                     val delList = info.map { it.gid to it.token!! }
-                    EhEngine.addFavoritesRange(delList, -1)
+                    EhEngine.modifyFavoritesRange(delList, -1)
                 }
                 mAdapter?.refresh()
             }
@@ -503,7 +512,7 @@ class FavoritesScene : SearchBarScene() {
                     EhDB.removeLocalFavorites(info)
                     val galleryList = info.map { it.gid to it.token!! }
                     runCatching {
-                        EhEngine.addFavoritesRange(galleryList, dstCat)
+                        EhEngine.modifyFavoritesRange(galleryList, dstCat)
                     }
                 } else if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                     // Move from cloud to local
