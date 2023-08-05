@@ -1,3 +1,5 @@
 package com.hippo.ehviewer.client.exception
 
-class CloudflareBypassException : EhException("Failed to bypass Cloudflare")
+import com.hippo.ehviewer.R
+
+class CloudflareBypassException : EhException(R.string.cloudflare_bypass_failed)

@@ -56,11 +56,9 @@ abstract class WebViewInterceptor(private val context: Context) : Interceptor {
         await(30, TimeUnit.SECONDS)
     }
 
-    fun createWebView(request: Request): WebView {
+    fun createWebView(): WebView {
         return WebView(context).apply {
             setDefaultSettings()
-            // Avoid sending empty User-Agent, Chromium WebView will reset to default if empty
-            settings.userAgentString = request.header("User-Agent")
         }
     }
 }

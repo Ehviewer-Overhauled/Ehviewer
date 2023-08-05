@@ -64,6 +64,8 @@
     <string name="sign_in_failed">登录失败</string>
     <string name="sign_in_failed_tip">若持续出错，请尝试“通过网页登录”或“通过 Cookie 登录”。</string>
     <string name="get_it">知道了</string>
+    <string name="cloudflare_bypass_failed">未能绕过 Cloudflare 验证</string>
+    <string name="open_in_webview">在 WebView 中打开链接以通过验证？</string>
     <!-- Select scene -->
     <string name="select_scene">你想选择哪个画廊站点？</string>
     <string name="select_scene_explain">e-hentai：对任何人开放\nexhentai：仅对登录用户开放</string>

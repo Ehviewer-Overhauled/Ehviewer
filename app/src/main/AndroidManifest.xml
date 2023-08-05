@@ -135,6 +135,8 @@
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".ui.WebViewActivity" />
 
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

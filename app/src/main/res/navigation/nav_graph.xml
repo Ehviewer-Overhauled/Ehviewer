@@ -76,4 +76,13 @@
         android:id="@+id/progressScene"
         android:name="com.hippo.ehviewer.ui.scene.ProgressScene"
         android:label="ProgressScene" />
+    <activity
+        android:id="@+id/webView"
+        android:name="com.hippo.ehviewer.ui.WebViewActivity"
+        android:label="WebViewActivity">
+        <argument
+            android:name="url"
+            android:defaultValue="@null"
+            app:argType="string" />
+    </activity>
 </navigation>

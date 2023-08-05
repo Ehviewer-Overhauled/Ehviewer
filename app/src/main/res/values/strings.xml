@@ -103,6 +103,8 @@
     <string name="sign_in_failed">Sign in failed</string>
     <string name="sign_in_failed_tip">If this issue continues, try \"Sign in via WebView\" or \"Sign in via cookies\".</string>
     <string name="get_it">Got it</string>
+    <string name="cloudflare_bypass_failed">Failed to bypass Cloudflare challenge</string>
+    <string name="open_in_webview">Open URL in WebView to finish the challenge?</string>
     <!-- Select scene -->
     <string name="select_scene">Which gallery site do you want to visit?</string>
     <string name="select_scene_explain">e-hentai: available for anyone\nexhentai: available for who has signed in</string>

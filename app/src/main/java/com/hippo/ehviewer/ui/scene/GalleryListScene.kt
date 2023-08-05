@@ -28,7 +28,9 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.material3.Text
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
@@ -60,6 +62,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
+import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
@@ -68,6 +71,7 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_SUBSCRIPTION
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_TAG
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_TOPLIST
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_WHATS_HOT
+import com.hippo.ehviewer.client.exception.CloudflareBypassException
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
@@ -75,6 +79,7 @@ import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.ItemDrawerListBinding
 import com.hippo.ehviewer.databinding.SceneGalleryListBinding
+import com.hippo.ehviewer.ui.WebViewActivity
 import com.hippo.ehviewer.ui.doGalleryInfoAction
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -372,6 +377,16 @@ class GalleryListScene : SearchBarScene() {
                             is LoadState.Error -> {
                                 binding.tip.text = ExceptionUtils.getReadableString(state.error)
                                 transition.showView(2)
+                                if (state.error.cause is CloudflareBypassException) {
+                                    dialogState.awaitPermissionOrCancel(
+                                        android.R.string.ok,
+                                        android.R.string.cancel,
+                                        R.string.cloudflare_bypass_failed,
+                                    ) {
+                                        Text(text = stringResource(id = R.string.open_in_webview))
+                                    }
+                                    navAnimated(R.id.webView, bundleOf(WebViewActivity.KEY_URL to EhUrl.host))
+                                }
                             }
                             is LoadState.NotLoading -> {
                                 delay(500)
