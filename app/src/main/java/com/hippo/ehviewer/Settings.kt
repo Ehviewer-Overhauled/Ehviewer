@@ -63,7 +63,6 @@ object Settings : DataStorePreferences(null) {
     var preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
     var downloadOriginImage by boolPref("download_origin_image", false)
     var enableQuic by boolPref("enable_quic", true)
-    var bypassCloudflare by boolPref("bypass_cloudflare", false)
     var thumbSizeDp by intPref("thumb_size_", 120)
     var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_LOCAL)
     var defaultFavSlot by intPref("default_favorite_slot", -2)
