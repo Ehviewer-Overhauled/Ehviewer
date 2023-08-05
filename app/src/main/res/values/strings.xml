@@ -419,8 +419,6 @@
     <string name="settings_advanced_app_language_title">App language</string>
     <string name="settings_advanced_enable_quic">[Experimental] QUIC support</string>
     <string name="settings_advanced_enable_quic_summary">Enable QUIC protocol support (App restart required)</string>
-    <string name="settings_advanced_bypass_cloudflare">[Experimental] Bypass Cloudflare</string>
-    <string name="settings_advanced_bypass_cloudflare_summary">Try this if you keep getting 403 error (App restart required)</string>
     <string name="settings_advanced_export_data">Export data</string>
     <string name="settings_advanced_export_data_summary">Save data like download list, quick search list, to external storage</string>
     <string name="settings_advanced_export_data_to">Exported data to %s</string>

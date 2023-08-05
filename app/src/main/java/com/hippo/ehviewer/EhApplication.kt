@@ -168,9 +168,7 @@ class EhApplication : Application(), ImageLoaderFactory {
                     dns(AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6))
                 }
                 chunker { alwaysReadResponseBody(false) }
-                if (Settings.bypassCloudflare) {
-                    addInterceptor(CloudflareInterceptor(appCtx))
-                }
+                addInterceptor(CloudflareInterceptor(appCtx))
             }
         }
 
