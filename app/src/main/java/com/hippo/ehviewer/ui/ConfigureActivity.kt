@@ -19,7 +19,7 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.ui.login.CookieSignInScene
 import com.hippo.ehviewer.ui.login.SelectSiteScreen
 import com.hippo.ehviewer.ui.login.SignInScreen
-import com.hippo.ehviewer.ui.login.WebviewSignInScreen
+import com.hippo.ehviewer.ui.login.WebViewSignInScreen
 import com.hippo.ehviewer.ui.settings.AboutScreen
 import com.hippo.ehviewer.ui.settings.AdvancedScreen
 import com.hippo.ehviewer.ui.settings.BaseScreen
@@ -55,7 +55,7 @@ class ConfigureActivity : EhActivity() {
                         SignInScreen(windowSizeClass)
                     }
                     composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
-                        WebviewSignInScreen()
+                        WebViewSignInScreen()
                     }
                     composable(COOKIE_SIGN_IN_ROUTE_NAME) {
                         CookieSignInScene(windowSizeClass)

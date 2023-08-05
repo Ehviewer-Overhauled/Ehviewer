@@ -51,7 +51,7 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
         val headers = parseHeaders(originalRequest.headers)
 
         executor.execute {
-            webview = createWebView(originalRequest)
+            webview = createWebView()
 
             webview?.webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView, url: String) {
@@ -102,7 +102,6 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
 
         // Throw exception if we failed to bypass Cloudflare
         if (!cloudflareBypassed) {
-            // TODO: Prompt user to open url in WebView and finish the challenge manually
             throw CloudflareBypassException()
         }
     }

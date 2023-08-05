@@ -24,7 +24,7 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Composable
-fun WebviewSignInScreen() {
+fun WebViewSignInScreen() {
     val navController = LocalNavController.current
     val coroutineScope = rememberCoroutineScope()
     val state = rememberWebViewState(url = EhUrl.URL_SIGN_IN)
