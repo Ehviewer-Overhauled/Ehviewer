@@ -101,11 +101,13 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
                 onSearchViewHidden()
             }
         }
+        onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
+        // This has to be placed after onCreateViewWithToolbar() since
+        // callbacks are invoked in the reverse order in which they are added
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             binding.searchview.addTransitionListener(mSearchViewOnBackPressedCallback)
             requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
         }
-        onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
         binding.appbar.bringToFront()
         return binding.root
     }
