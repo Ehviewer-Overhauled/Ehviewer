@@ -120,6 +120,7 @@
     <string name="rate_failed">Bewertung fehlgeschlagen</string>
     <string name="no_torrents">Keine Torrentdatei</string>
     <string name="torrents">Torrentdateien</string>
+    <string name="not_favorited">Nicht zu Favoriten hinzugefügt</string>
     <string name="add_favorites_dialog_title">Zu Favoriten hinzufügen</string>
     <string name="add_to_favorite_success">Zu Favoriten hinzugefügt</string>
     <string name="remove_from_favorite_success">Aus Favoriten entfernt</string>

@@ -152,6 +152,7 @@
     <string name="rate_failed">평가에 실패했습니다.</string>
     <string name="no_torrents">토렌트 없음</string>
     <string name="torrents">토렌트</string>
+    <string name="not_favorited">즐겨찾기에 없음</string>
     <string name="add_favorites_dialog_title">즐겨찾기에 추가</string>
     <string name="add_to_favorite_success">즐겨찾기에 추가했습니다.</string>
     <string name="remove_from_favorite_success">즐겨찾기에서 제거했습니다.</string>

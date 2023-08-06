@@ -68,9 +68,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -429,20 +429,11 @@ class GalleryDetailScene : BaseScene() {
                             },
                             scrollBehavior = scrollBehavior,
                             actions = {
-                                composeBindingGD?.let { galleryDetail ->
-                                    val favored by produceState(initialValue = false) {
-                                        value = galleryDetail.favoriteSlot != NOT_FAVORITED
-                                        FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { value = it != NOT_FAVORITED }
-                                    }
-                                    IconToggleButton(
-                                        checked = favored,
-                                        onCheckedChange = { modifyFavourite() },
-                                    ) {
-                                        Icon(
-                                            imageVector = getFavoriteIcon(favored),
-                                            contentDescription = null,
-                                        )
-                                    }
+                                IconButton(onClick = ::showArchiveDialog) {
+                                    Icon(
+                                        imageVector = Icons.Default.FolderZip,
+                                        contentDescription = null,
+                                    )
                                 }
                                 IconButton(onClick = ::doShareGallery) {
                                     Icon(
@@ -711,6 +702,27 @@ class GalleryDetailScene : BaseScene() {
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
         ) {
+            val favored by produceState(initialValue = false) {
+                value = galleryDetail.favoriteSlot != NOT_FAVORITED
+                FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { value = it != NOT_FAVORITED }
+            }
+            val favButtonText = if (favored) {
+                galleryDetail.favoriteName ?: stringResource(id = R.string.local_favorites)
+            } else {
+                stringResource(id = R.string.not_favorited)
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                FilledTonalIconToggleButton(
+                    checked = favored,
+                    onCheckedChange = { modifyFavourite() },
+                ) {
+                    Icon(
+                        imageVector = getFavoriteIcon(favored),
+                        contentDescription = null,
+                    )
+                }
+                Text(text = favButtonText)
+            }
             EhIconButton(
                 icon = Icons.Default.Search,
                 text = stringResource(id = R.string.similar_gallery),
@@ -725,11 +737,6 @@ class GalleryDetailScene : BaseScene() {
                 icon = Icons.Default.SwapVerticalCircle,
                 text = torrentText,
                 onClick = ::showTorrentDialog,
-            )
-            EhIconButton(
-                icon = Icons.Default.FolderZip,
-                text = stringResource(id = R.string.archive),
-                onClick = ::showArchiveDialog,
             )
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
