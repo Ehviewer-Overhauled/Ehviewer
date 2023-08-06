@@ -162,6 +162,7 @@
     <string name="rate_failed">Échec de notation</string>
     <string name="no_torrents">Aucun fiche torrent</string>
     <string name="torrents">Fiches torrent</string>
+    <string name="not_favorited">Non ajoutée à favoris</string>
     <string name="add_favorites_dialog_title">Ajouter à favoris</string>
     <string name="add_to_favorite_success">Ajouté à favoris</string>
     <string name="remove_from_favorite_success">Retirer de favoris</string>
