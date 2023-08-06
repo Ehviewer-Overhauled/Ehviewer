@@ -105,6 +105,8 @@
     <string name="read">Lesen</string>
     <string name="share">Teilen</string>
     <string name="rate">Bewerten</string>
+    <string name="similar_gallery">Ähnlich</string>
+    <string name="search_cover">Nach dem Umschlag suchen</string>
     <string name="no_tags">Kein Etikett</string>
     <string name="no_comments">Kein Kommentar</string>
     <string name="no_more_comments">Keine weiteren Kommentare</string>
@@ -309,6 +311,7 @@
     <string name="no_archives">Keine Archivdatei</string>
     <string name="download_archive_started">Archivdatei wird heruntergeladen</string>
     <string name="download_archive_failure">Fehler beim Herunterladen der Archivdatei</string>
+    <string name="archive">Archivdateien</string>
     <string name="download_archive_failure_no_hath">H@H-Klient ist für das Herunterladen der Archivdateien erforderlich</string>
     <string name="settings_privacy">Datenschutzoptionen</string>
     <string name="settings_privacy_secure">Screenshot verhindern</string>

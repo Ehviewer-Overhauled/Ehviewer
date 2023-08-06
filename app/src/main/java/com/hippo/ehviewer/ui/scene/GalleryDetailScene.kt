@@ -35,10 +35,10 @@ import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,13 +53,14 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.Difference
+import androidx.compose.material.icons.filled.FolderZip
 import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
@@ -69,6 +70,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -93,6 +95,7 @@ import androidx.compose.ui.layout.LocalPinnableContainer
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -156,7 +159,6 @@ import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.CrystalCard
 import com.hippo.ehviewer.ui.tools.DialogState
 import com.hippo.ehviewer.ui.tools.FilledTertiaryIconButton
-import com.hippo.ehviewer.ui.tools.FilledTertiaryIconToggleButton
 import com.hippo.ehviewer.ui.tools.GalleryDetailRating
 import com.hippo.ehviewer.util.AppHelper
 import com.hippo.ehviewer.util.ExceptionUtils
@@ -191,7 +193,6 @@ class GalleryDetailScene : BaseScene() {
     private var downloadButtonText by mutableStateOf("")
     private var ratingText by mutableStateOf("")
     private var torrentText by mutableStateOf("")
-    private var favButtonText by mutableStateOf("")
     private var getDetailError by mutableStateOf("")
 
     private var mTorrentList: TorrentResult? = null
@@ -412,6 +413,7 @@ class GalleryDetailScene : BaseScene() {
                                     Text(
                                         text = EhUtils.getSuitableTitle(it),
                                         maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
                                     )
                                 }
                             },
@@ -427,6 +429,27 @@ class GalleryDetailScene : BaseScene() {
                             },
                             scrollBehavior = scrollBehavior,
                             actions = {
+                                composeBindingGD?.let { galleryDetail ->
+                                    val favored by produceState(initialValue = false) {
+                                        value = galleryDetail.favoriteSlot != NOT_FAVORITED
+                                        FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { value = it != NOT_FAVORITED }
+                                    }
+                                    IconToggleButton(
+                                        checked = favored,
+                                        onCheckedChange = { modifyFavourite() },
+                                    ) {
+                                        Icon(
+                                            imageVector = getFavoriteIcon(favored),
+                                            contentDescription = null,
+                                        )
+                                    }
+                                }
+                                IconButton(onClick = ::doShareGallery) {
+                                    Icon(
+                                        imageVector = Icons.Default.Share,
+                                        contentDescription = null,
+                                    )
+                                }
                                 var dropdown by remember { mutableStateOf(false) }
                                 IconButton(onClick = { dropdown = !dropdown }) {
                                     Icon(
@@ -660,12 +683,16 @@ class GalleryDetailScene : BaseScene() {
         @Composable
         fun EhIconButton(
             icon: ImageVector,
+            text: String,
             onClick: () -> Unit,
-        ) = FilledTertiaryIconButton(onClick = onClick) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-            )
+        ) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            FilledTertiaryIconButton(onClick = onClick) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                )
+            }
+            Text(text = text)
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         if (galleryDetail.newerVersions.isNotEmpty()) {
@@ -680,41 +707,28 @@ class GalleryDetailScene : BaseScene() {
             }
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         }
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
         ) {
-            val favored by produceState(initialValue = false) {
-                value = galleryDetail.favoriteSlot != NOT_FAVORITED
-                FavouriteStatusRouter.stateFlow(galleryDetail.gid).collect { value = it != NOT_FAVORITED }
-            }
-            FilledTertiaryIconToggleButton(
-                checked = favored,
-                onCheckedChange = { modifyFavourite() },
-            ) {
-                Icon(
-                    imageVector = getFavoriteIcon(favored),
-                    contentDescription = null,
-                )
-            }
             EhIconButton(
-                icon = Icons.Default.Difference,
+                icon = Icons.Default.Search,
+                text = stringResource(id = R.string.similar_gallery),
                 onClick = ::showSimilarGalleryList,
             )
             EhIconButton(
                 icon = Icons.Default.ImageSearch,
+                text = stringResource(id = R.string.search_cover),
                 onClick = ::showCoverGalleryList,
             )
             EhIconButton(
-                icon = Icons.Default.Share,
-                onClick = ::doShareGallery,
-            )
-            EhIconButton(
                 icon = Icons.Default.SwapVerticalCircle,
+                text = torrentText,
                 onClick = ::showTorrentDialog,
             )
             EhIconButton(
-                icon = Icons.Default.CloudDone,
+                icon = Icons.Default.FolderZip,
+                text = stringResource(id = R.string.archive),
                 onClick = ::showArchiveDialog,
             )
         }
@@ -861,13 +875,6 @@ class GalleryDetailScene : BaseScene() {
         galleryDetailUrl?.let { AppHelper.share(requireActivity(), it) }
     }
 
-    private fun updateFavoriteDrawable() {
-        val gd = composeBindingGD ?: return
-        lifecycleScope.launchIO {
-            favButtonText = gd.favoriteName ?: getString(R.string.local_favorites)
-        }
-    }
-
     private fun modifyFavourite() {
         val galleryDetail = composeBindingGD ?: return
         lifecycleScope.launchIO {
@@ -880,9 +887,6 @@ class GalleryDetailScene : BaseScene() {
                     } else {
                         showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
                     }
-                    withUIContext {
-                        onModifyFavoritesSuccess()
-                    }
                 }.onFailure {
                     if (it !is CancellationException) {
                         if (remove) {
@@ -891,10 +895,6 @@ class GalleryDetailScene : BaseScene() {
                             showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
                         }
                     }
-                }
-                withUIContext {
-                    // Update UI
-                    updateFavoriteDrawable()
                 }
             }
         }
@@ -953,7 +953,6 @@ class GalleryDetailScene : BaseScene() {
         composeBindingGI = gd.galleryInfo
         composeBindingGD = gd
         updateDownloadText()
-        updateFavoriteDrawable()
         ratingText = getAllRatingText(gd.rating, gd.ratingCount)
         torrentText = resources.getString(R.string.torrent_count, gd.torrentCount)
     }
@@ -1247,12 +1246,6 @@ class GalleryDetailScene : BaseScene() {
         }
         mDownloadState = downloadState
         updateDownloadText()
-    }
-
-    private fun onModifyFavoritesSuccess() {
-        if (composeBindingGD != null) {
-            updateFavoriteDrawable()
-        }
     }
 
     private inner class DeleteDialogHelper(

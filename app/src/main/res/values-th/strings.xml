@@ -139,6 +139,8 @@
     <string name="torrent_count">Torrent (%d)</string>
     <string name="share">แชร์</string>
     <string name="rate">คะแนน</string>
+    <string name="similar_gallery">เหมือน</string>
+    <string name="search_cover">ค้นหาปก</string>
     <string name="no_tags">ไม่มีแท็ก</string>
     <string name="no_comments">ไม่มีความคิดเห็น</string>
     <string name="no_more_comments">ไม่มีความเห็นเพิ่มเติมแล้ว</string>
@@ -421,6 +423,7 @@
     <string name="no_archives">ยังไม่มีไฟล์บีบอัด</string>
     <string name="download_archive_started">เริ่มการดาวน์โหลดบีบอัด</string>
     <string name="download_archive_failure">การดาวน์โหลดไฟล์บีบอัดล้มเหลว</string>
+    <string name="archive">การบีบอัด</string>
     <string name="download_archive_failure_no_hath">ต้องการ H@H client เพื่อโหลดไฟล์บีบอัด</string>
     <string name="settings_privacy">ความเป็นส่วนตัว</string>
     <string name="settings_privacy_secure">ป้องกันการบันทึกภาพหน้าจอ</string>

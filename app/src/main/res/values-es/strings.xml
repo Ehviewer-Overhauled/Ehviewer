@@ -138,6 +138,8 @@
     <string name="torrent_count">Torrent (%d)</string>
     <string name="share">Compartir</string>
     <string name="rate">Valorar</string>
+    <string name="similar_gallery">Similar</string>
+    <string name="search_cover">Buscar portada</string>
     <string name="no_tags">Sin etiquetas</string>
     <string name="no_comments">Sin comentarios</string>
     <string name="no_more_comments">No hay más comentarios</string>
@@ -408,6 +410,7 @@
     <string name="cancel_vote_down">Cancelar voto negativo</string>
     <string name="clear_all">Limpiar todo</string>
     <string name="comment_failed">Comentario fallido</string>
+    <string name="archive">Archivo</string>
     <string name="delete">Eliminar</string>
     <string name="download_state_failed">Descarga fallida</string>
     <string name="download_state_none">Descarga en pausa</string>
