@@ -179,6 +179,8 @@
     <string name="torrent_count">Torrent (%d)</string>
     <string name="share">Share</string>
     <string name="rate">Rate</string>
+    <string name="similar_gallery">Similar</string>
+    <string name="search_cover">Search Cover</string>
     <string name="no_tags">No tags</string>
     <string name="no_comments">No comments</string>
     <string name="no_more_comments">No more comments</string>
@@ -515,6 +517,7 @@
     <string name="no_archives">No Archives</string>
     <string name="download_archive_started">Archive download started</string>
     <string name="download_archive_failure">Failed to download archive</string>
+    <string name="archive">Archive</string>
     <string name="archive_free">Free</string>
     <string name="archive_original">Original archive</string>
     <string name="archive_resample">Resample archive</string>

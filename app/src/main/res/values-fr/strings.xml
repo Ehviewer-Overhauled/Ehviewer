@@ -147,6 +147,8 @@
     <string name="torrent_count">Torrent (%d)</string>
     <string name="share">Partager</string>
     <string name="rate">Noter</string>
+    <string name="similar_gallery">Similaire(s)</string>
+    <string name="search_cover">Chercher le couverture</string>
     <string name="no_tags">Aucun tag</string>
     <string name="no_comments">Aucun commentaire</string>
     <string name="no_more_comments">Pas d\'autres commentaires</string>
@@ -442,6 +444,7 @@
     <string name="no_archives">Aucun fiche archives</string>
     <string name="download_archive_started">Téléchargement du fiche archives a commencé</string>
     <string name="download_archive_failure">Téléchargement du fiche archives a échoué</string>
+    <string name="archive">Fiches archives</string>
     <string name="download_archive_failure_no_hath">Client H@H est nécessaire pour le téléchargement de fiches archives</string>
     <string name="settings_privacy">Confidentialité</string>
     <string name="settings_privacy_secure">Empêcher les captures d\'ecran</string>

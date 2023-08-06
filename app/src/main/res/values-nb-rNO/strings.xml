@@ -13,6 +13,7 @@
     <string name="downloads">Nedlastninger</string>
     <string name="register">Registrering</string>
     <string name="error_invalid_number">Ugyldig nummer</string>
+    <string name="similar_gallery">Lignende</string>
     <string name="homepage">Hjemmeside</string>
     <string name="history">Historikk</string>
     <string name="subscription">Abonnement</string>
@@ -44,6 +45,7 @@
     <string name="search">Søk</string>
     <string name="image_search">Bildesøk</string>
     <string name="search_normal">Normalt søk</string>
+    <string name="search_cover">Søk i omslag</string>
     <string name="search_image">Bildesøk</string>
     <string name="search_specify_uploader">Angi opplaster</string>
     <string name="search_specify_tag">Angi etikett</string>

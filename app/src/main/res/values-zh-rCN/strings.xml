@@ -137,6 +137,8 @@
     <string name="torrent_count">种子 (%d)</string>
     <string name="share">分享</string>
     <string name="rate">评分</string>
+    <string name="similar_gallery">相似画廊</string>
+    <string name="search_cover">搜索封面</string>
     <string name="no_tags">暂无标签</string>
     <string name="no_comments">暂无评论</string>
     <string name="no_more_comments">已显示所有评论</string>
@@ -450,6 +452,7 @@
     <string name="no_archives">没有压缩包</string>
     <string name="download_archive_started">开始下载压缩包</string>
     <string name="download_archive_failure">无法下载压缩包</string>
+    <string name="archive">压缩包</string>
     <string name="archive_free">免费</string>
     <string name="archive_original">原始档案</string>
     <string name="archive_resample">重采样档案</string>

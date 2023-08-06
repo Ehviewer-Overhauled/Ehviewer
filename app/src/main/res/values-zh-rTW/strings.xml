@@ -134,6 +134,8 @@
     <string name="torrent_count">種子 (%d)</string>
     <string name="share">分享</string>
     <string name="rate">評分</string>
+    <string name="similar_gallery">類似的圖庫</string>
+    <string name="search_cover">以封面搜尋</string>
     <string name="no_tags">還沒有標籤</string>
     <string name="no_comments">沒有留言</string>
     <string name="no_more_comments">已顯示所有的留言了</string>
@@ -439,6 +441,7 @@
     <string name="no_archives">沒有壓縮檔</string>
     <string name="download_archive_started">開始下載壓縮檔</string>
     <string name="download_archive_failure">下載失敗</string>
+    <string name="archive">壓縮檔</string>
     <string name="archive_free">免費</string>
     <string name="archive_original">原始檔案</string>
     <string name="archive_resample">重新採樣檔案</string>
