@@ -15,19 +15,20 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.annotation.SuppressLint
 import android.content.res.Resources.Theme
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.core.view.GravityCompat
 import androidx.core.view.SoftwareKeyboardControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.google.android.material.sidesheet.SideSheetDialog
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.util.getSparseParcelableArrayCompat
 import rikka.core.res.resolveDrawable
@@ -35,6 +36,7 @@ import rikka.core.res.resolveDrawable
 abstract class BaseScene : Fragment() {
     private var drawerView: View? = null
     private var drawerViewState: SparseArray<Parcelable>? = null
+    private var sideSheetDialog: SideSheetDialog? = null
     fun addAboveSnackView(view: View) {
         val activity = activity
         if (activity is MainActivity) {
@@ -91,6 +93,9 @@ abstract class BaseScene : Fragment() {
         }
     }
 
+    fun openSideSheet() = sideSheetDialog!!.show()
+    fun closeSideSheet() = sideSheetDialog!!.hide()
+
     fun showTip(message: CharSequence?, length: Int) {
         val activity = activity
         if (activity is MainActivity) {
@@ -107,34 +112,18 @@ abstract class BaseScene : Fragment() {
 
     open val showLeftDrawer = true
 
-    fun recreateDrawerView() {
-        val activity = mainActivity
-        activity?.createDrawerView(this)
-    }
-
-    fun createDrawerView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        drawerView = onCreateDrawerView(inflater, container, savedInstanceState)
+    private fun createDrawerView(savedInstanceState: Bundle?): View? {
+        drawerView = onCreateDrawerView(layoutInflater)
         if (drawerView != null) {
-            var saved = drawerViewState
-            if (saved == null && savedInstanceState != null) {
-                saved = savedInstanceState.getSparseParcelableArrayCompat(KEY_DRAWER_VIEW_STATE)
-            }
-            if (saved != null) {
+            val saved = drawerViewState ?: savedInstanceState?.getSparseParcelableArrayCompat(KEY_DRAWER_VIEW_STATE)
+            saved?.let {
                 drawerView!!.restoreHierarchyState(saved)
             }
         }
         return drawerView
     }
 
-    open fun onCreateDrawerView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
+    open fun onCreateDrawerView(inflater: LayoutInflater): View? {
         return null
     }
 
@@ -147,9 +136,11 @@ abstract class BaseScene : Fragment() {
         drawerView = null
     }
 
-    open fun onDestroyDrawerView() {}
+    open fun onDestroyDrawerView() {
+        sideSheetDialog?.dismiss()
+        sideSheetDialog = null
+    }
 
-    @SuppressLint("RtlHardcoded")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.background = requireActivity().theme.resolveDrawable(android.R.attr.windowBackground)
@@ -161,7 +152,15 @@ abstract class BaseScene : Fragment() {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
         }
         hideSoftInput()
-        mainActivity!!.createDrawerView(this)
+        createDrawerView(savedInstanceState)?.let {
+            sideSheetDialog = SideSheetDialog(requireContext()).apply {
+                window?.decorView?.apply {
+                    setViewTreeLifecycleOwner(viewLifecycleOwner)
+                    setViewTreeSavedStateRegistryOwner(this@BaseScene)
+                }
+                setContentView(it)
+            }
+        }
     }
 
     override fun onDestroyView() {

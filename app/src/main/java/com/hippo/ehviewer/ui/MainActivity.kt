@@ -33,10 +33,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.core.view.GravityCompat
 import androidx.customview.widget.Openable
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -372,30 +370,6 @@ class MainActivity : EhActivity() {
         Settings.clipboardTextHashCode = hashCode
     }
 
-    @SuppressLint("RtlHardcoded")
-    fun createDrawerView(scene: Fragment?) {
-        if (scene is BaseScene) {
-            binding.rightDrawer.removeAllViews()
-            val drawerView = scene.createDrawerView(
-                scene.layoutInflater,
-                binding.rightDrawer,
-                null,
-            )
-            if (drawerView != null) {
-                binding.rightDrawer.addView(drawerView)
-                binding.drawView.setDrawerLockMode(
-                    DrawerLayout.LOCK_MODE_UNLOCKED,
-                    GravityCompat.END,
-                )
-            } else {
-                binding.drawView.setDrawerLockMode(
-                    DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
-                    GravityCompat.END,
-                )
-            }
-        }
-    }
-
     fun addAboveSnackView(view: View) {
         binding.absnacker.addAboveSnackView(view)
     }
@@ -423,12 +397,10 @@ class MainActivity : EhActivity() {
     }
 
     fun toggleDrawer(drawerGravity: Int) {
-        binding.drawView.run {
-            if (isDrawerOpen(drawerGravity)) {
-                closeDrawer(drawerGravity)
-            } else {
-                openDrawer(drawerGravity)
-            }
+        if (isDrawerOpen(drawerGravity)) {
+            closeDrawer(drawerGravity)
+        } else {
+            openDrawer(drawerGravity)
         }
     }
 

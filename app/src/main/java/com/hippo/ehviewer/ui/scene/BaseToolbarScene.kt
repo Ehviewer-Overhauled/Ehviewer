@@ -22,7 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.core.view.size
+import com.hippo.ehviewer.R
 import com.hippo.ehviewer.databinding.SceneToolbarBinding
 
 abstract class BaseToolbarScene : BaseScene(), ToolBarScene {
@@ -56,20 +56,17 @@ abstract class BaseToolbarScene : BaseScene(), ToolBarScene {
         }
     }
 
-    fun showMenu(menuResId: Int) {
-        if (binding.toolbar.menu?.size != 0) return
-        binding.toolbar.apply {
-            inflateMenu(menuResId)
-            setOnMenuItemClickListener { item: MenuItem -> onMenuItemClick(item) }
-        }
-    }
-
     override fun getMenuResId(): Int {
         return 0
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        return false
+        return if (item.itemId == R.id.action_open_side_sheet) {
+            openSideSheet()
+            true
+        } else {
+            false
+        }
     }
 
     override fun onNavigationClick() {

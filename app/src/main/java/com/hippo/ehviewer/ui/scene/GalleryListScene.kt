@@ -269,7 +269,6 @@ class GalleryListScene : SearchBarScene() {
         val isTopList = mode == MODE_TOPLIST
         if (isTopList != mIsTopList) {
             mIsTopList = isTopList
-            recreateDrawerView()
         }
 
         // Update fab visibility
@@ -332,11 +331,8 @@ class GalleryListScene : SearchBarScene() {
         )
         mViewTransition = BringOutTransition(binding.contentLayout, binding.searchLayout)
         binding.fastScroller.setOnDragHandlerListener(object : OnDragHandlerListener {
-            override fun onStartDragHandler() {
-                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-            }
+            override fun onStartDragHandler() {}
             override fun onEndDragHandler() {
-                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                 showSearchBar()
             }
         })
@@ -467,11 +463,9 @@ class GalleryListScene : SearchBarScene() {
         binding.fabLayout.addOnExpandListener {
             if (it) {
                 setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                 actionFabDrawable.setDelete(ANIMATE_TIME)
             } else {
                 setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-                setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                 actionFabDrawable.setAdd(ANIMATE_TIME)
             }
         }
@@ -592,12 +586,8 @@ class GalleryListScene : SearchBarScene() {
         }
     }
 
-    override fun onCreateDrawerView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        val drawerBinding = DrawerListRvBinding.inflate(inflater, container, false)
+    override fun onCreateDrawerView(inflater: LayoutInflater): View {
+        val drawerBinding = DrawerListRvBinding.inflate(inflater)
         drawerBinding.recyclerViewDrawer.layoutManager = LinearLayoutManager(context)
         val qsDrawerAdapter = QsDrawerAdapter(inflater)
         qsDrawerAdapter.setHasStableIds(true)
@@ -848,12 +838,16 @@ class GalleryListScene : SearchBarScene() {
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        if (mState == State.NORMAL) {
-            setState(State.SEARCH)
+        return if (item.itemId == R.id.action_search_more) {
+            if (mState == State.NORMAL) {
+                setState(State.SEARCH)
+            } else {
+                setState(State.NORMAL)
+            }
+            true
         } else {
-            setState(State.NORMAL)
+            super.onMenuItemClick(item)
         }
-        return true
     }
 
     private fun onApplySearch(query: String?) {
@@ -886,10 +880,8 @@ class GalleryListScene : SearchBarScene() {
         stateBackPressedCallback.isEnabled = newState != State.NORMAL
         if (newState == State.NORMAL || newState == State.SIMPLE_SEARCH) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         } else {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
         }
     }
 
@@ -906,7 +898,7 @@ class GalleryListScene : SearchBarScene() {
                     onUpdateUrlBuilder()
                     mAdapter?.refresh()
                     setState(State.NORMAL)
-                    closeDrawer(GravityCompat.END)
+                    closeSideSheet()
                 }
             } else {
                 val keywords = intArrayOf(11, 12, 13, 15)
@@ -915,7 +907,7 @@ class GalleryListScene : SearchBarScene() {
                     onUpdateUrlBuilder()
                     mAdapter?.refresh()
                     setState(State.NORMAL)
-                    closeDrawer(GravityCompat.END)
+                    closeSideSheet()
                 }
             }
             return holder

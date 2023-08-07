@@ -2,7 +2,6 @@ package com.hippo.ehviewer.ui.scene
 
 import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -131,22 +130,14 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     private var privLockModeStart: Int? = null
-    private var privLockModeEnd: Int? = null
 
     @CallSuper
     open fun onSearchViewExpanded() {
         privLockModeStart = getDrawerLockMode(GravityCompat.START)
-        privLockModeEnd = getDrawerLockMode(GravityCompat.END)
         privLockModeStart?.let {
             setDrawerLockMode(
                 DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
                 GravityCompat.START,
-            )
-        }
-        privLockModeEnd?.let {
-            setDrawerLockMode(
-                DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
-                GravityCompat.END,
             )
         }
         updateSuggestions()
@@ -157,8 +148,6 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         binding.toolbar.setText(binding.searchview.text)
         privLockModeStart?.let { setDrawerLockMode(it, GravityCompat.START) }
         privLockModeStart = null
-        privLockModeEnd?.let { setDrawerLockMode(it, GravityCompat.END) }
-        privLockModeEnd = null
     }
 
     fun setSearchBarHint(hint: String?) {
@@ -175,7 +164,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     override fun onNavigationClick() {
-        toggleDrawer(Gravity.START)
+        toggleDrawer(GravityCompat.START)
     }
 
     override fun getMenuResId(): Int {
@@ -183,7 +172,12 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        return false
+        return if (item.itemId == R.id.action_open_side_sheet) {
+            openSideSheet()
+            true
+        } else {
+            false
+        }
     }
 
     override fun setLiftOnScrollTargetView(view: View?) {

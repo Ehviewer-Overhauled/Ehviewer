@@ -161,13 +161,11 @@ class FavoritesScene : SearchBarScene() {
     }
 
     private fun onItemClick(position: Int) {
-        if (isDrawerOpen(GravityCompat.END)) {
-            // Skip if in search mode
-            if (!tracker.isInCustomChoice) {
-                switchFav(position - 2)
-                updateJumpFab()
-                closeDrawer(GravityCompat.END)
-            }
+        // Skip if in search mode
+        if (!tracker.isInCustomChoice) {
+            switchFav(position - 2)
+            updateJumpFab()
+            closeSideSheet()
         }
     }
 
@@ -199,6 +197,8 @@ class FavoritesScene : SearchBarScene() {
         setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName))
         Settings.recentFavCat = urlBuilder.favCat
     }
+
+    override fun getMenuResId() = R.menu.scene_favorites
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -294,14 +294,8 @@ class FavoritesScene : SearchBarScene() {
             addAboveSnackView(this)
         }
         binding.fastScroller.setOnDragHandlerListener(object : OnDragHandlerListener {
-            override fun onStartDragHandler() {
-                setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-            }
-
+            override fun onStartDragHandler() {}
             override fun onEndDragHandler() {
-                if (!tracker.isInCustomChoice) {
-                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-                }
                 showSearchBar()
             }
         })
@@ -364,7 +358,6 @@ class FavoritesScene : SearchBarScene() {
                         binding.refreshLayout.isEnabled = false
                         // Lock drawer
                         setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-                        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                     }) {
                         showNormalFab()
                         binding.fabLayout.setAutoCancel(true)
@@ -372,7 +365,6 @@ class FavoritesScene : SearchBarScene() {
                         binding.refreshLayout.isEnabled = true
                         // Unlock drawer
                         setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-                        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                     }
                     restoreSelection(savedInstanceState)
                 }
@@ -403,11 +395,7 @@ class FavoritesScene : SearchBarScene() {
         _binding = null
     }
 
-    override fun onCreateDrawerView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ) = ComposeView(inflater.context).apply {
+    override fun onCreateDrawerView(inflater: LayoutInflater) = ComposeView(inflater.context).apply {
         setMD3Content {
             val localFavCount by vm.localFavCount.collectAsState(0)
             ElevatedCard {

@@ -16,7 +16,6 @@
 
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/draw_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -50,14 +49,5 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/nav_drawer_main" />
-
-    <com.hippo.ehviewer.ui.legacy.DrawerView
-        android:id="@+id/right_drawer"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:fitsSystemWindows="true"
-        android:maxWidth="@dimen/m3_comp_navigation_drawer_container_width"
-        tools:ignore="PrivateResource" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -90,7 +90,6 @@ import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
-import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.ViewTransition
@@ -117,8 +116,7 @@ import com.hippo.ehviewer.download.DownloadManager as downloadManager
 class DownloadsScene :
     BaseToolbarScene(),
     DownloadInfoListener,
-    OnClickFabListener,
-    OnDragHandlerListener {
+    OnClickFabListener {
     /*---------------
      Whole life cycle
      ---------------*/
@@ -268,12 +266,10 @@ class DownloadsScene :
                     binding.fabLayout.isExpanded = true
                     // Lock drawer
                     setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
-                    setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                 }) {
                     binding.fabLayout.isExpanded = false
                     // Unlock drawer
                     setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
-                    setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                 }
                 restoreSelection(savedInstanceState)
             }
@@ -347,7 +343,6 @@ class DownloadsScene :
             val handlerDrawable = HandlerDrawable()
             handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
             fastScroller.setHandlerDrawable(handlerDrawable)
-            fastScroller.setOnDragHandlerListener(this@DownloadsScene)
             fabLayout.setExpanded(expanded = false, animation = false)
             fabLayout.addOnExpandListener { if (!it && tracker.isInCustomChoice) tracker.clearSelection() }
             fabLayout.setHidePrimaryFab(true)
@@ -420,11 +415,6 @@ class DownloadsScene :
                 return true
             }
 
-            R.id.action_open_download_labels -> {
-                openDrawer(GravityCompat.END)
-                return true
-            }
-
             R.id.action_reset_reading_progress -> {
                 BaseDialogBuilder(requireContext())
                     .setMessage(R.string.reset_reading_progress_message)
@@ -453,7 +443,7 @@ class DownloadsScene :
                 return true
             }
 
-            else -> return false
+            else -> return super.onMenuItemClick(item)
         }
     }
 
@@ -468,12 +458,8 @@ class DownloadsScene :
         updateTitle()
     }
 
-    override fun onCreateDrawerView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        val drawerBinding = DrawerListRvBinding.inflate(inflater, container, false)
+    override fun onCreateDrawerView(inflater: LayoutInflater): View {
+        val drawerBinding = DrawerListRvBinding.inflate(inflater)
         drawerBinding.toolbar.setTitle(R.string.download_labels)
         drawerBinding.toolbar.inflateMenu(R.menu.drawer_download)
         drawerBinding.toolbar.setOnMenuItemClickListener { item: MenuItem ->
@@ -523,18 +509,6 @@ class DownloadsScene :
         itemTouchHelper.attachToRecyclerView(drawerBinding.recyclerViewDrawer)
         drawerBinding.recyclerViewDrawer.adapter = mLabelAdapter
         return drawerBinding.root
-    }
-
-    override fun onStartDragHandler() {
-        // Lock right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
-    }
-
-    override fun onEndDragHandler() {
-        // Restore right drawer
-        if (!tracker.isInCustomChoice) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
-        }
     }
 
     fun onItemClick(position: Int): Boolean {
@@ -695,7 +669,7 @@ class DownloadsScene :
                     mLabel = label1
                     updateForLabel()
                     updateView()
-                    closeDrawer(GravityCompat.END)
+                    closeSideSheet()
                 }
             }
             holder.binding.edit.setOnClickListener {
