@@ -29,11 +29,12 @@ import androidx.core.view.SoftwareKeyboardControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.hippo.ehviewer.ui.MainActivity
+import com.hippo.ehviewer.util.getSparseParcelableArrayCompat
 import rikka.core.res.resolveDrawable
 
 abstract class BaseScene : Fragment() {
     private var drawerView: View? = null
-    private var drawerViewState: SparseArray<Parcelable?>? = null
+    private var drawerViewState: SparseArray<Parcelable>? = null
     fun addAboveSnackView(view: View) {
         val activity = activity
         if (activity is MainActivity) {
@@ -120,7 +121,7 @@ abstract class BaseScene : Fragment() {
         if (drawerView != null) {
             var saved = drawerViewState
             if (saved == null && savedInstanceState != null) {
-                saved = savedInstanceState.getSparseParcelableArray(KEY_DRAWER_VIEW_STATE)
+                saved = savedInstanceState.getSparseParcelableArrayCompat(KEY_DRAWER_VIEW_STATE)
             }
             if (saved != null) {
                 drawerView!!.restoreHierarchyState(saved)
