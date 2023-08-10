@@ -191,11 +191,7 @@ class MainActivity : EhActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         navController = navHostFragment.navController
         if (!EhUtils.needSignedIn()) setNavGraph()
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            binding.drawView.addDrawerListener(
-                mDrawerOnBackPressedCallback,
-            )
-        }
+        binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
 
         // Trick: Tweak NavigationUI to disable multiple backstack
@@ -323,10 +319,8 @@ class MainActivity : EhActivity() {
         super.onResume()
         lifecycleScope.launch {
             delay(300)
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                mDrawerOnBackPressedCallback.remove()
-                onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
-            }
+            mDrawerOnBackPressedCallback.remove()
+            onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
             checkClipboardUrl()
         }
     }

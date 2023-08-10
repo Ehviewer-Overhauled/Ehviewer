@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.scene
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -103,10 +102,8 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
         // This has to be placed after onCreateViewWithToolbar() since
         // callbacks are invoked in the reverse order in which they are added
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            binding.searchview.addTransitionListener(mSearchViewOnBackPressedCallback)
-            requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
-        }
+        binding.searchview.addTransitionListener(mSearchViewOnBackPressedCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
         binding.appbar.bringToFront()
         return binding.root
     }
@@ -125,7 +122,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) mSearchViewOnBackPressedCallback.remove()
+        mSearchViewOnBackPressedCallback.remove()
         _binding = null
     }
 
