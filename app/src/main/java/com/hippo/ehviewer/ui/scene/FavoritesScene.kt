@@ -210,6 +210,12 @@ class FavoritesScene : SearchBarScene() {
         mAdapter?.type = Settings.listMode
     }
 
+    private val SceneFavoritesBinding.fastScroller get() = contentLayout.fastScroller
+    private val SceneFavoritesBinding.refreshLayout get() = contentLayout.refreshLayout
+    private val SceneFavoritesBinding.recyclerView get() = contentLayout.recyclerView
+    private val SceneFavoritesBinding.progress get() = contentLayout.progress
+    private val SceneFavoritesBinding.tip get() = contentLayout.tip
+
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
         container: ViewGroup?,
