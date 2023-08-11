@@ -332,14 +332,18 @@ class FavoritesScene : SearchBarScene() {
                         when (val state = it.refresh) {
                             is LoadState.Loading -> {
                                 showSearchBar()
-                                transition.showView(1)
+                                if (!binding.refreshLayout.isRefreshing) {
+                                    transition.showView(1)
+                                }
                             }
                             is LoadState.Error -> {
+                                binding.refreshLayout.isRefreshing = false
                                 binding.tip.text = ExceptionUtils.getReadableString(state.error)
                                 transition.showView(2)
                             }
                             is LoadState.NotLoading -> {
                                 delay(500)
+                                binding.refreshLayout.isRefreshing = false
                                 if (mAdapter?.itemCount == 0) {
                                     binding.tip.text = empty
                                     transition.showView(2)

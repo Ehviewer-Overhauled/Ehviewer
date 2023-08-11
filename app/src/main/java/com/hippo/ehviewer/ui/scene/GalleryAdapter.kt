@@ -51,7 +51,6 @@ class GalleryAdapter(
 ) : PagingDataAdapter<BaseGalleryInfo, GalleryHolder>(diffCallback) {
     private val resources = recyclerView.context.resources
     private val layoutManager: AutoStaggeredGridLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
-    private val mPaddingTopSB: Int = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
     private var mListDecoration: ItemDecoration? = null
     private var mGirdDecoration: MarginItemDecoration? = null
     private var mType = TYPE_INVALID
@@ -142,16 +141,6 @@ class GalleryAdapter(
         recyclerView.adapter = this
         recyclerView.layoutManager = layoutManager
         type = Settings.listMode
-        adjustPaddings()
-    }
-
-    private fun adjustPaddings() {
-        recyclerView.setPadding(
-            recyclerView.paddingLeft,
-            recyclerView.paddingTop + mPaddingTopSB,
-            recyclerView.paddingRight,
-            recyclerView.paddingBottom,
-        )
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {

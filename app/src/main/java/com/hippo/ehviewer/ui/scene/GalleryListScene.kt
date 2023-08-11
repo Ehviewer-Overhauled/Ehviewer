@@ -372,9 +372,12 @@ class GalleryListScene : SearchBarScene() {
                         when (val state = it.refresh) {
                             is LoadState.Loading -> {
                                 showSearchBar()
-                                transition.showView(1)
+                                if (!binding.refreshLayout.isRefreshing) {
+                                    transition.showView(1)
+                                }
                             }
                             is LoadState.Error -> {
+                                binding.refreshLayout.isRefreshing = false
                                 binding.tip.text = ExceptionUtils.getReadableString(state.error)
                                 transition.showView(2)
                                 if (state.error.cause is CloudflareBypassException) {
@@ -390,6 +393,7 @@ class GalleryListScene : SearchBarScene() {
                             }
                             is LoadState.NotLoading -> {
                                 delay(500)
+                                binding.refreshLayout.isRefreshing = false
                                 if (mAdapter?.itemCount == 0) {
                                     if (mUrlBuilder.mode == MODE_SUBSCRIPTION) {
                                         binding.tip.text = noWatch
