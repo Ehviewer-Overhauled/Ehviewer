@@ -216,7 +216,7 @@ dependencies {
     val accompanist_version = "0.31.6-rc"
     implementation("com.google.accompanist:accompanist-themeadapter-material3:$accompanist_version")
     implementation("com.google.accompanist:accompanist-webview:$accompanist_version")
-    implementation("com.google.android.material:material:1.11.0-alpha01")
+    implementation("com.google.android.material:material:1.11.0-alpha02")
 
     val splitties = "3.0.0"
     implementation("com.louiscad.splitties:splitties-appctx:$splitties")
