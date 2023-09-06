@@ -171,7 +171,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
     implementation("androidx.browser:browser:1.6.0")
-    implementation("androidx.collection:collection-ktx:1.3.0-beta01")
+    implementation("androidx.collection:collection-ktx:1.3.0-rc01")
 
     // https://developer.android.com/jetpack/androidx/releases/compose-material3
     // api(platform("androidx.compose:compose-bom:2023.05.00"))
