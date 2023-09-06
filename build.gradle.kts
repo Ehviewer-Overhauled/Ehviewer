@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application") version "8.1.1" apply false
-    kotlin("android") version "1.9.0" apply false
-    kotlin("plugin.serialization") version "1.9.0" apply false
+    kotlin("android") version "1.9.10" apply false
+    kotlin("plugin.serialization") version "1.9.10" apply false
     id("com.google.devtools.ksp") version "1.9.10-1.0.13" apply false
     id("com.mikepenz.aboutlibraries.plugin") version "10.8.3" apply false
     id("org.mozilla.rust-android-gradle.rust-android") version "0.9.3" apply false
